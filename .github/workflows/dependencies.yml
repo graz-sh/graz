@@ -1,0 +1,20 @@
+name: Dependencies
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upgrade:
+    name: Upgrade dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: "yarn"
+          node-version-file: ".nvmrc"
+      - run: rm -rf yarn.lock **/node_modules/
+      - run: yarn install
+      - uses: EndBug/add-and-commit@v9
+        with:
+          message: "chore(deps): upgrade versions"

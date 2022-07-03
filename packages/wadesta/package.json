@@ -1,0 +1,60 @@
+{
+  "name": "wadesta",
+  "description": "React hooks for Cosmos",
+  "version": "0.0.0",
+  "author": "Griko Nibras <griko@stranvgelove.ventures>",
+  "repository": "https://github.com/strangelove-ventures/wadesta.git",
+  "homepage": "https://github.com/strangelove-ventures/wadesta",
+  "bugs": "https://github.com/strangelove-ventures/wadesta/issues",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.cjs",
+    "dist/**/*.mjs",
+    "dist/**/*.d.ts"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "@cosmjs/cosmwasm-stargate": "0.28.10",
+    "@cosmjs/proto-signing": "0.28.10",
+    "@keplr-wallet/common": "0.10.9",
+    "@keplr-wallet/cosmos": "0.10.9",
+    "@keplr-wallet/types": "0.10.9",
+    "react-query": "^3",
+    "zustand": "4.0.0-rc.1"
+  },
+  "devDependencies": {
+    "@types/node": "^16",
+    "@types/react": "^18",
+    "react": "^18",
+    "typescript": "^4"
+  },
+  "peerDependencies": {
+    "react": "^17 || ^18"
+  },
+  "eslintConfig": {
+    "extends": [
+      "@project/eslint-config"
+    ],
+    "ignorePatterns": [
+      "dist/**/*"
+    ],
+    "root": true
+  },
+  "lint-staged": {
+    "*.{json,md}": [
+      "prettier --write"
+    ],
+    "**/*.ts": [
+      "yarn workspace wadesta eslint --fix"
+    ]
+  },
+  "prettier": "@project/prettier-config",
+  "license": "MIT"
+}

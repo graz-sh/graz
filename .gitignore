@@ -1,0 +1,13 @@
+# default ignored directores/files
+**/node_modules/
+*.log
+.DS_Store
+.env*
+.eslintcache
+.turbo/
+.vercel/
+package-lock.json
+tsconfig.tsbuildinfo
+
+# allowed directories/files
+!.gitkeep
