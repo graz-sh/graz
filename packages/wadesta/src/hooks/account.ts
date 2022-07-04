@@ -8,14 +8,24 @@ import { useWadestaStore } from "../store";
 import type { EventableHooksArgs } from "../types/hooks";
 
 export function useAccount() {
-  return useWadestaStore((x) => x.account);
+  const account = useWadestaStore((x) => x.account);
+  const status = useWadestaStore((x) => x.status);
+
+  return {
+    data: account,
+    isConnected: status === "connected",
+    isConnecting: status === "connecting",
+    isDisconnected: status === "disconnected",
+    isReconnecting: status === "reconnecting",
+    status,
+  };
 }
 
 export const USE_BALANCES_QUERY_KEY = "USE_BALANCES";
 
 export function useBalances(bech32Address?: string) {
   const account = useAccount();
-  const address = bech32Address || account?.bech32Address;
+  const address = bech32Address || account.data?.bech32Address;
 
   const queryKey = [USE_BALANCES_QUERY_KEY, address] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalances(_address!), {
@@ -23,7 +33,7 @@ export function useBalances(bech32Address?: string) {
   });
 
   return {
-    balances: query.data,
+    data: query.data,
     error: query.error,
     isLoading: query.isLoading,
     isSuccess: query.isSuccess,
