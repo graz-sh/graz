@@ -1,9 +1,9 @@
+import type { Key } from "@keplr-wallet/types";
 import { useMutation, useQuery } from "react-query";
 import shallow from "zustand/shallow";
 
 import { connect, disconnect, getBalances } from "../actions/account";
 import type { WadestaChain } from "../chains";
-import type { WadestaStore } from "../store";
 import { useWadestaStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 
@@ -44,10 +44,11 @@ export function useCosmWasmClient() {
   return useWadestaStore((x) => x.client);
 }
 
-export type UseConnectChainArgs = MutationEventArgs<WadestaChain, WadestaStore["account"]>;
+export type UseConnectChainArgs = MutationEventArgs<WadestaChain, Key>;
 
 export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArgs = {}) {
-  const mutation = useMutation("WADESTA_USE_CONNECT", connect, {
+  const queryKey = ["WADESTA_USE_CONNECT", onError, onLoading, onSuccess];
+  const mutation = useMutation(queryKey, connect, {
     onError: (err, chain) => Promise.resolve(onError?.(err, chain)),
     onMutate: onLoading,
     onSuccess: (chain) => Promise.resolve(onSuccess?.(chain)),
@@ -64,10 +65,11 @@ export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArg
 }
 
 export function useDisconnect({ onError, onLoading, onSuccess }: MutationEventArgs = {}) {
-  const mutation = useMutation("WADESTA_USE_DISCONNECT", disconnect, {
-    onError: (err) => Promise.resolve(onError?.(err)),
+  const queryKey = ["WADESTA_USE_DISCONNECT", onError, onLoading, onSuccess];
+  const mutation = useMutation(queryKey, disconnect, {
+    onError: (err) => Promise.resolve(onError?.(err, undefined)),
     onMutate: onLoading,
-    onSuccess: () => Promise.resolve(onSuccess?.()),
+    onSuccess: () => Promise.resolve(onSuccess?.(undefined)),
   });
 
   return {
