@@ -3,13 +3,13 @@ import { useMutation } from "react-query";
 
 import { suggestChain } from "../actions/chains";
 import { useWadestaStore } from "../store";
-import type { EventableHooksArgs } from "../types/hooks";
+import type { MutationEventArgs } from "../types/hooks";
 
 export function useActiveChain() {
   return useWadestaStore((x) => x.activeChain);
 }
 
-export type UseSuggestChainArgs = EventableHooksArgs<ChainInfo>;
+export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
 
 export function useSuggestChain({ onError, onLoading, onSuccess }: UseSuggestChainArgs = {}) {
   const mutation = useMutation("WADESTA_USE_SUGGEST_CHAIN", suggestChain, {

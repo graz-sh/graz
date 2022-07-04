@@ -5,7 +5,7 @@ import { connect, disconnect, getBalances } from "../actions/account";
 import type { WadestaChain } from "../chains";
 import type { WadestaStore } from "../store";
 import { useWadestaStore } from "../store";
-import type { EventableHooksArgs } from "../types/hooks";
+import type { MutationEventArgs } from "../types/hooks";
 
 export function useAccount() {
   const account = useWadestaStore((x) => x.account);
@@ -44,7 +44,7 @@ export function useCosmWasmClient() {
   return useWadestaStore((x) => x.client);
 }
 
-export type UseConnectChainArgs = EventableHooksArgs<WadestaChain, WadestaStore["account"]>;
+export type UseConnectChainArgs = MutationEventArgs<WadestaChain, WadestaStore["account"]>;
 
 export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArgs = {}) {
   const mutation = useMutation("WADESTA_USE_CONNECT", connect, {
@@ -63,7 +63,7 @@ export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArg
   };
 }
 
-export function useDisconnect({ onError, onLoading, onSuccess }: EventableHooksArgs = {}) {
+export function useDisconnect({ onError, onLoading, onSuccess }: MutationEventArgs = {}) {
   const mutation = useMutation("WADESTA_USE_DISCONNECT", disconnect, {
     onError: (err) => Promise.resolve(onError?.(err)),
     onMutate: onLoading,
