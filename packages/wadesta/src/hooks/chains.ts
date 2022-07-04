@@ -2,7 +2,12 @@ import type { ChainInfo } from "@keplr-wallet/types";
 import { useMutation } from "react-query";
 
 import { suggestChain } from "../actions/chains";
+import { useWadestaStore } from "../store";
 import type { EventableHooksArgs } from "../types/hooks";
+
+export function useActiveChain() {
+  return useWadestaStore((x) => x.activeChain);
+}
 
 export type UseSuggestChainArgs = EventableHooksArgs<ChainInfo>;
 
