@@ -67,3 +67,8 @@ export async function getBalances(bech32Address: string) {
 
   return balances;
 }
+
+export function reconnect() {
+  const { activeChain } = useWadestaStore.getState();
+  if (activeChain) void connect(activeChain);
+}
