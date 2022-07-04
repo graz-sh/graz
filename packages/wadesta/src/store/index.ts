@@ -3,7 +3,7 @@ import type { Coin, OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-sig
 import type { Key } from "@keplr-wallet/types";
 import type { State } from "zustand";
 import create from "zustand";
-import { subscribeWithSelector } from "zustand/middleware";
+import { persist, subscribeWithSelector } from "zustand/middleware";
 
 import type { WadestaChain } from "../chains";
 
@@ -32,7 +32,14 @@ export const defaultValues: WadestaStore = {
 };
 
 export const useWadestaStore = create(
-  subscribeWithSelector<WadestaStore>(() => ({
-    ...defaultValues,
-  })),
+  subscribeWithSelector(
+    persist<WadestaStore, [["zustand/subscribeWithSelector", never]]>(() => ({ ...defaultValues }), {
+      name: "wadesta",
+      partialize: (x) => ({
+        activeChain: x.activeChain,
+        _reconnect: x._reconnect,
+      }),
+      version: 1,
+    }),
+  ),
 );
