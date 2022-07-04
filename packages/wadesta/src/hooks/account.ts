@@ -2,7 +2,7 @@ import type { Key } from "@keplr-wallet/types";
 import { useMutation, useQuery } from "react-query";
 import shallow from "zustand/shallow";
 
-import { connect, disconnect, getBalances } from "../actions/account";
+import { connect, disconnect, getBalances, reconnect } from "../actions/account";
 import type { WadestaChain } from "../chains";
 import { useWadestaStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
@@ -17,6 +17,7 @@ export function useAccount() {
     isConnecting: status === "connecting",
     isDisconnected: status === "disconnected",
     isReconnecting: status === "reconnecting",
+    reconnect,
     status,
   };
 }
