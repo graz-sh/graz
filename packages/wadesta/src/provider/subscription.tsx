@@ -18,5 +18,11 @@ export function WadestaSubscription() {
     };
   }, []);
 
+  // track reconnect state
+  useEffect(() => {
+    const { activeChain, _reconnect } = useWadestaStore.getState();
+    if (activeChain && _reconnect) void connect(activeChain);
+  }, []);
+
   return null;
 }
