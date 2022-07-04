@@ -1,9 +1,9 @@
-import type { Key } from "@keplr-wallet/types";
 import { useMutation, useQuery } from "react-query";
 import shallow from "zustand/shallow";
 
 import { connect, disconnect, getBalances } from "../actions/account";
 import type { WadestaChain } from "../chains";
+import type { WadestaStore } from "../store";
 import { useWadestaStore } from "../store";
 import type { EventableHooksArgs } from "../types/hooks";
 
@@ -46,7 +46,7 @@ export function useCosmWasmClient() {
   return useWadestaStore((x) => x.client);
 }
 
-export type UseConnectChainArgs = EventableHooksArgs<WadestaChain, Key>;
+export type UseConnectChainArgs = EventableHooksArgs<WadestaChain, WadestaStore["account"]>;
 
 export const USE_CONNECT_QUERY_KEY = "USE_CONNECT";
 
