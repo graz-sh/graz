@@ -1,27 +1,20 @@
 import { useEffect } from "react";
 
-import { connect } from "../actions/account";
+import { reconnect } from "../actions/account";
 import { useWadestaStore } from "../store";
 
 export function WadestaSubscription() {
-  // track keplr_keystorechange
+  // track keplr_keystorechange and reconnect state
   useEffect(() => {
-    function listen() {
-      const { activeChain } = useWadestaStore.getState();
-      if (activeChain) void connect(activeChain);
-    }
-    window.addEventListener("focus", listen);
-    window.addEventListener("keplr_keystorechange", listen);
-    return () => {
-      window.removeEventListener("focus", listen);
-      window.removeEventListener("keplr_keystorechange", listen);
-    };
-  }, []);
+    const { _reconnect } = useWadestaStore.getState();
+    if (_reconnect) reconnect();
 
-  // track reconnect state
-  useEffect(() => {
-    const { activeChain, _reconnect } = useWadestaStore.getState();
-    if (activeChain && _reconnect) void connect(activeChain);
+    window.addEventListener("focus", reconnect);
+    window.addEventListener("keplr_keystorechange", reconnect);
+    return () => {
+      window.removeEventListener("focus", reconnect);
+      window.removeEventListener("keplr_keystorechange", reconnect);
+    };
   }, []);
 
   return null;
