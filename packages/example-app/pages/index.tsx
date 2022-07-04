@@ -1,10 +1,10 @@
-import { Button, Stack, Text, useToast } from "@chakra-ui/react";
+import { Button, ButtonGroup, IconButton, Stack, Text, useToast } from "@chakra-ui/react";
 import { defaultChains, useAccount, useConnect, useDisconnect } from "wadesta/src";
 
 export default function HomePage() {
   const toast = useToast();
 
-  const { data: account, isConnected, isConnecting, isReconnecting, status } = useAccount();
+  const { data: account, isConnected, isConnecting, isReconnecting, reconnect, status } = useAccount();
 
   const { connect } = useConnect({
     onSuccess: (_account) => {
@@ -32,9 +32,12 @@ export default function HomePage() {
   return (
     <Stack p={4}>
       <Text>Account: {account ? account.name : status}</Text>
-      <Button isLoading={isConnecting || isReconnecting} onClick={handleConnect}>
-        {account ? "Disconnect" : "Connect"} Wallet
-      </Button>
+      <ButtonGroup isAttached>
+        <Button isLoading={isConnecting || isReconnecting} onClick={handleConnect}>
+          {account ? "Disconnect" : "Connect"} Wallet
+        </Button>
+        <IconButton aria-label="refresh" icon={<>🔄</>} onClick={reconnect} />
+      </ButtonGroup>
     </Stack>
   );
 }
