@@ -3,6 +3,7 @@ import type { Coin, OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-sig
 import type { ChainInfo, Key } from "@keplr-wallet/types";
 import type { State } from "zustand";
 import create from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
 
 export type WadestaChain = Pick<ChainInfo, "chainId" | "rest" | "rpc">;
 
@@ -30,6 +31,8 @@ export const defaultValues: WadestaStore = {
   status: "disconnected",
 };
 
-export const useWadestaStore = create<WadestaStore>(() => ({
-  ...defaultValues,
-}));
+export const useWadestaStore = create(
+  subscribeWithSelector<WadestaStore>(() => ({
+    ...defaultValues,
+  })),
+);
