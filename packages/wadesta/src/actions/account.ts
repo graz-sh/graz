@@ -13,7 +13,7 @@ export async function connect(chain: WadestaChain, opts: ConnectOptions = {}) {
   try {
     const keplr = getKeplr();
 
-    useWadestaStore.setState({ status: "connecting" });
+    useWadestaStore.setState((x) => ({ status: x._reconnect ? "reconnecting" : "connecting" }));
     await keplr.enable(chain.chainId);
 
     const signer = keplr.getOfflineSigner(chain.chainId);
