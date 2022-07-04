@@ -1,11 +1,11 @@
 import type { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import type { Coin, OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-signing";
-import type { ChainInfo, Key } from "@keplr-wallet/types";
+import type { Key } from "@keplr-wallet/types";
 import type { State } from "zustand";
 import create from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 
-export type WadestaChain = Pick<ChainInfo, "chainId" | "rest" | "rpc">;
+import type { WadestaChain } from "../chains";
 
 export interface WadestaStore extends State {
   account: Key | null;

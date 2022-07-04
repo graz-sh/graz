@@ -1,8 +1,8 @@
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import type { AppCurrency } from "@keplr-wallet/types";
 
+import type { WadestaChain } from "../chains";
 import { getKeplr } from "../keplr";
-import type { WadestaChain } from "../store";
 import { defaultValues, useWadestaStore } from "../store";
 
 export interface BalanceProps {

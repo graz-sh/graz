@@ -4,7 +4,7 @@ import { useMutation } from "react-query";
 
 import type { BalanceProps } from "../actions/account";
 import { connect, disconnect, fetchBalance } from "../actions/account";
-import type { WadestaChain } from "../store";
+import type { WadestaChain } from "../chains";
 import { useWadestaStore } from "../store";
 import type { EventableHooksArgs } from "../types/hooks";
 
