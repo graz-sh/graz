@@ -1,14 +1,8 @@
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import type { AppCurrency } from "@keplr-wallet/types";
 
 import type { WadestaChain } from "../chains";
 import { getKeplr } from "../keplr";
 import { defaultValues, useWadestaStore } from "../store";
-
-export interface BalanceProps {
-  address: string;
-  currencies: AppCurrency[];
-}
 
 export async function connect(chain: WadestaChain) {
   try {
@@ -53,16 +47,18 @@ export async function disconnect() {
   return Promise.resolve();
 }
 
-export async function fetchBalance({ currencies }: BalanceProps) {
-  const { client, account } = useWadestaStore.getState();
-  if (!client) throw new Error("client is not defined");
-  if (!account) throw new Error("account is not defined");
+export async function getBalances(bech32Address: string) {
+  const { activeChain, client } = useWadestaStore.getState();
 
-  const coins = await Promise.all(
-    currencies.map(async (item) => {
-      return client.getBalance(account.bech32Address, item.coinMinimalDenom);
+  if (!activeChain || !client) {
+    throw new Error("No connected account detected");
+  }
+
+  const balances = await Promise.all(
+    activeChain.currencies.map(async (item) => {
+      return client.getBalance(bech32Address, item.coinMinimalDenom);
     }),
   );
 
-  return coins;
+  return balances;
 }
