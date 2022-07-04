@@ -39,7 +39,7 @@
       "prettier --write"
     ],
     "**/*.{js,cjs,mjs,ts,tsx}": [
-      "yarn workspace example-app eslint --fix"
+      "yarn workspace @project/example-app eslint --fix"
     ]
   },
   "prettier": "@project/prettier-config",

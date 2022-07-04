@@ -10,6 +10,10 @@ export interface WadestaStore extends State {
   account: Key | null;
   activeChain: WadestaChain | null;
   balance: Coin[] | null;
+  /**
+   * custom provided chains
+   */
+  chains?: ChainInfo[];
   client: SigningCosmWasmClient | null;
   signer: (OfflineSigner & OfflineDirectSigner) | null;
   signerAmino: OfflineSigner | null;
@@ -23,6 +27,7 @@ export const defaultValues: WadestaStore = {
   account: null,
   activeChain: null,
   balance: null,
+  chains: undefined,
   client: null,
   signer: null,
   signerAmino: null,

@@ -9,14 +9,21 @@ import { useWadestaStore } from "../store";
 import type { EventableHooksArgs } from "../types/hooks";
 
 export function useAccount() {
-  return useWadestaStore((x) => x.account);
+  return useWadestaStore((x) => ({
+    account: x.account,
+    activeChain: x.activeChain,
+    signer: x.signer,
+    signerAmino: x.signerAmino,
+    signerAuto: x.signerAuto,
+  }));
 }
 
-export type UseBalanceChainArgs = EventableHooksArgs<BalanceProps, Coin[]>;
+export type UseBalanceChainArgs = EventableHooksArgs<BalanceProps, Coin[]> & BalanceProps;
 
 export const USE_BALANCE_QUERY_KEY = "USE_BALANCE";
 
 export function useBalance({ onError, onLoading, onSuccess }: UseBalanceChainArgs = {}) {
+  const balance = useWadestaStore((x) => x.balance);
   const mutation = useMutation(USE_BALANCE_QUERY_KEY, fetchBalance, {
     onError: (err, item) => Promise.resolve(onError?.(err, item)),
     onMutate: onLoading,
@@ -24,11 +31,12 @@ export function useBalance({ onError, onLoading, onSuccess }: UseBalanceChainArg
   });
 
   return {
+    data: balance,
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
-    balance: mutation.mutate,
-    balanceAsync: mutation.mutateAsync,
+    fetchBalance: mutation.mutate,
+    fetchBalanceAsync: mutation.mutateAsync,
   };
 }
 
