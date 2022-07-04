@@ -10,7 +10,7 @@ import type { WadestaChain } from "../chains";
 export interface WadestaStore extends State {
   account: Key | null;
   activeChain: WadestaChain | null;
-  balance: Coin[] | null;
+  balances: Coin[] | null;
   client: SigningCosmWasmClient | null;
   signer: (OfflineSigner & OfflineDirectSigner) | null;
   signerAmino: OfflineSigner | null;
@@ -23,7 +23,7 @@ export interface WadestaStore extends State {
 export const defaultValues: WadestaStore = {
   account: null,
   activeChain: null,
-  balance: null,
+  balances: null,
   client: null,
   signer: null,
   signerAmino: null,
