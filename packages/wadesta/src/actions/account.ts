@@ -4,7 +4,12 @@ import type { WadestaChain } from "../chains";
 import { getKeplr } from "../keplr";
 import { defaultValues, useWadestaStore } from "../store";
 
-export async function connect(chain: WadestaChain) {
+export interface ConnectOptions {
+  autoConnect?: boolean;
+}
+
+export async function connect(chain: WadestaChain, opts: ConnectOptions = {}) {
+  const { autoConnect = true } = opts;
   try {
     const keplr = getKeplr();
 
@@ -28,7 +33,7 @@ export async function connect(chain: WadestaChain) {
       signerAuto,
       signerAmino,
       status: "connected",
-      _reconnect: true,
+      _reconnect: autoConnect,
     });
 
     return account;
