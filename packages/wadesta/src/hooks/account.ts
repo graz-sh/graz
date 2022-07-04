@@ -1,9 +1,7 @@
-import type { Coin } from "@cosmjs/proto-signing";
 import type { Key } from "@keplr-wallet/types";
 import { useMutation } from "react-query";
 
-import type { BalanceProps } from "../actions/account";
-import { connect, disconnect, fetchBalance } from "../actions/account";
+import { connect, disconnect } from "../actions/account";
 import type { WadestaChain } from "../chains";
 import { useWadestaStore } from "../store";
 import type { EventableHooksArgs } from "../types/hooks";
@@ -12,24 +10,8 @@ export function useAccount() {
   return useWadestaStore((x) => x.account);
 }
 
-export type UseBalanceChainArgs = EventableHooksArgs<BalanceProps, Coin[]>;
-
-export const USE_BALANCE_QUERY_KEY = "USE_BALANCE";
-
-export function useBalance({ onError, onLoading, onSuccess }: UseBalanceChainArgs = {}) {
-  const mutation = useMutation(USE_BALANCE_QUERY_KEY, fetchBalance, {
-    onError: (err, item) => Promise.resolve(onError?.(err, item)),
-    onMutate: onLoading,
-    onSuccess: (item) => Promise.resolve(onSuccess?.(item)),
-  });
-
-  return {
-    error: mutation.error,
-    isLoading: mutation.isLoading,
-    isSuccess: mutation.isSuccess,
-    balance: mutation.mutate,
-    balanceAsync: mutation.mutateAsync,
-  };
+export function useBalances() {
+  return useWadestaStore((x) => x.balances);
 }
 
 export type UseConnectChainArgs = EventableHooksArgs<WadestaChain, Key>;
