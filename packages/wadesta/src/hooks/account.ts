@@ -1,5 +1,6 @@
 import type { Key } from "@keplr-wallet/types";
 import { useMutation } from "react-query";
+import shallow from "zustand/shallow";
 
 import { connect, disconnect } from "../actions/account";
 import type { WadestaChain } from "../chains";
@@ -12,6 +13,10 @@ export function useAccount() {
 
 export function useBalances() {
   return useWadestaStore((x) => x.balances);
+}
+
+export function useCosmWasmClient() {
+  return useWadestaStore((x) => x.client);
 }
 
 export type UseConnectChainArgs = EventableHooksArgs<WadestaChain, Key>;
@@ -52,4 +57,15 @@ export function useDisconnect({ onError, onLoading, onSuccess }: EventableHooksA
     disconnectAsync: mutation.mutateAsync,
     status: mutation.status,
   };
+}
+
+export function useSigners() {
+  return useWadestaStore(
+    (x) => ({
+      signer: x.signer,
+      signerAmino: x.signerAmino,
+      signerAuto: x.signerAuto,
+    }),
+    shallow,
+  );
 }
