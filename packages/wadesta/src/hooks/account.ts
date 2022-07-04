@@ -21,13 +21,11 @@ export function useAccount() {
   };
 }
 
-export const USE_BALANCES_QUERY_KEY = "USE_BALANCES";
-
 export function useBalances(bech32Address?: string) {
   const account = useAccount();
   const address = bech32Address || account.data?.bech32Address;
 
-  const queryKey = [USE_BALANCES_QUERY_KEY, address] as const;
+  const queryKey = ["WADESTA_USE_BALANCES", address] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalances(_address!), {
     enabled: Boolean(address),
   });
@@ -48,10 +46,8 @@ export function useCosmWasmClient() {
 
 export type UseConnectChainArgs = EventableHooksArgs<WadestaChain, WadestaStore["account"]>;
 
-export const USE_CONNECT_QUERY_KEY = "USE_CONNECT";
-
 export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArgs = {}) {
-  const mutation = useMutation(USE_CONNECT_QUERY_KEY, connect, {
+  const mutation = useMutation("WADESTA_USE_CONNECT", connect, {
     onError: (err, chain) => Promise.resolve(onError?.(err, chain)),
     onMutate: onLoading,
     onSuccess: (chain) => Promise.resolve(onSuccess?.(chain)),
@@ -67,10 +63,8 @@ export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArg
   };
 }
 
-export const USE_DISCONNECT_QUERY_KEY = "USE_DISCONNECT";
-
 export function useDisconnect({ onError, onLoading, onSuccess }: EventableHooksArgs = {}) {
-  const mutation = useMutation(USE_DISCONNECT_QUERY_KEY, disconnect, {
+  const mutation = useMutation("WADESTA_USE_DISCONNECT", disconnect, {
     onError: (err) => Promise.resolve(onError?.(err)),
     onMutate: onLoading,
     onSuccess: () => Promise.resolve(onSuccess?.()),

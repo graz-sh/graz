@@ -11,10 +11,8 @@ export function useActiveChain() {
 
 export type UseSuggestChainArgs = EventableHooksArgs<ChainInfo>;
 
-export const USE_SUGGEST_CHAIN_QUERY_KEY = "USE_SUGGEST_CHAIN";
-
 export function useSuggestChain({ onError, onLoading, onSuccess }: UseSuggestChainArgs = {}) {
-  const mutation = useMutation(USE_SUGGEST_CHAIN_QUERY_KEY, suggestChain, {
+  const mutation = useMutation("WADESTA_USE_SUGGEST_CHAIN", suggestChain, {
     onError: (err, chainInfo) => Promise.resolve(onError?.(err, chainInfo)),
     onMutate: onLoading,
     onSuccess: (chainInfo) => Promise.resolve(onSuccess?.(chainInfo)),
