@@ -1,5 +1,5 @@
 import { Button, Stack, Text } from "@chakra-ui/react";
-import { chain, useAccount, useConnect, useDisconnect } from "wadesta";
+import { defaultChains, useAccount, useConnect, useDisconnect } from "wadesta/src";
 
 export default function HomePage() {
   const account = useAccount();
@@ -7,7 +7,7 @@ export default function HomePage() {
   const { disconnect } = useDisconnect();
 
   function handleConnect() {
-    return account ? disconnect(undefined) : connect(chain.cosmoshub);
+    return account ? disconnect(undefined) : connect(defaultChains.cosmos);
   }
 
   return (
