@@ -64,5 +64,6 @@ export async function fetchBalance({ currencies }: BalanceProps) {
     }),
   );
 
+  useWadestaStore.setState({ balance: coins });
   return coins;
 }
