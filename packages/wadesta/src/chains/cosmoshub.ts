@@ -1,7 +1,7 @@
 import { Bech32Address } from "@keplr-wallet/cosmos";
-import type { ChainInfo, Currency } from "@keplr-wallet/types";
+import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 
-const currency: Currency = {
+const currency: AppCurrency = {
   coinDenom: "ATOM",
   coinMinimalDenom: "uatom",
   coinDecimals: 6,
