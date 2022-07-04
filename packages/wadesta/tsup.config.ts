@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 import packageJson from "./package.json";
 
 export default defineConfig(({ watch }) => ({
-  clean: true,
+  clean: !watch,
   dts: true,
   entry: ["src/index.ts"],
   external: [...Object.keys(packageJson.dependencies), ...Object.keys(packageJson.peerDependencies)],
