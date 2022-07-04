@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 
-import { WadestaSubscription } from "../store/subscription";
+import { WadestaSubscription } from "./subscription";
 
 const queryClient = new QueryClient({
   defaultOptions: {

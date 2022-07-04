@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import { connect } from "../actions/account";
-import { useWadestaStore } from ".";
+import { useWadestaStore } from "../store";
 
 export function WadestaSubscription() {
   // track keplr_keystorechange
