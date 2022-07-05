@@ -24,6 +24,9 @@
     - [`useCosmWasmClient`](#usecosmwasmclient)
       - [Usage](#usage-3)
       - [Return Value](#return-value-3)
+    - [`useConnect`](#useconnect)
+      - [Usage](#usage-4)
+      - [Return Value](#return-value-4)
   - [Development Guide](#development-guide)
   - [License](#license)
 
@@ -260,6 +263,40 @@ function App() {
 
 ```tsx
 SigningCosmWasmClient | null; //from @cosmjs/cosmwasm-stargate
+```
+
+### `useConnect`
+
+hook for connecting to an account with keplr wallet
+
+#### Usage
+
+```tsx
+import { useAccount, useConnect, defaultChains } from "wadesta";
+
+function App() {
+  const { connect } = useConnect();
+  const { isConnected, account } = useAccount();
+
+  return (
+    <div>
+      {isConnected ? account.bech32Address : <button onClick={() => connect(defaultChains.cosmos)}>Connect</button>}
+    </div>
+  );
+}
+```
+
+#### Return Value
+
+```tsx
+{
+  error: unknown;
+  isLoading: boolean;
+  isSuccess: boolean;
+  connect: (chain: WadestaChain) => Key;
+  connectAsync: (chain: WadestaChain) => Promise<Key>;
+  status: "idle" | "error" | "loading" | "success";
+}
 ```
 
 ## Development Guide
