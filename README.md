@@ -18,6 +18,9 @@
     - [`useAccount`](#useaccount)
       - [Usage](#usage-1)
       - [Return Value](#return-value-1)
+    - [`useBalances`](#usebalances)
+      - [Usage](#usage-2)
+      - [Return Value](#return-value-2)
   - [Development Guide](#development-guide)
   - [License](#license)
 
@@ -171,13 +174,64 @@ function App() {
 
 ```tsx
 {
-  data: Key | null;
+  data: Key | null; // from @keplr-wallet/types
   isConnected: boolean;
   isConnecting: boolean;
   isDisconnected: boolean;
   isReconnecting: boolean;
   reconnect: typeof reconnect;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
+}
+```
+
+### `useBalances`
+
+Hook for accesing account balances based on active chain's currencies.
+
+#### Usage
+
+`useBalance` receiving address, but not required. if the address empty it will fetching connected account based on active chain.
+
+```tsx
+import { useBalances } from "wadesta";
+function App() {
+  const address = "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430";
+  const { data, isFetching } = useBalances(address);
+
+  return (
+    <div>
+      Balances:
+      {isFetching ? (
+        "Fetching balances..."
+      ) : (
+        <ul>
+          {data?.map((coin) => (
+            <li key={coin.denom}>
+              {coin.amount} {coin.denom}
+            </li>
+          ))}{" "}
+        </ul>
+      )}
+    </div>
+  );
+}
+```
+
+#### Return Value
+
+```tsx
+{
+  data: Coin[] | null; // from @cosmjs/stargate
+  error: unknown;
+  isLoading: boolean;
+  isFetching: boolean;
+  isRefetching: boolean;
+  isSuccess: boolean;
+  refetch: (options: {
+    throwOnError: boolean
+    cancelRefetch: boolean
+  }) => Promise<Coin[]>
+  status: "idle" | "error" | "loading" | "success";
 }
 ```
 
