@@ -130,8 +130,8 @@ interface WadestaChain {
 <details><summary>Where do I need WadestaChain</summary>
 <p>
 
-- [useConnect](#useConnect)
-- [useBalances](#useBalances)
+- [useConnect](#useconnect)
+- [useBalances](#usebalances)
 
 </p>
 </details>
