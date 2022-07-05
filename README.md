@@ -8,7 +8,6 @@
 
 - [wadesta](#wadesta)
   - [Features](#features)
-  - [Installation](#installation)
   - [Quick start](#quick-start)
   - [Utility Functions](#utility-functions)
     - [`defineChains`](#definechains)
@@ -39,7 +38,6 @@
     - [`useSuggestChain`](#usesuggestchain)
       - [Usage](#usage-8)
       - [Return Value](#return-value-8)
-  - [Development Guide](#development-guide)
   - [License](#license)
 
 ## Features
@@ -53,6 +51,8 @@
 
 and a lot more coming soon 👀
 
+<!--
+
 ## Installation
 
 ```sh
@@ -62,6 +62,8 @@ npm install wadesta
 # using yarn
 yarn add wadesta
 ```
+
+-->
 
 ## Quick start
 
@@ -227,7 +229,7 @@ function App() {
             <li key={coin.denom}>
               {coin.amount} {coin.denom}
             </li>
-          ))}{" "}
+          ))}
         </ul>
       )}
     </div>
@@ -518,9 +520,7 @@ function App(){
 }
 ```
 
-## Development Guide
-
-TODO
+<!-- ## Development Guide -->
 
 ## License
 
