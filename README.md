@@ -30,6 +30,9 @@
     - [`useDisconnect`](#usedisconnect)
       - [Usage](#usage-5)
       - [Return Value](#return-value-5)
+    - [`useSigners`](#usesigners)
+      - [Usage](#usage-6)
+      - [Return Value](#return-value-6)
   - [Development Guide](#development-guide)
   - [License](#license)
 
@@ -304,7 +307,7 @@ function App() {
 
 ### `useDisconnect`
 
-hook for disconnecting to an account
+hook for disconnecting an account
 
 #### Usage
 
@@ -334,6 +337,34 @@ function App() {
   disconnect: () => void;
   disconnectAsync: () => Promise<void>;
   status: "idle" | "error" | "loading" | "success";
+}
+```
+
+### `useSigners`
+
+hook for accessing signers based on connected account
+
+#### Usage
+
+```tsx
+import { useSigners } from "wadesta";
+
+function App() {
+  const { signer } = useSigners();
+
+  async function getAccountFromSigner() {
+    return await signer.getAccount();
+  }
+}
+```
+
+#### Return Value
+
+```tsx
+{
+  signer: (OfflineSigner & OfflineDirectSigner) | null;
+  signerAmino: OfflineSigner | null;
+  signerAuto: OfflineSigner | OfflineDirectSigner | null;
 }
 ```
 
