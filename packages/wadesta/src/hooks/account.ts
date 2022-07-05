@@ -35,6 +35,8 @@ export function useBalances(bech32Address?: string) {
     data: query.data,
     error: query.error,
     isLoading: query.isLoading,
+    isFetching: query.isFetching,
+    isRefetching: query.isRefetching,
     isSuccess: query.isSuccess,
     refetch: query.refetch,
     status: query.status,
