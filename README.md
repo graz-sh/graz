@@ -21,6 +21,9 @@
     - [`useBalances`](#usebalances)
       - [Usage](#usage-2)
       - [Return Value](#return-value-2)
+    - [`useCosmWasmClient`](#usecosmwasmclient)
+      - [Usage](#usage-3)
+      - [Return Value](#return-value-3)
   - [Development Guide](#development-guide)
   - [License](#license)
 
@@ -221,7 +224,7 @@ function App() {
 
 ```tsx
 {
-  data: Coin[] | null; // from @cosmjs/stargate
+  data: Coin[] | null; // from @cosmjs/proto-signing
   error: unknown;
   isLoading: boolean;
   isFetching: boolean;
@@ -233,6 +236,30 @@ function App() {
   }) => Promise<Coin[]>
   status: "idle" | "error" | "loading" | "success";
 }
+```
+
+### `useCosmWasmClient`
+
+hook for accessing `SigningCosmWasmClient` based on connected account
+
+#### Usage
+
+```tsx
+import { useCosmWasmClient } from "wadesta";
+
+function App() {
+  const client = useCosmWasmClient();
+
+  async function getAccountFromClient() {
+    return await client.getAccount();
+  }
+}
+```
+
+#### Return Value
+
+```tsx
+SigningCosmWasmClient | null; //from @cosmjs/cosmwasm-stargate
 ```
 
 ## Development Guide
