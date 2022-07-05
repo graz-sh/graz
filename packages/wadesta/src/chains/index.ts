@@ -1,6 +1,7 @@
 import type { AppCurrency } from "@keplr-wallet/types";
 
 import { cosmoshub } from "./cosmoshub";
+import { juno } from "./juno";
 
 export interface WadestaChain {
   chainId: string;
@@ -15,4 +16,5 @@ export function defineChains<T extends Record<string, WadestaChain>>(chains: T) 
 
 export const defaultChains = defineChains({
   cosmos: cosmoshub,
+  juno,
 });
