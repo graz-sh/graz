@@ -1,5 +1,5 @@
 {
-  "name": "@project/example-app",
+  "name": "@project/example",
   "version": "0.0.0",
   "scripts": {
     "build": "next build",
@@ -39,7 +39,7 @@
       "prettier --write"
     ],
     "**/*.{js,cjs,mjs,ts,tsx}": [
-      "yarn workspace @project/example-app eslint --fix"
+      "yarn workspace @project/example eslint --fix"
     ]
   },
   "prettier": "@project/prettier-config",
