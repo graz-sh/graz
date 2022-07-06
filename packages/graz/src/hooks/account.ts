@@ -1,4 +1,5 @@
 import type { Key } from "@keplr-wallet/types";
+import { useEffect } from "react";
 import { useMutation, useQuery } from "react-query";
 import shallow from "zustand/shallow";
 
@@ -7,9 +8,29 @@ import type { GrazChain } from "../chains";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 
-export function useAccount() {
+export interface UseAccountArgs {
+  onConnect?: (args: { account: Key; isReconnect: boolean }) => void;
+  onDisconnect?: () => void;
+}
+
+export function useAccount({ onConnect, onDisconnect }: UseAccountArgs = {}) {
   const account = useGrazStore((x) => x.account);
   const status = useGrazStore((x) => x.status);
+
+  useEffect(() => {
+    return useGrazStore.subscribe(
+      (x) => x.status,
+      (stat, prevStat) => {
+        if (stat === "connected") {
+          const current = useGrazStore.getState();
+          onConnect?.({ account: current.account!, isReconnect: prevStat === "reconnecting" });
+        }
+        if (stat === "disconnected") {
+          onDisconnect?.();
+        }
+      },
+    );
+  }, [onConnect, onDisconnect]);
 
   return {
     data: account,
