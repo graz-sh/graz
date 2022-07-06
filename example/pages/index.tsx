@@ -44,7 +44,7 @@ export default function HomePage() {
 
   const { data: balances, isFetching: isBalancesFetching, refetch } = useBalances();
 
-  const { connect } = useConnect({
+  const { connect, isSupported } = useConnect({
     onSuccess: () => {
       console.log("wallet connected");
     },
@@ -93,7 +93,7 @@ export default function HomePage() {
           </>
         ))}
       <ButtonGroup isAttached>
-        <Button isLoading={isConnecting || isReconnecting} onClick={handleConnect}>
+        <Button isDisabled={!isSupported} isLoading={isConnecting || isReconnecting} onClick={handleConnect}>
           {accountData ? "Disconnect" : "Connect"} Wallet
         </Button>
         {accountData && <IconButton aria-label="refresh" icon={<>🔄</>} onClick={reconnect} />}
