@@ -18,7 +18,8 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "prepublish": "yarn build"
   },
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "^0.28.10",
