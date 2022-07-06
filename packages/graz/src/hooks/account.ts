@@ -7,6 +7,7 @@ import { connect, disconnect, getBalances, reconnect } from "../actions/account"
 import type { GrazChain } from "../chains";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
+import { useCheckKeplr } from "./keplr";
 
 export interface UseAccountArgs {
   onConnect?: (args: { account: Key; isReconnect: boolean }) => void;
@@ -82,6 +83,7 @@ export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArg
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
+    isSupported: useCheckKeplr(),
     connect: mutation.mutate,
     connectAsync: mutation.mutateAsync,
     status: mutation.status,
