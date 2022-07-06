@@ -36,7 +36,7 @@
     "typescript": "^4"
   },
   "peerDependencies": {
-    "react": "^17 || ^18"
+    "react": ">=16.8"
   },
   "eslintConfig": {
     "extends": [
