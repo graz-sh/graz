@@ -16,8 +16,7 @@ export interface GrazStore extends State {
   signerAmino: OfflineSigner | null;
   signerAuto: (OfflineSigner | OfflineDirectSigner) | null;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
-
-  _reconnect?: boolean;
+  _reconnect: boolean;
 }
 
 export const defaultValues: GrazStore = {
@@ -29,6 +28,7 @@ export const defaultValues: GrazStore = {
   signerAmino: null,
   signerAuto: null,
   status: "disconnected",
+  _reconnect: false,
 };
 
 export const useGrazStore = create(

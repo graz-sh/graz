@@ -4,12 +4,7 @@ import type { GrazChain } from "../chains";
 import { getKeplr } from "../keplr";
 import { defaultValues, useGrazStore } from "../store";
 
-export interface ConnectOptions {
-  autoConnect?: boolean;
-}
-
-export async function connect(chain: GrazChain, opts: ConnectOptions = {}) {
-  const { autoConnect = true } = opts;
+export async function connect(chain: GrazChain) {
   try {
     const keplr = getKeplr();
 
@@ -33,7 +28,7 @@ export async function connect(chain: GrazChain, opts: ConnectOptions = {}) {
       signerAuto,
       signerAmino,
       status: "connected",
-      _reconnect: autoConnect,
+      _reconnect: true,
     });
 
     return account;
