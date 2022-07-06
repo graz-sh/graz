@@ -23,7 +23,6 @@
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "0.28.10",
     "@cosmjs/proto-signing": "0.28.10",
-    "@keplr-wallet/common": "0.10.9",
     "@keplr-wallet/cosmos": "0.10.9",
     "@keplr-wallet/types": "0.10.9",
     "react-query": "^3",

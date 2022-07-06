@@ -11,12 +11,12 @@
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "framer-motion": "^6",
+    "graz": "*",
     "next": "^12",
     "next-transpile-modules": "^9",
     "react": "^18",
     "react-dom": "^18",
-    "typescript": "^4",
-    "graz": "*"
+    "typescript": "^4"
   },
   "devDependencies": {
     "@types/node": "^16",

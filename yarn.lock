@@ -1222,15 +1222,6 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@keplr-wallet/common@0.10.9":
-  version "0.10.9"
-  resolved "https://registry.yarnpkg.com/@keplr-wallet/common/-/common-0.10.9.tgz#f58c34b540e7a28bc28763579d64e1eb158ad0c9"
-  integrity sha512-nfyV/84yzFhmsJe7FwBTmvd7X5L/RuVZfJ7c8A+LTVj87xbrfMoGrzI4+jwiTVTpMBkVAeET1BWQhCY09GwXpQ==
-  dependencies:
-    "@keplr-wallet/crypto" "0.10.9"
-    buffer "^6.0.3"
-    delay "^4.4.0"
-
 "@keplr-wallet/cosmos@0.10.9":
   version "0.10.9"
   resolved "https://registry.yarnpkg.com/@keplr-wallet/cosmos/-/cosmos-0.10.9.tgz#7b9971be2412a98ffb3b17f0fb8fd57851d93d54"
@@ -2365,11 +2356,6 @@ define-properties@^1.1.3, define-properties@^1.1.4:
   dependencies:
     has-property-descriptors "^1.0.0"
     object-keys "^1.1.1"
-
-delay@^4.4.0:
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/delay/-/delay-4.4.1.tgz#6e02d02946a1b6ab98b39262ced965acba2ac4d1"
-  integrity sha512-aL3AhqtfhOlT/3ai6sWXeqwnw63ATNpnUiN4HL7x9q+My5QtHlO3OIkasmug9LKzpheLdmUKGRKnYXYAS7FQkQ==
 
 detect-node-es@^1.1.0:
   version "1.1.0"
