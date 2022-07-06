@@ -15,24 +15,44 @@ import { defaultChains, useAccount, useActiveChain, useBalances, useConnect, use
 export default function HomePage() {
   const toast = useToast();
 
-  const { data: account, isConnected, isConnecting, isReconnecting, reconnect, status } = useAccount();
-  const { data: balances, isFetching: isBalancesFetching, refetch } = useBalances();
-  const activeChain = useActiveChain();
-  const { connect } = useConnect({
-    onSuccess: (_account) => {
-      toast({
-        status: "success",
-        title: "Wallet connected!",
-        description: `Connected as ${_account.name}`,
-      });
+  const {
+    data: accountData,
+    isConnected,
+    isConnecting,
+    isReconnecting,
+    reconnect,
+    status,
+  } = useAccount({
+    onConnect: ({ account, isReconnect }) => {
+      if (!isReconnect) {
+        toast({
+          status: "success",
+          title: "Wallet connected!",
+          description: `Connected as ${account.name}`,
+        });
+      }
     },
-  });
-  const { disconnect } = useDisconnect({
-    onSuccess: () => {
+    onDisconnect: () => {
       toast({
         status: "info",
         title: "Wallet disconnected!",
       });
+    },
+  });
+
+  const activeChain = useActiveChain();
+
+  const { data: balances, isFetching: isBalancesFetching, refetch } = useBalances();
+
+  const { connect } = useConnect({
+    onSuccess: () => {
+      console.log("wallet connected");
+    },
+  });
+
+  const { disconnect } = useDisconnect({
+    onSuccess: () => {
+      console.log("wallet disconnected");
     },
   });
 
@@ -42,11 +62,12 @@ export default function HomePage() {
 
   return (
     <Stack p={4}>
-      <Text>Account Name: {account ? account.name : status}</Text>
-      {account && (
+      <Text>{status}</Text>
+      <Text>Account Name: {accountData ? accountData.name : status}</Text>
+      {accountData && (
         <>
           <Text>
-            Address: <Tag>{account.bech32Address}</Tag>
+            Address: <Tag>{accountData.bech32Address}</Tag>
           </Text>
           <Text>
             Connected to <Tag>{activeChain?.chainId}</Tag>
@@ -54,7 +75,7 @@ export default function HomePage() {
         </>
       )}
 
-      {account &&
+      {accountData &&
         (isBalancesFetching ? (
           <Spinner />
         ) : (
@@ -73,9 +94,9 @@ export default function HomePage() {
         ))}
       <ButtonGroup isAttached>
         <Button isLoading={isConnecting || isReconnecting} onClick={handleConnect}>
-          {account ? "Disconnect" : "Connect"} Wallet
+          {accountData ? "Disconnect" : "Connect"} Wallet
         </Button>
-        {account && <IconButton aria-label="refresh" icon={<>🔄</>} onClick={reconnect} />}
+        {accountData && <IconButton aria-label="refresh" icon={<>🔄</>} onClick={reconnect} />}
       </ButtonGroup>
     </Stack>
   );
