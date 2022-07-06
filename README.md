@@ -57,7 +57,7 @@ function Wallet() {
   return (
     <div>
       {account ? `Connected to ${account.bech32Address}` : status}
-      <button onClick={handleConnect}>{isConnected ? "Connect" : "Disconnect"}</button>
+      <button onClick={handleConnect}>{isConnected ? "Disconnect" : "Connect"}</button>
     </div>
   );
 }
