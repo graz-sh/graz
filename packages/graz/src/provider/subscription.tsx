@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 
 import { reconnect } from "../actions/account";
-import { useWadestaStore } from "../store";
+import { useGrazStore } from "../store";
 
-export function WadestaSubscription() {
+export function GrazSubscription() {
   // track keplr_keystorechange and reconnect state
   useEffect(() => {
-    const { _reconnect } = useWadestaStore.getState();
+    const { _reconnect } = useGrazStore.getState();
     if (_reconnect) reconnect();
 
     window.addEventListener("focus", reconnect);

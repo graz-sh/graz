@@ -3,13 +3,13 @@ import { useMutation, useQuery } from "react-query";
 import shallow from "zustand/shallow";
 
 import { connect, disconnect, getBalances, reconnect } from "../actions/account";
-import type { WadestaChain } from "../chains";
-import { useWadestaStore } from "../store";
+import type { GrazChain } from "../chains";
+import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 
 export function useAccount() {
-  const account = useWadestaStore((x) => x.account);
-  const status = useWadestaStore((x) => x.status);
+  const account = useGrazStore((x) => x.account);
+  const status = useGrazStore((x) => x.status);
 
   return {
     data: account,
@@ -44,10 +44,10 @@ export function useBalances(bech32Address?: string) {
 }
 
 export function useCosmWasmClient() {
-  return useWadestaStore((x) => x.client);
+  return useGrazStore((x) => x.client);
 }
 
-export type UseConnectChainArgs = MutationEventArgs<WadestaChain, Key>;
+export type UseConnectChainArgs = MutationEventArgs<GrazChain, Key>;
 
 export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArgs = {}) {
   const queryKey = ["WADESTA_USE_CONNECT", onError, onLoading, onSuccess];
@@ -86,7 +86,7 @@ export function useDisconnect({ onError, onLoading, onSuccess }: MutationEventAr
 }
 
 export function useSigners() {
-  return useWadestaStore(
+  return useGrazStore(
     (x) => ({
       signer: x.signer,
       signerAmino: x.signerAmino,

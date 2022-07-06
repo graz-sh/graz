@@ -4,13 +4,13 @@
 
 ### `defineChains`
 
-The `defineChains` function allows you to standarized your chains info/config to interact with `wadesta` except `useSuggestChain` hook. `wadesta` use own `ChainInfo` config that called `WadestaChain`
+The `defineChains` function allows you to standarized your chains info/config to interact with `graz` except `useSuggestChain` hook. `graz` use own `ChainInfo` config that called `GrazChain`
 
-<details><summary>WadestaChain</summary>
+<details><summary>GrazChain</summary>
 <p>
 
 ```tsx
-interface WadestaChain {
+interface GrazChain {
   chainId: string;
   currencies: AppCurrency[]; // from @keplr-wallet/types
   rest: string;
@@ -21,7 +21,7 @@ interface WadestaChain {
 </p>
 </details>
 
-<details><summary>Where do I need WadestaChain</summary>
+<details><summary>Where do I need GrazChain</summary>
 <p>
 
 - [useConnect](#useconnect)
@@ -32,10 +32,10 @@ interface WadestaChain {
 
 #### Usage
 
-to create your chains is simply create a record that filled with `WadestaChain`
+to create your chains is simply create a record that filled with `GrazChain`
 
 ```tsx
-import { defineChains } from "wadesta";
+import { defineChains } from "graz";
 
 export const myCustomChains = defineChains({
   cosmos: {
@@ -61,7 +61,7 @@ return a records that typed as your defined
 
 ```tsx
 {
-  string: WadestaChain;
+  string: GrazChain;
 }
 ```
 
@@ -74,7 +74,7 @@ Hook for accesing account data and connection status.
 #### Usage
 
 ```tsx
-import { useAccount } from "wadesta";
+import { useAccount } from "graz";
 function App() {
   const { data, status } = useAccount();
 
@@ -105,7 +105,7 @@ Hook for accesing account balances based on active chain's currencies.
 `useBalance` receiving address, but not required. if the address empty it will fetching connected account based on active chain.
 
 ```tsx
-import { useBalances } from "wadesta";
+import { useBalances } from "graz";
 function App() {
   const address = "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430";
   const { data, isFetching } = useBalances(address);
@@ -154,7 +154,7 @@ hook for accessing `SigningCosmWasmClient` based on connected account
 #### Usage
 
 ```tsx
-import { useCosmWasmClient } from "wadesta";
+import { useCosmWasmClient } from "graz";
 
 function App() {
   const client = useCosmWasmClient();
@@ -178,7 +178,7 @@ hook for connecting to an account with keplr wallet
 #### Usage
 
 ```tsx
-import { useAccount, useConnect, defaultChains } from "wadesta";
+import { useAccount, useConnect, defaultChains } from "graz";
 
 function App() {
   const { connect } = useConnect();
@@ -199,8 +199,8 @@ function App() {
   error: unknown;
   isLoading: boolean;
   isSuccess: boolean;
-  connect: (chain: WadestaChain) => Key;
-  connectAsync: (chain: WadestaChain) => Promise<Key>;
+  connect: (chain: GrazChain) => Key;
+  connectAsync: (chain: GrazChain) => Promise<Key>;
   status: "idle" | "error" | "loading" | "success";
 }
 ```
@@ -212,7 +212,7 @@ hook for disconnecting an account
 #### Usage
 
 ```tsx
-import { useAccount, useDisconnect, defaultChains } from "wadesta";
+import { useAccount, useDisconnect, defaultChains } from "graz";
 
 function App() {
   const { disconnect } = useDisconnect();
@@ -247,7 +247,7 @@ hook for accessing signers based on connected account
 #### Usage
 
 ```tsx
-import { useSigners } from "wadesta";
+import { useSigners } from "graz";
 
 function App() {
   const { signer } = useSigners();
@@ -270,12 +270,12 @@ function App() {
 
 ### `useActiveChain`
 
-hook for accessing the `WadestaChain` info based on connected chain/account
+hook for accessing the `GrazChain` info based on connected chain/account
 
 #### Usage
 
 ```tsx
-import { useActiveChain } from "wadesta";
+import { useActiveChain } from "graz";
 
 function App() {
   const activeChain = useActiveChain();
@@ -365,7 +365,7 @@ interface ChainInfo {
 
 ```tsx
 import { Bech32Address } from "@keplr-wallet/cosmos";
-import { useSuggestChain } from "wadesta";
+import { useSuggestChain } from "graz";
 
 const OSMO = {
   coinDenom: "osmo",

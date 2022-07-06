@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 
-import { WadestaSubscription } from "./subscription";
+import { GrazSubscription } from "./subscription";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -11,10 +11,10 @@ const queryClient = new QueryClient({
   },
 });
 
-export function WadestaProvider({ children }: { children: ReactNode }) {
+export function GrazProvider({ children }: { children: ReactNode }) {
   return (
-    <QueryClientProvider key="wadesta-query-client" client={queryClient}>
-      <WadestaSubscription />
+    <QueryClientProvider key="graz-query-client" client={queryClient}>
+      <GrazSubscription />
       {children}
     </QueryClientProvider>
   );

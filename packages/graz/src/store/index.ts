@@ -5,11 +5,11 @@ import type { State } from "zustand";
 import create from "zustand";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
-import type { WadestaChain } from "../chains";
+import type { GrazChain } from "../chains";
 
-export interface WadestaStore extends State {
+export interface GrazStore extends State {
   account: Key | null;
-  activeChain: WadestaChain | null;
+  activeChain: GrazChain | null;
   balances: Coin[] | null;
   client: SigningCosmWasmClient | null;
   signer: (OfflineSigner & OfflineDirectSigner) | null;
@@ -20,7 +20,7 @@ export interface WadestaStore extends State {
   _reconnect?: boolean;
 }
 
-export const defaultValues: WadestaStore = {
+export const defaultValues: GrazStore = {
   account: null,
   activeChain: null,
   balances: null,
@@ -31,10 +31,10 @@ export const defaultValues: WadestaStore = {
   status: "disconnected",
 };
 
-export const useWadestaStore = create(
+export const useGrazStore = create(
   subscribeWithSelector(
-    persist<WadestaStore, [["zustand/subscribeWithSelector", never]]>(() => ({ ...defaultValues }), {
-      name: "wadesta",
+    persist<GrazStore, [["zustand/subscribeWithSelector", never]]>(() => ({ ...defaultValues }), {
+      name: "graz",
       partialize: (x) => ({
         activeChain: x.activeChain,
         _reconnect: x._reconnect,

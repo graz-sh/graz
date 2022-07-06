@@ -10,7 +10,7 @@ import {
   UnorderedList,
   useToast,
 } from "@chakra-ui/react";
-import { defaultChains, useAccount, useActiveChain, useBalances, useConnect, useDisconnect } from "wadesta/src";
+import { defaultChains, useAccount, useActiveChain, useBalances, useConnect, useDisconnect } from "graz/src";
 
 export default function HomePage() {
   const toast = useToast();

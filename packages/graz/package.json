@@ -1,11 +1,11 @@
 {
-  "name": "wadesta",
+  "name": "graz",
   "description": "React hooks for Cosmos",
   "version": "0.0.0",
   "author": "Griko Nibras <griko@stranvgelove.ventures>",
-  "repository": "https://github.com/strangelove-ventures/wadesta.git",
-  "homepage": "https://github.com/strangelove-ventures/wadesta",
-  "bugs": "https://github.com/strangelove-ventures/wadesta/issues",
+  "repository": "https://github.com/strangelove-ventures/graz.git",
+  "homepage": "https://github.com/strangelove-ventures/graz",
+  "bugs": "https://github.com/strangelove-ventures/graz/issues",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -52,7 +52,7 @@
       "prettier --write"
     ],
     "**/*.ts": [
-      "yarn workspace wadesta eslint --fix"
+      "yarn workspace graz eslint --fix"
     ]
   },
   "prettier": "@project/prettier-config",

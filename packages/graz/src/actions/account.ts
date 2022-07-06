@@ -1,19 +1,19 @@
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
-import type { WadestaChain } from "../chains";
+import type { GrazChain } from "../chains";
 import { getKeplr } from "../keplr";
-import { defaultValues, useWadestaStore } from "../store";
+import { defaultValues, useGrazStore } from "../store";
 
 export interface ConnectOptions {
   autoConnect?: boolean;
 }
 
-export async function connect(chain: WadestaChain, opts: ConnectOptions = {}) {
+export async function connect(chain: GrazChain, opts: ConnectOptions = {}) {
   const { autoConnect = true } = opts;
   try {
     const keplr = getKeplr();
 
-    useWadestaStore.setState((x) => ({ status: x._reconnect ? "reconnecting" : "connecting" }));
+    useGrazStore.setState((x) => ({ status: x._reconnect ? "reconnecting" : "connecting" }));
     await keplr.enable(chain.chainId);
 
     const signer = keplr.getOfflineSigner(chain.chainId);
@@ -25,7 +25,7 @@ export async function connect(chain: WadestaChain, opts: ConnectOptions = {}) {
       await SigningCosmWasmClient.connectWithSigner(chain.rpc, signer),
     ] as const);
 
-    useWadestaStore.setState({
+    useGrazStore.setState({
       account,
       activeChain: chain,
       client,
@@ -38,22 +38,22 @@ export async function connect(chain: WadestaChain, opts: ConnectOptions = {}) {
 
     return account;
   } catch (error) {
-    if (useWadestaStore.getState().account === null) {
-      useWadestaStore.setState({ status: "disconnected" });
+    if (useGrazStore.getState().account === null) {
+      useGrazStore.setState({ status: "disconnected" });
     }
     throw error;
   }
 }
 
 export async function disconnect() {
-  useWadestaStore.setState({
+  useGrazStore.setState({
     ...defaultValues,
   });
   return Promise.resolve();
 }
 
 export async function getBalances(bech32Address: string) {
-  const { activeChain, client } = useWadestaStore.getState();
+  const { activeChain, client } = useGrazStore.getState();
 
   if (!activeChain || !client) {
     throw new Error("No connected account detected");
@@ -69,6 +69,6 @@ export async function getBalances(bech32Address: string) {
 }
 
 export function reconnect() {
-  const { activeChain } = useWadestaStore.getState();
+  const { activeChain } = useGrazStore.getState();
   if (activeChain) void connect(activeChain);
 }

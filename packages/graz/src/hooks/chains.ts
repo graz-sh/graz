@@ -2,11 +2,11 @@ import type { ChainInfo } from "@keplr-wallet/types";
 import { useMutation } from "react-query";
 
 import { suggestChain } from "../actions/chains";
-import { useWadestaStore } from "../store";
+import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 
 export function useActiveChain() {
-  return useWadestaStore((x) => x.activeChain);
+  return useGrazStore((x) => x.activeChain);
 }
 
 export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;

@@ -1,6 +1,6 @@
-![wadesta](./banner.jpg)
+![graz](./banner.jpg)
 
-`wadesta` is a collection of React hooks containing everything you need to start working with the [Cosmos ecosystem](https://cosmos.network/).
+`graz` is a collection of React hooks containing everything you need to start working with the [Cosmos ecosystem](https://cosmos.network/).
 
 ## Features
 
@@ -20,30 +20,30 @@
 
 ```sh
 # using npm
-npm install wadesta
+npm install graz
 
 # using yarn
-yarn add wadesta
+yarn add graz
 ```
 
 ## Quick start
 
-Wrap your React app with `<WadestaProvider />` and use available `wadesta` hooks anywhere:
+Wrap your React app with `<GrazProvider />` and use available `graz` hooks anywhere:
 
 ```jsx
-import { WadestaProvider } from "wadesta";
+import { GrazProvider } from "graz";
 
 function App() {
   return (
-    <WadestaProvider>
+    <GrazProvider>
       <Wallet />
-    </WadestaProvider>
+    </GrazProvider>
   );
 }
 ```
 
 ```jsx
-import { defaultChains, useAccount, useConnect, useDisconnect } from "wadesta";
+import { defaultChains, useAccount, useConnect, useDisconnect } from "graz";
 
 function Wallet() {
   const { connect, status } = useConnect();
@@ -63,7 +63,7 @@ function Wallet() {
 }
 ```
 
-View an example app at https://wadesta-example.vercel.app
+View an example app at https://graz-example.vercel.app
 
 ## API
 
