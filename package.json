@@ -13,6 +13,7 @@
     "dev": "turbo run dev --filter=!@project/docs",
     "docs": "yarn workspace @project/docs",
     "example": "yarn workspace @project/example",
+    "graz": "yarn workspace graz",
     "lint": "turbo run lint",
     "prepare": "husky install",
     "prerelease": "yarn build",
