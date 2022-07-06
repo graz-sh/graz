@@ -1,5 +1,5 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { GrazProvider } from "graz/src";
+import { GrazProvider } from "graz";
 import type { AppProps } from "next/app";
 
 export default function CustomApp({ Component, pageProps }: AppProps) {
