@@ -27,6 +27,9 @@
     "tsup": "^6",
     "turbo": "^1"
   },
+  "resolutions": {
+    "axios": "npm:redaxios@latest"
+  },
   "eslintConfig": {
     "extends": [
       "@project/eslint-config"
