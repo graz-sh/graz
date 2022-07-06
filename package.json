@@ -16,6 +16,7 @@
     "graz": "yarn workspace graz",
     "lint": "turbo run lint",
     "prepare": "husky install",
+    "release": "turbo run build --filter=graz && yarn workspace graz publish",
     "test": "turbo run test"
   },
   "devDependencies": {
