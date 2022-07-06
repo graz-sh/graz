@@ -11,7 +11,10 @@ let nextConfig = {
   },
   headers: async () => [],
   reactStrictMode: true,
-  redirects: async () => [],
+  redirects: async () => [
+    { source: "/(.*)", destination: "https://github.com/strangelove-ventures/graz", permanent: false },
+    //
+  ],
   rewrites: async () => [],
   swcMinify: false,
   trailingSlash: true,
