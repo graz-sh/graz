@@ -3,18 +3,20 @@
   "version": "0.0.0",
   "packageManager": "yarn@1.22.18",
   "workspaces": [
+    "docs",
     "example",
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --filter=!@project/docs",
     "deduplicate": "npx yarn-deduplicate && yarn install",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=!@project/docs",
+    "docs": "yarn workspace @project/docs",
+    "example": "yarn workspace @project/example",
     "lint": "turbo run lint",
     "prepare": "husky install",
     "prerelease": "yarn build",
-    "test": "turbo run test",
-    "website": "yarn workspace example-website"
+    "test": "turbo run test"
   },
   "devDependencies": {
     "husky": "^8",

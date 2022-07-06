@@ -21,10 +21,9 @@
   "eslint.packageManager": "yarn",
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "eslint.workingDirectories": [
-    {
-      "!cwd": false,
-      "pattern": "packages/*"
-    }
+    { "!cwd": false, "directory": "docs" },
+    { "!cwd": false, "directory": "example" },
+    { "!cwd": false, "pattern": "packages/*" }
   ],
   "npm.packageManager": "yarn"
 }
