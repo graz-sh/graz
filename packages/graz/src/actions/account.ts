@@ -27,8 +27,7 @@ export async function connect(chain: GrazChain) {
       await keplr.getKey(chain.chainId),
       await keplr.getOfflineSignerAuto(chain.chainId),
       await SigningCosmWasmClient.connectWithSigner(chain.rpc, signer, {
-        gasPrice:
-          chain.gasPrice && chain.gasDenom ? GasPrice.fromString(`${chain.gasPrice}${chain.gasDenom}`) : undefined,
+        gasPrice: chain.gas ? GasPrice.fromString(`${chain.gas.price}${chain.gas.denom}`) : undefined,
       }),
     ] as const);
 
