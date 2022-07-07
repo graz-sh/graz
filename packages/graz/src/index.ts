@@ -1,3 +1,5 @@
+export * from "./actions/account";
+export * from "./actions/chains";
 export * from "./chains";
 export * from "./hooks/account";
 export * from "./hooks/chains";
