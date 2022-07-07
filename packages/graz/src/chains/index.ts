@@ -20,3 +20,5 @@ export const defaultChains = defineChains({
   juno,
   osmosis,
 });
+
+export const defaultChainsArray = [cosmoshub, juno, osmosis];
