@@ -8,7 +8,15 @@ export async function connect(chain: GrazChain) {
   try {
     const keplr = getKeplr();
 
-    useGrazStore.setState((x) => ({ status: x._reconnect ? "reconnecting" : "connecting" }));
+    useGrazStore.setState((x) => {
+      const isReconnecting = x._reconnect;
+      const isSwitchingChain = x.activeChain && x.activeChain.chainId !== chain.chainId;
+
+      if (isSwitchingChain) return { status: "connecting" };
+      if (isReconnecting) return { status: "reconnecting" };
+      return { status: "connecting" };
+    });
+
     await keplr.enable(chain.chainId);
 
     const signer = keplr.getOfflineSigner(chain.chainId);
@@ -41,9 +49,10 @@ export async function connect(chain: GrazChain) {
 }
 
 export async function disconnect() {
-  useGrazStore.setState({
+  useGrazStore.setState((x) => ({
     ...defaultValues,
-  });
+    _supported: x._supported,
+  }));
   return Promise.resolve();
 }
 
