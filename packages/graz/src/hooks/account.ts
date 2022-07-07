@@ -65,10 +65,6 @@ export function useBalances(bech32Address?: string) {
   };
 }
 
-export function useCosmWasmClient() {
-  return useGrazStore((x) => x.signingClient);
-}
-
 export type UseConnectChainArgs = MutationEventArgs<GrazChain, Key>;
 
 export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArgs = {}) {
