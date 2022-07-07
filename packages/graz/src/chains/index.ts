@@ -9,6 +9,10 @@ export interface GrazChain {
   currencies: AppCurrency[];
   rest: string;
   rpc: string;
+  gas?: {
+    price: string;
+    denom: string;
+  };
 }
 
 export function defineChains<T extends Record<string, GrazChain>>(chains: T) {
