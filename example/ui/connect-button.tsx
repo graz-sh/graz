@@ -35,7 +35,7 @@ export function ConnectButton() {
   }
 
   return (
-    <ButtonGroup alignSelf="end" isAttached>
+    <ButtonGroup alignSelf="end" isAttached variant="outline">
       <Button isDisabled={!isSupported} isLoading={isConnecting || isReconnecting} onClick={handleConnect}>
         {isConnected ? "Disconnect" : "Connect"} Wallet
       </Button>

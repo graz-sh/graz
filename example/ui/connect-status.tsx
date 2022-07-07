@@ -6,7 +6,7 @@ export function ConnectStatus() {
   const activeChain = useActiveChain();
 
   return (
-    <Tag alignSelf="start">
+    <Tag>
       <TagLeftIcon as={Box} bgColor={isConnected ? "green.500" : "red.500"} boxSize={3} rounded="full" />
       <TagLabel>{isConnected && activeChain ? `Connected to ${activeChain.chainId}` : "Disconnected"}</TagLabel>
     </Tag>

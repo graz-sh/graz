@@ -1,17 +1,20 @@
-import { Center, Stack, Text } from "@chakra-ui/react";
+import { Center, HStack, Spacer, Stack, Text } from "@chakra-ui/react";
 import { useAccount } from "graz";
 import { BalanceList } from "ui/balance-list";
 import { ChainSwitcher } from "ui/chain-switcher";
 import { ConnectButton } from "ui/connect-button";
 import { ConnectStatus } from "ui/connect-status";
+import { ToggleTheme } from "ui/toggle-theme";
 
 export default function HomePage() {
   const { data: accountData } = useAccount();
 
   return (
     <Center minH="100vh">
-      <Stack boxShadow="md" maxW="md" p={4} rounded="md" spacing={4} w="full">
-        <ConnectStatus />
+      <Stack bgColor="whiteAlpha.100" boxShadow="md" maxW="md" p={4} rounded="md" spacing={4} w="full">
+        <HStack>
+          <ConnectStatus />
+        </HStack>
         {accountData && (
           <>
             <Text>
@@ -24,8 +27,11 @@ export default function HomePage() {
             <ChainSwitcher />
           </>
         )}
-        <br />
-        <ConnectButton />
+        <HStack align="end" pt={4}>
+          <ToggleTheme />
+          <Spacer />
+          <ConnectButton />
+        </HStack>
       </Stack>
     </Center>
   );

@@ -10,7 +10,7 @@ export default class CustomDocument extends Document {
           <meta content="ie=edge" httpEquiv="X-UA-Compatible" />
         </Head>
         <body>
-          <ColorModeScript initialColorMode="light" />
+          <ColorModeScript initialColorMode="system" />
           <Main />
           <NextScript />
         </body>
