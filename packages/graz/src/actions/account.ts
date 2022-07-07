@@ -1,4 +1,5 @@
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { GasPrice } from "@cosmjs/stargate";
 
 import type { GrazChain } from "../chains";
 import { getKeplr } from "../keplr";
@@ -25,7 +26,10 @@ export async function connect(chain: GrazChain) {
     const [account, signerAuto, client] = await Promise.all([
       await keplr.getKey(chain.chainId),
       await keplr.getOfflineSignerAuto(chain.chainId),
-      await SigningCosmWasmClient.connectWithSigner(chain.rpc, signer),
+      await SigningCosmWasmClient.connectWithSigner(chain.rpc, signer, {
+        gasPrice:
+          chain.gasPrice && chain.gasDenom ? GasPrice.fromString(`${chain.gasPrice}${chain.gasDenom}`) : undefined,
+      }),
     ] as const);
 
     useGrazStore.setState({
