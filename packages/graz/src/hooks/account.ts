@@ -35,7 +35,7 @@ export function useAccount({ onConnect, onDisconnect }: UseAccountArgs = {}) {
 
   return {
     data: account,
-    isConnected: status === "connected",
+    isConnected: Boolean(account),
     isConnecting: status === "connecting",
     isDisconnected: status === "disconnected",
     isReconnecting: status === "reconnecting",
@@ -45,8 +45,8 @@ export function useAccount({ onConnect, onDisconnect }: UseAccountArgs = {}) {
 }
 
 export function useBalances(bech32Address?: string) {
-  const account = useAccount();
-  const address = bech32Address || account.data?.bech32Address;
+  const { data: account } = useAccount();
+  const address = bech32Address || account?.bech32Address;
 
   const queryKey = ["WADESTA_USE_BALANCES", address] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalances(_address!), {
@@ -56,8 +56,8 @@ export function useBalances(bech32Address?: string) {
   return {
     data: query.data,
     error: query.error,
-    isLoading: query.isLoading,
     isFetching: query.isFetching,
+    isLoading: query.isLoading,
     isRefetching: query.isRefetching,
     isSuccess: query.isSuccess,
     refetch: query.refetch,
