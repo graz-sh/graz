@@ -66,7 +66,7 @@ export function useBalances(bech32Address?: string) {
 }
 
 export function useCosmWasmClient() {
-  return useGrazStore((x) => x.client);
+  return useGrazStore((x) => x.signingClient);
 }
 
 export type UseConnectChainArgs = MutationEventArgs<GrazChain, Key>;
@@ -111,9 +111,9 @@ export function useDisconnect({ onError, onLoading, onSuccess }: MutationEventAr
 export function useSigners() {
   return useGrazStore(
     (x) => ({
-      signer: x.signer,
-      signerAmino: x.signerAmino,
-      signerAuto: x.signerAuto,
+      signer: x.offlineSigner,
+      signerAmino: x.offlineSignerAmino,
+      signerAuto: x.offlineSignerAuto,
     }),
     shallow,
   );

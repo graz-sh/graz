@@ -1,5 +1,5 @@
 import type { SigningCosmWasmClientOptions } from "@cosmjs/cosmwasm-stargate";
-import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { CosmWasmClient, SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { GasPrice } from "@cosmjs/stargate";
 
 import type { GrazChain } from "../chains";
@@ -21,13 +21,14 @@ export async function connect(chain: GrazChain, signerOpts: SigningCosmWasmClien
 
     await keplr.enable(chain.chainId);
 
-    const signer = keplr.getOfflineSigner(chain.chainId);
-    const signerAmino = keplr.getOfflineSignerOnlyAmino(chain.chainId);
+    const offlineSigner = keplr.getOfflineSigner(chain.chainId);
+    const offlineSignerAmino = keplr.getOfflineSignerOnlyAmino(chain.chainId);
 
-    const [account, signerAuto, client] = await Promise.all([
-      await keplr.getKey(chain.chainId),
-      await keplr.getOfflineSignerAuto(chain.chainId),
-      await SigningCosmWasmClient.connectWithSigner(chain.rpc, signer, {
+    const [account, client, offlineSignerAuto, signingClient] = await Promise.all([
+      keplr.getKey(chain.chainId),
+      CosmWasmClient.connect(chain.rpc),
+      keplr.getOfflineSignerAuto(chain.chainId),
+      SigningCosmWasmClient.connectWithSigner(chain.rpc, offlineSigner, {
         gasPrice: chain.gas ? GasPrice.fromString(`${chain.gas.price}${chain.gas.denom}`) : undefined,
         ...signerOpts,
       }),
@@ -37,9 +38,10 @@ export async function connect(chain: GrazChain, signerOpts: SigningCosmWasmClien
       account,
       activeChain: chain,
       client,
-      signer,
-      signerAuto,
-      signerAmino,
+      offlineSigner,
+      offlineSignerAmino,
+      offlineSignerAuto,
+      signingClient,
       status: "connected",
       _reconnect: true,
     });
@@ -62,7 +64,7 @@ export async function disconnect() {
 }
 
 export async function getBalances(bech32Address: string) {
-  const { activeChain, client } = useGrazStore.getState();
+  const { activeChain, signingClient: client } = useGrazStore.getState();
 
   if (!activeChain || !client) {
     throw new Error("No connected account detected");
