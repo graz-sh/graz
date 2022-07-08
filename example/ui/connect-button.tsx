@@ -1,5 +1,5 @@
 import { Button, ButtonGroup, IconButton, useToast } from "@chakra-ui/react";
-import { defaultChains, useAccount, useConnect, useDisconnect } from "graz";
+import { mainnetChains, useAccount, useConnect, useDisconnect } from "graz";
 
 export function ConnectButton() {
   const toast = useToast();
@@ -31,7 +31,7 @@ export function ConnectButton() {
   });
 
   function handleConnect() {
-    return isConnected ? disconnect(undefined) : connect(defaultChains.cosmos);
+    return isConnected ? disconnect(undefined) : connect(mainnetChains.cosmos);
   }
 
   return (
