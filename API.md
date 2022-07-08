@@ -178,7 +178,7 @@ hook for connecting to an account with keplr wallet
 #### Usage
 
 ```tsx
-import { useAccount, useConnect, defaultChains } from "graz";
+import { useAccount, useConnect, mainnetChains } from "graz";
 
 function App() {
   const { connect } = useConnect();
@@ -186,7 +186,7 @@ function App() {
 
   return (
     <div>
-      {isConnected ? account.bech32Address : <button onClick={() => connect(defaultChains.cosmos)}>Connect</button>}
+      {isConnected ? account.bech32Address : <button onClick={() => connect(mainnetChains.cosmos)}>Connect</button>}
     </div>
   );
 }
@@ -199,6 +199,7 @@ function App() {
   error: unknown;
   isLoading: boolean;
   isSuccess: boolean;
+  isSupported: boolean;
   connect: (chain: GrazChain) => Key;
   connectAsync: (chain: GrazChain) => Promise<Key>;
   status: "idle" | "error" | "loading" | "success";
@@ -212,7 +213,7 @@ hook for disconnecting an account
 #### Usage
 
 ```tsx
-import { useAccount, useDisconnect, defaultChains } from "graz";
+import { useAccount, useDisconnect } from "graz";
 
 function App() {
   const { disconnect } = useDisconnect();
@@ -396,6 +397,12 @@ function App(){
     function handleSuggestChain(){
         suggest(osmosisTestnet)
     }
+
+    return (
+      <div>
+        <button onClick={handleSuggestChain}>Suggest Osmosis Testnet to Keplr Wallet</button>
+      </div>
+    )
 }
 ```
 
@@ -409,5 +416,67 @@ function App(){
   suggest: (chain: ChainInfo) => ChainInfo;
   suggestAsync: (chain: ChainInfo) => Promise<ChainInfo>;
   status: "idle" | "error" | "loading" | "success";
+}
+```
+
+### `useSuggestChainAndConnect`
+
+[Suggesting a chain](#usesuggestchain) and [connect](#useConnect) to keplr wallet in one hook.
+
+#### Usage
+
+```tsx
+import { Bech32Address } from "@keplr-wallet/cosmos";
+import { useSuggestChainAndConnect } from "graz";
+
+const OSMO = {
+  coinDenom: "osmo",
+  coinMinimalDenom: "uosmo",
+  coinDecimals: 6,
+  coinGeckoId: "osmosis",
+  coinImageUrl: "https://dhj8dql1kzq2v.cloudfront.net/white/osmo.png",
+};
+
+const osmosisTestnet = {
+  rpc: "https://testnet-rpc.osmosis.zone",
+  rest: "https://testnet-rest.osmosis.zone",
+  chainId: "osmo-test-4",
+  chainName: "Osmosis Testnet",
+  stakeCurrency: OSMO,
+  bip44: {
+    coinType: 118,
+  },
+  bech32Config: Bech32Address.defaultBech32Config("osmo"),
+  currencies: [OSMO],
+  feeCurrencies: [OSMO],
+  coinType: 118,
+};
+
+function App() {
+  const { suggestAndConnect } = useSuggestChainAndConnect();
+
+  function handleSuggestAndConnect() {
+    suggestAndConnect(osmosisTestnet);
+  }
+
+  return (
+    <div>
+      <button onClick={handleSuggestAndConnect}>Suggest and Connect to Osmosis Testnet</button>
+    </div>
+  );
+}
+```
+
+#### Return Value
+
+```tsx
+{
+  error: unknown;
+  isLoading: boolean;
+  isSuccess: boolean;
+  isSupported: boolean;
+  status: "idle" | "error" | "loading" | "success";
+  suggestAndConnect: (chain: ChainInfo) => ChainInfo;
+  suggestAndConnectAsync: (chain: ChainInfo) => Promise<{ chain: ChainInfo; account: Key }>;
 }
 ```

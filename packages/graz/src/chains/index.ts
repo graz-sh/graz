@@ -4,6 +4,7 @@ import type { Dictionary } from "../types/core";
 import { cosmoshub } from "./cosmoshub";
 import { juno } from "./juno";
 import { osmosis } from "./osmosis";
+import { osmosisTestnet } from "./osmosis-testnet";
 
 export interface GrazChain {
   chainId: string;
@@ -21,10 +22,16 @@ export function defineChains<T extends Record<string, GrazChain>>(chains: T) {
   return chains;
 }
 
-export const defaultChains = defineChains({
+export const mainnetChains = defineChains({
   cosmos: cosmoshub,
   juno,
   osmosis,
 });
 
-export const defaultChainsArray = [cosmoshub, juno, osmosis];
+export const mainnetChainsArray = [cosmoshub, juno, osmosis];
+
+export const testnetChains = defineChains({
+  osmosis: osmosisTestnet,
+});
+
+export const testnetChainsArray = [osmosisTestnet];
