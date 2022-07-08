@@ -1,5 +1,6 @@
 import { Button, ButtonGroup, FormControl, FormLabel, useToast } from "@chakra-ui/react";
-import { defaultChainsArray, useAccount, useConnect } from "graz";
+import { OSMOSIS_TESTNET } from "constants/osmosis-testnet";
+import { defaultChainsArray, useAccount, useConnect, useSuggestChainAndConnect } from "graz";
 
 export function ChainSwitcher() {
   const toast = useToast();
@@ -20,6 +21,10 @@ export function ChainSwitcher() {
     onSuccess: () => console.log("switched chain"),
   });
 
+  const { suggestAndConnect } = useSuggestChainAndConnect({
+    onSuccess: () => console.log("switched chain"),
+  });
+
   return (
     <FormControl>
       <FormLabel>Switch Chain</FormLabel>
@@ -29,6 +34,10 @@ export function ChainSwitcher() {
             {chain.chainId}
           </Button>
         ))}
+      </ButtonGroup>
+      <FormLabel mt={2}>Suggest and connect chain</FormLabel>
+      <ButtonGroup isDisabled={isConnecting || isReconnecting} size="sm">
+        <Button onClick={() => suggestAndConnect(OSMOSIS_TESTNET)}>{OSMOSIS_TESTNET.chainId}</Button>
       </ButtonGroup>
     </FormControl>
   );
