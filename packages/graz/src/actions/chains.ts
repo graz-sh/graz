@@ -10,7 +10,10 @@ export async function suggestChain(chainInfo: ChainInfo) {
 }
 
 export async function suggestChainAndConnect(chainInfo: ChainInfo) {
-  await suggestChain(chainInfo);
-  await connect(chainInfo);
-  return chainInfo;
+  const [resSuggest, resConnect] = await Promise.all([suggestChain(chainInfo), connect(chainInfo)]);
+
+  return {
+    chain: resSuggest,
+    account: resConnect,
+  };
 }
