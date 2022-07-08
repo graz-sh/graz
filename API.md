@@ -452,18 +452,18 @@ const osmosisTestnet = {
   coinType: 118,
 };
 
-function App(){
-    const { suggestAndConnect } = useSuggestChainAndConnect()
+function App() {
+  const { suggestAndConnect } = useSuggestChainAndConnect();
 
-    function handleSuggestAndConnect(){
-        suggestAndConnect(osmosisTestnet)
-    }
+  function handleSuggestAndConnect() {
+    suggestAndConnect(osmosisTestnet);
+  }
 
-    return (
-      <div>
-        <button onClick={handleSuggestAndConnect}>Suggest and Connect to Osmosis Testnet</button>
-      </div>
-    )
+  return (
+    <div>
+      <button onClick={handleSuggestAndConnect}>Suggest and Connect to Osmosis Testnet</button>
+    </div>
+  );
 }
 ```
 
