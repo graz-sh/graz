@@ -43,7 +43,7 @@ function App() {
 ```
 
 ```jsx
-import { defaultChains, useAccount, useConnect, useDisconnect } from "graz";
+import { mainnetChains, useAccount, useConnect, useDisconnect } from "graz";
 
 function Wallet() {
   const { connect, status } = useConnect();
@@ -51,7 +51,7 @@ function Wallet() {
   const { disconnect } = useDisconnect();
 
   function handleConnect() {
-    return isConnected ? disconnect(undefined) : connect(defaultChains.cosmos);
+    return isConnected ? disconnect(undefined) : connect(mainnetChains.cosmos);
   }
 
   return (
