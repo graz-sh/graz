@@ -94,7 +94,7 @@ yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr
 
 ## API
 
-Read more on available hooks and other imports at [API.md](./API.md).
+You can read more about available hooks and exports on [API.md](./API.md) or via [paka.dev](https://paka.dev/npm/graz).
 
 ## Maintainers
 

@@ -6,12 +6,37 @@ import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckKeplr } from "./keplr";
 
+/**
+ * graz hook to retrieve connected account's active chain
+ *
+ * @example
+ * ```ts
+ * import { useActiveChain } from "graz";
+ * const { rpc, rest, chainId, currencies } = useActiveChain();
+ * ```
+ */
 export function useActiveChain() {
   return useGrazStore((x) => x.activeChain);
 }
 
 export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
 
+/**
+ * graz mutation hook to suggest chain to Keplr Wallet
+ *
+ * @example
+ * ```ts
+ * import { useSuggestChain } from "graz";
+ * const { suggest, isLoading, isSuccess, ... } = useSuggestChain();
+ *
+ * suggest({
+ *    rpc: "https://rpc.cosmoshub.strange.love",
+ *    rest: "https://api.cosmoshub.strange.love",
+ *    chainId: "cosmoshub-4",
+ *    ...
+ * });
+ * ```
+ */
 export function useSuggestChain({ onError, onLoading, onSuccess }: UseSuggestChainArgs = {}) {
   const queryKey = ["USE_SUGGEST_CHAIN", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, suggestChain, {
@@ -32,6 +57,33 @@ export function useSuggestChain({ onError, onLoading, onSuccess }: UseSuggestCha
 
 export type UseSuggestChainAndConnectArgs = MutationEventArgs<ChainInfo, { chain: ChainInfo; account: Key }>;
 
+/**
+ * graz mutation hook to suggest chain to Keplr Wallet and connect account
+ * afterwards
+ *
+ * @example
+ * ```ts
+ * import { useSuggestChainAndConnect } from "graz";
+ *
+ * // basic example
+ * const { suggestAndConnect } = useSuggestChainAndConnect();
+ *
+ * // with event arguments
+ * useSuggestChainAndConnect({
+ *   onError: (err, chainInfo) => { ... },
+ *   onLoading: () => { ... },
+ *   onSuccess: ({ account, chain }) => { ... },
+ * });
+ *
+ * // suggest and connect usage
+ * suggestAndConnect({
+ *    rpc: "https://rpc.cosmoshub.strange.love",
+ *    rest: "https://api.cosmoshub.strange.love",
+ *    chainId: "cosmoshub-4",
+ *    ...
+ * });
+ * ```
+ */
 export function useSuggestChainAndConnect({ onError, onLoading, onSuccess }: UseSuggestChainAndConnectArgs = {}) {
   const queryKey = ["USE_SUGGEST_CHAIN_AND_CONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, suggestChainAndConnect, {

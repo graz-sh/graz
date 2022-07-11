@@ -21,23 +21,77 @@ export interface GrazChain {
   };
 }
 
+/**
+ * Helper function to define chain information records (key values).
+ *
+ * This function does not do anything special else than providing type safety
+ * when defining chain informations.
+ *
+ * @example
+ * ```ts
+ * import { connect, defineChains } from "graz";
+ *
+ * const myChains = defineChains({
+ *    cosmoshub: {
+ *      rpc: "https://rpc.cosmoshub.strange.love",
+ *      rest: "https://api.cosmoshub.strange.love",
+ *      chainId: "cosmoshub-4",
+ *      ...
+ *    },
+ * });
+ *
+ * connect(myChains.cosmoshub);
+ * ```
+ */
 export function defineChains<T extends Dictionary<GrazChain>>(chains: T): T {
   return chains;
 }
 
+/**
+ * Provided mainnet chains
+ *
+ * @example
+ * ```ts
+ * import { connect, mainnetChains } from "graz";
+ * connect(mainnetChains.cosmos);
+ * ```
+ *
+ * @see {@link testnetChains}
+ */
 export const mainnetChains = defineChains({
+  axelar,
   cosmos: cosmoshub,
   juno,
   osmosis,
-  axelar,
   sommelier,
 });
 
-export const mainnetChainsArray = [cosmoshub, juno, osmosis];
+/**
+ * Arary version on {@link mainnetChains}
+ *
+ * @see {@link mainnetChains}
+ */
+export const mainnetChainsArray = [axelar, cosmoshub, juno, osmosis, sommelier];
 
+/**
+ * Provided testnet chains
+ *
+ * @example
+ * ```ts
+ * import { connect, testnetChains } from "graz";
+ * connect(testnetChains.osmosis);
+ * ```
+ *
+ * @see {@link mainnetChains}
+ */
 export const testnetChains = defineChains({
-  osmosis: osmosisTestnet,
   crescent: crescentTestnet,
+  osmosis: osmosisTestnet,
 });
 
-export const testnetChainsArray = [osmosisTestnet];
+/**
+ * Arary version on {@link testnetChains}
+ *
+ * @see {@link testnetChains}
+ */
+export const testnetChainsArray = [crescentTestnet, osmosisTestnet];
