@@ -13,10 +13,8 @@ export function GrazSubscription() {
     const { _reconnect } = useGrazStore.getState();
     if (_reconnect) reconnect();
 
-    window.addEventListener("focus", reconnect);
     window.addEventListener("keplr_keystorechange", reconnect);
     return () => {
-      window.removeEventListener("focus", reconnect);
       window.removeEventListener("keplr_keystorechange", reconnect);
     };
   }, []);
