@@ -48,7 +48,7 @@ export function useBalances(bech32Address?: string) {
   const { data: account } = useAccount();
   const address = bech32Address || account?.bech32Address;
 
-  const queryKey = ["WADESTA_USE_BALANCES", address] as const;
+  const queryKey = ["USE_BALANCES", address] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalances(_address!), {
     enabled: Boolean(address),
   });
@@ -68,7 +68,7 @@ export function useBalances(bech32Address?: string) {
 export type UseConnectChainArgs = MutationEventArgs<GrazChain, Key>;
 
 export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArgs = {}) {
-  const queryKey = ["WADESTA_USE_CONNECT", onError, onLoading, onSuccess];
+  const queryKey = ["USE_CONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, connect, {
     onError: (err, chain) => Promise.resolve(onError?.(err, chain)),
     onMutate: onLoading,
@@ -87,7 +87,7 @@ export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArg
 }
 
 export function useDisconnect({ onError, onLoading, onSuccess }: MutationEventArgs = {}) {
-  const queryKey = ["WADESTA_USE_DISCONNECT", onError, onLoading, onSuccess];
+  const queryKey = ["USE_DISCONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, disconnect, {
     onError: (err) => Promise.resolve(onError?.(err, undefined)),
     onMutate: onLoading,

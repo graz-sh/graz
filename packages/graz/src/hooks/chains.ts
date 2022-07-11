@@ -13,7 +13,7 @@ export function useActiveChain() {
 export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
 
 export function useSuggestChain({ onError, onLoading, onSuccess }: UseSuggestChainArgs = {}) {
-  const queryKey = ["WADESTA_USE_SUGGEST_CHAIN", onError, onLoading, onSuccess];
+  const queryKey = ["USE_SUGGEST_CHAIN", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, suggestChain, {
     onError: (err, chainInfo) => Promise.resolve(onError?.(err, chainInfo)),
     onMutate: onLoading,
@@ -33,7 +33,7 @@ export function useSuggestChain({ onError, onLoading, onSuccess }: UseSuggestCha
 export type UseSuggestChainAndConnectArgs = MutationEventArgs<ChainInfo, { chain: ChainInfo; account: Key }>;
 
 export function useSuggestChainAndConnect({ onError, onLoading, onSuccess }: UseSuggestChainAndConnectArgs = {}) {
-  const queryKey = ["WADESTA_USE_SUGGEST_CHAIN_AND_CONNECT", onError, onLoading, onSuccess];
+  const queryKey = ["USE_SUGGEST_CHAIN_AND_CONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, suggestChainAndConnect, {
     onError: (err, chainInfo) => Promise.resolve(onError?.(err, chainInfo)),
     onMutate: onLoading,
