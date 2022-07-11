@@ -12,6 +12,5 @@ export async function suggestChain(chainInfo: ChainInfo) {
 export async function suggestChainAndConnect(chainInfo: ChainInfo) {
   const chain = await suggestChain(chainInfo);
   const account = await connect(chainInfo);
-
   return { account, chain };
 }

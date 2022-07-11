@@ -9,6 +9,8 @@ const OSMO = {
   coinImageUrl: "https://dhj8dql1kzq2v.cloudfront.net/white/osmo.png",
 };
 
+const currencies = [OSMO];
+
 export const osmosisTestnet: ChainInfo = {
   rpc: "https://testnet-rpc.osmosis.zone",
   rest: "https://testnet-rest.osmosis.zone",
@@ -19,7 +21,7 @@ export const osmosisTestnet: ChainInfo = {
     coinType: 118,
   },
   bech32Config: Bech32Address.defaultBech32Config("osmo"),
-  currencies: [OSMO],
+  currencies,
   feeCurrencies: [OSMO],
   coinType: 118,
 };

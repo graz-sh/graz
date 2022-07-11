@@ -76,12 +76,12 @@ export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArg
   });
 
   return {
+    connect: mutation.mutate,
+    connectAsync: mutation.mutateAsync,
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
     isSupported: useCheckKeplr(),
-    connect: mutation.mutate,
-    connectAsync: mutation.mutateAsync,
     status: mutation.status,
   };
 }
@@ -95,11 +95,11 @@ export function useDisconnect({ onError, onLoading, onSuccess }: MutationEventAr
   });
 
   return {
+    disconnect: mutation.mutate,
+    disconnectAsync: mutation.mutateAsync,
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
-    disconnect: mutation.mutate,
-    disconnectAsync: mutation.mutateAsync,
     status: mutation.status,
   };
 }
