@@ -31,7 +31,7 @@ export function ConnectButton() {
   });
 
   function handleConnect() {
-    return isConnected ? disconnect(undefined) : connect(mainnetChains.cosmos);
+    return isConnected ? disconnect() : connect(mainnetChains.cosmos);
   }
 
   return (
