@@ -62,6 +62,20 @@ const eslintConfig = {
         "import/no-default-export": ["off"],
       },
     },
+    {
+      files: ["theme.config.js"],
+      parserOptions: {
+        parser: "@babel/eslint-parser",
+        babelOptions: {
+          parserOpts: {
+            plugins: ["jsx"],
+          },
+        },
+      },
+      rules: {
+        "import/no-default-export": ["off"],
+      },
+    },
   ],
 };
 
