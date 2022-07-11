@@ -1,5 +1,9 @@
 ![graz](./banner.jpg)
 
+[![npm/v](https://badgen.net/npm/v/graz)](https://www.npmjs.com/package/graz)
+[![npm/dt](https://badgen.net/npm/dt/graz)](https://www.npmjs.com/package/graz)
+[![stars](https://badgen.net/github/stars/strangelove-ventures/graz)](https://github.com/strangelove-ventures/graz)
+
 `graz` is a collection of React hooks containing everything you need to start working with the [Cosmos ecosystem](https://cosmos.network/).
 
 ## Features
@@ -18,12 +22,17 @@
 
 ## Installing
 
+Install `graz` using [npm](https://docs.npmjs.com/cli/v8/commands/npm-install), [yarn](https://yarnpkg.com/cli/add), or [pnpm](https://pnpm.io/cli/install):
+
 ```sh
 # using npm
 npm install graz
 
 # using yarn
 yarn add graz
+
+# using pnpm
+pnpm add graz
 ```
 
 ## Quick start
