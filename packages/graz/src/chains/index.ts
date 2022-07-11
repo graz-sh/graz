@@ -21,7 +21,7 @@ export interface GrazChain {
   };
 }
 
-export function defineChains<T extends Record<string, GrazChain>>(chains: T) {
+export function defineChains<T extends Dictionary<GrazChain>>(chains: T): T {
   return chains;
 }
 

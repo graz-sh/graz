@@ -11,7 +11,11 @@ const queryClient = new QueryClient({
   },
 });
 
-export function GrazProvider({ children }: { children: ReactNode }) {
+export interface GrazProviderProps {
+  children: ReactNode;
+}
+
+export function GrazProvider({ children }: GrazProviderProps): JSX.Element {
   return (
     <QueryClientProvider key="graz-query-client" client={queryClient}>
       <GrazSubscription />

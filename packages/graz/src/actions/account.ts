@@ -1,12 +1,14 @@
 import type { SigningCosmWasmClientOptions } from "@cosmjs/cosmwasm-stargate";
+import type { Coin } from "@cosmjs/proto-signing";
 import { GasPrice } from "@cosmjs/stargate";
+import type { Key } from "@keplr-wallet/types";
 
 import type { GrazChain } from "../chains";
 import { getKeplr } from "../keplr";
 import { defaultValues, useGrazStore } from "../store";
 import { createClient, createSigningClient } from "./clients";
 
-export async function connect(chain: GrazChain, signerOpts: SigningCosmWasmClientOptions = {}) {
+export async function connect(chain: GrazChain, signerOpts: SigningCosmWasmClientOptions = {}): Promise<Key> {
   try {
     const keplr = getKeplr();
 
@@ -54,7 +56,7 @@ export async function connect(chain: GrazChain, signerOpts: SigningCosmWasmClien
   }
 }
 
-export async function disconnect() {
+export async function disconnect(): Promise<void> {
   useGrazStore.setState((x) => ({
     ...defaultValues,
     _supported: x._supported,
@@ -62,7 +64,7 @@ export async function disconnect() {
   return Promise.resolve();
 }
 
-export async function getBalances(bech32Address: string) {
+export async function getBalances(bech32Address: string): Promise<Coin[]> {
   const { activeChain, signingClient: client } = useGrazStore.getState();
 
   if (!activeChain || !client) {
@@ -78,7 +80,7 @@ export async function getBalances(bech32Address: string) {
   return balances;
 }
 
-export function reconnect() {
+export function reconnect(): void {
   const { activeChain } = useGrazStore.getState();
   if (activeChain) void connect(activeChain);
 }
