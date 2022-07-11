@@ -7,6 +7,7 @@ import { crescentTestnet } from "./crescent-testnet";
 import { juno } from "./juno";
 import { osmosis } from "./osmosis";
 import { osmosisTestnet } from "./osmosis-testnet";
+import { sommelier } from "./sommelier";
 
 export interface GrazChain {
   chainId: string;
@@ -29,6 +30,7 @@ export const mainnetChains = defineChains({
   juno,
   osmosis,
   axelar,
+  sommelier,
 });
 
 export const mainnetChainsArray = [cosmoshub, juno, osmosis];
