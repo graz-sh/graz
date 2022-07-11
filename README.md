@@ -72,7 +72,25 @@ function Wallet() {
 }
 ```
 
-View an example app at https://graz-example.vercel.app
+View an example app at [graz-example.vercel.app](https://graz-example.vercel.app).
+
+## Third-party dependencies
+
+`graz` uses various dependencies such as [`@cosmjs/cosmwasm-stargate`](https://www.npmjs.com/package/@cosmjs/cosmwasm-stargate) and [`@keplr-wallet/types`](https://www.npmjs.com/package/@keplr-wallet/types).
+
+Rather than importing those packages directly, you can import from [`graz/dist/vendor`](./packages/graz/src/vendor.ts) which re-exports all dependencies being used (except for [`@keplr-wallet/cosmos`](https://www.npmjs.com/package/@keplr-wallet/cosmos) due to export conflicts):
+
+```diff
+- import type { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
++ import type { CosmWasmClient } from "graz/dist/vendor";
+```
+
+But if you prefer importing from their respective pacakges, you can install dependencies that `graz` uses for better intellisense:
+
+```sh
+# using yarn
+yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr-wallet/types
+```
 
 ## API
 
