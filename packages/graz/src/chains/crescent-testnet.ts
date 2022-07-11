@@ -1,5 +1,5 @@
 import { Bech32Address } from "@keplr-wallet/cosmos";
-import type { ChainInfo } from "@keplr-wallet/types";
+import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 
 const CRE = {
   coinDenom: "CRE",
@@ -8,6 +8,8 @@ const CRE = {
   coinGeckoId: "crescent",
   coinImageUrl: "https://raw.githubusercontent.com/crescent-network/asset/main/images/coin/CRE.png",
 };
+
+const currencies: AppCurrency[] = [CRE];
 
 export const crescentTestnet: ChainInfo = {
   rpc: "https://testnet-endpoint.crescent.network/rpc/crescent",
@@ -18,8 +20,8 @@ export const crescentTestnet: ChainInfo = {
     coinType: 118,
   },
   bech32Config: Bech32Address.defaultBech32Config("CRE"),
-  currencies: [CRE],
-  feeCurrencies: [CRE],
+  currencies,
+  feeCurrencies: currencies,
   stakeCurrency: CRE,
   coinType: 118,
 };
