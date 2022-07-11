@@ -27,7 +27,7 @@ export function ChainSwitcher() {
   return (
     <FormControl>
       <FormLabel>Switch Chain</FormLabel>
-      <ButtonGroup isDisabled={isConnecting || isReconnecting} size="sm">
+      <ButtonGroup flexWrap="wrap" gap={2} isDisabled={isConnecting || isReconnecting} size="sm" spacing={0}>
         {mainnetChainsArray.map((chain) => (
           <Button key={chain.chainId} onClick={() => connect(chain)}>
             {chain.chainId}
