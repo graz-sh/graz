@@ -2,6 +2,7 @@ import type { AppCurrency } from "@keplr-wallet/types";
 
 import type { Dictionary } from "../types/core";
 import { cosmoshub } from "./cosmoshub";
+import { crescentTestnet } from "./crescent-testnet";
 import { juno } from "./juno";
 import { osmosis } from "./osmosis";
 import { osmosisTestnet } from "./osmosis-testnet";
@@ -32,6 +33,7 @@ export const mainnetChainsArray = [cosmoshub, juno, osmosis];
 
 export const testnetChains = defineChains({
   osmosis: osmosisTestnet,
+  crescent: crescentTestnet,
 });
 
 export const testnetChainsArray = [osmosisTestnet];
