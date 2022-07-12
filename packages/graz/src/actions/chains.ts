@@ -1,7 +1,22 @@
 import type { ChainInfo, Key } from "@keplr-wallet/types";
 
-import { getKeplr } from "../keplr";
+import type { GrazChain } from "../chains";
+import { useGrazStore } from "../store";
 import { connect } from "./account";
+import { getKeplr } from "./keplr";
+
+export function configureDefaultChain(chain: GrazChain): GrazChain {
+  useGrazStore.setState({ lastChain: chain });
+  return chain;
+}
+
+export function getRecentChain(): GrazChain | null {
+  return useGrazStore.getState().lastChain;
+}
+
+export function clearRecentChain(): void {
+  useGrazStore.setState({ lastChain: null });
+}
 
 export async function suggestChain(chainInfo: ChainInfo): Promise<ChainInfo> {
   const keplr = getKeplr();
