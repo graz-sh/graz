@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import { useMutation, useQuery } from "react-query";
 import shallow from "zustand/shallow";
 
+import type { ConnectArgs } from "../actions/account";
 import { connect, disconnect, getBalances, reconnect } from "../actions/account";
-import type { GrazChain } from "../chains";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckKeplr } from "./keplr";
@@ -99,7 +99,7 @@ export function useBalances(bech32Address?: string) {
   };
 }
 
-export type UseConnectChainArgs = MutationEventArgs<GrazChain, Key>;
+export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, Key>;
 
 /**
  * graz mutation hook to execute wallet connection with optional arguments to
@@ -136,14 +136,14 @@ export type UseConnectChainArgs = MutationEventArgs<GrazChain, Key>;
 export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArgs = {}) {
   const queryKey = ["USE_CONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, connect, {
-    onError: (err, chain) => Promise.resolve(onError?.(err, chain)),
+    onError: (err, args) => Promise.resolve(onError?.(err, args)),
     onMutate: onLoading,
     onSuccess: (account) => Promise.resolve(onSuccess?.(account)),
   });
 
   return {
-    connect: mutation.mutate,
-    connectAsync: mutation.mutateAsync,
+    connect: (args?: ConnectArgs) => mutation.mutate(args),
+    connectAsync: (args?: ConnectArgs) => mutation.mutateAsync(args),
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,

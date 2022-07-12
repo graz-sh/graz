@@ -4,13 +4,21 @@ import { GasPrice } from "@cosmjs/stargate";
 import type { Key } from "@keplr-wallet/types";
 
 import type { GrazChain } from "../chains";
-import { getKeplr } from "../keplr";
 import { defaultValues, useGrazStore } from "../store";
+import type { Maybe } from "../types/core";
 import { createClient, createSigningClient } from "./clients";
+import { getKeplr } from "./keplr";
 
-export async function connect(chain: GrazChain, signerOpts: SigningCosmWasmClientOptions = {}): Promise<Key> {
+export type ConnectArgs = Maybe<GrazChain & { signerOpts?: SigningCosmWasmClientOptions }>;
+
+export async function connect(args?: ConnectArgs): Promise<Key> {
   try {
     const keplr = getKeplr();
+
+    const chain = args || useGrazStore.getState().lastChain;
+    if (!chain) {
+      throw new Error("No last known connected chain, connect action requires chain info");
+    }
 
     useGrazStore.setState((x) => {
       const isReconnecting = x._reconnect;
@@ -32,13 +40,14 @@ export async function connect(chain: GrazChain, signerOpts: SigningCosmWasmClien
       keplr.getKey(chain.chainId),
       createClient(chain),
       keplr.getOfflineSignerAuto(chain.chainId),
-      createSigningClient({ ...chain, offlineSigner, signerOptions: { gasPrice, ...signerOpts } }),
+      createSigningClient({ ...chain, offlineSigner, signerOptions: { gasPrice, ...(args?.signerOpts || {}) } }),
     ] as const);
 
     useGrazStore.setState({
       account,
       activeChain: chain,
       client,
+      lastChain: chain,
       offlineSigner,
       offlineSignerAmino,
       offlineSignerAuto,
@@ -59,6 +68,7 @@ export async function connect(chain: GrazChain, signerOpts: SigningCosmWasmClien
 export async function disconnect(): Promise<void> {
   useGrazStore.setState((x) => ({
     ...defaultValues,
+    lastChain: x.lastChain,
     _supported: x._supported,
   }));
   return Promise.resolve();
