@@ -12,6 +12,7 @@ export interface GrazStore extends State {
   activeChain: GrazChain | null;
   balances: Coin[] | null;
   client: CosmWasmClient | null;
+  lastChain: GrazChain | null;
   offlineSigner: (OfflineSigner & OfflineDirectSigner) | null;
   offlineSignerAmino: OfflineSigner | null;
   offlineSignerAuto: (OfflineSigner | OfflineDirectSigner) | null;
@@ -27,6 +28,7 @@ export const defaultValues: GrazStore = {
   activeChain: null,
   balances: null,
   client: null,
+  lastChain: null,
   offlineSigner: null,
   offlineSignerAmino: null,
   offlineSignerAuto: null,
@@ -43,6 +45,7 @@ export const useGrazStore = create(
       name: "graz",
       partialize: (x) => ({
         activeChain: x.activeChain,
+        lastChain: x.lastChain,
         _reconnect: x._reconnect,
       }),
       version: 1,
