@@ -5,7 +5,7 @@ import packageJson from "./package.json";
 export default defineConfig(({ watch }) => ({
   clean: !watch,
   dts: true,
-  entry: ["src/index.ts", "src/vendor.ts"],
+  entry: ["src/*.ts"],
   external: [...Object.keys(packageJson.dependencies), ...Object.keys(packageJson.peerDependencies)],
   format: ["cjs", "esm"],
   inject: ["./inject-react.js"],
