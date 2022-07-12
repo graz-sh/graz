@@ -14,12 +14,6 @@
 - 👏 Fully typed and tree-shakeable
 - ...and many more ✨
 
----
-
-**🚧 Currently in development and might not be ready for production use, expect breaking changes until we reach version 1.x 🚧**
-
----
-
 ## Installing
 
 Install `graz` using [npm](https://docs.npmjs.com/cli/v8/commands/npm-install), [yarn](https://yarnpkg.com/cli/add), or [pnpm](https://pnpm.io/cli/install):
