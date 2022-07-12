@@ -1,7 +1,7 @@
 import type { ChainInfo, Key } from "@keplr-wallet/types";
 import { useMutation } from "react-query";
 
-import { suggestChain, suggestChainAndConnect } from "../actions/chains";
+import { clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckKeplr } from "./keplr";
@@ -17,6 +17,27 @@ import { useCheckKeplr } from "./keplr";
  */
 export function useActiveChain() {
   return useGrazStore((x) => x.activeChain);
+}
+
+/**
+ * graz hook to retrieve last connected chain info
+ *
+ * @example
+ * ```ts
+ * import { useRecentChain, connect, mainnetChains } from "graz";
+ * const recentChain = useRecentChain();
+ * try {
+ *   connect();
+ * } catch {
+ *   connect(mainnetChains.cosmos);
+ * }
+ * ```
+ *
+ * @see {@link useActiveChain}
+ */
+export function useRecentChain() {
+  const recentChain = useGrazStore((x) => x.lastChain);
+  return { data: recentChain, clear: clearRecentChain };
 }
 
 export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
