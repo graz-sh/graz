@@ -4,6 +4,7 @@ import { BalanceList } from "ui/balance-list";
 import { ChainSwitcher } from "ui/chain-switcher";
 import { ConnectButton } from "ui/connect-button";
 import { ConnectStatus } from "ui/connect-status";
+import { RecentChain } from "ui/recent-chain";
 import { ToggleTheme } from "ui/toggle-theme";
 
 export default function HomePage() {
@@ -15,6 +16,7 @@ export default function HomePage() {
         <HStack>
           <ConnectStatus />
         </HStack>
+        {!accountData && <RecentChain />}
         {accountData && (
           <>
             <Text>
