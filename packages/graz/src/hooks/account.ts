@@ -169,6 +169,9 @@ export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArg
  *   onLoading: () => { ... },
  *   onSuccess: () => { ... },
  * });
+ *
+ * // pass `true` on disconnect to clear recent connected chain
+ * disconnect(true);
  * ```
  *
  * @see {@link disconnect}
@@ -182,8 +185,8 @@ export function useDisconnect({ onError, onLoading, onSuccess }: MutationEventAr
   });
 
   return {
-    disconnect: () => mutation.mutate(undefined),
-    disconnectAsync: () => mutation.mutateAsync(undefined),
+    disconnect: mutation.mutate,
+    disconnectAsync: mutation.mutateAsync,
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
