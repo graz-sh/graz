@@ -34,7 +34,9 @@ pnpm add graz
 Wrap your React app with `<GrazProvider />` and use available `graz` hooks anywhere:
 
 ```jsx
-import { GrazProvider } from "graz";
+import { GrazProvider, configureDefaultChain, mainnetChains } from "graz";
+
+configureDefaultChain(mainnetChains.cosmos);
 
 function App() {
   return (
@@ -54,7 +56,7 @@ function Wallet() {
   const { disconnect } = useDisconnect();
 
   function handleConnect() {
-    return isConnected ? disconnect(undefined) : connect(mainnetChains.cosmos);
+    return isConnected ? disconnect() : connect();
   }
 
   return (
@@ -72,11 +74,11 @@ View an example app at [graz-example.vercel.app](https://graz-example.vercel.app
 
 `graz` uses various dependencies such as [`@cosmjs/cosmwasm-stargate`](https://www.npmjs.com/package/@cosmjs/cosmwasm-stargate) and [`@keplr-wallet/types`](https://www.npmjs.com/package/@keplr-wallet/types).
 
-Rather than importing those packages directly, you can import from [`graz/dist/vendor`](./packages/graz/src/vendor.ts) which re-exports all dependencies being used (except for [`@keplr-wallet/cosmos`](https://www.npmjs.com/package/@keplr-wallet/cosmos) due to export conflicts):
+Rather than importing those packages directly, you can import from [`graz/dist/cosmjs`](./packages/graz/src/cosmjs.ts) and [`graz/dist/keplr`](./packages/graz/src/keplr.ts) which re-exports all respective dependencies:
 
 ```diff
 - import type { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-+ import type { CosmWasmClient } from "graz/dist/vendor";
++ import type { CosmWasmClient } from "graz/dist/cosmjs";
 ```
 
 But if you prefer importing from their respective pacakges, you can install dependencies that `graz` uses for better intellisense:
