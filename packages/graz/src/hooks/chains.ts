@@ -36,7 +36,7 @@ export function useActiveChain() {
  * @see {@link useActiveChain}
  */
 export function useRecentChain() {
-  const recentChain = useGrazStore((x) => x.lastChain);
+  const recentChain = useGrazStore((x) => x.recentChain);
   return { data: recentChain, clear: clearRecentChain };
 }
 

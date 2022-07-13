@@ -15,8 +15,8 @@ export async function connect(args?: ConnectArgs): Promise<Key> {
   try {
     const keplr = getKeplr();
 
-    const { defaultChain, lastChain } = useGrazStore.getState();
-    const chain = args || lastChain || defaultChain;
+    const { defaultChain, recentChain } = useGrazStore.getState();
+    const chain = args || recentChain || defaultChain;
     if (!chain) {
       throw new Error("No last known connected chain, connect action requires chain info");
     }
@@ -48,10 +48,10 @@ export async function connect(args?: ConnectArgs): Promise<Key> {
       account,
       activeChain: chain,
       client,
-      lastChain: chain,
       offlineSigner,
       offlineSignerAmino,
       offlineSignerAuto,
+      recentChain: chain,
       signingClient,
       status: "connected",
       _reconnect: true,
@@ -69,7 +69,7 @@ export async function connect(args?: ConnectArgs): Promise<Key> {
 export async function disconnect(): Promise<void> {
   useGrazStore.setState((x) => ({
     ...defaultValues,
-    lastChain: x.lastChain,
+    recentChain: x.recentChain,
     _supported: x._supported,
   }));
   return Promise.resolve();

@@ -11,11 +11,11 @@ export function configureDefaultChain(chain: GrazChain): GrazChain {
 }
 
 export function getRecentChain(): GrazChain | null {
-  return useGrazStore.getState().lastChain;
+  return useGrazStore.getState().recentChain;
 }
 
 export function clearRecentChain(): void {
-  useGrazStore.setState({ lastChain: null });
+  useGrazStore.setState({ recentChain: null });
 }
 
 export async function suggestChain(chainInfo: ChainInfo): Promise<ChainInfo> {
