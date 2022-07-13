@@ -6,7 +6,7 @@ import { connect } from "./account";
 import { getKeplr } from "./keplr";
 
 export function configureDefaultChain(chain: GrazChain): GrazChain {
-  useGrazStore.setState({ lastChain: chain });
+  useGrazStore.setState({ defaultChain: chain });
   return chain;
 }
 

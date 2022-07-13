@@ -15,7 +15,8 @@ export async function connect(args?: ConnectArgs): Promise<Key> {
   try {
     const keplr = getKeplr();
 
-    const chain = args || useGrazStore.getState().lastChain;
+    const { defaultChain, lastChain } = useGrazStore.getState();
+    const chain = args || lastChain || defaultChain;
     if (!chain) {
       throw new Error("No last known connected chain, connect action requires chain info");
     }

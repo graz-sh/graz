@@ -12,6 +12,7 @@ export interface GrazStore extends State {
   activeChain: GrazChain | null;
   balances: Coin[] | null;
   client: CosmWasmClient | null;
+  defaultChain: GrazChain | null;
   lastChain: GrazChain | null;
   offlineSigner: (OfflineSigner & OfflineDirectSigner) | null;
   offlineSignerAmino: OfflineSigner | null;
@@ -28,6 +29,7 @@ export const defaultValues: GrazStore = {
   activeChain: null,
   balances: null,
   client: null,
+  defaultChain: null,
   lastChain: null,
   offlineSigner: null,
   offlineSignerAmino: null,
