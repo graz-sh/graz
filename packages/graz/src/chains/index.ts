@@ -5,6 +5,7 @@ import { axelar } from "./axelar";
 import { cosmoshub } from "./cosmoshub";
 import { crescentTestnet } from "./crescent-testnet";
 import { juno } from "./juno";
+import { junoTestnet } from "./juno-testnet"
 import { osmosis } from "./osmosis";
 import { osmosisTestnet } from "./osmosis-testnet";
 import { sommelier } from "./sommelier";
@@ -86,6 +87,7 @@ export const mainnetChainsArray = [axelar, cosmoshub, juno, osmosis, sommelier];
  */
 export const testnetChains = defineChains({
   crescent: crescentTestnet,
+  juno: junoTestnet,
   osmosis: osmosisTestnet,
 });
 
@@ -94,4 +96,4 @@ export const testnetChains = defineChains({
  *
  * @see {@link testnetChains}
  */
-export const testnetChainsArray = [crescentTestnet, osmosisTestnet];
+export const testnetChainsArray = [crescentTestnet, junoTestnet, osmosisTestnet];
