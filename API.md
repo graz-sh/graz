@@ -385,7 +385,7 @@ const osmosisTestnet = {
   bip44: {
     coinType: 118,
   },
-  bech32Config: bech32Config: Bech32Address.defaultBech32Config("osmo"),
+  bech32Config: Bech32Address.defaultBech32Config("osmo"),
   currencies: [OSMO],
   feeCurrencies: [OSMO],
   coinType: 118,
