@@ -68,7 +68,10 @@ function Wallet() {
 }
 ```
 
-View an example app at [graz-example.vercel.app](https://graz-example.vercel.app).
+## Examples
+
+- Next.js + Chakra UI: https://graz-example.vercel.app
+- Vite: https://graz-vite-example.vercel.app
 
 ## Third-party dependencies
 
