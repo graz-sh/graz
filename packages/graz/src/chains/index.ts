@@ -5,7 +5,7 @@ import { axelar } from "./axelar";
 import { cosmoshub } from "./cosmoshub";
 import { crescentTestnet } from "./crescent-testnet";
 import { juno } from "./juno";
-import { junoTestnet } from "./juno-testnet"
+import { junoTestnet } from "./juno-testnet";
 import { osmosis } from "./osmosis";
 import { osmosisTestnet } from "./osmosis-testnet";
 import { sommelier } from "./sommelier";

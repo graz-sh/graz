@@ -1,7 +1,7 @@
 import { Bech32Address } from "@keplr-wallet/cosmos";
 import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 
-const CRE = {
+const CRE: AppCurrency = {
   coinDenom: "CRE",
   coinMinimalDenom: "ucre",
   coinDecimals: 6,
