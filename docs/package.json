@@ -4,19 +4,23 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "start": "next start"
+    "start": "next start",
+    "favicons": "favicons-compiled --input public/icon.png --config config/favicons.json --output public/assets/ --jsx favicons-meta-tags.jsx"
   },
   "dependencies": {
+    "graz": "*",
     "next": "^12",
     "next-transpile-modules": "^9",
+    "nextra": "^2.0.0-alpha.50",
+    "nextra-theme-docs": "^2.0.0-alpha.53",
     "react": "^18",
     "react-dom": "^18",
-    "typescript": "^4",
-    "graz": "*"
+    "typescript": "^4"
   },
   "devDependencies": {
     "@types/node": "^16",
-    "@types/react": "^18"
+    "@types/react": "^18",
+    "favicons-compiled-cli": "^0.0.8"
   },
   "eslintConfig": {
     "extends": [

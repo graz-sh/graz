@@ -1,0 +1,17 @@
+{
+  "path": "/assets/",
+  "appName": "graz",
+  "appShortName": "graz",
+  "appDescription": "React hooks for cosmos",
+  "developerName": "Strangelove Ventures",
+  "developerURL": "https://strangelove.ventures",
+  "background": "#1E1E1E",
+  "theme_color": "#1E1E1E",
+  "icons": {
+    "android": true,
+    "appleIcon": true,
+    "appleStartup": true,
+    "favicons": true,
+    "windows": true
+  }
+}

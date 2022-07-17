@@ -1,0 +1,11 @@
+{
+  "index": {
+    "title": "Overview",
+    "type": "page",
+    "hidden": true
+  },
+  "docs": {
+    "title": "Docs",
+    "type": "page"
+  }
+}

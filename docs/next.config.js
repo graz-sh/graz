@@ -3,6 +3,10 @@
 
 const withTranspileModules = require("next-transpile-modules");
 const packageJson = require("./package.json");
+const withNextra = require("nextra")({
+  theme: "nextra-theme-docs",
+  themeConfig: "./theme.config.js",
+});
 
 /** @type {import("next").NextConfig} */
 let nextConfig = {
@@ -12,7 +16,7 @@ let nextConfig = {
   headers: async () => [],
   reactStrictMode: true,
   redirects: async () => [
-    { source: "/(.*)", destination: "https://github.com/strangelove-ventures/graz", permanent: false },
+    // { source: "/(.*)", destination: "https://github.com/strangelove-ventures/graz", permanent: false },
     //
   ],
   rewrites: async () => [],
@@ -26,4 +30,4 @@ let nextConfig = {
 const localModules = ["graz", ...Object.keys(packageJson.dependencies).filter((dep) => dep.startsWith("@project/"))];
 nextConfig = withTranspileModules(localModules)(nextConfig);
 
-module.exports = nextConfig;
+module.exports = withNextra({ ...nextConfig });
