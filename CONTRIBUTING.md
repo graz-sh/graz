@@ -70,6 +70,8 @@ The following steps will get you up and running to contribute to graz:
 
 `yarn`: bootstrap the entire project
 `yarn dev`: compiles `graz` and start the development server of the example app
+`yarn docs dev`: start the documentation website
+`yarn example dev`: start the example app
 
 ## Pull Request
 
