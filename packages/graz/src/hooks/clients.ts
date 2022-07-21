@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import type { CreateClientArgs, CreateSigningClientArgs } from "../actions/clients";
 import { createClient, createSigningClient } from "../actions/clients";

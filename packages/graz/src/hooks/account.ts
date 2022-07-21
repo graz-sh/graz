@@ -1,6 +1,6 @@
 import type { Key } from "@keplr-wallet/types";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useMutation, useQuery } from "react-query";
 import shallow from "zustand/shallow";
 
 import type { ConnectArgs } from "../actions/account";

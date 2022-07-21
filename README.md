@@ -9,7 +9,7 @@
 ## Features
 
 - 🪝 8+ hooks for interfacing with [Keplr Wallet](https://www.keplr.app/) (connecting, view balances, etc.)
-- 📚 Built-in caching, request deduplication, and all the good stuff from [`react-query`](https://react-query.tanstack.com/) and [`zustand`](https://github.com/pmndrs/zustand)
+- 📚 Built-in caching, request deduplication, and all the good stuff from [`@tanstack/react-query`](https://tanstack.com/query) and [`zustand`](https://github.com/pmndrs/zustand)
 - 🔄 Auto refresh on wallet and network change
 - 👏 Fully typed and tree-shakeable
 - ...and many more ✨

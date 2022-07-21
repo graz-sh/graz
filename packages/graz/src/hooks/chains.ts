@@ -1,5 +1,5 @@
 import type { ChainInfo, Key } from "@keplr-wallet/types";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import { useGrazStore } from "../store";
