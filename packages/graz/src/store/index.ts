@@ -1,13 +1,13 @@
 import type { CosmWasmClient, SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import type { Coin, OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-signing";
 import type { Key } from "@keplr-wallet/types";
-import type { State } from "zustand";
 import create from "zustand";
+import type { PersistOptions } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
 import type { GrazChain } from "../chains";
 
-export interface GrazStore extends State {
+export interface GrazStore {
   account: Key | null;
   activeChain: GrazChain | null;
   balances: Coin[] | null;
@@ -23,6 +23,8 @@ export interface GrazStore extends State {
   _reconnect: boolean;
   _supported: boolean;
 }
+
+export type GrazPersistedStore = Pick<GrazStore, "activeChain" | "recentChain" | "_reconnect">;
 
 export const defaultValues: GrazStore = {
   account: null,
@@ -41,16 +43,14 @@ export const defaultValues: GrazStore = {
   _supported: false,
 };
 
-export const useGrazStore = create(
-  subscribeWithSelector(
-    persist<GrazStore, [["zustand/subscribeWithSelector", never]]>(() => ({ ...defaultValues }), {
-      name: "graz",
-      partialize: (x) => ({
-        activeChain: x.activeChain,
-        recentChain: x.recentChain,
-        _reconnect: x._reconnect,
-      }),
-      version: 1,
-    }),
-  ),
-);
+const persistOptions: PersistOptions<GrazStore, GrazPersistedStore> = {
+  name: "graz",
+  partialize: (x) => ({
+    activeChain: x.activeChain,
+    recentChain: x.recentChain,
+    _reconnect: x._reconnect,
+  }),
+  version: 1,
+};
+
+export const useGrazStore = create(subscribeWithSelector(persist(() => defaultValues, persistOptions)));
