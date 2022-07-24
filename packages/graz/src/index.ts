@@ -1,6 +1,7 @@
 export * from "./actions/account";
 export * from "./actions/chains";
 export * from "./actions/clients";
+export * from "./actions/configure";
 export * from "./actions/keplr";
 export * from "./chains";
 export * from "./hooks/account";
