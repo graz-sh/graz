@@ -789,7 +789,7 @@
     "@cosmjs/math" "0.28.11"
     "@cosmjs/utils" "0.28.11"
 
-"@cosmjs/cosmwasm-stargate@^0.28.10":
+"@cosmjs/cosmwasm-stargate@^0.28.11":
   version "0.28.11"
   resolved "https://registry.yarnpkg.com/@cosmjs/cosmwasm-stargate/-/cosmwasm-stargate-0.28.11.tgz#73e30208a0f7668c0550c5a2410e5289ae46cbd2"
   integrity sha512-sZ04c9ZvwAC7IngNeOhTnHJLBu7PXX3QfWM2vCVGd9puP9f3Hj3nbre75WKjHZ3DDVvxfS3u3JUJ6LjVWeIRuQ==
@@ -905,7 +905,7 @@
   dependencies:
     bn.js "^4.11.8"
 
-"@cosmjs/proto-signing@0.28.11", "@cosmjs/proto-signing@^0.28.10":
+"@cosmjs/proto-signing@0.28.11", "@cosmjs/proto-signing@^0.28.11":
   version "0.28.11"
   resolved "https://registry.yarnpkg.com/@cosmjs/proto-signing/-/proto-signing-0.28.11.tgz#7eecb60a025ab55a409441daa14a07bb1d9b2825"
   integrity sha512-ym0DpLff+0RBkD/mtFf6wrzyuGhcbcjuDMEdcUWOrJTo6n8DXeRmHkJkyy/mrG3QC4tQX/A81+DhfkANQmgcxw==
@@ -937,7 +937,7 @@
     ws "^7"
     xstream "^11.14.0"
 
-"@cosmjs/stargate@0.28.11", "@cosmjs/stargate@^0.28.10":
+"@cosmjs/stargate@0.28.11", "@cosmjs/stargate@^0.28.11":
   version "0.28.11"
   resolved "https://registry.yarnpkg.com/@cosmjs/stargate/-/stargate-0.28.11.tgz#ad89a008ead81cea884714570276523310e95822"
   integrity sha512-UyFH/mTNNKTZohVhj+SmjCRv/xopqU/UinGedmWzs4MqEZteX9xs6D3HTmRCgpmBQ03lpbTslE/FhhT9Hkl9KQ==
@@ -1222,7 +1222,7 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@keplr-wallet/cosmos@^0.10.10":
+"@keplr-wallet/cosmos@^0.10.13":
   version "0.10.13"
   resolved "https://registry.yarnpkg.com/@keplr-wallet/cosmos/-/cosmos-0.10.13.tgz#6f810666108c8615ad83aa44e4919c017d5a92b1"
   integrity sha512-NCF2I3miSMXOmgcN4BZ4Zk40/LnO7lir2MPD71GDVNz6Mf8AbgjHf7EWRXCamZluEvwMtoleHNI/LXcx51Ir1w==
@@ -1259,7 +1259,7 @@
     long "^4.0.0"
     protobufjs "^6.11.2"
 
-"@keplr-wallet/types@0.10.13", "@keplr-wallet/types@^0.10.10":
+"@keplr-wallet/types@0.10.13", "@keplr-wallet/types@^0.10.13":
   version "0.10.13"
   resolved "https://registry.yarnpkg.com/@keplr-wallet/types/-/types-0.10.13.tgz#1c2e64cdcd0ef51e5168375b77a739366c406034"
   integrity sha512-15dLe1oGQjY1nLGQeJERrKawMqPcU6QAY+9eglI2TNi6KGpmpH1PsDb+UIQNCehBTvYfKQl+vdFwHh3Eyw5VWA==
