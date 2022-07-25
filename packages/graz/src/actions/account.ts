@@ -6,7 +6,7 @@ import type { Key } from "@keplr-wallet/types";
 import type { GrazChain } from "../chains";
 import { defaultValues, useGrazStore } from "../store";
 import type { Maybe } from "../types/core";
-import { createClient, createSigningClient } from "./clients";
+import { createClients, createSigningClient } from "./clients";
 import { getKeplr } from "./keplr";
 
 export type ConnectArgs = Maybe<GrazChain & { signerOpts?: SigningCosmWasmClientOptions }>;
@@ -39,7 +39,7 @@ export async function connect(args?: ConnectArgs): Promise<Key> {
 
     const [account, clients, offlineSignerAuto, signingClients] = await Promise.all([
       keplr.getKey(chain.chainId),
-      createClient(chain),
+      createClients(chain),
       keplr.getOfflineSignerAuto(chain.chainId),
       createSigningClient({
         ...chain,

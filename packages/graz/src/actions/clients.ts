@@ -18,7 +18,7 @@ export interface Clients {
 
 export type CreateClientArgs = Pick<GrazChain, "rpc" | "rpcHeaders">;
 
-export async function createClient({ rpc, rpcHeaders }: CreateClientArgs): Promise<Clients> {
+export async function createClients({ rpc, rpcHeaders }: CreateClientArgs): Promise<Clients> {
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
   const cosmWasmClient = await SigningCosmWasmClient.connect(endpoint);
   const stargateClient = await SigningStargateClient.connect(endpoint);

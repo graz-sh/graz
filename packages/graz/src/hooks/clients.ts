@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import type { CreateClientArgs, CreateSigningClientArgs } from "../actions/clients";
-import { createClient, createSigningClient } from "../actions/clients";
+import { createClients, createSigningClient } from "../actions/clients";
 import { useGrazStore } from "../store";
 
 type WithRefetchOpts<T> = T & { keepRefetchBehavior?: boolean };
@@ -27,7 +27,7 @@ export function useClients(args?: WithRefetchOpts<CreateClientArgs>) {
   const query = useQuery(
     queryKey,
     ({ queryKey: [, _args, _current] }) => {
-      return _args?.rpc ? createClient(_args) : _current;
+      return _args?.rpc ? createClients(_args) : _current;
     },
     {
       refetchOnMount: Boolean(args?.keepRefetchBehavior),
