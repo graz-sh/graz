@@ -34,7 +34,7 @@ export type CreateSigningClientArgs = CreateClientArgs & {
   stargateSignerOptions?: SigningStargateClientOptions;
 };
 
-export async function createSigningClient(args: CreateSigningClientArgs): Promise<SigningClients> {
+export async function createSigningClients(args: CreateSigningClientArgs): Promise<SigningClients> {
   const { rpc, rpcHeaders, offlineSigner, cosmWasmSignerOptions = {}, stargateSignerOptions = {} } = args;
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
   const signingCosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
