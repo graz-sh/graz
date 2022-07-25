@@ -1,23 +1,25 @@
-import type { CosmWasmClient, SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import type { Coin, OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-signing";
 import type { Key } from "@keplr-wallet/types";
 import create from "zustand";
 import type { PersistOptions } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
+import type { Clients, SigningClients } from "../actions/clients";
 import type { GrazChain } from "../chains";
 
 export interface GrazStore {
   account: Key | null;
   activeChain: GrazChain | null;
   balances: Coin[] | null;
-  client: CosmWasmClient | null;
+  // TODO: rename this key to clients
+  clients: Clients | null;
   defaultChain: GrazChain | null;
   offlineSigner: (OfflineSigner & OfflineDirectSigner) | null;
   offlineSignerAmino: OfflineSigner | null;
   offlineSignerAuto: (OfflineSigner | OfflineDirectSigner) | null;
   recentChain: GrazChain | null;
-  signingClient: SigningCosmWasmClient | null;
+  // TODO: rename this key to signingClients
+  signingClients: SigningClients | null;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
   _notFoundFn: () => void;
   _reconnect: boolean;
@@ -30,13 +32,13 @@ export const defaultValues: GrazStore = {
   account: null,
   activeChain: null,
   balances: null,
-  client: null,
+  clients: null,
   defaultChain: null,
   offlineSigner: null,
   offlineSignerAmino: null,
   offlineSignerAuto: null,
   recentChain: null,
-  signingClient: null,
+  signingClients: null,
   status: "disconnected",
   _notFoundFn: () => null,
   _reconnect: false,
