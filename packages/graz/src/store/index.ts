@@ -11,14 +11,12 @@ export interface GrazStore {
   account: Key | null;
   activeChain: GrazChain | null;
   balances: Coin[] | null;
-  // TODO: rename this key to clients
   clients: Clients | null;
   defaultChain: GrazChain | null;
   offlineSigner: (OfflineSigner & OfflineDirectSigner) | null;
   offlineSignerAmino: OfflineSigner | null;
   offlineSignerAuto: (OfflineSigner | OfflineDirectSigner) | null;
   recentChain: GrazChain | null;
-  // TODO: rename this key to signingClients
   signingClients: SigningClients | null;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
   _notFoundFn: () => void;
