@@ -27,7 +27,7 @@
     "@keplr-wallet/cosmos": "^0.10.13",
     "@keplr-wallet/types": "^0.10.13",
     "@tanstack/react-query": "^4.0.10",
-    "zustand": "^4.0.0-rc.4"
+    "zustand": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^16",
