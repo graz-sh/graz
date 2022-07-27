@@ -1,23 +1,30 @@
+import type { CosmWasmClient, SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import type { Coin, OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-signing";
+import type { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import type { Key } from "@keplr-wallet/types";
 import create from "zustand";
 import type { PersistOptions } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
-import type { Clients, SigningClients } from "../actions/clients";
 import type { GrazChain } from "../chains";
 
 export interface GrazStore {
   account: Key | null;
   activeChain: GrazChain | null;
   balances: Coin[] | null;
-  clients: Clients | null;
+  clients: {
+    cosmWasm: CosmWasmClient;
+    stargate: StargateClient;
+  } | null;
   defaultChain: GrazChain | null;
   offlineSigner: (OfflineSigner & OfflineDirectSigner) | null;
   offlineSignerAmino: OfflineSigner | null;
   offlineSignerAuto: (OfflineSigner | OfflineDirectSigner) | null;
   recentChain: GrazChain | null;
-  signingClients: SigningClients | null;
+  signingClients: {
+    cosmWasm: SigningCosmWasmClient;
+    stargate: SigningStargateClient;
+  } | null;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
   _notFoundFn: () => void;
   _reconnect: boolean;

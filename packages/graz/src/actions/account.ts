@@ -88,7 +88,7 @@ export async function getBalances(bech32Address: string): Promise<Coin[]> {
 
   const balances = await Promise.all(
     activeChain.currencies.map(async (item) => {
-      return signingClients.signingCosmWasmClient.getBalance(bech32Address, item.coinMinimalDenom);
+      return signingClients.cosmWasm.getBalance(bech32Address, item.coinMinimalDenom);
     }),
   );
 
