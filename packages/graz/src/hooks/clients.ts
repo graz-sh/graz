@@ -23,7 +23,7 @@ type WithRefetchOpts<T> = T & { keepRefetchBehavior?: boolean };
 export function useClients(args?: WithRefetchOpts<CreateClientArgs>) {
   const currentClient = useGrazStore((x) => x.clients);
 
-  const queryKey = ["USE_CLIENT", args, currentClient] as const;
+  const queryKey = ["USE_CLIENTS", args, currentClient] as const;
   const query = useQuery(
     queryKey,
     ({ queryKey: [, _args, _current] }) => {
