@@ -20,8 +20,10 @@ export type CreateClientArgs = Pick<GrazChain, "rpc" | "rpcHeaders">;
 
 export async function createClients({ rpc, rpcHeaders }: CreateClientArgs): Promise<Clients> {
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
-  const cosmWasmClient = await SigningCosmWasmClient.connect(endpoint);
-  const stargateClient = await SigningStargateClient.connect(endpoint);
+  const [cosmWasmClient, stargateClient] = await Promise.all([
+    SigningCosmWasmClient.connect(endpoint),
+    SigningStargateClient.connect(endpoint),
+  ]);
   return {
     cosmWasmClient,
     stargateClient,
@@ -37,16 +39,10 @@ export type CreateSigningClientArgs = CreateClientArgs & {
 export async function createSigningClients(args: CreateSigningClientArgs): Promise<SigningClients> {
   const { rpc, rpcHeaders, offlineSigner, cosmWasmSignerOptions = {}, stargateSignerOptions = {} } = args;
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
-  const signingCosmWasmClient = await SigningCosmWasmClient.connectWithSigner(
-    endpoint,
-    offlineSigner,
-    cosmWasmSignerOptions,
-  );
-  const signingStargateClient = await SigningStargateClient.connectWithSigner(
-    endpoint,
-    offlineSigner,
-    stargateSignerOptions,
-  );
+  const [signingCosmWasmClient, signingStargateClient] = await Promise.all([
+    SigningCosmWasmClient.connectWithSigner(endpoint, offlineSigner, cosmWasmSignerOptions),
+    SigningStargateClient.connectWithSigner(endpoint, offlineSigner, stargateSignerOptions),
+  ]);
   return {
     signingCosmWasmClient,
     signingStargateClient,
