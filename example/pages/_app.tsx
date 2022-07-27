@@ -1,10 +1,12 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { configureDefaultChain, GrazProvider, mainnetChains } from "graz";
+import { configureGraz, GrazProvider, mainnetChains } from "graz";
 import type { AppProps } from "next/app";
 
 const theme = extendTheme();
 
-configureDefaultChain(mainnetChains.cosmos);
+configureGraz({
+  defaultChain: mainnetChains.cosmos,
+});
 
 export default function CustomApp({ Component, pageProps }: AppProps) {
   return (
