@@ -6,7 +6,7 @@ import type { Key } from "@keplr-wallet/types";
 import type { GrazChain } from "../chains";
 import { defaultValues, useGrazStore } from "../store";
 import type { Maybe } from "../types/core";
-import { createClient, createSigningClient } from "./clients";
+import { createClients, createSigningClients } from "./clients";
 import { getKeplr } from "./keplr";
 
 export type ConnectArgs = Maybe<GrazChain & { signerOpts?: SigningCosmWasmClientOptions }>;
@@ -37,22 +37,26 @@ export async function connect(args?: ConnectArgs): Promise<Key> {
 
     const gasPrice = chain.gas ? GasPrice.fromString(`${chain.gas.price}${chain.gas.denom}`) : undefined;
 
-    const [account, client, offlineSignerAuto, signingClient] = await Promise.all([
+    const [account, clients, offlineSignerAuto, signingClients] = await Promise.all([
       keplr.getKey(chain.chainId),
-      createClient(chain),
+      createClients(chain),
       keplr.getOfflineSignerAuto(chain.chainId),
-      createSigningClient({ ...chain, offlineSigner, signerOptions: { gasPrice, ...(args?.signerOpts || {}) } }),
+      createSigningClients({
+        ...chain,
+        offlineSigner,
+        cosmWasmSignerOptions: { gasPrice, ...(args?.signerOpts || {}) },
+      }),
     ] as const);
 
     useGrazStore.setState({
       account,
       activeChain: chain,
-      client,
+      clients,
       offlineSigner,
       offlineSignerAmino,
       offlineSignerAuto,
       recentChain: chain,
-      signingClient,
+      signingClients,
       status: "connected",
       _reconnect: true,
     });
@@ -76,15 +80,15 @@ export async function disconnect(clearRecentChain = false): Promise<void> {
 }
 
 export async function getBalances(bech32Address: string): Promise<Coin[]> {
-  const { activeChain, signingClient: client } = useGrazStore.getState();
+  const { activeChain, signingClients } = useGrazStore.getState();
 
-  if (!activeChain || !client) {
+  if (!activeChain || !signingClients) {
     throw new Error("No connected account detected");
   }
 
   const balances = await Promise.all(
     activeChain.currencies.map(async (item) => {
-      return client.getBalance(bech32Address, item.coinMinimalDenom);
+      return signingClients.cosmWasm.getBalance(bech32Address, item.coinMinimalDenom);
     }),
   );
 

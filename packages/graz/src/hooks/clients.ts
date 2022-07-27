@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import type { CreateClientArgs, CreateSigningClientArgs } from "../actions/clients";
-import { createClient, createSigningClient } from "../actions/clients";
+import { createClients, createSigningClients } from "../actions/clients";
 import { useGrazStore } from "../store";
 
 type WithRefetchOpts<T> = T & { keepRefetchBehavior?: boolean };
@@ -20,14 +20,14 @@ type WithRefetchOpts<T> = T & { keepRefetchBehavior?: boolean };
  * useClient({ rpc: "https://rpc.cosmoshub.strange.love", });
  * ```
  */
-export function useClient(args?: WithRefetchOpts<CreateClientArgs>) {
-  const currentClient = useGrazStore((x) => x.client);
+export function useClients(args?: WithRefetchOpts<CreateClientArgs>) {
+  const currentClient = useGrazStore((x) => x.clients);
 
-  const queryKey = ["USE_CLIENT", args, currentClient] as const;
+  const queryKey = ["USE_CLIENTS", args, currentClient] as const;
   const query = useQuery(
     queryKey,
     ({ queryKey: [, _args, _current] }) => {
-      return _args?.rpc ? createClient(_args) : _current;
+      return _args?.rpc ? createClients(_args) : _current;
     },
     {
       refetchOnMount: Boolean(args?.keepRefetchBehavior),
@@ -65,14 +65,14 @@ export function useClient(args?: WithRefetchOpts<CreateClientArgs>) {
  * });
  * ```
  */
-export function useSigningClient(args?: WithRefetchOpts<CreateSigningClientArgs>) {
-  const currentClient = useGrazStore((x) => x.signingClient);
+export function useSigningClients(args?: WithRefetchOpts<CreateSigningClientArgs>) {
+  const currentClient = useGrazStore((x) => x.signingClients);
 
-  const queryKey = ["USE_SIGNING_CLIENT", args, currentClient] as const;
+  const queryKey = ["USE_SIGNING_CLIENTS", args, currentClient] as const;
   const query = useQuery(
     queryKey,
     ({ queryKey: [, _args, _current] }) => {
-      return _args?.rpc ? createSigningClient(_args) : _current;
+      return _args?.rpc ? createSigningClients(_args) : _current;
     },
     {
       refetchOnMount: Boolean(args?.keepRefetchBehavior),
