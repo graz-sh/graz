@@ -68,7 +68,7 @@ export function useClients(args?: WithRefetchOpts<CreateClientArgs>) {
 export function useSigningClients(args?: WithRefetchOpts<CreateSigningClientArgs>) {
   const currentClient = useGrazStore((x) => x.signingClients);
 
-  const queryKey = ["USE_SIGNING_CLIENT", args, currentClient] as const;
+  const queryKey = ["USE_SIGNING_CLIENTS", args, currentClient] as const;
   const query = useQuery(
     queryKey,
     ({ queryKey: [, _args, _current] }) => {
