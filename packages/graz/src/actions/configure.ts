@@ -1,5 +1,5 @@
 import type { GrazChain } from "../chains";
-import { configureDefaultChain } from "./chains";
+import { useGrazStore } from "../store";
 import { registerKeplrNotFound } from "./keplr";
 
 export interface ConfigureGrazArgs {
@@ -11,7 +11,7 @@ export function configureGraz(args: ConfigureGrazArgs = {}): ConfigureGrazArgs {
   const { defaultChain, onKeplrNotFound } = args;
 
   if (defaultChain) {
-    configureDefaultChain(defaultChain);
+    useGrazStore.setState({ defaultChain });
   }
 
   if (onKeplrNotFound) {

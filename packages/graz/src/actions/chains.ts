@@ -5,11 +5,6 @@ import { useGrazStore } from "../store";
 import { connect } from "./account";
 import { getKeplr } from "./keplr";
 
-export function configureDefaultChain(chain: GrazChain): GrazChain {
-  useGrazStore.setState({ defaultChain: chain });
-  return chain;
-}
-
 export function getRecentChain(): GrazChain | null {
   return useGrazStore.getState().recentChain;
 }
