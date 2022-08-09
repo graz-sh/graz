@@ -86,9 +86,10 @@ export async function getBalances(bech32Address: string): Promise<Coin[]> {
     throw new Error("No connected account detected");
   }
 
+  const { defaultSigningClient } = useGrazStore.getState();
   const balances = await Promise.all(
     activeChain.currencies.map(async (item) => {
-      return signingClients.cosmWasm.getBalance(bech32Address, item.coinMinimalDenom);
+      return signingClients[defaultSigningClient].getBalance(bech32Address, item.coinMinimalDenom);
     }),
   );
 
