@@ -36,7 +36,9 @@ Wrap your React app with `<GrazProvider />` and use available `graz` hooks anywh
 ```jsx
 import { GrazProvider, configureDefaultChain, mainnetChains } from "graz";
 
-configureDefaultChain(mainnetChains.cosmos);
+configureGraz({
+  defaultChain: mainnetChains.cosmos,
+});
 
 function App() {
   return (
