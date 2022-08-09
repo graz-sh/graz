@@ -17,6 +17,7 @@ export interface GrazStore {
     stargate: StargateClient;
   } | null;
   defaultChain: GrazChain | null;
+  defaultSigningClient: "cosmWasm" | "stargate";
   offlineSigner: (OfflineSigner & OfflineDirectSigner) | null;
   offlineSignerAmino: OfflineSigner | null;
   offlineSignerAuto: (OfflineSigner | OfflineDirectSigner) | null;
@@ -39,6 +40,7 @@ export const defaultValues: GrazStore = {
   balances: null,
   clients: null,
   defaultChain: null,
+  defaultSigningClient: "stargate",
   offlineSigner: null,
   offlineSignerAmino: null,
   offlineSignerAuto: null,
