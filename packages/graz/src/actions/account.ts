@@ -34,16 +34,16 @@ export async function connect(args?: ConnectArgs): Promise<Key> {
 
     const offlineSigner = keplr.getOfflineSigner(chain.chainId);
     const offlineSignerAmino = keplr.getOfflineSignerOnlyAmino(chain.chainId);
+    const offlineSignerAuto = await keplr.getOfflineSignerAuto(chain.chainId);
 
     const gasPrice = chain.gas ? GasPrice.fromString(`${chain.gas.price}${chain.gas.denom}`) : undefined;
 
-    const [account, clients, offlineSignerAuto, signingClients] = await Promise.all([
+    const [account, clients, signingClients] = await Promise.all([
       keplr.getKey(chain.chainId),
       createClients(chain),
-      keplr.getOfflineSignerAuto(chain.chainId),
       createSigningClients({
         ...chain,
-        offlineSigner,
+        offlineSignerAuto,
         cosmWasmSignerOptions: { gasPrice, ...(args?.signerOpts || {}) },
       }),
     ] as const);

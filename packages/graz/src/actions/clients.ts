@@ -1,6 +1,6 @@
 import type { HttpEndpoint, SigningCosmWasmClientOptions } from "@cosmjs/cosmwasm-stargate";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import type { OfflineSigner } from "@cosmjs/proto-signing";
+import type { OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-signing";
 import type { SigningStargateClientOptions } from "@cosmjs/stargate";
 import { SigningStargateClient } from "@cosmjs/stargate";
 
@@ -19,17 +19,17 @@ export async function createClients({ rpc, rpcHeaders }: CreateClientArgs): Prom
 }
 
 export type CreateSigningClientArgs = CreateClientArgs & {
-  offlineSigner: OfflineSigner;
+  offlineSignerAuto: OfflineSigner | OfflineDirectSigner;
   cosmWasmSignerOptions?: SigningCosmWasmClientOptions;
   stargateSignerOptions?: SigningStargateClientOptions;
 };
 
 export async function createSigningClients(args: CreateSigningClientArgs): Promise<GrazStore["signingClients"]> {
-  const { rpc, rpcHeaders, offlineSigner, cosmWasmSignerOptions = {}, stargateSignerOptions = {} } = args;
+  const { rpc, rpcHeaders, offlineSignerAuto, cosmWasmSignerOptions = {}, stargateSignerOptions = {} } = args;
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
   const [cosmWasm, stargate] = await Promise.all([
-    SigningCosmWasmClient.connectWithSigner(endpoint, offlineSigner, cosmWasmSignerOptions),
-    SigningStargateClient.connectWithSigner(endpoint, offlineSigner, stargateSignerOptions),
+    SigningCosmWasmClient.connectWithSigner(endpoint, offlineSignerAuto, cosmWasmSignerOptions),
+    SigningStargateClient.connectWithSigner(endpoint, offlineSignerAuto, stargateSignerOptions),
   ]);
   return { cosmWasm, stargate };
 }
