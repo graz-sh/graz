@@ -1,6 +1,6 @@
 # Chains
 
-`graz` provide some mainnet and testnet chains.
+`graz` provides the following mainnet and testnet chains.
 
 ### Mainnet
 
