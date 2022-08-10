@@ -1,6 +1,6 @@
 # configureGraz
 
-`configureGraz` is a function that you can use to set default action or state that provided to interact with `graz`
+`configureGraz` sets a default action or state to interact with `graz`
 
 #### Arguments
 
