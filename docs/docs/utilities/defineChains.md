@@ -8,9 +8,11 @@ The `defineChains` function allows you to standarized your chains info/config to
 ```tsx
 interface GrazChain {
   chainId: string;
-  currencies: AppCurrency[]; // from @keplr-wallet/types
+  currencies: any[];
   rest: string;
   rpc: string;
+  rpcHeaders?: Dictionary<string>;
+  gas?: { price: string; denom: string };
 }
 ```
 
