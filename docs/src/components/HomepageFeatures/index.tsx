@@ -12,7 +12,7 @@ export default function HomepageFeatures(): JSX.Element {
           <div className={clsx("col col--8 col--offset-2")}>
             <h1>Features</h1>
             <ul>
-              <li>🪝 8+ hooks for interfacing with Keplr Wallet (connecting, view balances, etc.)</li>
+              <li>🪝 10+ hooks for interfacing with Keplr Wallet (connecting, view balances, etc.)</li>
               <li>
                 📚 Built-in caching, request deduplication, and all the good stuff from @tanstack/react-query and
                 zustand
