@@ -38,6 +38,14 @@
   "peerDependencies": {
     "react": ">=17"
   },
+  "keywords": [
+    "graz",
+    "keplr-wallet",
+    "keplr",
+    "react-cosmos-hooks",
+    "strangelove-ventures",
+    "use-keplr"
+  ],
   "eslintConfig": {
     "extends": [
       "@project/eslint-config"
