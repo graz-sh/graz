@@ -1,6 +1,6 @@
 # defineChains
 
-The `defineChains` function allows you to standarized your chains info/config to interact with `graz` except `useSuggestChain` hook. `graz` use own `ChainInfo` config that called `GrazChain`
+`graz` uses a lighter-weight implementation of Keplr's `ChainInfo` config called `GrazChain`. The `defineChains` function allows you to set default chain info configurations for `graz`. The `useSuggestChain` and `useSuggestChainAndConnect` hooks do not use these defaults, as they require the full Keplr `ChainInfo` spec. 
 
 <details><summary>GrazChain</summary>
 <p>
@@ -30,7 +30,7 @@ interface GrazChain {
 
 #### Usage
 
-to create your chains is simply create a record that filled with `GrazChain`
+define your chain by popluating a `GrazChain` record
 
 ```tsx
 import { defineChains, connect } from "graz";
@@ -56,8 +56,6 @@ connect(myCustomChains.cosmos);
 ```
 
 #### Return Value
-
-return a records that typed as your defined
 
 ```tsx
 {
