@@ -1,6 +1,6 @@
 # GrazChain
 
-`graz` use own `ChainInfo` config that we called `GrazChain`
+`graz` uses a dedicated `ChainInfo` config called `GrazChain`
 
 ```tsx
 interface GrazChain {
