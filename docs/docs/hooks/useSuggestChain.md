@@ -4,7 +4,7 @@ hook for suggesting a chain to keplr wallet
 
 :::info
 
-Keplr's 'suggest chain' feature allows front-ends to request adding new Cosmos-SDK based blockchains that isn't natively integrated to Keplr extension. If the same chain is already added to Keplr, nothing will happen. If the user rejects the request, an error will be thrown.
+Keplr's 'suggest chain' feature allows front-ends to request the addition of a Cosmos-SDK-based blockchain that isn't already integrated into the Keplr extension. If the same chain is already supported by Keplr, nothing will happen. If the user rejects the request, an error will be thrown.
 
 This allows all Cosmos-SDK blockchains to have permissionless, instant wallet and transaction signing support for front-ends.
 https://docs.keplr.app/api/suggest-chain.html
@@ -13,7 +13,7 @@ https://docs.keplr.app/api/suggest-chain.html
 
 #### Usage
 
-You need to have the `ChainInfo` to use `suggest` on `useSuggestChain`
+You need to populate a full `ChainInfo` record to use `suggest` on `useSuggestChain`
 
 <details><summary>ChainInfo</summary>
 <p>
