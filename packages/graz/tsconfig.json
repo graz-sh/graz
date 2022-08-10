@@ -1,7 +1,7 @@
 {
   "extends": "@vercel/style-guide/typescript.json",
   "compilerOptions": {
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "moduleResolution": "node",
     "resolveJsonModule": true
   },
