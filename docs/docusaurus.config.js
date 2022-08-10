@@ -100,7 +100,7 @@ const config = {
         ],
         copyright: `MIT License, Copyright © ${new Date().getFullYear()} Strangelove Ventures`,
       },
-      image: "img/social.jpg",
+      image: "img/social.png",
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
