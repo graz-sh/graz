@@ -52,3 +52,11 @@
 .footer {
   background-color: #131314;
 }
+
+.table-of-contents__link--active {
+  color: rgb(96, 159, 107);
+}
+
+.clean-btn:hover {
+  background-color: rgba(183, 252, 194, 0.7) !important;
+}
