@@ -19,7 +19,14 @@
 .heroDescription {
   margin: auto;
   width: 60%;
-  color: var(--ifm-color-primary-light);
+  color: rgba(183, 252, 194, 0.7);
+}
+
+.badge {
+  display: flex;
+  gap: 4px;
+  flex-direction: row;
+  justify-content: center;
 }
 
 @media screen and (max-width: 996px) {
@@ -38,6 +45,12 @@
   width: 100%;
   display: "flex";
   justify-content: "center";
+}
+
+.installContainer.tabs-container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .installContainerCode {

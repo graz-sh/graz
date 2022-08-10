@@ -106,7 +106,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Strangelove Ventures`,
+        copyright: `MIT License, Copyright © ${new Date().getFullYear()} Strangelove Ventures`,
       },
       image: "img/social.jpg",
       prism: {

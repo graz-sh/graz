@@ -14,6 +14,18 @@ function HomepageHeader() {
     <header className={clsx(styles.heroBanner)}>
       <div className="container">
         <img alt="graz logo" height={100} src="img/logo.png" />
+        <div className={clsx("hero__subtitle", styles.badge)}>
+          <a href="https://www.npmjs.com/package/graz">
+            <img alt="versions badge" src="https://badgen.net/npm/v/graz" />
+          </a>
+          <a href="https://www.npmjs.com/package/graz">
+            <img alt="downloads badge" src="https://badgen.net/npm/dt/graz" />
+          </a>
+          <a href="https://github.com/strangelove-ventures/graz">
+            <img alt="stars badge" src="https://badgen.net/github/stars/strangelove-ventures/graz" />
+          </a>
+        </div>
+
         <p className={clsx("hero__subtitle", styles.heroDescription)}>
           graz is a collection of React hooks containing everything you need to start working with the Cosmos ecosystem.
         </p>
@@ -39,6 +51,9 @@ export default function Home(): JSX.Element {
             </TabItem>
             <TabItem label="npm" value="npm">
               <div className={styles.installContainerCode}>npm install graz</div>
+            </TabItem>
+            <TabItem label="pnpm" value="pnpm">
+              <div className={styles.installContainerCode}>pnpm add graz</div>
             </TabItem>
           </Tabs>
         </div>
