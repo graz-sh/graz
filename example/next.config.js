@@ -20,7 +20,7 @@ let nextConfig = {
   },
 };
 
-const localModules = ["graz", ...Object.keys(packageJson.dependencies).filter((dep) => dep.startsWith("@project/"))];
+const localModules = Object.keys(packageJson.dependencies).filter((dep) => dep.startsWith("@project/"));
 nextConfig = withTranspileModules(localModules)(nextConfig);
 
 module.exports = nextConfig;
