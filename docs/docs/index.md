@@ -79,7 +79,7 @@ function Wallet() {
 
 `graz` uses various dependencies such as [`@cosmjs/cosmwasm-stargate`](https://www.npmjs.com/package/@cosmjs/cosmwasm-stargate) and [`@keplr-wallet/types`](https://www.npmjs.com/package/@keplr-wallet/types).
 
-Rather than importing those packages directly, you can import from [`graz/dist/cosmjs`](./packages/graz/src/cosmjs.ts) and [`graz/dist/keplr`](./packages/graz/src/keplr.ts) which re-exports all respective dependencies:
+Rather than importing those packages directly, you can import from [`graz/dist/cosmjs`](https://github.com/strangelove-ventures/graz/tree/dev/packages/graz/src/cosmjs.ts) and [`graz/dist/keplr`](https://github.com/strangelove-ventures/graz/tree/dev/packages/graz/src/keplr.ts) which re-exports all respective dependencies:
 
 ```diff
 - import type { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
@@ -100,4 +100,4 @@ yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr
 
 ## License
 
-[MIT License, Copyright (c) 2022 Strangelove Ventures](./LICENSE)
+[MIT License, Copyright (c) 2022 Strangelove Ventures](./license)
