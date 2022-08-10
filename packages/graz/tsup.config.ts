@@ -9,7 +9,6 @@ export default defineConfig(({ watch }) => ({
   external: [...Object.keys(packageJson.dependencies), ...Object.keys(packageJson.peerDependencies)],
   format: ["cjs", "esm"],
   inject: ["./inject-react.js"],
-  legacyOutput: true,
   minify: !watch,
   minifyIdentifiers: !watch,
   minifySyntax: !watch,
