@@ -1,6 +1,6 @@
 # useCheckKeplr
 
-hook which returns boolean whether Keplr Wallet is supported
+hook which returns a boolean describing whether Keplr Wallet is supported
 
 #### Usage
 
