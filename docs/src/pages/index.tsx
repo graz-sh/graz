@@ -36,7 +36,7 @@ function HomepageHeader() {
 export default function Home(): JSX.Element {
   return (
     <Layout
-      description="Graz is a collection of React hooks containing everything you need to start working with the Cosmos ecosystem"
+      description="graz is a collection of React hooks containing everything you need to start working with the Cosmos ecosystem"
       title="React hooks for Cosmos"
     >
       <HomepageHeader />
