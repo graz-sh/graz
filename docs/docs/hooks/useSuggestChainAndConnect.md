@@ -1,6 +1,6 @@
 # useSuggestChainAndConnect
 
-[Suggesting a chain](#usesuggestchain) and [connect](#useConnect) to keplr wallet in one hook.
+[Suggesting a chain](useSuggestChain.md) and [connect](./useConnect.md) to keplr wallet in one hook.
 
 #### Usage
 
