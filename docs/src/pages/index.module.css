@@ -16,10 +16,14 @@
   background-size: cover;
 }
 
+.heroImage {
+  height: 100px;
+}
+
 .heroDescription {
   margin: auto;
-  width: 60%;
   color: rgba(183, 252, 194, 0.7);
+  width: 60%;
 }
 
 .badge {
@@ -32,6 +36,13 @@
 @media screen and (max-width: 996px) {
   .heroBanner {
     padding: 2rem;
+  }
+  .heroDescription {
+    width: 100%;
+    font-size: 1.2rem;
+  }
+  .heroImage {
+    height: 80px;
   }
 }
 

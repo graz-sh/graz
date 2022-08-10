@@ -11,15 +11,15 @@ function HomepageHeader() {
   return (
     <header className={clsx(styles.heroBanner)}>
       <div className="container">
-        <img alt="graz logo" height={100} src="img/logo.png" />
+        <img alt="graz logo" className={styles.heroImage} src="img/logo.png" />
         <div className={clsx("hero__subtitle", styles.badge)}>
-          <a href="https://www.npmjs.com/package/graz">
+          <a href="https://www.npmjs.com/package/graz" rel="noopener" target="_blank">
             <img alt="versions badge" src="https://badgen.net/npm/v/graz" />
           </a>
-          <a href="https://www.npmjs.com/package/graz">
+          <a href="https://www.npmjs.com/package/graz" rel="noopener" target="_blank">
             <img alt="downloads badge" src="https://badgen.net/npm/dt/graz" />
           </a>
-          <a href="https://github.com/strangelove-ventures/graz">
+          <a href="https://github.com/strangelove-ventures/graz" rel="noopener" target="_blank">
             <img alt="stars badge" src="https://badgen.net/github/stars/strangelove-ventures/graz" />
           </a>
         </div>
