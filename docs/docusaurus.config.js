@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "Graz",
   tagline: "React hooks for cosmos",
-  url: "https://your-docusaurus-test-site.com",
+  url: "https://graz.strange.love",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
