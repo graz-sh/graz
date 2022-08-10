@@ -38,7 +38,7 @@
   background-color: #041d12;
 }
 
-.installContainer_src-pages-index-module > .tabs-container {
+.install-container > .tabs-container {
   align-items: center;
   display: flex;
   flex-direction: column;
