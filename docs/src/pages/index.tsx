@@ -1,4 +1,3 @@
-import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import HomepageFeatures from "@site/src/components/HomepageFeatures";
 import Layout from "@theme/Layout";
 import TabItem from "@theme/TabItem";
@@ -9,7 +8,6 @@ import React from "react";
 import styles from "./index.module.css";
 
 function HomepageHeader() {
-  const { siteConfig } = useDocusaurusContext();
   return (
     <header className={clsx(styles.heroBanner)}>
       <div className="container">
@@ -36,7 +34,6 @@ function HomepageHeader() {
 
 // eslint-disable-next-line import/no-default-export
 export default function Home(): JSX.Element {
-  const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
       description="Graz is a collection of React hooks containing everything you need to start working with the Cosmos ecosystem"
