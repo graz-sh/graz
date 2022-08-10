@@ -93,10 +93,6 @@ But if you prefer importing from their respective pacakges, you can install depe
 yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr-wallet/types
 ```
 
-## API
-
-You can read more about available hooks and exports on [API.md](./API.md) or via [paka.dev](https://paka.dev/npm/graz).
-
 ## Maintainers
 
 - Griko Nibras ([@grikomsn](https://github.com/grikomsn))
