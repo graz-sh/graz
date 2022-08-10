@@ -4,7 +4,7 @@ Hook for accesing account balances based on active chain's currencies.
 
 #### Usage
 
-`useBalances` receiving address, but not required. if the address empty it will fetching connected account based on active chain.
+`useBalances` accepts an optional receiving address. If the address is empty it will fetch the connected account based on the active chain.
 
 ```tsx
 import { useBalances } from "graz";
