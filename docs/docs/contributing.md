@@ -84,9 +84,7 @@ Pull requests only need one collaborator 👍 to be merged.
 
 Before you create a Pull Request, please check whether your commits comply with the commit conventions used in this repository.
 
-When you create a commit we kindly ask you to follow the convention of category (scope or module): title
-   
-in your commit message, using one of the following categories:
+When you create a commit we kindly ask you to follow the convention of category (scope or module): title in your commit message, using one of the following categories:  
 
 - `feat / feature`: all changes that introduce completely new code or new features
 - `fix`: changes that fix a bug (reference the relevant issue(s) if possible)
