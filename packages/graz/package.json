@@ -7,7 +7,7 @@
   "homepage": "https://github.com/strangelove-ventures/graz",
   "bugs": "https://github.com/strangelove-ventures/graz/issues",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "module": "./dist/esm/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist/**/*.js",
