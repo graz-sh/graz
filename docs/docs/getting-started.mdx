@@ -1,0 +1,81 @@
+---
+sidebar_position: 2
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+
+# Getting Started
+
+## Installation
+
+Install `graz`
+
+```shell
+# using npm
+npm install graz
+
+# using yarn
+yarn add graz
+
+# using pnpm
+pnpm add graz
+```
+
+## Quick start
+
+### 1. Wrap app with `<GrazProvider />`
+
+```jsx
+import { GrazProvider } from "graz";
+
+function App() {
+  return (
+    <GrazProvider>
+      <Wallet />
+    </GrazProvider>
+  );
+}
+```
+
+### 2. Configure `graz`
+
+:::info
+
+**Optional** You can configure your default chain
+
+:::
+
+```jsx
+import { configureGraz, mainnetChains } from "graz";
+
+configureGraz({
+  defaultChain: mainnetChains.cosmos,
+});
+```
+
+### 3. You're good to go!
+
+Use hooks! Every component inside the GrazProvider is now set up to use the graz hooks.
+
+```jsx
+import { mainnetChains, useAccount, useConnect, useDisconnect } from "graz";
+
+function Wallet() {
+  const { connect, status } = useConnect();
+  const { data: account, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+
+  function handleConnect() {
+    return isConnected ? disconnect() : connect();
+  }
+
+  return (
+    <div>
+      {account ? `Connected to ${account.bech32Address}` : status}
+      <button onClick={handleConnect}>{isConnected ? "Disconnect" : "Connect"}</button>
+    </div>
+  );
+}
+```

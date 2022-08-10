@@ -4,44 +4,104 @@ sidebar_position: 1
 
 # Overview
 
-Let's discover **Docusaurus in less than 5 minutes**.
+`graz` is a collection of React hooks containing everything you need to start working with the [Cosmos ecosystem](https://cosmos.network/).
 
-## Getting Started
+## Features
 
-Get started by **creating a new site**.
+- 🪝 8+ hooks for interfacing with [Keplr Wallet](https://www.keplr.app/) (connecting, view balances, etc.)
+- 📚 Built-in caching, request deduplication, and all the good stuff from [`@tanstack/react-query`](https://tanstack.com/query) and [`zustand`](https://github.com/pmndrs/zustand)
+- 🔄 Auto refresh on wallet and network change
+- 👏 Fully typed and tree-shakeable
+- ...and many more ✨
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+## Installing
 
-### What you'll need
+Install `graz` using [npm](https://docs.npmjs.com/cli/v8/commands/npm-install), [yarn](https://yarnpkg.com/cli/add), or [pnpm](https://pnpm.io/cli/install):
 
-- [Node.js](https://nodejs.org/en/download/) version 16.14 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+```sh
+# using npm
+npm install graz
 
-## Generate a new site
+# using yarn
+yarn add graz
 
-Generate a new Docusaurus site using the **classic template**.
-
-The classic template will automatically be added to your project after you run the command:
-
-```bash
-npm init docusaurus@latest my-website classic
+# using pnpm
+pnpm add graz
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+## Quick start
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+Wrap your React app with `<GrazProvider />` and use available `graz` hooks anywhere:
 
-## Start your site
+```jsx
+import { GrazProvider, mainnetChains } from "graz";
 
-Run the development server:
+configureGraz({
+  defaultChain: mainnetChains.cosmos,
+});
 
-```bash
-cd my-website
-npm run start
+function App() {
+  return (
+    <GrazProvider>
+      <Wallet />
+    </GrazProvider>
+  );
+}
 ```
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+```jsx
+import { mainnetChains, useAccount, useConnect, useDisconnect } from "graz";
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
+function Wallet() {
+  const { connect, status } = useConnect();
+  const { data: account, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
 
-Open `docs/overview.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+  function handleConnect() {
+    return isConnected ? disconnect() : connect();
+  }
+
+  return (
+    <div>
+      {account ? `Connected to ${account.bech32Address}` : status}
+      <button onClick={handleConnect}>{isConnected ? "Disconnect" : "Connect"}</button>
+    </div>
+  );
+}
+```
+
+## Examples
+
+- Next.js + Chakra UI: https://graz-example.vercel.app
+- Vite: https://graz-vite-example.vercel.app
+
+## Third-party dependencies
+
+`graz` uses various dependencies such as [`@cosmjs/cosmwasm-stargate`](https://www.npmjs.com/package/@cosmjs/cosmwasm-stargate) and [`@keplr-wallet/types`](https://www.npmjs.com/package/@keplr-wallet/types).
+
+Rather than importing those packages directly, you can import from [`graz/dist/cosmjs`](./packages/graz/src/cosmjs.ts) and [`graz/dist/keplr`](./packages/graz/src/keplr.ts) which re-exports all respective dependencies:
+
+```diff
+- import type { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
++ import type { CosmWasmClient } from "graz/dist/cosmjs";
+```
+
+But if you prefer importing from their respective pacakges, you can install dependencies that `graz` uses for better intellisense:
+
+```sh
+# using yarn
+yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr-wallet/types
+```
+
+## API
+
+You can read more about available hooks and exports on [API.md](./API.md) or via [paka.dev](https://paka.dev/npm/graz).
+
+## Maintainers
+
+- Griko Nibras ([@grikomsn](https://github.com/grikomsn))
+- Nur Fikri ([@codingki](https://github.com/codingki))
+
+## License
+
+[MIT License, Copyright (c) 2022 Strangelove Ventures](./LICENSE)
