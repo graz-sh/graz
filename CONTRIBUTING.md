@@ -1,20 +1,20 @@
 # Contributing to graz
 
-Thanks for showing interest to contribute to graz❤️
+Thanks for showing interest to contribute to `graz` <3
 
 The following is a set of guidelines for contributing to graz, which are hosted in the [Strangelove Ventures Organization](https://github.com/strangelove-ventures) on GitHub. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [graz Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+This project and everyone participating in it is governed by the [`graz` Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
 ## Brief of graz
 
-#### What is graz?
+### What is graz?
 
 `graz` is a collection of React hooks containing everything you need to start working with the Cosmos ecosystem.
 
-#### Why this library exist?
+### Why this library exist?
 
 Currently there is no stable library for cosmos wallets, in ethereum there's [`wagmi`](https://wagmi.sh) with hook patterns that we inspired from.
 
@@ -25,24 +25,27 @@ It would be better you know these things:
 - [Cosmos ecosystem](https://cosmos.network/)
 - [`react-query`](https://react-query.tanstack.com/)
 - [`zustand`](https://github.com/pmndrs/zustand)
-- [keplr](https://docs.keplr.app)
+- [Keplr Wallet](https://docs.keplr.app)
 
 ## Setup the Project
 
-The following steps will get you up and running to contribute to graz:
+The following steps will get you up and running to contribute to `graz`:
 
 1. Fork the repo (click the <kbd>Fork</kbd> button at the top right of [this page](https://github.com/strangelove-ventures/graz))
+
 2. Clone your fork locally
-   ```
+
+   ```sh
    git clone https://github.com/<your_github_username>/graz.git
-   cd chakra-ui
+   cd graz
    ```
+
 3. Setup all the dependencies and packages by running `yarn`. This command will install dependencies and bootstrap the repo.
-   > We are using `yarn` so We suggest to You to do the same.
+   > We are using `yarn` as the default package manager, we suggest to you to do the same.
 
 ## Directory structure
 
-#### Repository
+### Repository
 
 ```sh
 ├── packages/             # local packages
@@ -53,7 +56,7 @@ The following steps will get you up and running to contribute to graz:
 └── example/              # example website (nextjs + chakra ui)
 ```
 
-#### graz
+### graz
 
 ```sh
 ├── src/                  # main project entry point
@@ -68,16 +71,16 @@ The following steps will get you up and running to contribute to graz:
 
 ## Development
 
-`yarn`: bootstrap the entire project
-`yarn dev`: compiles `graz` and start the development server of the example app
-`yarn docs dev`: start the documentation website
-`yarn example dev`: start the example app
+- `yarn`: bootstrap the entire project
+- `yarn dev`: compiles `graz` and start the development server of the example app
+- `yarn docs dev`: start the documentation website
+- `yarn example dev`: start the example app
 
 ## Pull Request
 
-Pull requests need only the 👍 of one collaborator to be merged
+Pull requests need only the 👍 of one collaborator to be merged.
 
-#### Commit Convention
+### Commit Convention
 
 Before you create a Pull Request, please check whether your commits comply with the commit conventions used in this repository.
 
@@ -96,4 +99,4 @@ If you are interested in the detailed specification you can visit https://www.co
 
 ## License
 
-By contributing your code to the graz GitHub repository, you agree to license your contribution under the MIT license.
+By contributing your code to the graz GitHub repository, you agree to license your contribution under the [MIT license](./LICENSE).
