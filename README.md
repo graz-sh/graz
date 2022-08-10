@@ -34,7 +34,7 @@ pnpm add graz
 Wrap your React app with `<GrazProvider />` and use available `graz` hooks anywhere:
 
 ```jsx
-import { GrazProvider, configureDefaultChain, mainnetChains } from "graz";
+import { GrazProvider, mainnetChains } from "graz";
 
 configureGraz({
   defaultChain: mainnetChains.cosmos,
