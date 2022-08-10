@@ -1,39 +1,47 @@
-import React from 'react';
-import clsx from 'clsx';
-import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import Layout from '@theme/Layout';
-import HomepageFeatures from '@site/src/components/HomepageFeatures';
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import HomepageFeatures from "@site/src/components/HomepageFeatures";
+import Layout from "@theme/Layout";
+import TabItem from "@theme/TabItem";
+import Tabs from "@theme/Tabs";
+import clsx from "clsx";
+import React from "react";
 
-import styles from './index.module.css';
+import styles from "./index.module.css";
 
 function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext();
   return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
+    <header className={clsx(styles.heroBanner)}>
       <div className="container">
-        <h1 className="hero__title">{siteConfig.title}</h1>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/intro">
-            Docusaurus Tutorial - 5min ⏱️
-          </Link>
-        </div>
+        <img alt="graz logo" height={100} src="img/logo.png" />
+        <p className={clsx("hero__subtitle", styles.heroDescription)}>
+          graz is a collection of React hooks containing everything you need to start working with the Cosmos ecosystem.
+        </p>
       </div>
     </header>
   );
 }
 
+// eslint-disable-next-line import/no-default-export
 export default function Home(): JSX.Element {
-  const {siteConfig} = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      description="Graz is a collection of React hooks containing everything you need to start working with the Cosmos ecosystem"
+      title="React hooks for Cosmos"
+    >
       <HomepageHeader />
       <main>
+        <div className={styles.installContainer}>
+          <Tabs>
+            <TabItem default label="yarn" value="yarn">
+              <div className={styles.installContainerCode}>yarn add graz</div>
+            </TabItem>
+            <TabItem label="npm" value="npm">
+              <div className={styles.installContainerCode}>npm install graz</div>
+            </TabItem>
+          </Tabs>
+        </div>
         <HomepageFeatures />
       </main>
     </Layout>

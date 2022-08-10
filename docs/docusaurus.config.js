@@ -6,8 +6,8 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "My Site",
-  tagline: "Dinosaurs are cool",
+  title: "Graz",
+  tagline: "React hooks for cosmos",
   url: "https://your-docusaurus-test-site.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
@@ -16,8 +16,8 @@ const config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: "facebook", // Usually your GitHub org/user name.
-  projectName: "docusaurus", // Usually your repo name.
+  organizationName: "strangelove-ventures", // Usually your GitHub org/user name.
+  projectName: "graz", // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
@@ -55,21 +55,26 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: "My Site",
+        style: "dark",
+        title: "React hooks for Cosmos",
         logo: {
-          alt: "My Site Logo",
-          src: "img/logo.svg",
+          alt: "graz logo",
+          src: "img/logo.png",
         },
         items: [
           {
             type: "doc",
-            docId: "intro",
+            docId: "index",
             position: "left",
-            label: "Tutorial",
+            label: "Docs",
           },
-          { to: "/blog", label: "Blog", position: "left" },
           {
-            href: "https://github.com/facebook/docusaurus",
+            href: "https://graz-example.vercel.app/",
+            label: "Example",
+            position: "left",
+          },
+          {
+            href: "https://github.com/strangelove-ventures/graz",
             label: "GitHub",
             position: "right",
           },
@@ -82,25 +87,8 @@ const config = {
             title: "Docs",
             items: [
               {
-                label: "Tutorial",
-                to: "/docs/intro",
-              },
-            ],
-          },
-          {
-            title: "Community",
-            items: [
-              {
-                label: "Stack Overflow",
-                href: "https://stackoverflow.com/questions/tagged/docusaurus",
-              },
-              {
-                label: "Discord",
-                href: "https://discordapp.com/invite/docusaurus",
-              },
-              {
-                label: "Twitter",
-                href: "https://twitter.com/docusaurus",
+                label: "Documentation",
+                to: "/docs/",
               },
             ],
           },
@@ -108,18 +96,19 @@ const config = {
             title: "More",
             items: [
               {
-                label: "Blog",
-                to: "/blog",
+                label: "Example",
+                href: "https://graz-example.vercel.app/",
               },
               {
                 label: "GitHub",
-                href: "https://github.com/facebook/docusaurus",
+                href: "https://github.com/strangelove-ventures/graz",
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Strangelove Ventures`,
       },
+      image: "img/social.jpg",
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,

@@ -8,6 +8,18 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+  background-color: #02120b;
+  background-image: url("/img/grid.png");
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.heroDescription {
+  margin: auto;
+  width: 60%;
+  color: var(--ifm-color-primary-light);
 }
 
 @media screen and (max-width: 996px) {
@@ -20,4 +32,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.installContainer {
+  width: 100%;
+  display: "flex";
+  justify-content: "center";
+}
+
+.installContainerCode {
+  background-color: var(--docusaurus-highlighted-code-line-bg);
+  width: 240px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  font-family: monospace;
 }
