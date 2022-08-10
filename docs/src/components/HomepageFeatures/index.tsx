@@ -3,12 +3,6 @@ import React from "react";
 
 import styles from "./styles.module.css";
 
-interface FeatureItem {
-  title: string;
-  Svg: React.ComponentType<React.ComponentProps<"svg">>;
-  description: JSX.Element;
-}
-
 // eslint-disable-next-line import/no-default-export
 export default function HomepageFeatures(): JSX.Element {
   return (
