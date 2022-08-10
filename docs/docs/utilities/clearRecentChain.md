@@ -1,6 +1,6 @@
 # clearRecentChain
 
-To clear recent chains that stored
+clear recent chains 
 
 #### Usage
 
