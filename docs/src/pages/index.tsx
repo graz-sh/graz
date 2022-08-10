@@ -44,7 +44,7 @@ export default function Home(): JSX.Element {
     >
       <HomepageHeader />
       <main>
-        <div className={styles.installContainer}>
+        <div className={clsx("install-container", styles.installContainer)}>
           <Tabs>
             <TabItem default label="yarn" value="yarn">
               <div className={styles.installContainerCode}>yarn add graz</div>

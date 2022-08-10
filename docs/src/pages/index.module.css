@@ -47,12 +47,6 @@
   justify-content: "center";
 }
 
-.installContainer.tabs-container {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-}
-
 .installContainerCode {
   background-color: var(--docusaurus-highlighted-code-line-bg);
   width: 240px;
