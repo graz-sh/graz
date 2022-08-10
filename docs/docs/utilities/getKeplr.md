@@ -1,6 +1,6 @@
 # getKeplr
 
-Function to return `Keplr` object and throws and error if it does not exist on window
+Function to return the `Keplr` object and throw an error if it does not exist
 
 #### Usage
 
