@@ -1,6 +1,6 @@
 # clearRecentChain
 
-clear recent chains 
+`clearRecentChain` sets `recentChain` to `null`
 
 #### Usage
 
