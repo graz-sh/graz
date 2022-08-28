@@ -46,23 +46,10 @@
     "strangelove-ventures",
     "use-keplr"
   ],
-  "eslintConfig": {
-    "extends": [
-      "@project/eslint-config"
-    ],
-    "ignorePatterns": [
-      "dist/**/*"
-    ],
-    "root": true
-  },
   "lint-staged": {
-    "*.{json,md}": [
-      "prettier --write"
-    ],
     "**/*.ts": [
-      "yarn workspace graz eslint --fix"
+      "eslint --fix"
     ]
   },
-  "prettier": "@project/prettier-config",
   "license": "MIT"
 }

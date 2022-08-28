@@ -22,26 +22,10 @@
     "@types/node": "^16",
     "@types/react": "^18"
   },
-  "eslintConfig": {
-    "extends": [
-      "@project/eslint-config"
-    ],
-    "ignorePatterns": [
-      ".next",
-      "__generated__",
-      "node_modules",
-      "out"
-    ],
-    "root": true
-  },
   "lint-staged": {
-    "*.{json,md}": [
-      "prettier --write"
-    ],
     "**/*.{js,cjs,mjs,ts,tsx}": [
-      "yarn workspace @project/example eslint --fix"
+      "eslint --fix"
     ]
   },
-  "prettier": "@project/prettier-config",
   "private": true
 }

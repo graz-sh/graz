@@ -1,5 +1,5 @@
 {
-  "extends": "@vercel/style-guide/typescript.json",
+  "extends": "@grikomsn/style-guide/tsconfig.json",
   "compilerOptions": {
     "jsx": "react-jsx",
     "moduleResolution": "node",

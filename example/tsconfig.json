@@ -1,19 +1,7 @@
 {
-  "extends": "@vercel/style-guide/typescript",
+  "extends": "@grikomsn/style-guide/tsconfig/next",
   "compilerOptions": {
-    "allowJs": true,
-    "baseUrl": ".",
-    "incremental": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "esnext",
-    "moduleResolution": "node",
-    "noEmit": true,
-    "resolveJsonModule": true,
-    "strict": false,
-    "strictNullChecks": true,
-    "target": "es5"
+    "baseUrl": "."
   },
   "exclude": ["node_modules"],
   "include": ["next-env.d.ts", "env.d.ts", "**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"]
