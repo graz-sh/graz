@@ -1,7 +1,7 @@
 {
   "name": "@strangelove-ventures/graz",
   "version": "0.0.0",
-  "packageManager": "yarn@1.22.18",
+  "packageManager": "yarn@1.22.19",
   "workspaces": [
     "docs",
     "example",
