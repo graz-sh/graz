@@ -1,11 +1,10 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "baseBranch": "origin/main",
   "globalDependencies": ["yarn.lock"],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**"]
+      "outputs": [".next/**", "build/**", "dist/**"]
     },
     "dev": {
       "cache": false
