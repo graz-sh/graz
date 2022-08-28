@@ -22,9 +22,6 @@
   "devDependencies": {
     "husky": "^8",
     "lint-staged": "^13",
-    "patch-package": "^6",
-    "postinstall-postinstall": "^2",
-    "shx": "^0",
     "tsup": "^6",
     "turbo": "^1"
   },
