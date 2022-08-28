@@ -17,6 +17,14 @@ const eslintConfig = {
   parserOptions: {
     project: getTsconfigPath(),
   },
+  overrides: [
+    {
+      files: ["tsup.config.{js,ts}"],
+      rules: {
+        "import/no-default-export": ["off"],
+      },
+    },
+  ],
   root: true,
 };
 
