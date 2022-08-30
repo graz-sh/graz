@@ -13,6 +13,7 @@ import { sommelier } from "./sommelier";
 export interface GrazChain {
   chainId: string;
   currencies: AppCurrency[];
+  path?: string;
   rest: string;
   rpc: string;
   rpcHeaders?: Dictionary;
