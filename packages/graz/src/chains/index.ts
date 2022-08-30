@@ -50,6 +50,30 @@ export function defineChains<T extends Dictionary<GrazChain>>(chains: T): T {
 }
 
 /**
+ * Helper function to define chain information object.
+ *
+ * This function does not do anything special else than providing type safety
+ * when defining chain information.
+ *
+ * @example
+ * ```ts
+ * import { connect, defineChain } from "graz";
+ *
+ * const cosmoshub = defineChain({
+ *    rpc: "https://rpc.cosmoshub.strange.love",
+ *    rest: "https://api.cosmoshub.strange.love",
+ *    chainId: "cosmoshub-4",
+ *    ...
+ * });
+ *
+ * connect(cosmoshub);
+ * ```
+ */
+export function defineChain<T extends GrazChain>(chain: T): T {
+  return chain;
+}
+
+/**
  * Provided mainnet chains
  *
  * @example
