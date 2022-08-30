@@ -23,10 +23,11 @@
     }
   },
   "bin": {
-    "graz": "./dist/cli.js"
+    "graz": "cli.js"
   },
   "files": [
     "chains/*.stub",
+    "cli.js",
     "dist/*.js",
     "dist/*.mjs",
     "dist/*.d.ts"
