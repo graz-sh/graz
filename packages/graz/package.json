@@ -15,16 +15,26 @@
       "module": "./dist/index.mjs",
       "import": "./dist/index.mjs",
       "default": "./dist/index.js"
+    },
+    "./chains": {
+      "module": "./chains/index.mjs",
+      "import": "./chains/index.mjs",
+      "default": "./chains/index.js"
     }
   },
+  "bin": {
+    "graz": "./dist/cli.js"
+  },
   "files": [
-    "dist/**/*.js",
-    "dist/**/*.mjs",
-    "dist/**/*.d.ts"
+    "chains/*.stub",
+    "dist/*.js",
+    "dist/*.mjs",
+    "dist/*.d.ts"
   ],
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
+    "cli": "node dist/cli.js",
     "dev": "tsup --watch"
   },
   "dependencies": {
@@ -34,6 +44,8 @@
     "@keplr-wallet/cosmos": "^0.10.13",
     "@keplr-wallet/types": "^0.10.13",
     "@tanstack/react-query": "^4.0.10",
+    "arg": "^5",
+    "cosmos-directory-client": "0.0.6",
     "zustand": "^4.0.0"
   },
   "devDependencies": {
