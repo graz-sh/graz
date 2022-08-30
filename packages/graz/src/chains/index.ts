@@ -62,7 +62,9 @@ export function defineChains<T extends Dictionary<GrazChain>>(chains: T): T {
  */
 export const mainnetChains = defineChains({
   axelar,
+  /** @deprecated kept for compatibilty purposes; change to `mainnetChains.cosmoshub` */
   cosmos: cosmoshub,
+  cosmoshub,
   juno,
   osmosis,
   sommelier,
