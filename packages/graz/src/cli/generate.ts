@@ -50,7 +50,7 @@ export async function generate() {
 }
 
 function cwd(...args: string[]) {
-  return path.resolve(process.cwd(), ...args);
+  return path.resolve(path.dirname(""), ...args);
 }
 
 function makeChainMap(record: Record<string, GrazChain>, { testnet = false } = {}) {
