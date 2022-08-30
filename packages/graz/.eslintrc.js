@@ -17,6 +17,10 @@ const eslintConfig = {
   parserOptions: {
     project: getTsconfigPath(),
   },
+  rules: {
+    "no-console": ["warn"],
+    "prefer-named-capture-group": ["warn"],
+  },
   overrides: [
     {
       files: ["tsup.config.{js,ts}"],
