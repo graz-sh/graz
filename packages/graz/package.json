@@ -9,9 +9,16 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "module": "./dist/index.mjs",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    }
+  },
   "files": [
     "dist/**/*.js",
-    "dist/**/*.cjs",
     "dist/**/*.mjs",
     "dist/**/*.d.ts"
   ],
