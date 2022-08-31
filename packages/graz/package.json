@@ -35,7 +35,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
-    "cli": "node dist/cli.js",
+    "cli": "node cli.mjs",
     "dev": "tsup --watch"
   },
   "dependencies": {
