@@ -2518,34 +2518,6 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@grikomsn/style-guide@latest":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@grikomsn/style-guide/-/style-guide-0.0.7.tgz#29ec3f026dd33c59dc5398c5ffa4c3cd6efa0eaa"
-  integrity sha512-kGnSwHG0v4tynaZXMCQp1iVx7NjnzjQjCqLYv00LcJdGnKWZobjewvNKP7a7wlwwDNFKYpoAS0OmaWyTfzzxUw==
-  dependencies:
-    "@babel/eslint-parser" "^7"
-    "@rushstack/eslint-patch" "^1"
-    "@typescript-eslint/eslint-plugin" "^5"
-    "@typescript-eslint/parser" "^5"
-    eslint-config-prettier "^8"
-    eslint-import-resolver-alias "^1"
-    eslint-import-resolver-typescript "^3"
-    eslint-plugin-eslint-comments "^3"
-    eslint-plugin-import "^2"
-    eslint-plugin-jsx-a11y "^6"
-    eslint-plugin-prettier "^4"
-    eslint-plugin-react "^7"
-    eslint-plugin-react-hooks "^4"
-    eslint-plugin-simple-import-sort "^7"
-    eslint-plugin-tsdoc "^0"
-    eslint-plugin-unicorn "^43"
-    eslint-plugin-unused-imports "^2"
-  optionalDependencies:
-    "@next/eslint-plugin-next" "^12"
-    eslint-plugin-jest "^26"
-    eslint-plugin-tailwindcss "^3"
-    eslint-plugin-testing-library "^5"
-
 "@hapi/hoek@^9.0.0":
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.3.0.tgz#8368869dcb735be2e7f5cb7647de78e167a251fb"
@@ -3050,6 +3022,34 @@
     eval "^0.1.8"
     p-map "^4.0.0"
     webpack-sources "^3.2.2"
+
+"@strangelovelabs/style-guide@latest":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@strangelovelabs/style-guide/-/style-guide-0.0.1.tgz#d63d554fffbcce3774cb6f8793355b9080857192"
+  integrity sha512-aIgwyCzPEP/lMAcfroYzbgoKAd6ehSmWcyhUVyhy8Qoeyly2y3cCXxiN/9d0vNz6pOxr6c2MdSpbfxmOFmXfgw==
+  dependencies:
+    "@babel/eslint-parser" "^7"
+    "@rushstack/eslint-patch" "^1"
+    "@typescript-eslint/eslint-plugin" "^5"
+    "@typescript-eslint/parser" "^5"
+    eslint-config-prettier "^8"
+    eslint-import-resolver-alias "^1"
+    eslint-import-resolver-typescript "^3"
+    eslint-plugin-eslint-comments "^3"
+    eslint-plugin-import "^2"
+    eslint-plugin-jsx-a11y "^6"
+    eslint-plugin-prettier "^4"
+    eslint-plugin-react "^7"
+    eslint-plugin-react-hooks "^4"
+    eslint-plugin-simple-import-sort "^7"
+    eslint-plugin-tsdoc "^0"
+    eslint-plugin-unicorn "^43"
+    eslint-plugin-unused-imports "^2"
+  optionalDependencies:
+    "@next/eslint-plugin-next" "^12"
+    eslint-plugin-jest "^26"
+    eslint-plugin-tailwindcss "^3"
+    eslint-plugin-testing-library "^5"
 
 "@svgr/babel-plugin-add-jsx-attribute@^6.3.1":
   version "6.3.1"

@@ -1,6 +1,6 @@
 // @ts-check
 
-const { getTsconfigPath } = require("@grikomsn/style-guide/eslint/helpers");
+const { getTsconfigPath } = require("@strangelovelabs/style-guide/eslint/helpers");
 
 /** @type {import("eslint").Linter.Config} */
 const eslintConfig = {
@@ -9,9 +9,9 @@ const eslintConfig = {
     node: true,
   },
   extends: [
-    require.resolve("@grikomsn/style-guide/eslint/base"),
-    require.resolve("@grikomsn/style-guide/eslint/react"),
-    require.resolve("@grikomsn/style-guide/eslint/typescript"),
+    require.resolve("@strangelovelabs/style-guide/eslint/base"),
+    require.resolve("@strangelovelabs/style-guide/eslint/react"),
+    require.resolve("@strangelovelabs/style-guide/eslint/typescript"),
   ],
   ignorePatterns: ["chains/**", "dist/**"],
   parserOptions: {

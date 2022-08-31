@@ -1,5 +1,5 @@
 {
-  "extends": "@grikomsn/style-guide/tsconfig/next",
+  "extends": "@strangelovelabs/style-guide/tsconfig/next",
   "compilerOptions": {
     "baseUrl": "."
   },

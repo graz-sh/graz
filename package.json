@@ -20,7 +20,7 @@
     "test": "turbo run test"
   },
   "devDependencies": {
-    "@grikomsn/style-guide": "latest",
+    "@strangelovelabs/style-guide": "latest",
     "eslint": "^8",
     "husky": "^8",
     "lint-staged": "^13",
@@ -33,7 +33,7 @@
       "prettier --write"
     ]
   },
-  "prettier": "@grikomsn/style-guide/prettier",
+  "prettier": "@strangelovelabs/style-guide/prettier",
   "private": true,
   "license": "MIT"
 }
