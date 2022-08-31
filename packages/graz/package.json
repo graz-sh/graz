@@ -23,7 +23,7 @@
     }
   },
   "bin": {
-    "graz": "cli.js"
+    "graz": "./cli.mjs"
   },
   "files": [
     "chains/*.stub",

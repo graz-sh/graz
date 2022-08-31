@@ -1,11 +1,48 @@
-import type { DirectoryClient } from "cosmos-directory-client";
+#!/usr/bin/env node
+// @ts-check
+import arg from "arg";
 import { createClient, createTestnetClient } from "cosmos-directory-client";
 import * as fs from "fs/promises";
 import * as path from "path";
+import { fileURLToPath } from "url";
 
-import type { GrazChain } from "../chains";
+const HELP_MESSAGE = `Usage: graz [options]
 
-export async function generate() {
+Options:
+
+  -g, --generate        Generate chain definitions and export to "graz/chains"
+  -h, --help            Show this help message
+
+https://github.com/strangelove-ventures/graz
+`;
+
+async function cli() {
+  try {
+    const args = arg({
+      "--generate": Boolean,
+      "-g": "--generate",
+
+      "--help": Boolean,
+      "-h": "--help",
+    });
+
+    if (args["--help"]) {
+      console.log(HELP_MESSAGE);
+      return;
+    }
+
+    if (args["--generate"]) {
+      await generate();
+      return;
+    }
+
+    console.log(HELP_MESSAGE);
+  } catch (error) {
+    console.error(String(error));
+  }
+}
+
+async function generate() {
   console.log(`⏳ Generating chain list from cosmos.directory ...`);
 
   const [mainnetRecord, testnetRecord] = await Promise.all([
@@ -14,8 +51,8 @@ export async function generate() {
   ]);
 
   const [jsStub, mjsStub] = await Promise.all([
-    fs.readFile(cwd("chains/index.js.stub"), { encoding: "utf-8" }),
-    fs.readFile(cwd("chains/index.mjs.stub"), { encoding: "utf-8" }),
+    fs.readFile(chainsDir("index.js.stub"), { encoding: "utf-8" }),
+    fs.readFile(chainsDir("index.mjs.stub"), { encoding: "utf-8" }),
   ]);
 
   const jsContent = jsStub
@@ -41,48 +78,65 @@ export async function generate() {
     .trim();
 
   await Promise.all([
-    fs.writeFile(cwd("chains/index.js"), jsContent, { encoding: "utf-8" }),
-    fs.writeFile(cwd("chains/index.mjs"), mjsContent, { encoding: "utf-8" }),
-    fs.writeFile(cwd("chains/index.ts"), mjsContent, { encoding: "utf-8" }),
+    fs.writeFile(chainsDir("index.js"), jsContent, { encoding: "utf-8" }),
+    fs.writeFile(chainsDir("index.mjs"), mjsContent, { encoding: "utf-8" }),
+    fs.writeFile(chainsDir("index.ts"), mjsContent, { encoding: "utf-8" }),
   ]);
 
   console.log('✨ Generate complete! You can import `mainnetChains` and `testnetChains` from "graz/chains".');
 }
 
-function cwd(...args: string[]) {
-  return path.resolve(path.dirname(""), ...args);
+/** @param {string[]} args */
+function chainsDir(...args) {
+  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "chains", ...args);
 }
 
-function makeChainMap(record: Record<string, GrazChain>, { testnet = false } = {}) {
+/**
+ * @param {Record<string, import(".").GrazChain>} record
+ * @param {Record<string, boolean>} opts
+ */
+function makeChainMap(record, { testnet = false } = {}) {
   return Object.keys(record)
     .map((k) => `  ${k}: ${k}${testnet ? "Testnet" : ""},`)
     .join("\n");
 }
 
-function makeDefs(record: Record<string, GrazChain>, { mjs = false, testnet = false } = {}) {
+/**
+ * @param {Record<string, import(".").GrazChain>} record
+ * @param {Record<string, boolean>} opts
+ */
+function makeDefs(record, { mjs = false, testnet = false } = {}) {
   return Object.entries(record)
     .map(([k, v]) => `${mjs ? "export " : ""}const ${k}${testnet ? "Testnet" : ""} = ${JSON.stringify(v, null, 2)};\n`)
     .join("");
 }
 
-function makeExports(record: Record<string, GrazChain>, { testnet = false } = {}) {
+/**
+ * @param {Record<string, import(".").GrazChain>} record
+ * @param {Record<string, boolean>} opts
+ */
+function makeExports(record, { testnet = false } = {}) {
   return Object.keys(record)
     .map((k) => `  ${k}${testnet ? "Testnet" : ""},`)
     .join("\n");
 }
 
-async function makeRecord(client: DirectoryClient) {
+/**
+ * @param {import("cosmos-directory-client").DirectoryClient} client
+ */
+async function makeRecord(client) {
   const { chains } = await client.fetchChains();
 
-  const record: Record<string, GrazChain> = {};
+  /** @type {Record<string, import(".").GrazChain>} */
+  const record = {};
   chains.forEach((chain) => {
     record[chain.path] = {
       chainId: chain.chain_id,
       currencies:
         chain.assets?.map((asset) => ({
-          coinDenom: asset.denom_units[asset.denom_units.length - 1]!.denom,
-          coinMinimalDenom: asset.denom_units[0]!.denom,
-          coinDecimals: asset.denom_units[asset.denom_units.length - 1]!.exponent,
+          coinDenom: asset.denom_units[asset.denom_units.length - 1].denom,
+          coinMinimalDenom: asset.denom_units[0].denom,
+          coinDecimals: asset.denom_units[asset.denom_units.length - 1].exponent,
         })) || [],
       path: chain.path,
       rest: chain.best_apis.rest[0]?.address || "",
@@ -92,3 +146,5 @@ async function makeRecord(client: DirectoryClient) {
 
   return record;
 }
+
+void cli();
