@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // @ts-check
+import { Bech32Address } from "@keplr-wallet/cosmos";
 import arg from "arg";
 import { createClient, createTestnetClient } from "cosmos-directory-client";
 import * as fs from "fs/promises";
@@ -92,7 +93,7 @@ function chainsDir(...args) {
 }
 
 /**
- * @param {Record<string, import(".").GrazChain>} record
+ * @param {Record<string, import("@keplr-wallet/types").ChainInfo & {path: string}>} record
  * @param {Record<string, boolean>} opts
  */
 function makeChainMap(record, { testnet = false } = {}) {
@@ -102,7 +103,7 @@ function makeChainMap(record, { testnet = false } = {}) {
 }
 
 /**
- * @param {Record<string, import(".").GrazChain>} record
+ * @param {Record<string, import("@keplr-wallet/types").ChainInfo & {path: string}>} record
  * @param {Record<string, boolean>} opts
  */
 function makeDefs(record, { mjs = false, testnet = false } = {}) {
@@ -112,7 +113,7 @@ function makeDefs(record, { mjs = false, testnet = false } = {}) {
 }
 
 /**
- * @param {Record<string, import(".").GrazChain>} record
+ * @param {Record<string, import("@keplr-wallet/types").ChainInfo & {path: string}>} record
  * @param {Record<string, boolean>} opts
  */
 function makeExports(record, { testnet = false } = {}) {
@@ -127,23 +128,46 @@ function makeExports(record, { testnet = false } = {}) {
 async function makeRecord(client) {
   const { chains } = await client.fetchChains();
 
-  /** @type {Record<string, import(".").GrazChain>} */
+  /** @type {Record<string, import("@keplr-wallet/types").ChainInfo & {path: string}>} */
   const record = {};
-  chains.forEach((chain) => {
-    record[chain.path] = {
-      chainId: chain.chain_id,
-      currencies:
-        chain.assets?.map((asset) => ({
-          coinDenom: asset.denom_units[asset.denom_units.length - 1].denom,
-          coinMinimalDenom: asset.denom_units[0].denom,
-          coinDecimals: asset.denom_units[asset.denom_units.length - 1].exponent,
-        })) || [],
-      path: chain.path,
-      rest: chain.best_apis.rest[0]?.address || "",
-      rpc: chain.best_apis.rpc[0]?.address || "",
-    };
-  });
+  await Promise.all(
+    chains.map(async (chain) => {
+      const { chain: singleChain } = await client.fetchChain(chain.path);
 
+      const nativeChainCoin = chain.assets?.[0];
+      /** @type{import("@keplr-wallet/types").Currency} */
+      const nativeChainCoinRes = {
+        coinDenom: nativeChainCoin?.denom_units[nativeChainCoin.denom_units.length - 1].denom || "",
+        coinMinimalDenom: nativeChainCoin?.denom_units[0].denom || "",
+        // @ts-ignore
+        coinDecimals: nativeChainCoin?.denom_units[nativeChainCoin.denom_units.length - 1].exponent,
+        coinGeckoId: nativeChainCoin?.coingecko_id,
+      };
+
+      record[chain.path] = {
+        chainId: chain.chain_id,
+        currencies:
+          chain.assets?.map((asset) => ({
+            coinDenom: asset.denom_units[asset.denom_units.length - 1].denom,
+            coinMinimalDenom: asset.denom_units[0].denom,
+            coinDecimals: asset.denom_units[asset.denom_units.length - 1].exponent,
+            coinGeckoId: asset.coingecko_id,
+          })) || [],
+        path: chain.path,
+        rest: chain.best_apis.rest[0]?.address || "",
+        rpc: chain.best_apis.rpc[0]?.address || "",
+        // @ts-ignore
+        bech32Config: Bech32Address.defaultBech32Config(singleChain.bech32_prefix),
+        chainName: chain.chain_name,
+        feeCurrencies: [nativeChainCoinRes],
+        stakeCurrency: nativeChainCoinRes,
+        bip44: {
+          // @ts-ignore
+          coinType: singleChain.slip44,
+        },
+      };
+    }),
+  );
   return record;
 }
 
