@@ -101,7 +101,7 @@ async function generate() {
 
   await Promise.all([
     fs.writeFile(chainsDir("index.js"), jsContent, { encoding: "utf-8" }),
-    fs.writeFile(chainsDir("index.mjs"), mjsContent, { encoding: "utf-8" }),
+    fs.writeFile(chainsDir("index.mjs"), mjsContent.replace('"../dist"', '"../dist/index.mjs"'), { encoding: "utf-8" }),
     fs.writeFile(chainsDir("index.ts"), mjsContent, { encoding: "utf-8" }),
   ]);
 
