@@ -1,4 +1,4 @@
-import { defineChains } from "../dist";
+import { defineChainInfo, defineChains } from "../dist";
 
 /* REPLACE_MAINNET_DEFS */
 /* REPLACE_TESTNET_DEFS */
