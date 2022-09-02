@@ -7,6 +7,8 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { fileURLToPath } from "url";
 
+import pmap from "./compiled/p-map/index.mjs";
+
 const HELP_MESSAGE = `Usage: graz [options]
 
 Options:
@@ -93,7 +95,7 @@ function chainsDir(...args) {
 }
 
 /**
- * @param {Record<string, import("@keplr-wallet/types").ChainInfo & {path: string}>} record
+ * @param {Record<string, import(".").ChainInfoWithPath>} record
  * @param {Record<string, boolean>} opts
  */
 function makeChainMap(record, { testnet = false } = {}) {
@@ -103,17 +105,21 @@ function makeChainMap(record, { testnet = false } = {}) {
 }
 
 /**
- * @param {Record<string, import("@keplr-wallet/types").ChainInfo & {path: string}>} record
+ * @param {Record<string, import(".").ChainInfoWithPath>} record
  * @param {Record<string, boolean>} opts
  */
 function makeDefs(record, { mjs = false, testnet = false } = {}) {
   return Object.entries(record)
-    .map(([k, v]) => `${mjs ? "export " : ""}const ${k}${testnet ? "Testnet" : ""} = ${JSON.stringify(v, null, 2)};\n`)
+    .map(([k, v]) => {
+      const jsVariable = `${k}${testnet ? "Testnet" : ""}`;
+      const jsChainInfo = JSON.stringify(v, null, 2);
+      return `${mjs ? "export " : ""}const ${jsVariable} = defineChainInfo(${jsChainInfo});\n`;
+    })
     .join("");
 }
 
 /**
- * @param {Record<string, import("@keplr-wallet/types").ChainInfo & {path: string}>} record
+ * @param {Record<string, import(".").ChainInfoWithPath>} record
  * @param {Record<string, boolean>} opts
  */
 function makeExports(record, { testnet = false } = {}) {
@@ -128,46 +134,53 @@ function makeExports(record, { testnet = false } = {}) {
 async function makeRecord(client) {
   const { chains } = await client.fetchChains();
 
-  /** @type {Record<string, import("@keplr-wallet/types").ChainInfo & {path: string}>} */
-  const record = {};
-  await Promise.all(
-    chains.map(async (chain) => {
-      const { chain: singleChain } = await client.fetchChain(chain.path);
+  const resolvedChains = await pmap(chains, async (c) => client.fetchChain(c.path).then((x) => x.chain), {
+    concurrency: 8,
+  });
 
-      const nativeChainCoin = chain.assets?.[0];
+  const filteredChains = resolvedChains.filter((chain) => (chain.assets ? chain.assets.length > 0 : false));
+
+  /** @type {Record<string, import(".").ChainInfoWithPath>} */
+  const record = {};
+  filteredChains.forEach((chain) => {
+    try {
+      if (!chain.assets) {
+        throw new Error(`${chain.name} has no assets, skipping codegen...`);
+      }
+
+      const mainAsset = chain.assets[0];
+
       /** @type{import("@keplr-wallet/types").Currency} */
       const nativeChainCoinRes = {
-        coinDenom: nativeChainCoin?.denom_units[nativeChainCoin.denom_units.length - 1].denom || "",
-        coinMinimalDenom: nativeChainCoin?.denom_units[0].denom || "",
-        // @ts-ignore
-        coinDecimals: nativeChainCoin?.denom_units[nativeChainCoin.denom_units.length - 1].exponent,
-        coinGeckoId: nativeChainCoin?.coingecko_id,
+        coinDenom: mainAsset.denom_units[mainAsset.denom_units.length - 1].denom || "",
+        coinMinimalDenom: mainAsset.denom_units[0].denom || "",
+        coinDecimals: mainAsset.denom_units[mainAsset.denom_units.length - 1].exponent,
+        coinGeckoId: mainAsset.coingecko_id,
       };
 
       record[chain.path] = {
         chainId: chain.chain_id,
-        currencies:
-          chain.assets?.map((asset) => ({
-            coinDenom: asset.denom_units[asset.denom_units.length - 1].denom,
-            coinMinimalDenom: asset.denom_units[0].denom,
-            coinDecimals: asset.denom_units[asset.denom_units.length - 1].exponent,
-            coinGeckoId: asset.coingecko_id,
-          })) || [],
+        currencies: chain.assets.map((asset) => ({
+          coinDenom: asset.denom_units[asset.denom_units.length - 1].denom,
+          coinMinimalDenom: asset.denom_units[0].denom,
+          coinDecimals: asset.denom_units[asset.denom_units.length - 1].exponent,
+          coinGeckoId: asset.coingecko_id,
+        })),
         path: chain.path,
         rest: chain.best_apis.rest[0]?.address || "",
         rpc: chain.best_apis.rpc[0]?.address || "",
-        // @ts-ignore
-        bech32Config: Bech32Address.defaultBech32Config(singleChain.bech32_prefix),
+        bech32Config: Bech32Address.defaultBech32Config(chain.bech32_prefix),
         chainName: chain.chain_name,
         feeCurrencies: [nativeChainCoinRes],
         stakeCurrency: nativeChainCoinRes,
         bip44: {
-          // @ts-ignore
-          coinType: singleChain.slip44,
+          coinType: chain.slip44 || 0,
         },
       };
-    }),
-  );
+    } catch (error) {
+      console.error(error);
+    }
+  });
   return record;
 }
 
