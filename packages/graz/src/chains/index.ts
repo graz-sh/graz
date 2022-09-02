@@ -1,6 +1,7 @@
-import type { AppCurrency } from "@keplr-wallet/types";
+import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 
 import type { Dictionary } from "../types/core";
+import type { ChainInfoWithPath } from "../types/keplr";
 import { axelar } from "./axelar";
 import { cosmoshub } from "./cosmoshub";
 import { crescentTestnet } from "./crescent-testnet";
@@ -70,6 +71,30 @@ export function defineChains<T extends Dictionary<GrazChain>>(chains: T): T {
  * ```
  */
 export function defineChain<T extends GrazChain>(chain: T): T {
+  return chain;
+}
+
+/**
+ * Helper function to define Keplr's `ChainInfo` object.
+ *
+ * This function does not do anything special else than providing type safety
+ * when defining chain information.
+ *
+ * @example
+ * ```ts
+ * import { defineChainInfo } from "graz";
+ *
+ * const cosmoshub = defineChainInfo({
+ *   chainId: "cosmoshub-4",
+ *   currencies: [ ... ],
+ *   path: "cosmoshub",
+ *   rest: "https://lcd-cosmoshub.blockapsis.com/",
+ *   rpc: "https://rpc-cosmoshub.ecostake.com/",
+ *   ...
+ * });
+ * ```
+ */
+export function defineChainInfo<T extends ChainInfo | ChainInfoWithPath>(chain: T): T {
   return chain;
 }
 
