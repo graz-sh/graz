@@ -20,6 +20,7 @@ Generate options:
   -b, --best            Set REST and RPC endpoint to best available nodes instead or first listed ones
   -M, --mainnet         Generate given mainnet chain paths seperated by commas (e.g. "axelar,cosmoshub,juno")
   -T, --testnet         Generate given testnet chain paths seperated by commas (e.g. "atlantic,bitcannadev,cheqdtestnet")
+  --authz               Generate only authz compatible chains
 
 https://github.com/strangelove-ventures/graz
 `;
@@ -28,11 +29,12 @@ const args = arg({
   "--generate": Boolean,
   "-g": "--generate",
 
+  "--authz": Boolean,
   "--best": Boolean,
-  "-b": "--best",
   "--mainnet": String,
-  "-M": "--mainnet",
   "--testnet": String,
+  "-b": "--best",
+  "-M": "--mainnet",
   "-T": "--testnet",
 
   "--help": Boolean,
@@ -55,6 +57,9 @@ async function cli() {
 
 async function generate() {
   console.log(`⏳\tGenerating chain list from cosmos.directory...`);
+  if (args["--authz"]) {
+    console.log(`✍️\tDetected authz flag, generating only compatible chains...`);
+  }
   if (args["--best"]) {
     console.log(`💁‍♂️\tDetected best flag, setting REST and RPC endpoints to best latency...`);
   }
@@ -158,6 +163,10 @@ async function makeRecord(client, { filter = "" } = {}) {
 
   chains.forEach((chain) => {
     try {
+      if (args["--authz"] && !chain.params?.authz) {
+        return;
+      }
+
       const apis = args["--best"] ? chain.best_apis : chain.apis;
       if (!apis || !apis.rest?.[0] || !apis.rpc?.[0]) {
         throw new Error(`⚠️\t${chain.name} has no REST/RPC endpoints, skipping codegen...`);
