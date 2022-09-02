@@ -16,41 +16,55 @@ Options:
   -g, --generate        Generate chain definitions and export to "graz/chains"
   -h, --help            Show this help message
 
+Generate options:
+  -b, --best            Set REST and RPC endpoint to best available nodes instead or first listed ones
+  -M, --mainnet         Generate given mainnet chain paths seperated by commas (e.g. "axelar,cosmoshub,juno")
+  -T, --testnet         Generate given testnet chain paths seperated by commas (e.g. "atlantic,bitcannadev,cheqdtestnet")
+
 https://github.com/strangelove-ventures/graz
 `;
 
+const args = arg({
+  "--generate": Boolean,
+  "-g": "--generate",
+
+  "--best": Boolean,
+  "-b": "--best",
+  "--mainnet": String,
+  "-M": "--mainnet",
+  "--testnet": String,
+  "-T": "--testnet",
+
+  "--help": Boolean,
+  "-h": "--help",
+});
+
 async function cli() {
-  try {
-    const args = arg({
-      "--generate": Boolean,
-      "-g": "--generate",
-
-      "--help": Boolean,
-      "-h": "--help",
-    });
-
-    if (args["--help"]) {
-      console.log(HELP_MESSAGE);
-      return;
-    }
-
-    if (args["--generate"]) {
-      await generate();
-      return;
-    }
-
+  if (args["--help"]) {
     console.log(HELP_MESSAGE);
-  } catch (error) {
-    console.error(String(error));
+    return;
   }
+
+  if (args["--generate"]) {
+    await generate();
+    return;
+  }
+
+  console.log(HELP_MESSAGE);
 }
 
 async function generate() {
-  console.log(`⏳ Generating chain list from cosmos.directory ...`);
+  console.log(`⏳\tGenerating chain list from cosmos.directory...`);
+  if (args["--best"]) {
+    console.log(`💁‍♂️\tDetected best flag, setting REST and RPC endpoints to best latency...`);
+  }
+  if (args["--mainnet"] || args["--testnet"]) {
+    console.log(`🐙\tDetected chain filtering flag, generating only given chain paths...`);
+  }
 
   const [mainnetRecord, testnetRecord] = await Promise.all([
-    makeRecord(createClient()),
-    makeRecord(createTestnetClient()),
+    makeRecord(createClient(), { filter: args["--mainnet"] }),
+    makeRecord(createTestnetClient(), { filter: args["--testnet"] }),
   ]);
 
   const [jsStub, mjsStub] = await Promise.all([
@@ -86,7 +100,7 @@ async function generate() {
     fs.writeFile(chainsDir("index.ts"), mjsContent, { encoding: "utf-8" }),
   ]);
 
-  console.log('✨ Generate complete! You can import `mainnetChains` and `testnetChains` from "graz/chains".');
+  console.log('✨\tGenerate complete! You can import `mainnetChains` and `testnetChains` from "graz/chains".\n');
 }
 
 /** @param {string[]} args */
@@ -130,30 +144,34 @@ function makeExports(record, { testnet = false } = {}) {
 
 /**
  * @param {import("cosmos-directory-client").DirectoryClient} client
+ * @param {{ filter?: string }} opts
  */
-async function makeRecord(client) {
-  const { chains } = await client.fetchChains();
+async function makeRecord(client, { filter = "" } = {}) {
+  const paths = filter
+    ? filter.split(",").map((path) => ({ path }))
+    : await client.fetchChains().then((c) => c.chains.map(({ path }) => ({ path })));
 
-  const resolvedChains = await pmap(chains, async (c) => client.fetchChain(c.path).then((x) => x.chain), {
-    concurrency: 8,
-  });
-
-  const filteredChains = resolvedChains.filter((chain) => (chain.assets ? chain.assets.length > 0 : false));
+  const chains = await pmap(paths, async (c) => client.fetchChain(c.path).then((x) => x.chain), { concurrency: 4 });
 
   /** @type {Record<string, import(".").ChainInfoWithPath>} */
   const record = {};
-  filteredChains.forEach((chain) => {
+
+  chains.forEach((chain) => {
     try {
-      if (!chain.assets) {
-        throw new Error(`${chain.name} has no assets, skipping codegen...`);
+      const apis = args["--best"] ? chain.best_apis : chain.apis;
+      if (!apis || !apis.rest?.[0] || !apis.rpc?.[0]) {
+        throw new Error(`⚠️\t${chain.name} has no REST/RPC endpoints, skipping codegen...`);
       }
 
+      if (!chain.assets) {
+        throw new Error(`⚠️\t${chain.name} has no assets, skipping codegen...`);
+      }
       const mainAsset = chain.assets[0];
 
       /** @type{import("@keplr-wallet/types").Currency} */
-      const nativeChainCoinRes = {
-        coinDenom: mainAsset.denom_units[mainAsset.denom_units.length - 1].denom || "",
-        coinMinimalDenom: mainAsset.denom_units[0].denom || "",
+      const nativeCurrency = {
+        coinDenom: mainAsset.denom_units[mainAsset.denom_units.length - 1].denom,
+        coinMinimalDenom: mainAsset.denom_units[0].denom,
         coinDecimals: mainAsset.denom_units[mainAsset.denom_units.length - 1].exponent,
         coinGeckoId: mainAsset.coingecko_id,
       };
@@ -167,18 +185,18 @@ async function makeRecord(client) {
           coinGeckoId: asset.coingecko_id,
         })),
         path: chain.path,
-        rest: chain.best_apis.rest[0]?.address || "",
-        rpc: chain.best_apis.rpc[0]?.address || "",
+        rest: apis.rest[0].address || "",
+        rpc: apis.rpc[0].address || "",
         bech32Config: Bech32Address.defaultBech32Config(chain.bech32_prefix),
         chainName: chain.chain_name,
-        feeCurrencies: [nativeChainCoinRes],
-        stakeCurrency: nativeChainCoinRes,
+        feeCurrencies: [nativeCurrency],
+        stakeCurrency: nativeCurrency,
         bip44: {
-          coinType: chain.slip44 || 0,
+          coinType: chain.slip44 ?? 0,
         },
       };
     } catch (error) {
-      console.error(error);
+      console.error(error instanceof Error ? error.message : String(error));
     }
   });
   return record;
