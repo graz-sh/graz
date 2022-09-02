@@ -13,7 +13,7 @@ const eslintConfig = {
     require.resolve("@strangelovelabs/style-guide/eslint/react"),
     require.resolve("@strangelovelabs/style-guide/eslint/typescript"),
   ],
-  ignorePatterns: ["chains/**", "dist/**"],
+  ignorePatterns: ["chains/**", "compiled/**", "dist/**"],
   parserOptions: {
     project: getTsconfigPath(),
   },
