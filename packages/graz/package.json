@@ -28,9 +28,10 @@
   "files": [
     "chains/*.stub",
     "cli.js",
+    "compiled/**",
+    "dist/*.d.ts",
     "dist/*.js",
-    "dist/*.mjs",
-    "dist/*.d.ts"
+    "dist/*.mjs"
   ],
   "sideEffects": false,
   "scripts": {
