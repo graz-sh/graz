@@ -1,6 +1,6 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "globalDependencies": ["yarn.lock"],
+  "globalDependencies": ["pnpm-lock.yaml"],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],

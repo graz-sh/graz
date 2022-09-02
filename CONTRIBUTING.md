@@ -40,8 +40,8 @@ The following steps will get you up and running to contribute to `graz`:
    cd graz
    ```
 
-3. Setup all the dependencies and packages by running `yarn`. This command will install dependencies and bootstrap the repo.
-   > We are using `yarn` as the default package manager, we suggest to you to do the same.
+3. Setup all the dependencies and packages by running `pnpm`. This command will install dependencies and bootstrap the repo.
+   > We are using `pnpm` as the default package manager, we suggest to you to do the same.
 
 ## Directory structure
 
@@ -71,10 +71,10 @@ The following steps will get you up and running to contribute to `graz`:
 
 ## Development
 
-- `yarn`: bootstrap the entire project
-- `yarn dev`: compiles `graz` and start the development server of the example app
-- `yarn docs dev`: start the documentation website
-- `yarn example dev`: start the example app
+- `pnpm install`: bootstrap the entire project
+- `pnpm dev`: compiles `graz` and start the development server of the example app
+- `pnpm docs dev`: start the documentation website
+- `pnpm example dev`: start the example app
 
 ## Pull Request
 

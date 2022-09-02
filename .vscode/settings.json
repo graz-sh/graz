@@ -11,12 +11,12 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
-  "eslint.packageManager": "yarn",
+  "eslint.packageManager": "pnpm",
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "eslint.workingDirectories": [
     { "!cwd": false, "directory": "docs" },
     { "!cwd": false, "directory": "example" },
     { "!cwd": false, "pattern": "packages/*" }
   ],
-  "npm.packageManager": "yarn"
+  "npm.packageManager": "pnpm"
 }

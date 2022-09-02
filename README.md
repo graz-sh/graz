@@ -93,8 +93,8 @@ Rather than importing those packages directly, you can import from [`graz/dist/c
 But if you prefer importing from their respective pacakges, you can install dependencies that `graz` uses for better intellisense:
 
 ```sh
-# using yarn
-yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr-wallet/types
+# using pnpm
+pnpm add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr-wallet/types
 ```
 
 ## API

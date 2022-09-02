@@ -40,8 +40,8 @@ The following steps will get you up and running to contribute to `graz`:
    cd graz
    ```
 
-3. Setup all the dependencies and packages by running `yarn`. This command will install dependencies and bootstrap the repo.
-   > We are using `yarn` as the default package manager, we suggest to you to do the same.
+3. Setup all the dependencies and packages by running `pnpm`. This command will install dependencies and bootstrap the repo.
+   > We are using `pnpm` as the default package manager, we suggest to you to do the same.
 
 ## Directory structure
 
@@ -71,10 +71,10 @@ The following steps will get you up and running to contribute to `graz`:
 
 ## Development
 
-- `yarn`: bootstrap the entire project
-- `yarn dev`: compiles `graz` and start the development server of the example app
-- `yarn docs dev`: start the documentation website
-- `yarn example dev`: start the example app
+- `pnpm install`: bootstrap the entire project
+- `pnpm dev`: compiles `graz` and start the development server of the example app
+- `pnpm docs dev`: start the documentation website
+- `pnpm example dev`: start the example app
 
 ## Pull Request
 
@@ -84,7 +84,7 @@ Pull requests only need one collaborator 👍 to be merged.
 
 Before you create a Pull Request, please check whether your commits comply with the commit conventions used in this repository.
 
-When you create a commit we kindly ask you to follow the convention of category (scope or module): title in your commit message, using one of the following categories:  
+When you create a commit we kindly ask you to follow the convention of category (scope or module): title in your commit message, using one of the following categories:
 
 - `feat / feature`: all changes that introduce completely new code or new features
 - `fix`: changes that fix a bug (reference the relevant issue(s) if possible)

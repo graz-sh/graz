@@ -9,12 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
       - uses: actions/setup-node@v3
         with:
-          cache: "yarn"
+          cache: "pnpm"
           node-version-file: ".nvmrc"
-      - run: rm -rf yarn.lock **/node_modules/
-      - run: yarn install
+      - run: rm -rf pnpm-lock.yaml **/node_modules/
+      - run: pnpm install
       - uses: EndBug/add-and-commit@v9
         with:
           message: "chore(deps): upgrade versions"

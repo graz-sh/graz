@@ -9,14 +9,13 @@
   ],
   "scripts": {
     "build": "turbo run build --filter=!@project/docs",
-    "deduplicate": "npx yarn-deduplicate && yarn install",
     "dev": "turbo run dev --filter=!@project/docs",
-    "docs": "yarn workspace @project/docs",
-    "example": "yarn workspace @project/example",
-    "graz": "yarn workspace graz",
+    "docs": "pnpm --dir docs",
+    "example": "pnpm --dir example",
+    "graz": "pnpm --dir packages/graz",
     "lint": "turbo run lint",
     "prepare": "husky install",
-    "release": "turbo run build --filter=graz && yarn workspace graz publish",
+    "release": "turbo run build --filter=graz && pnpm --dir packages/graz publish",
     "test": "turbo run test"
   },
   "devDependencies": {
