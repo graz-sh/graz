@@ -9,5 +9,6 @@ export * from "./hooks/chains";
 export * from "./hooks/clients";
 export * from "./hooks/keplr";
 export * from "./provider";
+export * from "./provider/events";
 export * from "./types/core";
 export * from "./types/keplr";
