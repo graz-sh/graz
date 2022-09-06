@@ -1,7 +1,7 @@
 import type { QueryClientProviderProps } from "@tanstack/react-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { GrazSubscription } from "./subscription";
+import { GrazEvents } from "./events";
 
 const queryClient = new QueryClient({
   //
@@ -30,7 +30,7 @@ export type GrazProviderProps = Partial<QueryClientProviderProps>;
 export function GrazProvider({ children, ...props }: GrazProviderProps): JSX.Element {
   return (
     <QueryClientProvider client={queryClient} {...props}>
-      <GrazSubscription />
+      <GrazEvents />
       {children}
     </QueryClientProvider>
   );

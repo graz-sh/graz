@@ -3,8 +3,12 @@ import { useEffect } from "react";
 import { reconnect } from "../actions/account";
 import { useGrazStore } from "../store";
 
-export function GrazSubscription() {
-  // track keplr_keystorechange and reconnect state
+/**
+ * Graz custom hook to track `keplr_keystorechange` event and reconnect state
+ *
+ * **Note: only use this hook if not using graz's provider component.**
+ */
+export function useGrazEvents() {
   useEffect(() => {
     useGrazStore.setState({
       _supported: typeof window.keplr !== "undefined",
@@ -19,5 +23,15 @@ export function GrazSubscription() {
     };
   }, []);
 
+  return null;
+}
+
+/**
+ * Null component to run {@link useGrazEvents} without affecting component tree.
+ *
+ * **Note: only use this component if not using graz's provider component.**
+ */
+export function GrazEvents() {
+  useGrazEvents();
   return null;
 }
