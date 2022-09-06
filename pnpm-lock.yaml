@@ -80,19 +80,19 @@ importers:
 
   packages/graz:
     specifiers:
-      '@cosmjs/cosmwasm-stargate': ^0.28.11
-      '@cosmjs/proto-signing': ^0.28.11
-      '@cosmjs/stargate': ^0.28.11
-      '@keplr-wallet/cosmos': ^0.10.13
-      '@keplr-wallet/types': ^0.10.13
-      '@tanstack/react-query': ^4.0.10
+      '@cosmjs/cosmwasm-stargate': ^0
+      '@cosmjs/proto-signing': ^0
+      '@cosmjs/stargate': ^0
+      '@keplr-wallet/cosmos': ^0
+      '@keplr-wallet/types': ^0
+      '@tanstack/react-query': ^4
       '@types/node': ^16
       '@types/react': ^18
       arg: ^5
       cosmos-directory-client: 0.0.6
       react: ^18
       typescript: ^4
-      zustand: ^4.0.0
+      zustand: ^4
     dependencies:
       '@cosmjs/cosmwasm-stargate': 0.28.13
       '@cosmjs/proto-signing': 0.28.13
@@ -4783,6 +4783,7 @@ packages:
 
   /@types/node/16.11.57:
     resolution: {integrity: sha512-diBb5AE2V8h9Fs9zEDtBwSeLvIACng/aAkdZ3ujMV+cGuIQ9Nc/V+wQqurk9HJp8ni5roBxQHW21z/ZYbGDivg==}
+    dev: true
 
   /@types/node/17.0.45:
     resolution: {integrity: sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==}
@@ -10620,7 +10621,7 @@ packages:
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
       '@types/long': 4.0.2
-      '@types/node': 16.11.57
+      '@types/node': 18.7.15
       long: 4.0.0
     dev: false
 
