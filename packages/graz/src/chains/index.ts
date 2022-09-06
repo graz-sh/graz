@@ -2,14 +2,14 @@ import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 
 import type { Dictionary } from "../types/core";
 import type { ChainInfoWithPath } from "../types/keplr";
-import { axelar } from "./axelar";
-import { cosmoshub } from "./cosmoshub";
-import { crescentTestnet } from "./crescent-testnet";
-import { juno } from "./juno";
-import { junoTestnet } from "./juno-testnet";
-import { osmosis } from "./osmosis";
-import { osmosisTestnet } from "./osmosis-testnet";
-import { sommelier } from "./sommelier";
+import { axelar } from "./mainnet/axelar";
+import { cosmoshub } from "./mainnet/cosmoshub";
+import { juno } from "./mainnet/juno";
+import { osmosis } from "./mainnet/osmosis";
+import { sommelier } from "./mainnet/sommelier";
+import { crescentTestnet } from "./testnet/crescent";
+import { junoTestnet } from "./testnet/juno";
+import { osmosisTestnet } from "./testnet/osmosis";
 
 export interface GrazChain {
   chainId: string;
