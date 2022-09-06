@@ -1,7 +1,7 @@
 import { Bech32Address } from "@keplr-wallet/cosmos";
-import type { ChainInfo } from "@keplr-wallet/types";
+import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 
-const JUNO = {
+const JUNO: AppCurrency = {
   coinDenom: "junox",
   coinMinimalDenom: "ujunox",
   coinDecimals: 6,
@@ -9,7 +9,7 @@ const JUNO = {
   coinImageUrl: "https://raw.githubusercontent.com/cosmos/chain-registry/master/juno/images/juno.png",
 };
 
-const currencies = [JUNO];
+const currencies: AppCurrency[] = [JUNO];
 
 export const junoTestnet: ChainInfo = {
   rpc: "https://rpc.uni.junonetwork.io",

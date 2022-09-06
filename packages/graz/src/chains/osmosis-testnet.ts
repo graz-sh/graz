@@ -1,7 +1,7 @@
 import { Bech32Address } from "@keplr-wallet/cosmos";
-import type { ChainInfo } from "@keplr-wallet/types";
+import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 
-const OSMO = {
+const OSMO: AppCurrency = {
   coinDenom: "osmo",
   coinMinimalDenom: "uosmo",
   coinDecimals: 6,
@@ -9,7 +9,7 @@ const OSMO = {
   coinImageUrl: "https://dhj8dql1kzq2v.cloudfront.net/white/osmo.png",
 };
 
-const currencies = [OSMO];
+const currencies: AppCurrency[] = [OSMO];
 
 export const osmosisTestnet: ChainInfo = {
   rpc: "https://testnet-rpc.osmosis.zone",
