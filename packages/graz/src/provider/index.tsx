@@ -1,5 +1,5 @@
+import type { QueryClientProviderProps } from "@tanstack/react-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import type { ReactNode } from "react";
 
 import { GrazSubscription } from "./subscription";
 
@@ -7,12 +7,11 @@ const queryClient = new QueryClient({
   //
 });
 
-export interface GrazProviderProps {
-  children: ReactNode;
-}
+export type GrazProviderProps = Partial<QueryClientProviderProps>;
 
 /**
- * Provider component which wraps `@tanstack/react-query`'s {@link QueryClientProvider} and various `graz` side effects
+ * Provider component which extends `@tanstack/react-query`'s {@link QueryClientProvider} with built-in query client
+ * and various `graz` side effects
  *
  * @example
  * ```tsx
@@ -28,13 +27,11 @@ export interface GrazProviderProps {
  *
  * @see https://tanstack.com/query
  */
-export function GrazProvider({ children }: GrazProviderProps): JSX.Element {
+export function GrazProvider({ children, ...props }: GrazProviderProps): JSX.Element {
   return (
-    <QueryClientProvider key={GRAZ_PROVIDER_COMPONENT_KEY} client={queryClient}>
+    <QueryClientProvider client={queryClient} {...props}>
       <GrazSubscription />
       {children}
     </QueryClientProvider>
   );
 }
-
-export const GRAZ_PROVIDER_COMPONENT_KEY = "graz-query-client";
