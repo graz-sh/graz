@@ -74,7 +74,6 @@ export async function disconnect(clearRecentChain = false): Promise<void> {
   useGrazStore.setState((x) => ({
     ...defaultValues,
     recentChain: clearRecentChain ? null : x.recentChain,
-    _supported: x._supported,
   }));
   return Promise.resolve();
 }

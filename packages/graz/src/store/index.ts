@@ -31,7 +31,6 @@ export interface GrazStore {
   walletType: WalletType;
   _notFoundFn: () => void;
   _reconnect: boolean;
-  _supported: boolean;
 }
 
 export type GrazPersistedStore = Pick<GrazStore, "activeChain" | "recentChain" | "_reconnect">;
@@ -52,7 +51,6 @@ export const defaultValues: GrazStore = {
   walletType: "keplr",
   _notFoundFn: () => null,
   _reconnect: false,
-  _supported: false,
 };
 
 const persistOptions: PersistOptions<GrazStore, GrazPersistedStore> = {

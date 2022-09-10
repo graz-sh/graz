@@ -10,10 +10,6 @@ import { useGrazStore } from "../store";
  */
 export function useGrazEvents() {
   useEffect(() => {
-    useGrazStore.setState({
-      _supported: typeof window.keplr !== "undefined",
-    });
-
     const { _reconnect } = useGrazStore.getState();
     if (_reconnect) reconnect();
 
