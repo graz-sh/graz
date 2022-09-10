@@ -19,5 +19,5 @@ import { useGrazStore } from "../store";
 export function getKeplr(): Keplr {
   if (typeof window.keplr !== "undefined") return window.keplr;
   useGrazStore.getState()._notFoundFn();
-  throw new Error("Keplr is not defined");
+  throw new Error("window.keplr is not defined");
 }
