@@ -11,17 +11,13 @@ import type { WalletType } from "../types/core";
  * ```ts
  * import { useCheckKeplr } from "graz";
  *
- * // basic example
- * const isSupported = useCheckKeplr();
- * if (isSupported) {
- *   ...
- * }
+ * const { data: isSupported } = useCheckKeplr();
  * ```
  *
- * @see {@link getKeplr}
+ * @deprecated prefer using {@link useCheckWallet}
  */
 export function useCheckKeplr() {
-  return useGrazStore((x) => x._supported);
+  return useCheckWallet("keplr");
 }
 
 /**
