@@ -21,28 +21,3 @@ export function getKeplr(): Keplr {
   useGrazStore.getState()._notFoundFn();
   throw new Error("Keplr is not defined");
 }
-
-/**
- * Register a callback to run when invoking {@link getKeplr} throws an error.
- *
- * @example
- * ```ts
- * registerKeplrNotFound(() => {
- *   console.error("keplr not found");
- * });
- * ```
- *
- * @see {@link unregisterKeplrNotFound}
- */
-export function registerKeplrNotFound(fn: () => void): void {
-  useGrazStore.setState({ _notFoundFn: fn });
-}
-
-/**
- * Clear registered callback when using {@link registerKeplrNotFound}.
- *
- * @see {@link registerKeplrNotFound}
- */
-export function unregisterKeplrNotFound(): void {
-  useGrazStore.setState({ _notFoundFn: () => null });
-}
