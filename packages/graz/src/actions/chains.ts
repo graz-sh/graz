@@ -5,12 +5,12 @@ import { useGrazStore } from "../store";
 import { connect } from "./account";
 import { getKeplr } from "./keplr";
 
-export function getRecentChain(): GrazChain | null {
-  return useGrazStore.getState().recentChain;
-}
-
 export function clearRecentChain(): void {
   useGrazStore.setState({ recentChain: null });
+}
+
+export function getRecentChain(): GrazChain | null {
+  return useGrazStore.getState().recentChain;
 }
 
 export async function suggestChain(chainInfo: ChainInfo): Promise<ChainInfo> {
