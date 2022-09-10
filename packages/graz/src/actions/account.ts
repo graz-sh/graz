@@ -7,7 +7,7 @@ import type { GrazChain } from "../chains";
 import { defaultValues, useGrazStore } from "../store";
 import type { Maybe } from "../types/core";
 import { createClients, createSigningClients } from "./clients";
-import { getKeplr } from "./keplr";
+import { getKeplr } from "./wallet";
 
 export type ConnectArgs = Maybe<GrazChain & { signerOpts?: SigningCosmWasmClientOptions }>;
 

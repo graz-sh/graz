@@ -3,7 +3,7 @@ import type { ChainInfo, Key } from "@keplr-wallet/types";
 import type { GrazChain } from "../chains";
 import { useGrazStore } from "../store";
 import { connect } from "./account";
-import { getKeplr } from "./keplr";
+import { getKeplr } from "./wallet";
 
 export function clearRecentChain(): void {
   useGrazStore.setState({ recentChain: null });
