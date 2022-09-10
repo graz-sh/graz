@@ -7,13 +7,13 @@ import type { GrazChain } from "../chains";
 import { defaultValues, useGrazStore } from "../store";
 import type { Maybe } from "../types/core";
 import { createClients, createSigningClients } from "./clients";
-import { getKeplr } from "./wallet";
+import { getWallet } from "./wallet";
 
 export type ConnectArgs = Maybe<GrazChain & { signerOpts?: SigningCosmWasmClientOptions }>;
 
 export async function connect(args?: ConnectArgs): Promise<Key> {
   try {
-    const keplr = getKeplr();
+    const wallet = getWallet();
 
     const { defaultChain, recentChain } = useGrazStore.getState();
     const chain = args || recentChain || defaultChain;
@@ -30,16 +30,16 @@ export async function connect(args?: ConnectArgs): Promise<Key> {
       return { status: "connecting" };
     });
 
-    await keplr.enable(chain.chainId);
+    await wallet.enable(chain.chainId);
 
-    const offlineSigner = keplr.getOfflineSigner(chain.chainId);
-    const offlineSignerAmino = keplr.getOfflineSignerOnlyAmino(chain.chainId);
-    const offlineSignerAuto = await keplr.getOfflineSignerAuto(chain.chainId);
+    const offlineSigner = wallet.getOfflineSigner(chain.chainId);
+    const offlineSignerAmino = wallet.getOfflineSignerOnlyAmino(chain.chainId);
+    const offlineSignerAuto = await wallet.getOfflineSignerAuto(chain.chainId);
 
     const gasPrice = chain.gas ? GasPrice.fromString(`${chain.gas.price}${chain.gas.denom}`) : undefined;
 
     const [account, clients, signingClients] = await Promise.all([
-      keplr.getKey(chain.chainId),
+      wallet.getKey(chain.chainId),
       createClients(chain),
       createSigningClients({
         ...chain,

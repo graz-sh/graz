@@ -3,7 +3,7 @@ import type { ChainInfo, Key } from "@keplr-wallet/types";
 import type { GrazChain } from "../chains";
 import { useGrazStore } from "../store";
 import { connect } from "./account";
-import { getKeplr } from "./wallet";
+import { getWallet } from "./wallet";
 
 export function clearRecentChain(): void {
   useGrazStore.setState({ recentChain: null });
@@ -14,8 +14,8 @@ export function getRecentChain(): GrazChain | null {
 }
 
 export async function suggestChain(chainInfo: ChainInfo): Promise<ChainInfo> {
-  const keplr = getKeplr();
-  await keplr.experimentalSuggestChain(chainInfo);
+  const wallet = getWallet();
+  await wallet.experimentalSuggestChain(chainInfo);
   return chainInfo;
 }
 
