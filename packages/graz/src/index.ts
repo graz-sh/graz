@@ -7,7 +7,7 @@ export * from "./chains";
 export * from "./hooks/account";
 export * from "./hooks/chains";
 export * from "./hooks/clients";
-export * from "./hooks/keplr";
+export * from "./hooks/wallet";
 export * from "./provider";
 export * from "./provider/events";
 export * from "./types/core";

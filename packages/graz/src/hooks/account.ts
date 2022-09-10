@@ -7,7 +7,7 @@ import type { ConnectArgs } from "../actions/account";
 import { connect, disconnect, getBalances, reconnect } from "../actions/account";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
-import { useCheckKeplr } from "./keplr";
+import { useCheckKeplr } from "./wallet";
 
 export interface UseAccountArgs {
   onConnect?: (args: { account: Key; isReconnect: boolean }) => void;

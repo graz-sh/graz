@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
-import { useCheckKeplr } from "./keplr";
+import { useCheckKeplr } from "./wallet";
 
 /**
  * graz hook to retrieve connected account's active chain
