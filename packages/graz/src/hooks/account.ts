@@ -7,7 +7,7 @@ import type { ConnectArgs } from "../actions/account";
 import { connect, disconnect, getBalances, reconnect } from "../actions/account";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
-import { useCheckKeplr } from "./wallet";
+import { useCheckWallet } from "./wallet";
 
 export interface UseAccountArgs {
   onConnect?: (args: { account: Key; isReconnect: boolean }) => void;
@@ -140,14 +140,14 @@ export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArg
     onMutate: onLoading,
     onSuccess: (account) => Promise.resolve(onSuccess?.(account)),
   });
-
+  const { data: isSupported } = useCheckWallet();
   return {
     connect: (args?: ConnectArgs) => mutation.mutate(args),
     connectAsync: (args?: ConnectArgs) => mutation.mutateAsync(args),
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
-    isSupported: useCheckKeplr(),
+    isSupported: Boolean(isSupported),
     status: mutation.status,
   };
 }

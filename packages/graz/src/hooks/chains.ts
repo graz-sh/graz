@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
-import { useCheckKeplr } from "./wallet";
+import { useCheckWallet } from "./wallet";
 
 /**
  * graz hook to retrieve connected account's active chain
@@ -112,12 +112,12 @@ export function useSuggestChainAndConnect({ onError, onLoading, onSuccess }: Use
     onMutate: onLoading,
     onSuccess: (res) => Promise.resolve(onSuccess?.(res)),
   });
-
+  const { data: isSupported } = useCheckWallet();
   return {
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
-    isSupported: useCheckKeplr(),
+    isSupported: Boolean(isSupported),
     status: mutation.status,
     suggestAndConnect: mutation.mutate,
     suggestAndConnectAsync: mutation.mutateAsync,
