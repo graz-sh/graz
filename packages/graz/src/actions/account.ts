@@ -5,17 +5,24 @@ import type { Key } from "@keplr-wallet/types";
 
 import type { GrazChain } from "../chains";
 import { defaultValues, useGrazStore } from "../store";
-import type { Maybe } from "../types/core";
+import type { Maybe, WalletType } from "../types/core";
 import { createClients, createSigningClients } from "./clients";
 import { getWallet } from "./wallet";
 
-export type ConnectArgs = Maybe<GrazChain & { signerOpts?: SigningCosmWasmClientOptions }>;
+export type ConnectArgs = Maybe<
+  GrazChain & {
+    signerOpts?: SigningCosmWasmClientOptions;
+    walletType?: WalletType;
+  }
+>;
 
 export async function connect(args?: ConnectArgs): Promise<Key> {
   try {
-    const wallet = getWallet();
+    const { defaultChain, recentChain, walletType } = useGrazStore.getState();
 
-    const { defaultChain, recentChain } = useGrazStore.getState();
+    const currentWalletType = args?.walletType || walletType;
+    const wallet = getWallet(currentWalletType);
+
     const chain = args || recentChain || defaultChain;
     if (!chain) {
       throw new Error("No last known connected chain, connect action requires chain info");
@@ -58,6 +65,7 @@ export async function connect(args?: ConnectArgs): Promise<Key> {
       recentChain: chain,
       signingClients,
       status: "connected",
+      walletType: currentWalletType,
       _reconnect: true,
     });
 
