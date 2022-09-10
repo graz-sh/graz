@@ -7,6 +7,7 @@ import type { PersistOptions } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
 import type { GrazChain } from "../chains";
+import type { WalletType } from "../types/core";
 
 export interface GrazStore {
   account: Key | null;
@@ -27,6 +28,7 @@ export interface GrazStore {
     stargate: SigningStargateClient;
   } | null;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
+  walletType: WalletType;
   _notFoundFn: () => void;
   _reconnect: boolean;
   _supported: boolean;
@@ -47,6 +49,7 @@ export const defaultValues: GrazStore = {
   recentChain: null,
   signingClients: null,
   status: "disconnected",
+  walletType: "keplr",
   _notFoundFn: () => null,
   _reconnect: false,
   _supported: false,
