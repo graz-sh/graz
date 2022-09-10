@@ -5,7 +5,7 @@ import type { AppProps } from "next/app";
 const theme = extendTheme();
 
 configureGraz({
-  defaultChain: mainnetChains.cosmos,
+  defaultChain: mainnetChains.cosmoshub,
 });
 
 export default function CustomApp({ Component, pageProps }: AppProps) {
