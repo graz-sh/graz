@@ -87,16 +87,7 @@ export function useBalances(bech32Address?: string) {
     enabled: Boolean(address),
   });
 
-  return {
-    data: query.data,
-    error: query.error,
-    isFetching: query.isFetching,
-    isLoading: query.isLoading,
-    isRefetching: query.isRefetching,
-    isSuccess: query.isSuccess,
-    refetch: query.refetch,
-    status: query.status,
-  };
+  return query;
 }
 
 export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, Key>;

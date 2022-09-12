@@ -37,16 +37,7 @@ export function useClients(args?: WithRefetchOpts<CreateClientArgs>) {
     },
   );
 
-  return {
-    data: query.data,
-    error: query.error,
-    isFetching: query.isFetching,
-    isLoading: query.isLoading,
-    isRefetching: query.isRefetching,
-    isSuccess: query.isSuccess,
-    refetch: query.refetch,
-    status: query.status,
-  };
+  return query;
 }
 
 /**
@@ -82,14 +73,5 @@ export function useSigningClients(args?: WithRefetchOpts<CreateSigningClientArgs
     },
   );
 
-  return {
-    data: query.data,
-    error: query.error,
-    isFetching: query.isFetching,
-    isLoading: query.isLoading,
-    isRefetching: query.isRefetching,
-    isSuccess: query.isSuccess,
-    refetch: query.refetch,
-    status: query.status,
-  };
+  return query;
 }

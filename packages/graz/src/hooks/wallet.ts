@@ -33,16 +33,9 @@ export function useCheckKeplr() {
  */
 export function useCheckWallet(type?: WalletType) {
   const walletType = useGrazStore((x) => type || x.walletType);
+
   const queryKey = ["USE_CHECK_WALLET", walletType] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _type] }) => checkWallet(_type));
-  return {
-    data: query.data,
-    error: query.error,
-    isFetching: query.isFetching,
-    isLoading: query.isLoading,
-    isRefetching: query.isRefetching,
-    isSuccess: query.isSuccess,
-    refetch: query.refetch,
-    status: query.status,
-  };
+
+  return query;
 }
