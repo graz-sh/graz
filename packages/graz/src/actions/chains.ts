@@ -11,6 +11,11 @@ export function clearRecentChain(): void {
   useGrazStore.setState({ recentChain: null });
 }
 
+export function getActiveChainCurrency(denom: string) {
+  const { activeChain } = useGrazStore.getState();
+  return activeChain!.currencies.find((x) => x.coinMinimalDenom === denom);
+}
+
 export function getRecentChain(): GrazChain | null {
   return useGrazStore.getState().recentChain;
 }
