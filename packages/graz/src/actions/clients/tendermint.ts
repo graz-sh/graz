@@ -6,29 +6,33 @@ import { assert, isNonNullObject } from "@cosmjs/utils";
 import { useGrazStore } from "../../store";
 import type { ExtensionSetup } from "../../types/tendermint";
 
-export function createTendermintQueryClient(): QueryClient;
+/**
+ * Note: `createQueryClient` creates \@cosmjs/stargate's {@link QueryClient},
+ * NOT to be confused with \@tanstack/react-query query client
+ */
+export function createQueryClient(): QueryClient;
 
-export function createTendermintQueryClient<A extends object>(setupA: ExtensionSetup<A>): QueryClient & A;
+export function createQueryClient<A extends object>(setupA: ExtensionSetup<A>): QueryClient & A;
 
-export function createTendermintQueryClient<A extends object, B extends object>(
+export function createQueryClient<A extends object, B extends object>(
   setupA: ExtensionSetup<A>,
   setupB: ExtensionSetup<B>,
 ): QueryClient & A & B;
 
-export function createTendermintQueryClient<A extends object, B extends object, C extends object>(
+export function createQueryClient<A extends object, B extends object, C extends object>(
   setupA: ExtensionSetup<A>,
   setupB: ExtensionSetup<B>,
   setupC: ExtensionSetup<C>,
 ): QueryClient & A & B & C;
 
-export function createTendermintQueryClient<A extends object, B extends object, C extends object, D extends object>(
+export function createQueryClient<A extends object, B extends object, C extends object, D extends object>(
   setupA: ExtensionSetup<A>,
   setupB: ExtensionSetup<B>,
   setupC: ExtensionSetup<C>,
   setupD: ExtensionSetup<D>,
 ): QueryClient & A & B & C & D;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -42,7 +46,7 @@ export function createTendermintQueryClient<
   setupE: ExtensionSetup<E>,
 ): QueryClient & A & B & C & D & E;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -58,7 +62,7 @@ export function createTendermintQueryClient<
   setupF: ExtensionSetup<F>,
 ): QueryClient & A & B & C & D & E & F;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -76,7 +80,7 @@ export function createTendermintQueryClient<
   setupG: ExtensionSetup<G>,
 ): QueryClient & A & B & C & D & E & F & G;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -96,7 +100,7 @@ export function createTendermintQueryClient<
   setupH: ExtensionSetup<H>,
 ): QueryClient & A & B & C & D & E & F & G & H;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -118,7 +122,7 @@ export function createTendermintQueryClient<
   setupI: ExtensionSetup<I>,
 ): QueryClient & A & B & C & D & E & F & G & H & I;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -142,7 +146,7 @@ export function createTendermintQueryClient<
   setupJ: ExtensionSetup<J>,
 ): QueryClient & A & B & C & D & E & F & G & H & I & J;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -168,7 +172,7 @@ export function createTendermintQueryClient<
   setupK: ExtensionSetup<K>,
 ): QueryClient & A & B & C & D & E & F & G & H & I & J & K;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -196,7 +200,7 @@ export function createTendermintQueryClient<
   setupL: ExtensionSetup<L>,
 ): QueryClient & A & B & C & D & E & F & G & H & I & J & K & L;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -226,7 +230,7 @@ export function createTendermintQueryClient<
   setupM: ExtensionSetup<M>,
 ): QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -258,7 +262,7 @@ export function createTendermintQueryClient<
   setupN: ExtensionSetup<N>,
 ): QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M & N;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -292,7 +296,7 @@ export function createTendermintQueryClient<
   setupO: ExtensionSetup<O>,
 ): QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M & N & O;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -328,7 +332,7 @@ export function createTendermintQueryClient<
   setupP: ExtensionSetup<P>,
 ): QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M & N & O & P;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -366,7 +370,7 @@ export function createTendermintQueryClient<
   setupQ: ExtensionSetup<Q>,
 ): QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M & N & O & P & Q;
 
-export function createTendermintQueryClient<
+export function createQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -406,7 +410,7 @@ export function createTendermintQueryClient<
   setupR: ExtensionSetup<R>,
 ): QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M & N & O & P & Q & R;
 
-export function createTendermintQueryClient(...extensionSetups: ExtensionSetup<object>[]): any {
+export function createQueryClient(...extensionSetups: ExtensionSetup<object>[]): any {
   const { tendermint } = useGrazStore.getState().clients!;
   const queryClient = new QueryClient(tendermint);
   const exts = extensionSetups.map((setup) => setup(queryClient));

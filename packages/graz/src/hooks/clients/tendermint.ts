@@ -2,32 +2,54 @@ import type { QueryClient } from "@cosmjs/stargate";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 
-import { createTendermintQueryClient } from "../../actions/chains";
+import { createQueryClient } from "../../actions/chains";
 import type { ExtensionSetup } from "../../types/tendermint";
 
-export function useTendermintQueryClient(): UseQueryResult<QueryClient>;
+/**
+ * graz query hook to create and use {@link QueryClient} similar when using {@link QueryClient.withExtensions}.
+ *
+ * Note: `useQueryClient` returns \@cosmjs/stargate's {@link QueryClient},
+ * NOT to be confused with \@tanstack/react-query useQueryClient.
+ *
+ * @example
+ * ```ts
+ * // example without extensions
+ * import { useQueryClient } from "graz";
+ *
+ * const queryClient = useQueryClient();
+ *
+ * // example with extensions
+ * import { useQueryClient } from "graz";
+ * import { setupAuthExtension, setupIbcExtension } from "@cosmjs/stargate";
+ *
+ * const queryClientWithExtensions = useQueryClient(setupAuthExtension, setupIbcExtension);
+ * ```
+ *
+ * @see {@link createQueryClient}
+ */
+export function useQueryClient(): UseQueryResult<QueryClient>;
 
-export function useTendermintQueryClient<A extends object>(setupA: ExtensionSetup<A>): UseQueryResult<QueryClient & A>;
+export function useQueryClient<A extends object>(setupA: ExtensionSetup<A>): UseQueryResult<QueryClient & A>;
 
-export function useTendermintQueryClient<A extends object, B extends object>(
+export function useQueryClient<A extends object, B extends object>(
   setupA: ExtensionSetup<A>,
   setupB: ExtensionSetup<B>,
 ): UseQueryResult<QueryClient & A & B>;
 
-export function useTendermintQueryClient<A extends object, B extends object, C extends object>(
+export function useQueryClient<A extends object, B extends object, C extends object>(
   setupA: ExtensionSetup<A>,
   setupB: ExtensionSetup<B>,
   setupC: ExtensionSetup<C>,
 ): UseQueryResult<QueryClient & A & B & C>;
 
-export function useTendermintQueryClient<A extends object, B extends object, C extends object, D extends object>(
+export function useQueryClient<A extends object, B extends object, C extends object, D extends object>(
   setupA: ExtensionSetup<A>,
   setupB: ExtensionSetup<B>,
   setupC: ExtensionSetup<C>,
   setupD: ExtensionSetup<D>,
 ): UseQueryResult<QueryClient & A & B & C & D>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -41,7 +63,7 @@ export function useTendermintQueryClient<
   setupE: ExtensionSetup<E>,
 ): UseQueryResult<QueryClient & A & B & C & D & E>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -57,7 +79,7 @@ export function useTendermintQueryClient<
   setupF: ExtensionSetup<F>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -75,7 +97,7 @@ export function useTendermintQueryClient<
   setupG: ExtensionSetup<G>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -95,7 +117,7 @@ export function useTendermintQueryClient<
   setupH: ExtensionSetup<H>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -117,7 +139,7 @@ export function useTendermintQueryClient<
   setupI: ExtensionSetup<I>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -141,7 +163,7 @@ export function useTendermintQueryClient<
   setupJ: ExtensionSetup<J>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I & J>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -167,7 +189,7 @@ export function useTendermintQueryClient<
   setupK: ExtensionSetup<K>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I & J & K>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -195,7 +217,7 @@ export function useTendermintQueryClient<
   setupL: ExtensionSetup<L>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I & J & K & L>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -225,7 +247,7 @@ export function useTendermintQueryClient<
   setupM: ExtensionSetup<M>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -257,7 +279,7 @@ export function useTendermintQueryClient<
   setupN: ExtensionSetup<N>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M & N>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -291,7 +313,7 @@ export function useTendermintQueryClient<
   setupO: ExtensionSetup<O>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M & N & O>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -327,7 +349,7 @@ export function useTendermintQueryClient<
   setupP: ExtensionSetup<P>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M & N & O & P>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -365,7 +387,7 @@ export function useTendermintQueryClient<
   setupQ: ExtensionSetup<Q>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M & N & O & P & Q>;
 
-export function useTendermintQueryClient<
+export function useQueryClient<
   A extends object,
   B extends object,
   C extends object,
@@ -405,13 +427,13 @@ export function useTendermintQueryClient<
   setupR: ExtensionSetup<R>,
 ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I & J & K & L & M & N & O & P & Q & R>;
 
-export function useTendermintQueryClient(...extensionSetups: ExtensionSetup<object>[]): any {
-  const queryKey = ["USE_TENDERMINT_QUERY_CLIENT", extensionSetups] as const;
+export function useQueryClient(...extensionSetups: ExtensionSetup<object>[]): any {
+  const queryKey = ["USE_QUERY_CLIENT", ...extensionSetups] as const;
   const query = useQuery(
     queryKey,
-    ({ queryKey: [, _extensionSetups] }) => {
+    ({ queryKey: [, ..._extensionSetups] }) => {
       // @ts-expect-error spreading tuples
-      return createTendermintQueryClient(...extensionSetups);
+      return createQueryClient(...extensionSetups);
     },
     {
       refetchOnMount: false,
