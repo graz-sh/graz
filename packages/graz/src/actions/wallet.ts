@@ -43,6 +43,26 @@ export function getKeplr(): Keplr {
 }
 
 /**
+ * Function to return Leap object (which is {@link Keplr}) and throws and error if it does not exist on `window`.
+ *
+ * @example
+ * ```ts
+ * try {
+ *   const leap = getLeap();
+ * } catch (error: Error) {
+ *   console.error(error.message);
+ * }
+ * ```
+ *
+ * @see https://docs.keplr.app
+ */
+export function getLeap(): Keplr {
+  if (typeof window.leap !== "undefined") return window.leap;
+  useGrazStore.getState()._notFoundFn();
+  throw new Error("window.leap is not defined");
+}
+
+/**
  * Function to return wallet object based on given {@link WalletType} or from store and throws an error if it does not
  * exist on `window` or unknown wallet type.
  *
@@ -58,6 +78,9 @@ export function getWallet(type: WalletType = useGrazStore.getState().walletType)
   switch (type) {
     case "keplr": {
       return getKeplr();
+    }
+    case "leap": {
+      return getLeap();
     }
     default: {
       throw new Error("Unknown wallet type");
