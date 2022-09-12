@@ -1,4 +1,4 @@
-import type { ChainInfo, Key } from "@keplr-wallet/types";
+import type { AppCurrency, ChainInfo, Key } from "@keplr-wallet/types";
 
 import type { GrazChain } from "../chains";
 import { useGrazStore } from "../store";
@@ -11,9 +11,9 @@ export function clearRecentChain(): void {
   useGrazStore.setState({ recentChain: null });
 }
 
-export function getActiveChainCurrency(denom: string) {
+export function getActiveChainCurrency(denom: string): AppCurrency | undefined {
   const { activeChain } = useGrazStore.getState();
-  return activeChain!.currencies.find((x) => x.coinMinimalDenom === denom);
+  return activeChain?.currencies.find((x) => x.coinMinimalDenom === denom);
 }
 
 export function getRecentChain(): GrazChain | null {

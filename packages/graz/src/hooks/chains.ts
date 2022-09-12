@@ -1,7 +1,7 @@
 import type { ChainInfo, Key } from "@keplr-wallet/types";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
+import { clearRecentChain, getActiveChainCurrency, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
@@ -17,6 +17,23 @@ import { useCheckWallet } from "./wallet";
  */
 export function useActiveChain() {
   return useGrazStore((x) => x.activeChain);
+}
+
+/**
+ * graz hook to retrieve specific connected account's currency
+ *
+ * @param denom - Currency denom to search
+ *
+ * @example
+ * ```ts
+ * import { useActiveChainCurrency } from "graz";
+ * const { data: currency, ... } = useActiveChainCurrency("juno");
+ * ```
+ */
+export function useActiveChainCurrency(denom: string) {
+  const queryKey = ["USE_ACTIVE_CHAIN_CURRENCY", denom] as const;
+  const query = useQuery(queryKey, ({ queryKey: [, _denom] }) => getActiveChainCurrency(_denom));
+  return query;
 }
 
 /**
