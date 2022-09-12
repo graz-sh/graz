@@ -4,6 +4,8 @@ import type { CreateClientArgs, CreateSigningClientArgs } from "../actions/clien
 import { createClients, createSigningClients } from "../actions/clients";
 import { useGrazStore } from "../store";
 
+export * from "./clients/tendermint";
+
 type WithRefetchOpts<T> = T & { keepRefetchBehavior?: boolean };
 
 /**
