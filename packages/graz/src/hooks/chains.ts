@@ -1,3 +1,5 @@
+import type { QueryClient, StakingExtension } from "@cosmjs/stargate";
+import type { BondStatusString } from "@cosmjs/stargate/build/modules/staking/queries";
 import type { ChainInfo, Key } from "@keplr-wallet/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -33,6 +35,32 @@ export function useActiveChain() {
 export function useActiveChainCurrency(denom: string) {
   const queryKey = ["USE_ACTIVE_CHAIN_CURRENCY", denom] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _denom] }) => getActiveChainCurrency(_denom));
+  return query;
+}
+
+/**
+ * graz hook to retrieve active chain validators with given query client and optional bond status
+ *
+ * @param queryClient - \@cosmjs/stargate query client object with {@link StakingExtension}
+ * @param status - Validator bond status string (defaults to BOND_STATUS_BONDED)
+ *
+ * @example
+ * ```ts
+ * import { useActiveChainValidators, useQueryClient } from "graz";
+ * import { setupStakingExtension } from "@cosmjs/stargate";
+ *
+ * const queryClient = useQueryClient(setupStakingExtension);
+ * const { data: response, ... } = useActiveChainValidators(queryClient);
+ * ```
+ */
+export function useActiveChainValidators<T extends QueryClient & StakingExtension>(
+  queryClient: T,
+  status: BondStatusString = "BOND_STATUS_BONDED",
+) {
+  const queryKey = ["USE_ACTIVE_CHAIN_VALIDATORS", queryClient, status] as const;
+  const query = useQuery(queryKey, ({ queryKey: [, _queryClient, _status] }) => {
+    return _queryClient.staking.validators(_status);
+  });
   return query;
 }
 
