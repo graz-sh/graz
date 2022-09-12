@@ -5,6 +5,8 @@ import { useGrazStore } from "../store";
 import { connect } from "./account";
 import { getWallet } from "./wallet";
 
+export * from "./clients/tendermint";
+
 export function clearRecentChain(): void {
   useGrazStore.setState({ recentChain: null });
 }
