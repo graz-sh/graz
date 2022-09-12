@@ -90,6 +90,40 @@ export function useBalances(bech32Address?: string) {
   return query;
 }
 
+/**
+ * graz query hook to retrieve specific asset balance from current account or given address.
+ *
+ * @param denom - Asset denom to search
+ * @param bech32Address - Optional bech32 account address, defaults to connected account address
+ *
+ * @example
+ * ```ts
+ * import { useBalance } from "graz";
+ *
+ * // basic example
+ * const { data, isFetching, refetch, ... } = useBalance("atom");
+ *
+ * // with custom bech32 address
+ * useBalance("atom", "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
+ * ```
+ */
+export function useBalance(denom: string, bech32Address?: string) {
+  const { data: balances } = useBalances(bech32Address);
+
+  const queryKey = ["USE_BALANCE", balances, denom, bech32Address] as const;
+  const query = useQuery(
+    queryKey,
+    ({ queryKey: [, _balances] }) => {
+      return _balances?.find((x) => x.denom === denom);
+    },
+    {
+      enabled: Boolean(balances),
+    },
+  );
+
+  return query;
+}
+
 export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, Key>;
 
 /**
