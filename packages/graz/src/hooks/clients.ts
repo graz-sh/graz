@@ -6,8 +6,6 @@ import { useGrazStore } from "../store";
 
 export * from "./clients/tendermint";
 
-type WithRefetchOpts<T> = T & { keepRefetchBehavior?: boolean };
-
 /**
  * graz query hook to retrieve a CosmWasmClient. If there's no given arguments it will be using the current connected client
  *
@@ -22,7 +20,7 @@ type WithRefetchOpts<T> = T & { keepRefetchBehavior?: boolean };
  * useClient({ rpc: "https://rpc.cosmoshub.strange.love", });
  * ```
  */
-export function useClients(args?: WithRefetchOpts<CreateClientArgs>) {
+export function useClients(args?: CreateClientArgs) {
   const currentClient = useGrazStore((x) => x.clients);
 
   const queryKey = ["USE_CLIENTS", args, currentClient] as const;
@@ -32,8 +30,8 @@ export function useClients(args?: WithRefetchOpts<CreateClientArgs>) {
       return _args?.rpc ? createClients(_args) : _current;
     },
     {
-      refetchOnMount: Boolean(args?.keepRefetchBehavior),
-      refetchOnWindowFocus: Boolean(args?.keepRefetchBehavior),
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     },
   );
 
@@ -58,7 +56,7 @@ export function useClients(args?: WithRefetchOpts<CreateClientArgs>) {
  * });
  * ```
  */
-export function useSigningClients(args?: WithRefetchOpts<CreateSigningClientArgs>) {
+export function useSigningClients(args?: CreateSigningClientArgs) {
   const currentClient = useGrazStore((x) => x.signingClients);
 
   const queryKey = ["USE_SIGNING_CLIENTS", args, currentClient] as const;
@@ -68,8 +66,8 @@ export function useSigningClients(args?: WithRefetchOpts<CreateSigningClientArgs
       return _args?.rpc ? createSigningClients(_args) : _current;
     },
     {
-      refetchOnMount: Boolean(args?.keepRefetchBehavior),
-      refetchOnWindowFocus: Boolean(args?.keepRefetchBehavior),
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     },
   );
 
