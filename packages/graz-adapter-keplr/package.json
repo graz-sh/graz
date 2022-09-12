@@ -1,0 +1,36 @@
+{
+  "name": "graz-adapter-keplr",
+  "description": "Graz adapter for Keplr Wallet",
+  "version": "0.0.0",
+  "files": [
+    "dist/*.d.ts",
+    "dist/*.js",
+    "dist/*.mjs"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "graz": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^16",
+    "typescript": "^4"
+  },
+  "keywords": [
+    "graz",
+    "graz-adapter",
+    "graz-adapter-keplr",
+    "keplr-wallet",
+    "keplr",
+    "use-keplr"
+  ],
+  "lint-staged": {
+    "**/*.ts": [
+      "eslint --fix"
+    ]
+  },
+  "license": "MIT"
+}
