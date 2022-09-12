@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import shallow from "zustand/shallow";
 
 import type { ConnectArgs } from "../actions/account";
-import { connect, disconnect, getBalances, reconnect } from "../actions/account";
+import { connect, disconnect, getBalances, getStakedBalances, reconnect } from "../actions/account";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
@@ -239,4 +239,32 @@ export function useSigners() {
     }),
     shallow,
   );
+}
+
+/**
+ * graz query hook to retrieve list of staked balances from current account or given address.
+ *
+ * @param bech32Address - Optional bech32 account address, defaults to connected account address
+ *
+ * @example
+ * ```ts
+ * import { useStakedBalances } from "graz";
+ *
+ * // basic example
+ * const { data, isFetching, refetch, ... } = useStakedBalances();
+ *
+ * // with custom bech32 address
+ * useStakedBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
+ * ```
+ */
+export function useStakedBalances(bech32Address?: string) {
+  const { data: account } = useAccount();
+  const address = bech32Address || account?.bech32Address;
+
+  const queryKey = ["USE_STAKED_BALANCES", address] as const;
+  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getStakedBalances(address!), {
+    enabled: Boolean(address),
+  });
+
+  return query;
 }
