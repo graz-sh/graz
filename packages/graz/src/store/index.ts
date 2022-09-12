@@ -1,6 +1,7 @@
 import type { CosmWasmClient, SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import type { Coin, OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-signing";
 import type { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
+import type { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import type { Key } from "@keplr-wallet/types";
 import create from "zustand";
 import type { PersistOptions } from "zustand/middleware";
@@ -16,6 +17,7 @@ export interface GrazStore {
   clients: {
     cosmWasm: CosmWasmClient;
     stargate: StargateClient;
+    tendermint: Tendermint34Client;
   } | null;
   defaultChain: GrazChain | null;
   defaultSigningClient: "cosmWasm" | "stargate";
