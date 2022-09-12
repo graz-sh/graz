@@ -103,6 +103,14 @@ export async function getBalances(bech32Address: string): Promise<Coin[]> {
   return balances;
 }
 
+export async function getStakedBalances(bech32Address: string) {
+  const { clients } = useGrazStore.getState();
+  if (!clients?.stargate) {
+    throw new Error("Stargate client is not ready");
+  }
+  return clients.stargate.getBalanceStaked(bech32Address);
+}
+
 export function reconnect(): void {
   const { activeChain } = useGrazStore.getState();
   if (activeChain) void connect(activeChain);
