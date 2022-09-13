@@ -57,13 +57,19 @@ export function useActiveChainCurrency(denom: string): UseQueryResult<AppCurrenc
  * ```
  */
 export function useActiveChainValidators<T extends QueryClient & StakingExtension>(
-  queryClient: T,
+  queryClient: T | undefined,
   status: BondStatusString = "BOND_STATUS_BONDED",
 ): UseQueryResult<QueryValidatorsResponse> {
   const queryKey = ["USE_ACTIVE_CHAIN_VALIDATORS", queryClient, status] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _queryClient, _status] }) => {
-    return _queryClient.staking.validators(_status);
-  });
+  const query = useQuery(
+    queryKey,
+    ({ queryKey: [, _queryClient, _status] }) => {
+      return _queryClient!.staking.validators(_status);
+    },
+    {
+      enabled: typeof queryClient !== "undefined",
+    },
+  );
   return query;
 }
 
