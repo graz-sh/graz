@@ -228,11 +228,11 @@ export function useDisconnect({ onError, onLoading, onSuccess }: MutationEventAr
  *
  * @example
  * ```ts
- * import { useSigners } from "graz";
- * const { signer, signerAmino, signerAuto } = useSigners();
+ * import { useOfflineSigners } from "graz";
+ * const { signer, signerAmino, signerAuto } = useOfflineSigners();
  * ```
  */
-export function useSigners() {
+export function useOfflineSigners() {
   return useGrazStore(
     (x) => ({
       signer: x.offlineSigner,
@@ -241,6 +241,16 @@ export function useSigners() {
     }),
     shallow,
   );
+}
+
+/**
+ * graz hook to retrieve offline signer objects (default, amino enabled, and auto).
+ *
+ * @deprecated prefer using {@link useOfflineSigners}
+ * @see {@link useOfflineSigners}
+ */
+export function useSigners() {
+  return useOfflineSigners();
 }
 
 /**
