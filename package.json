@@ -15,7 +15,7 @@
     "graz": "pnpm --dir packages/graz",
     "lint": "turbo run lint",
     "prepare": "husky install",
-    "release": "turbo run build --filter=graz && pnpm --dir packages/graz publish",
+    "release": "turbo run build --filter=graz && pnpm publish --filter graz",
     "test": "turbo run test"
   },
   "devDependencies": {
