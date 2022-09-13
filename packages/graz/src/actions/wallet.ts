@@ -12,7 +12,7 @@ import type { WalletType } from "../types/core";
  * const isKeplrSupported = checkWallet("keplr");
  * ```
  */
-export function checkWallet(type: WalletType = useGrazStore.getState().walletType) {
+export function checkWallet(type: WalletType = useGrazStore.getState().walletType): boolean {
   try {
     getWallet(type);
     return true;

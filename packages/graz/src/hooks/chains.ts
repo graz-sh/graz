@@ -1,9 +1,12 @@
 import type { QueryClient, StakingExtension } from "@cosmjs/stargate";
 import type { BondStatusString } from "@cosmjs/stargate/build/modules/staking/queries";
-import type { ChainInfo, Key } from "@keplr-wallet/types";
+import type { AppCurrency, ChainInfo, Key } from "@keplr-wallet/types";
+import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import type { QueryValidatorsResponse } from "cosmjs-types/cosmos/staking/v1beta1/query";
 
 import { clearRecentChain, getActiveChainCurrency, suggestChain, suggestChainAndConnect } from "../actions/chains";
+import type { GrazChain } from "../chains";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
@@ -17,7 +20,7 @@ import { useCheckWallet } from "./wallet";
  * const { rpc, rest, chainId, currencies } = useActiveChain();
  * ```
  */
-export function useActiveChain() {
+export function useActiveChain(): GrazChain | null {
   return useGrazStore((x) => x.activeChain);
 }
 
@@ -32,7 +35,7 @@ export function useActiveChain() {
  * const { data: currency, ... } = useActiveChainCurrency("juno");
  * ```
  */
-export function useActiveChainCurrency(denom: string) {
+export function useActiveChainCurrency(denom: string): UseQueryResult<AppCurrency | undefined> {
   const queryKey = ["USE_ACTIVE_CHAIN_CURRENCY", denom] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _denom] }) => getActiveChainCurrency(_denom));
   return query;
@@ -56,7 +59,7 @@ export function useActiveChainCurrency(denom: string) {
 export function useActiveChainValidators<T extends QueryClient & StakingExtension>(
   queryClient: T,
   status: BondStatusString = "BOND_STATUS_BONDED",
-) {
+): UseQueryResult<QueryValidatorsResponse> {
   const queryKey = ["USE_ACTIVE_CHAIN_VALIDATORS", queryClient, status] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _queryClient, _status] }) => {
     return _queryClient.staking.validators(_status);

@@ -1,3 +1,4 @@
+import type { UseQueryResult } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 
 import { checkWallet } from "../actions/wallet";
@@ -16,7 +17,7 @@ import type { WalletType } from "../types/core";
  *
  * @deprecated prefer using {@link useCheckWallet}
  */
-export function useCheckKeplr() {
+export function useCheckKeplr(): UseQueryResult<boolean> {
   return useCheckWallet("keplr");
 }
 
@@ -31,7 +32,7 @@ export function useCheckKeplr() {
  * const { data: isKeplrSupported } = useCheckWallet("keplr");
  * ```
  */
-export function useCheckWallet(type?: WalletType) {
+export function useCheckWallet(type?: WalletType): UseQueryResult<boolean> {
   const walletType = useGrazStore((x) => type || x.walletType);
 
   const queryKey = ["USE_CHECK_WALLET", walletType] as const;

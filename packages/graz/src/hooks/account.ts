@@ -1,4 +1,6 @@
+import type { Coin } from "@cosmjs/proto-signing";
 import type { Key } from "@keplr-wallet/types";
+import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import shallow from "zustand/shallow";
@@ -78,7 +80,7 @@ export function useAccount({ onConnect, onDisconnect }: UseAccountArgs = {}) {
  * useBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export function useBalances(bech32Address?: string) {
+export function useBalances(bech32Address?: string): UseQueryResult<Coin[]> {
   const { data: account } = useAccount();
   const address = bech32Address || account?.bech32Address;
 
@@ -107,7 +109,7 @@ export function useBalances(bech32Address?: string) {
  * useBalance("atom", "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export function useBalance(denom: string, bech32Address?: string) {
+export function useBalance(denom: string, bech32Address?: string): UseQueryResult<Coin | undefined> {
   const { data: balances } = useBalances(bech32Address);
 
   const queryKey = ["USE_BALANCE", balances, denom, bech32Address] as const;
@@ -257,7 +259,7 @@ export function useSigners() {
  * useStakedBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export function useStakedBalances(bech32Address?: string) {
+export function useStakedBalances(bech32Address?: string): UseQueryResult<Coin | null> {
   const { data: account } = useAccount();
   const address = bech32Address || account?.bech32Address;
 

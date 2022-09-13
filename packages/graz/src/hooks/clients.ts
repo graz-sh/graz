@@ -1,7 +1,9 @@
+import type { UseQueryResult } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 
 import type { CreateClientArgs, CreateSigningClientArgs } from "../actions/clients";
 import { createClients, createSigningClients } from "../actions/clients";
+import type { GrazStore } from "../store";
 import { useGrazStore } from "../store";
 
 export * from "./clients/tendermint";
@@ -20,7 +22,7 @@ export * from "./clients/tendermint";
  * useClient({ rpc: "https://rpc.cosmoshub.strange.love", });
  * ```
  */
-export function useClients(args?: CreateClientArgs) {
+export function useClients(args?: CreateClientArgs): UseQueryResult<GrazStore["clients"]> {
   const currentClient = useGrazStore((x) => x.clients);
 
   const queryKey = ["USE_CLIENTS", args, currentClient] as const;
@@ -56,7 +58,7 @@ export function useClients(args?: CreateClientArgs) {
  * });
  * ```
  */
-export function useSigningClients(args?: CreateSigningClientArgs) {
+export function useSigningClients(args?: CreateSigningClientArgs): UseQueryResult<GrazStore["signingClients"]> {
   const currentClient = useGrazStore((x) => x.signingClients);
 
   const queryKey = ["USE_SIGNING_CLIENTS", args, currentClient] as const;
