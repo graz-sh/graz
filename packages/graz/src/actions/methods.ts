@@ -1,8 +1,8 @@
 import type { Coin } from "@cosmjs/proto-signing";
-import type { DeliverTxResponse } from "@cosmjs/stargate";
+import type { DeliverTxResponse, StdFee } from "@cosmjs/stargate";
+import type { Height } from "cosmjs-types/ibc/core/client/v1/client";
 
 import { useGrazStore } from "../store";
-import type { SendIbcTokensProps, SendTokensProps } from "../types/methods";
 
 export async function getBalances(bech32Address: string): Promise<Coin[]> {
   const { activeChain, signingClients } = useGrazStore.getState();
@@ -28,10 +28,16 @@ export async function getStakedBalances(bech32Address: string): Promise<Coin | n
   }
   return clients.stargate.getBalanceStaked(bech32Address);
 }
-/**
- *
- * @see https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendTokens
- */
+
+export interface SendTokensProps {
+  senderAddress: string | undefined;
+  recipientAddress: string;
+  amount: Coin[];
+  fee: number | StdFee | "auto";
+  memo?: string;
+}
+
+// https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendTokens
 export async function sendTokens({
   senderAddress,
   recipientAddress,
@@ -49,10 +55,19 @@ export async function sendTokens({
   return signingClients[defaultSigningClient].sendTokens(senderAddress, recipientAddress, amount, fee, memo);
 }
 
-/**
- *
- * @see https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendIbcTokens
- */
+export interface SendIbcTokensProps {
+  senderAddress: string | undefined;
+  recipientAddress: string;
+  transferAmount: Coin;
+  sourcePort: string;
+  sourceChannel: string;
+  timeoutHeight: Height | undefined;
+  timeoutTimestamp: number | undefined;
+  fee: number | StdFee | "auto";
+  memo: string;
+}
+
+// https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendIbcTokens
 export async function sendIbcTokens({
   senderAddress,
   recipientAddress,
