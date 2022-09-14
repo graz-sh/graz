@@ -29,25 +29,25 @@ export async function getStakedBalances(bech32Address: string): Promise<Coin | n
   return clients.stargate.getBalanceStaked(bech32Address);
 }
 
-export interface SendTokensProps {
-  senderAddress: string | undefined;
+// https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendTokens
+export interface SendTokensArgs {
+  senderAddress?: string;
   recipientAddress: string;
   amount: Coin[];
   fee: number | StdFee | "auto";
   memo?: string;
 }
 
-// https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendTokens
 export async function sendTokens({
   senderAddress,
   recipientAddress,
   amount,
   fee,
   memo,
-}: SendTokensProps): Promise<DeliverTxResponse> {
+}: SendTokensArgs): Promise<DeliverTxResponse> {
   const { signingClients, defaultSigningClient } = useGrazStore.getState();
-  if (!signingClients?.stargate) {
-    throw new Error("Stargate client is not ready");
+  if (!signingClients) {
+    throw new Error("No connected account detected");
   }
   if (!senderAddress) {
     throw new Error("senderAddress is not defined");
@@ -55,19 +55,19 @@ export async function sendTokens({
   return signingClients[defaultSigningClient].sendTokens(senderAddress, recipientAddress, amount, fee, memo);
 }
 
-export interface SendIbcTokensProps {
-  senderAddress: string | undefined;
+// https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendIbcTokens
+export interface SendIbcTokensArgs {
+  senderAddress?: string;
   recipientAddress: string;
   transferAmount: Coin;
   sourcePort: string;
   sourceChannel: string;
-  timeoutHeight: Height | undefined;
-  timeoutTimestamp: number | undefined;
+  timeoutHeight?: Height;
+  timeoutTimestamp?: number;
   fee: number | StdFee | "auto";
   memo: string;
 }
 
-// https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendIbcTokens
 export async function sendIbcTokens({
   senderAddress,
   recipientAddress,
@@ -78,10 +78,10 @@ export async function sendIbcTokens({
   timeoutTimestamp,
   fee,
   memo,
-}: SendIbcTokensProps) {
+}: SendIbcTokensArgs) {
   const { signingClients } = useGrazStore.getState();
   if (!signingClients?.stargate) {
-    throw new Error("Stargate client is not ready");
+    throw new Error("Stargate signing client is not ready");
   }
   if (!senderAddress) {
     throw new Error("senderAddress is not defined");

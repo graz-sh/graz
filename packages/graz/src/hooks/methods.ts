@@ -1,14 +1,12 @@
-import type { DeliverTxResponse } from "@cosmjs/stargate";
 import { useMutation } from "@tanstack/react-query";
 
-import type { SendIbcTokensProps, SendTokensProps } from "../actions/methods";
+import type { SendIbcTokensArgs, SendTokensArgs } from "../actions/methods";
 import { sendIbcTokens, sendTokens } from "../actions/methods";
 import type { MutationEventArgs } from "../types/hooks";
 import { useAccount } from "./account";
 
 /**
- * graz mutation hook to send tokens with optional arguments to invoke given functions on error, loading, or success event.
- *
+ * graz mutation hook to send tokens. Note: if `senderAddress` undefined, it will use current connected account address.
  *
  * @example
  * ```ts
@@ -21,19 +19,17 @@ import { useAccount } from "./account";
  * // ...args
  * })
  * ```
+ *
+ * @see {@link sendTokens}
  */
 export function useSendTokens({ onError, onLoading, onSuccess }: MutationEventArgs = {}) {
   const { data: account } = useAccount();
   const accountAddress = account?.bech32Address;
 
   const queryKey = ["USE_SEND_TOKENS", onError, onLoading, onSuccess, accountAddress];
-  const mutation = useMutation<DeliverTxResponse, unknown, SendTokensProps>(
+  const mutation = useMutation(
     queryKey,
-    ({ senderAddress, ...rest }) =>
-      sendTokens({
-        senderAddress: senderAddress || accountAddress,
-        ...rest,
-      }),
+    (args: SendTokensArgs) => sendTokens({ senderAddress: accountAddress, ...args }),
     {
       onError: (err, txResponse) => Promise.resolve(onError?.(err, txResponse)),
       onMutate: onLoading,
@@ -45,19 +41,13 @@ export function useSendTokens({ onError, onLoading, onSuccess }: MutationEventAr
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
-    /**
-     * if senderAddress undefined, it will use current connected account address
-     */
     sendTokens: mutation.mutate,
-    /**
-     * if senderAddress undefined, it will use current connected account address
-     */
     sendTokensAsync: mutation.mutateAsync,
     status: mutation.status,
   };
 }
 /**
- * graz mutation hook to send IBC tokens with optional arguments to invoke given functions on error, loading, or success event.
+ * graz mutation hook to send IBC tokens. Note: if `senderAddress` undefined, it will use current connected account address.
  *
  *
  * @example
@@ -77,13 +67,9 @@ export function useSendIbcTokens({ onError, onLoading, onSuccess }: MutationEven
   const accountAddress = account?.bech32Address;
 
   const queryKey = ["USE_SEND_IBC_TOKENS", onError, onLoading, onSuccess, accountAddress];
-  const mutation = useMutation<DeliverTxResponse, unknown, SendIbcTokensProps>(
+  const mutation = useMutation(
     queryKey,
-    ({ senderAddress, ...rest }) =>
-      sendIbcTokens({
-        senderAddress: senderAddress || accountAddress,
-        ...rest,
-      }),
+    (args: SendIbcTokensArgs) => sendIbcTokens({ senderAddress: accountAddress, ...args }),
     {
       onError: (err, txResponse) => Promise.resolve(onError?.(err, txResponse)),
       onMutate: onLoading,
@@ -95,13 +81,7 @@ export function useSendIbcTokens({ onError, onLoading, onSuccess }: MutationEven
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
-    /**
-     * if senderAddress undefined, it will use current connected account address
-     */
     sendIbcTokens: mutation.mutate,
-    /**
-     * if senderAddress undefined, it will use current connected account address
-     */
     sendIbcTokensAsync: mutation.mutateAsync,
     status: mutation.status,
   };
