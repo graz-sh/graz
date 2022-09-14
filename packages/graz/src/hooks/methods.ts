@@ -1,9 +1,9 @@
 import type { DeliverTxResponse } from "@cosmjs/stargate";
 import { useMutation } from "@tanstack/react-query";
 
+import type { SendIbcTokensProps, SendTokensProps } from "../actions/methods";
 import { sendIbcTokens, sendTokens } from "../actions/methods";
 import type { MutationEventArgs } from "../types/hooks";
-import type { SendIbcTokensProps, SendTokensProps } from "../types/methods";
 import { useAccount } from "./account";
 
 /**
