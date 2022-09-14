@@ -6,7 +6,8 @@ import { useEffect } from "react";
 import shallow from "zustand/shallow";
 
 import type { ConnectArgs } from "../actions/account";
-import { connect, disconnect, getBalances, getStakedBalances, reconnect } from "../actions/account";
+import { connect, disconnect, reconnect } from "../actions/account";
+import { getBalances, getStakedBalances } from "../actions/methods";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
