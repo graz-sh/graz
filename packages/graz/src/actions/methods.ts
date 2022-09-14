@@ -1,6 +1,8 @@
 import type { Coin } from "@cosmjs/proto-signing";
+import type { DeliverTxResponse } from "@cosmjs/stargate";
 
 import { useGrazStore } from "../store";
+import type { SendTokensProps } from "../types/methods";
 
 export async function getBalances(bech32Address: string): Promise<Coin[]> {
   const { activeChain, signingClients } = useGrazStore.getState();
@@ -25,4 +27,24 @@ export async function getStakedBalances(bech32Address: string): Promise<Coin | n
     throw new Error("Stargate client is not ready");
   }
   return clients.stargate.getBalanceStaked(bech32Address);
+}
+/**
+ *
+ * @see https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendTokens
+ */
+export async function sendTokens({
+  senderAddress,
+  recipientAddress,
+  amount,
+  fee,
+  memo,
+}: SendTokensProps): Promise<DeliverTxResponse> {
+  const { signingClients, defaultSigningClient } = useGrazStore.getState();
+  if (!signingClients?.stargate) {
+    throw new Error("Stargate client is not ready");
+  }
+  if (!senderAddress) {
+    throw new Error("senderAddress is not defined");
+  }
+  return signingClients[defaultSigningClient].sendTokens(senderAddress, recipientAddress, amount, fee, memo);
 }
