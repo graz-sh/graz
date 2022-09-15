@@ -16,7 +16,9 @@ import { useAccount } from "./account";
  * const { sendTokens } = useSendTokens();
  *
  * sendTokens({
- * // ...args
+ *    recipientAddress: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430";
+ *    amount: [coin];
+ *    ...
  * })
  * ```
  *
@@ -58,7 +60,9 @@ export function useSendTokens({ onError, onLoading, onSuccess }: MutationEventAr
  * const { sendIbcTokens } = useSendIbcTokens();
  *
  * sendIbcTokens({
- * // ...args
+ *    recipientAddress: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
+ *    transferAmount: coin,
+ *    ...
  * })
  * ```
  */
