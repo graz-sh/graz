@@ -2,6 +2,7 @@ export * from "./actions/account";
 export * from "./actions/chains";
 export * from "./actions/clients";
 export * from "./actions/configure";
+export * from "./actions/methods";
 export * from "./actions/wallet";
 export * from "./adapter";
 export * from "./chains";
