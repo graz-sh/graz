@@ -37,7 +37,8 @@
   "scripts": {
     "build": "tsup",
     "cli": "node cli.mjs",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "lint": "eslint --fix \"src/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "^0",
