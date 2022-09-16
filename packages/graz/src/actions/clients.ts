@@ -8,6 +8,8 @@ import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import type { GrazChain } from "../chains";
 import type { GrazStore } from "../store";
 
+export * from "./clients/tendermint";
+
 export type CreateClientArgs = Pick<GrazChain, "rpc" | "rpcHeaders">;
 
 export async function createClients({ rpc, rpcHeaders }: CreateClientArgs): Promise<GrazStore["clients"]> {
