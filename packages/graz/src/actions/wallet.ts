@@ -1,7 +1,7 @@
 import type { Keplr } from "@keplr-wallet/types";
 
 import { useGrazStore } from "../store";
-import type { WalletType } from "../types/core";
+import { WALLET_TYPES, WalletType } from "../types/wallet";
 
 /**
  * Function to check whether given {@link WalletType} or default configured wallet exists.
@@ -74,16 +74,20 @@ export function getLeap(): Keplr {
  *
  * @see {@link getKeplr}
  */
-export function getWallet(type: WalletType = useGrazStore.getState().walletType) {
+export function getWallet(type: WalletType = useGrazStore.getState().walletType): Keplr {
   switch (type) {
-    case "keplr": {
+    case WalletType.KEPLR: {
       return getKeplr();
     }
-    case "leap": {
+    case WalletType.LEAP: {
       return getLeap();
     }
     default: {
       throw new Error("Unknown wallet type");
     }
   }
+}
+
+export function getAvailableWallets(): Record<WalletType, boolean> {
+  return Object.fromEntries(WALLET_TYPES.map((type) => [type, checkWallet(type)])) as Record<WalletType, boolean>;
 }

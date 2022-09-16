@@ -8,7 +8,7 @@ import type { PersistOptions } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
 import type { GrazChain } from "../chains";
-import type { WalletType } from "../types/core";
+import { WalletType } from "../types/wallet";
 
 export interface GrazStore {
   account: Key | null;
@@ -50,7 +50,7 @@ export const defaultValues: GrazStore = {
   recentChain: null,
   signingClients: null,
   status: "disconnected",
-  walletType: "keplr",
+  walletType: WalletType.KEPLR,
   _notFoundFn: () => null,
   _reconnect: false,
 };

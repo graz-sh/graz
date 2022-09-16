@@ -1,7 +1,7 @@
 import type { GrazChain } from "../chains";
 import type { GrazStore } from "../store";
 import { useGrazStore } from "../store";
-import type { WalletType } from "../types/core";
+import type { WalletType } from "../types/wallet";
 
 export interface ConfigureGrazArgs {
   defaultChain?: GrazChain;

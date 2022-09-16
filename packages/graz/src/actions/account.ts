@@ -4,7 +4,8 @@ import type { Key } from "@keplr-wallet/types";
 
 import type { GrazChain } from "../chains";
 import { defaultValues, useGrazStore } from "../store";
-import type { Maybe, WalletType } from "../types/core";
+import type { Maybe } from "../types/core";
+import type { WalletType } from "../types/wallet";
 import { createClients, createSigningClients } from "./clients";
 import { getWallet } from "./wallet";
 

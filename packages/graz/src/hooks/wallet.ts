@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { checkWallet } from "../actions/wallet";
 import { useGrazStore } from "../store";
-import type { WalletType } from "../types/core";
+import { WalletType } from "../types/wallet";
 
 /**
  * graz hook which returns boolean whether Keplr Wallet is supported
@@ -18,7 +18,7 @@ import type { WalletType } from "../types/core";
  * @deprecated prefer using {@link useCheckWallet}
  */
 export function useCheckKeplr(): UseQueryResult<boolean> {
-  return useCheckWallet("keplr");
+  return useCheckWallet(WalletType.KEPLR);
 }
 
 /**
