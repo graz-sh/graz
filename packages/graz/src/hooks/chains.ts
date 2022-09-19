@@ -152,9 +152,12 @@ export type UseSuggestChainAndConnectArgs = MutationEventArgs<ChainInfo, { chain
  *
  * // suggest and connect usage
  * suggestAndConnect({
- *    rpc: "https://rpc.cosmoshub.strange.love",
- *    rest: "https://api.cosmoshub.strange.love",
- *    chainId: "cosmoshub-4",
+ *    chainInfo: {
+ *        rpc: "https://rpc.cosmoshub.strange.love",
+ *        rest: "https://api.cosmoshub.strange.love",
+ *        chainId: "cosmoshub-4",
+ *        ...
+ *    },
  *    ...
  * });
  * ```
@@ -162,8 +165,8 @@ export type UseSuggestChainAndConnectArgs = MutationEventArgs<ChainInfo, { chain
 export function useSuggestChainAndConnect({ onError, onLoading, onSuccess }: UseSuggestChainAndConnectArgs = {}) {
   const queryKey = ["USE_SUGGEST_CHAIN_AND_CONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, suggestChainAndConnect, {
-    onError: (err, chainInfo) => Promise.resolve(onError?.(err, chainInfo)),
-    onMutate: onLoading,
+    onError: (err, args) => Promise.resolve(onError?.(err, args.chainInfo)),
+    onMutate: (args) => onLoading?.(args.chainInfo),
     onSuccess: (res) => Promise.resolve(onSuccess?.(res)),
   });
   const { data: isSupported } = useCheckWallet();
