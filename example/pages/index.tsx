@@ -8,7 +8,7 @@ import { RecentChain } from "ui/recent-chain";
 import { ToggleTheme } from "ui/toggle-theme";
 
 export default function HomePage() {
-  const { data: accountData } = useAccount();
+  const { data: accountData, isConnecting, isReconnecting } = useAccount();
 
   return (
     <Center minH="100vh">
@@ -16,7 +16,7 @@ export default function HomePage() {
         <HStack>
           <ConnectStatus />
         </HStack>
-        {!accountData && <RecentChain />}
+        {!accountData && (isConnecting || isReconnecting) && <RecentChain />}
         {accountData && (
           <>
             <Text>
