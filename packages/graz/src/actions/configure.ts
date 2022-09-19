@@ -13,7 +13,7 @@ export interface ConfigureGrazArgs {
 export function configureGraz(args: ConfigureGrazArgs = {}): ConfigureGrazArgs {
   useGrazStore.setState((prev) => ({
     defaultChain: args.defaultChain || prev.defaultChain,
-    defaultSigningClient: args.defaultSigningClient || args.defaultSigningClient,
+    defaultSigningClient: args.defaultSigningClient || prev.defaultSigningClient,
     walletType: args.defaultWallet || prev.walletType,
     _notFoundFn: args.onNotFound || prev._notFoundFn,
   }));
