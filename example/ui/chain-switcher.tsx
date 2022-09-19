@@ -36,7 +36,15 @@ export function ChainSwitcher() {
       </ButtonGroup>
       <FormLabel mt={2}>Suggest and connect chain</FormLabel>
       <ButtonGroup isDisabled={isConnecting || isReconnecting} size="sm">
-        <Button onClick={() => suggestAndConnect(testnetChains.osmosis)}>{testnetChains.osmosis.chainId}</Button>
+        <Button
+          onClick={() =>
+            suggestAndConnect({
+              chainInfo: testnetChains.osmosis,
+            })
+          }
+        >
+          {testnetChains.osmosis.chainId}
+        </Button>
       </ButtonGroup>
     </FormControl>
   );
