@@ -5,6 +5,7 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { QueryValidatorsResponse } from "cosmjs-types/cosmos/staking/v1beta1/query";
 
+import type { SuggestChainAndConnectArgs } from "../actions/chains";
 import { clearRecentChain, getActiveChainCurrency, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import type { GrazChain } from "../chains";
 import { useGrazStore } from "../store";
@@ -130,7 +131,10 @@ export function useSuggestChain({ onError, onLoading, onSuccess }: UseSuggestCha
   };
 }
 
-export type UseSuggestChainAndConnectArgs = MutationEventArgs<ChainInfo, { chain: ChainInfo; account: Key }>;
+export type UseSuggestChainAndConnectArgs = MutationEventArgs<
+  SuggestChainAndConnectArgs,
+  { chain: ChainInfo; account: Key }
+>;
 
 /**
  * graz mutation hook to suggest chain to Keplr Wallet and connect account
@@ -152,21 +156,21 @@ export type UseSuggestChainAndConnectArgs = MutationEventArgs<ChainInfo, { chain
  *
  * // suggest and connect usage
  * suggestAndConnect({
- *    chainInfo: {
- *        rpc: "https://rpc.cosmoshub.strange.love",
- *        rest: "https://api.cosmoshub.strange.love",
- *        chainId: "cosmoshub-4",
- *        ...
- *    },
- *    ...
+ *   chainInfo: {
+ *     rpc: "https://rpc.cosmoshub.strange.love",
+ *     rest: "https://api.cosmoshub.strange.love",
+ *     chainId: "cosmoshub-4",
+ *     ...
+ *   },
+ *   ...
  * });
  * ```
  */
 export function useSuggestChainAndConnect({ onError, onLoading, onSuccess }: UseSuggestChainAndConnectArgs = {}) {
   const queryKey = ["USE_SUGGEST_CHAIN_AND_CONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, suggestChainAndConnect, {
-    onError: (err, args) => Promise.resolve(onError?.(err, args.chainInfo)),
-    onMutate: (args) => onLoading?.(args.chainInfo),
+    onError: (err, args) => Promise.resolve(onError?.(err, args)),
+    onMutate: (args) => onLoading?.(args),
     onSuccess: (res) => Promise.resolve(onSuccess?.(res)),
   });
   const { data: isSupported } = useCheckWallet();
