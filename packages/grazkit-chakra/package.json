@@ -1,0 +1,63 @@
+{
+  "name": "grazkit-chakra",
+  "description": "Graz UI kit using Chakra UI",
+  "version": "0.0.1",
+  "author": "Griko Nibras <griko@strangelove.ventures>",
+  "repository": "https://github.com/strangelove-ventures/graz.git",
+  "homepage": "https://github.com/strangelove-ventures/graz",
+  "bugs": "https://github.com/strangelove-ventures/graz/issues",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "module": "./dist/index.mjs",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/*.d.ts",
+    "dist/*.js",
+    "dist/*.mjs"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "devDependencies": {
+    "@chakra-ui/react": "^2",
+    "@emotion/react": "^11",
+    "@emotion/styled": "^11",
+    "@types/node": "^16",
+    "@types/react": "^18",
+    "framer-motion": "^6",
+    "graz": "*",
+    "react": "^18",
+    "typescript": "^4"
+  },
+  "peerDependencies": {
+    "@chakra-ui/react": "^2",
+    "@emotion/react": "^11",
+    "@emotion/styled": "^11",
+    "framer-motion": "^6",
+    "graz": "*",
+    "react": ">=18"
+  },
+  "keywords": [
+    "graz",
+    "grazkit",
+    "grazkit-chakra",
+    "keplr-wallet",
+    "keplr",
+    "use-keplr"
+  ],
+  "lint-staged": {
+    "**/*.{ts,tsx}": [
+      "eslint --fix"
+    ]
+  },
+  "license": "MIT"
+}
