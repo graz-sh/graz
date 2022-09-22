@@ -6,7 +6,12 @@ export default defineConfig(({ watch }) => ({
   clean: !watch,
   dts: true,
   entry: ["src/*.ts"],
-  external: [...Object.keys(packageJson.dependencies), ...Object.keys(packageJson.peerDependencies)],
+  external: [
+    ...Object.keys(packageJson.dependencies),
+    ...Object.keys(packageJson.peerDependencies),
+    /^@cosmjs\/.*/,
+    /^@keplr-wallet\/.*/,
+  ],
   format: ["cjs", "esm"],
   inject: ["./inject-react.js"],
   minify: !watch,
