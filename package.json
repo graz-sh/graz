@@ -8,8 +8,8 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build --filter=!@project/docs",
-    "dev": "turbo run dev --filter=!@project/docs",
+    "build": "turbo run build --filter=!@project/docs --filter=!graz-adapter-*",
+    "dev": "turbo run dev --filter=!@project/docs --filter=!graz-adapter-*",
     "docs": "pnpm --dir docs",
     "example": "pnpm --dir example",
     "graz": "pnpm --dir packages/graz",
