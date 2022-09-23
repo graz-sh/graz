@@ -274,7 +274,7 @@ export function useBalanceStaked(bech32Address?: string): UseQueryResult<Coin | 
   const { data: account } = useAccount();
   const address = bech32Address || account?.bech32Address;
 
-  const queryKey = ["USE_STAKED_BALANCES", address] as const;
+  const queryKey = ["USE_BALANCE_STAKED", address] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalanceStaked(address!), {
     enabled: Boolean(address),
   });
