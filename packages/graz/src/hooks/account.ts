@@ -7,7 +7,7 @@ import shallow from "zustand/shallow";
 
 import type { ConnectArgs } from "../actions/account";
 import { connect, disconnect, reconnect } from "../actions/account";
-import { getBalances, getStakedBalances } from "../actions/methods";
+import { getBalances, getBalanceStaked } from "../actions/methods";
 import { useGrazStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
@@ -261,21 +261,21 @@ export function useSigners() {
  *
  * @example
  * ```ts
- * import { useStakedBalances } from "graz";
+ * import { useStakedBalance } from "graz";
  *
  * // basic example
- * const { data, isFetching, refetch, ... } = useStakedBalances();
+ * const { data, isFetching, refetch, ... } = useStakedBalance();
  *
  * // with custom bech32 address
- * useStakedBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
+ * useStakedBalance("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export function useStakedBalances(bech32Address?: string): UseQueryResult<Coin | null> {
+export function useStakedBalance(bech32Address?: string): UseQueryResult<Coin | null> {
   const { data: account } = useAccount();
   const address = bech32Address || account?.bech32Address;
 
   const queryKey = ["USE_STAKED_BALANCES", address] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getStakedBalances(address!), {
+  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalanceStaked(address!), {
     enabled: Boolean(address),
   });
 
