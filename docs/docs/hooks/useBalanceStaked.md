@@ -1,16 +1,17 @@
-# useStakedBalances
+# useBalanceStaked
 
 Hook to retrieve list of staked balances from current account or given address
 
 #### Usage
 
-`useStakedBalances` accepts an optional receiving address. If the address is empty it will fetch the connected account based on the active chain.
+`useBalanceStaked` accepts an optional receiving address. If the address is empty it will fetch the connected account based on the active chain.
 
 ```tsx
-import { useStakedBalances } from "graz";
+import { useBalanceStaked } from "graz";
+
 function App() {
   const address = "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430";
-  const { data: coin, isLoading } = useStakedBalances(address);
+  const { data: coin, isLoading } = useBalanceStaked(address);
 
   return (
     <div>
