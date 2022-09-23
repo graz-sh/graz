@@ -33,7 +33,7 @@ export function useSendTokens({ onError, onLoading, onSuccess }: MutationEventAr
     queryKey,
     (args: SendTokensArgs) => sendTokens({ senderAddress: accountAddress, ...args }),
     {
-      onError: (err, txResponse) => Promise.resolve(onError?.(err, txResponse)),
+      onError: (err, args) => Promise.resolve(onError?.(err, args)),
       onMutate: onLoading,
       onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
     },
