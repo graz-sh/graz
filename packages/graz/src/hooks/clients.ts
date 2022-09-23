@@ -9,7 +9,7 @@ import { useGrazStore } from "../store";
 export * from "./clients/tendermint";
 
 /**
- * graz query hook to retrieve a CosmWasmClient. If there's no given arguments it will be using the current connected client
+ * graz query hook to retrieve a CosmWasmClient, StargateClient and Tendermint34Client. If there's no given arguments it will be using the current connected client
  *
  * @example
  * ```ts

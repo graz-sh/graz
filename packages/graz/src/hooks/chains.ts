@@ -80,11 +80,11 @@ export function useActiveChainValidators<T extends QueryClient & StakingExtensio
  * @example
  * ```ts
  * import { useRecentChain, connect, mainnetChains } from "graz";
- * const recentChain = useRecentChain();
+ * const { data: recentChain, clear } = useRecentChain();
  * try {
- *   connect();
- * } catch {
  *   connect(mainnetChains.cosmos);
+ * } catch {
+ *   connect(recentChain);
  * }
  * ```
  *
@@ -98,7 +98,7 @@ export function useRecentChain() {
 export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
 
 /**
- * graz mutation hook to suggest chain to Keplr Wallet
+ * graz mutation hook to suggest chain to a Wallet
  *
  * @example
  * ```ts
@@ -137,7 +137,7 @@ export type UseSuggestChainAndConnectArgs = MutationEventArgs<
 >;
 
 /**
- * graz mutation hook to suggest chain to Keplr Wallet and connect account
+ * graz mutation hook to suggest chain to a Wallet and connect account
  * afterwards
  *
  * @example
