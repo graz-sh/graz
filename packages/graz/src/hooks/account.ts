@@ -261,16 +261,16 @@ export function useSigners() {
  *
  * @example
  * ```ts
- * import { useStakedBalance } from "graz";
+ * import { useBalanceStaked } from "graz";
  *
  * // basic example
- * const { data, isFetching, refetch, ... } = useStakedBalance();
+ * const { data, isFetching, refetch, ... } = useBalanceStaked();
  *
  * // with custom bech32 address
- * useStakedBalance("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
+ * useBalanceStaked("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export function useStakedBalance(bech32Address?: string): UseQueryResult<Coin | null> {
+export function useBalanceStaked(bech32Address?: string): UseQueryResult<Coin | null> {
   const { data: account } = useAccount();
   const address = bech32Address || account?.bech32Address;
 
