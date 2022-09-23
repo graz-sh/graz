@@ -21,7 +21,7 @@ export async function getBalances(bech32Address: string): Promise<Coin[]> {
   return balances;
 }
 
-export async function getStakedBalances(bech32Address: string): Promise<Coin | null> {
+export async function getBalanceStaked(bech32Address: string): Promise<Coin | null> {
   const { clients } = useGrazStore.getState();
   if (!clients?.stargate) {
     throw new Error("Stargate client is not ready");
