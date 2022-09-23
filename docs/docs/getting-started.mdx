@@ -43,20 +43,28 @@ function App() {
 }
 ```
 
-### 2. Configure `graz`
+### 2. Configure `grazOptions`
 
 :::info
 
-**Optional** You can configure your default chain
+**Optional** You can configure your default chain, default wallet, default `SigningClient`
 
 :::
 
 ```jsx
-import { configureGraz, mainnetChains } from "graz";
+import { GrazProvider, mainnetChains } from "graz";
 
-configureGraz({
-  defaultChain: mainnetChains.cosmos,
-});
+function App() {
+  return (
+    <GrazProvider
+      grazOptions={{
+        defaultChain: mainnetChains.cosmoshub,
+      }}
+    >
+      <Wallet />
+    </GrazProvider>
+  );
+}
 ```
 
 ### 3. You're good to go!

@@ -8,7 +8,9 @@ sidebar_position: 1
 
 ## Features
 
-- 🪝 10+ hooks for interfacing with [Keplr Wallet](https://www.keplr.app/) (connecting, view balances, etc.)
+- 🪝 20+ hooks for interfacing with wallets, clients, signers, etc. (connecting, view balances, send tokens, etc.)
+- 💳 Multiple wallet supports
+- ⚙️ Generate mainnet & testnet `ChainInfo`
 - 📚 Built-in caching, request deduplication, and all the good stuff from [`@tanstack/react-query`](https://tanstack.com/query) and [`zustand`](https://github.com/pmndrs/zustand)
 - 🔄 Auto refresh on wallet and network change
 - 👏 Fully typed and tree-shakeable
@@ -39,10 +41,6 @@ Wrap your React app with `<GrazProvider />` and use available `graz` hooks anywh
 
 ```jsx
 import { GrazProvider, mainnetChains } from "graz";
-
-configureGraz({
-  defaultChain: mainnetChains.cosmos,
-});
 
 function App() {
   return (

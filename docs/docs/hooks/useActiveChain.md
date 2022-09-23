@@ -26,5 +26,5 @@ function App() {
   currencies: AppCurrency[]; // from @keplr-wallet/types
   rest: string;
   rpc: string;
-}
+} | null
 ```

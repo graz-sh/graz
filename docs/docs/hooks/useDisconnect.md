@@ -1,6 +1,6 @@
 # useDisconnect
 
-hook for disconnecting an account
+Mutation hook to execute wallet disconnection with optional arguments to invoke given functions on error, loading, or success event.
 
 #### Usage
 
@@ -8,27 +8,36 @@ hook for disconnecting an account
 import { useAccount, useDisconnect } from "graz";
 
 function App() {
+  // pass `true` on disconnect to clear recent connected chain
   const { disconnect } = useDisconnect();
   const { isConnected, account, status } = useAccount();
 
   return (
     <div>
       {isConnected ? `Connected to ${account?.bech32Address}` : status}
-      {isConnected && <button onClick={() => disconnect(undefined)}>Disconnect</button>}
+      {isConnected && <button onClick={() => disconnect(true)}>Disconnect</button>}
     </div>
   );
 }
 ```
 
+#### Params
+
+Object params
+
+- onError?: `(error: unknown, data: boolean) => void`
+- onMutate?: `(data: boolean) => void`
+- onSuccess?: `(data: boolean) => void`
+
 #### Return Value
 
 ```tsx
 {
+  disconnect: (forget?: boolean) => void;
+  disconnectAsync: (forget?: boolean) => Promise<void>;
   error: unknown;
   isLoading: boolean;
   isSuccess: boolean;
-  disconnect: () => void;
-  disconnectAsync: () => Promise<void>;
-  status: "idle" | "error" | "loading" | "success";
+  status: "error" | "idle" | "loading" | "success";
 }
 ```

@@ -1,30 +1,26 @@
-# useBalances
+# useBalance
 
-Hook to retrieve list of balances from current account or given address
+Hook to retrieve specific asset balance from current account or given address
 
 #### Usage
 
-`useBalances` accepts an optional receiving address. If the address is empty it will fetch the connected account based on the active chain.
-
 ```tsx
-import { useBalances } from "graz";
+import { useBalance } from "graz";
 function App() {
-  const address = "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430";
-  const { data, isLoading } = useBalances(address);
+  const { data: atomBalance, isLoading, refetch } = useBalance("atom");
+
+  // with custom bech32 address
+  const userBalance = useBalance("atom", "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
 
   return (
     <div>
-      Balances:
+      Atom Balance:
       {isLoading ? (
         "Fetching balances..."
       ) : (
-        <ul>
-          {data?.map((coin) => (
-            <li key={coin.denom}>
-              {coin.amount} {coin.denom}
-            </li>
-          ))}
-        </ul>
+        <span>
+          {atomBalance.amount} {atomBalance.denom}
+        </span>
       )}
     </div>
   );
@@ -33,6 +29,7 @@ function App() {
 
 #### Params
 
+- denom: `string` = Asset denom to search
 - bech32Address?: `string` = Optional bech32 account address, defaults to connected account address
 
 #### Return Value

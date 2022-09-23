@@ -1,6 +1,6 @@
 # useSuggestChain
 
-hook for suggesting a chain to keplr wallet
+Mutation hook for suggesting a chain to a wallet
 
 :::info
 
@@ -108,6 +108,14 @@ function App() {
 }
 ```
 
+#### Params
+
+Object params
+
+- onError?: `(error: unknown, data: ChainInfo) => void`
+- onMutate?: `(data: chainInfo) => void`
+- onSuccess?: `(data: chainInfo) => void`
+
 #### Return Value
 
 ```tsx
@@ -115,7 +123,7 @@ function App() {
   error: unknown;
   isLoading: boolean;
   isSuccess: boolean;
-  suggest: (chain: ChainInfo) => ChainInfo;
+  suggest: (chain: ChainInfo) => void;
   suggestAsync: (chain: ChainInfo) => Promise<ChainInfo>;
   status: "idle" | "error" | "loading" | "success";
 }

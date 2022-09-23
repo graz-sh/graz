@@ -6,7 +6,8 @@ hook to retrieve last connected chain info
 
 ```tsx
 import { useRecentChain, connect, mainnetChains } from "graz";
-const recentChain = useRecentChain();
+const { data: recentChain, clear } = useRecentChain();
+
 try {
   connect(mainnetChains.cosmos);
 } catch {
@@ -18,14 +19,17 @@ try {
 
 ```tsx
 {
-  chainId: string;
-  currencies: AppCurrency[];
-  rest: string;
-  rpc: string;
-  rpcHeaders?: Dictionary;
-  gas?: {
-    price: string;
-    denom: string;
-  };
-} | null
+  data: {
+          chainId: string;
+          currencies: AppCurrency[];
+          rest: string;
+          rpc: string;
+          rpcHeaders?: Dictionary;
+          gas?: {
+            price: string;
+            denom: string;
+          };
+        } | null,
+clear: () => void // clear recent chain
+}
 ```

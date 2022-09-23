@@ -1,6 +1,6 @@
 # useConnect
 
-hook for connecting to an account with keplr wallet
+Mutation hook to execute wallet connection with optional arguments to invoke given functions on error, loading, or success event
 
 #### Usage
 
@@ -19,16 +19,44 @@ function App() {
 }
 ```
 
+#### Types
+
+- `ConnectArgs`
+  ```tsx
+  {
+    chainId: string;
+    currencies: AppCurrency[];
+    path?: string;
+    rest: string;
+    rpc: string;
+    rpcHeaders?: Dictionary;
+    gas?: {
+      price: string;
+      denom: string;
+    };
+    signerOpts?: SigningCosmWasmClientOptions;
+    walletType?: WalletType;
+  }
+  ```
+
+#### Params
+
+Object params
+
+- onError?: `(error: unknown, data: ConnectArgs) => void`
+- onMutate?: `(data: ConnectArgs) => void`
+- onSuccess?: `(data: ConnectArgs) => void`
+
 #### Return Value
 
 ```tsx
 {
+  connect:  (args?: ConnectArgs) => void;
+  connectAsync: (args?: ConnectArgs) => Promise<Key>;
   error: unknown;
   isLoading: boolean;
   isSuccess: boolean;
   isSupported: boolean;
-  connect: (chain: GrazChain) => void;
-  connectAsync: (chain: GrazChain) => Promise<Key>;
-  status: "idle" | "error" | "loading" | "success";
+  status: "error" | "idle" | "loading" | "success"
 }
 ```

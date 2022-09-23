@@ -1,6 +1,6 @@
-# useClients
+# useSigningClients
 
-hook for accessing `SigningCosmWasmClient` and `SigningStargateClient` based on connected account
+Hook to retrieve a SigningCosmWasmClient and SigningStargateClient.
 
 #### Usage
 
@@ -11,29 +11,64 @@ function App() {
   const { data } = useSigningClients();
   const { cosmWasm, stargate } = data;
 
-  async function sendTokens() {
-    return await cosmWasm.sendTokens(senderAddress, recipientAddress, amountPayload, fee);
+  async function getAccountFromClient() {
+    return await cosmWasm.getAccount();
   }
 }
 ```
 
-#### Return Value
+#### Params
+
+Object params(Optional)
+If there's no given arguments it will be using the current connected client
+
+- rpc: `string`
+- rpcHeaders?: `Dictionary<string> | undefined`
+- offlineSignerAuto: `OfflineSigner | OfflineDirectSigner`;
+- cosmWasmSignerOptions?: `SigningCosmWasmClientOptions`;
+- stargateSignerOptions?: `SigningStargateClientOptions`;
+
+##### Usage with given params
 
 ```tsx
+useSigningClients({
+  rpc: "https://rpc.cosmoshub.strange.love",
+  offlineSigner: customOfflineSigner,
+});
+```
+
+#### Return Value
+
+```ts
 {
   data: {
-    cosmWasm: SigningCosmWasmClient, //from @cosmjs/cosmwasm-stargate
-    stargate: SigningStargateClient //from @cosmjs/stargate
+    cosmWasm: SigningCosmWasmClient, // from @cosmjs/cosmwasm-stargate
+    stargate: SigningStargateClient, // from @cosmjs/stargate
  };
-  error: unknown;
-  isLoading: boolean;
+  dataUpdatedAt: number;
+  error: TError | null;
+  errorUpdatedAt: number;
+  failureCount: number;
+  errorUpdateCount: number;
+  isError: boolean;
+  isFetched: boolean;
+  isFetchedAfterMount: boolean;
   isFetching: boolean;
+  isLoading: boolean;
+  isLoadingError: boolean;
+  isPaused: boolean;
+  isPlaceholderData: boolean;
+  isPreviousData: boolean;
+  isRefetchError: boolean;
   isRefetching: boolean;
+  isStale: boolean;
   isSuccess: boolean;
-  refetch: (options: {
-    throwOnError: boolean
-    cancelRefetch: boolean
-  }) => Promise<Coin[]>
-  status: "error" | "loading" | "success"
+  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<{
+    cosmWasm: SigningCosmWasmClient, // from @cosmjs/cosmwasm-stargate
+    stargate: SigningStargateClient, // from @cosmjs/stargate
+ } | null, unknown>>;
+  remove: () => void;
+  status: 'loading' | 'error' | 'success';
+  fetchStatus: 'fetching' | 'paused' | 'idle';
 }
 ```

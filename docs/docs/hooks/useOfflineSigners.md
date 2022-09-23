@@ -1,14 +1,16 @@
-# useSigners
+# useOfflineSigners
 
-hook for accessing signers based on connected account
+Hook to retrieve offline signer objects (default, amino enabled, and auto)
+
+Note: signer objects is initialized after connecting an account.
 
 #### Usage
 
 ```tsx
-import { useSigners } from "graz";
+import { useOfflineSigners } from "graz";
 
 function App() {
-  const { signer } = useSigners();
+  const { signer, signerAmino, signerAuto } = useOfflineSigners();
 
   async function getAccountFromSigner() {
     return await signer.getAccount();

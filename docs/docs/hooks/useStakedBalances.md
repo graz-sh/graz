@@ -1,30 +1,26 @@
-# useBalances
+# useStakedBalances
 
-Hook to retrieve list of balances from current account or given address
+Hook to retrieve list of staked balances from current account or given address
 
 #### Usage
 
-`useBalances` accepts an optional receiving address. If the address is empty it will fetch the connected account based on the active chain.
+`useStakedBalances` accepts an optional receiving address. If the address is empty it will fetch the connected account based on the active chain.
 
 ```tsx
-import { useBalances } from "graz";
+import { useStakedBalances } from "graz";
 function App() {
   const address = "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430";
-  const { data, isLoading } = useBalances(address);
+  const { data: coin, isLoading } = useStakedBalances(address);
 
   return (
     <div>
-      Balances:
+      Staked Balance:
       {isLoading ? (
-        "Fetching balances..."
+        "Fetching staked balances..."
       ) : (
-        <ul>
-          {data?.map((coin) => (
-            <li key={coin.denom}>
-              {coin.amount} {coin.denom}
-            </li>
-          ))}
-        </ul>
+        <span>
+          {coin?.amount} {coin?.denom}
+        </span>
       )}
     </div>
   );
@@ -39,7 +35,7 @@ function App() {
 
 ```tsx
 {
-  data: Coin[] | null; // from @cosmjs/proto-signing
+  data: Coin | null; // from @cosmjs/proto-signing
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -58,7 +54,7 @@ function App() {
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Coin[], unknown>>;
+  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Coin | null, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

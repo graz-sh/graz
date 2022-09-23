@@ -1,0 +1,36 @@
+# Generate ChainInfo
+
+With `graz cli` you can generate mainnet and testnet chain `ChainInfo` directly from https://cosmos.directory
+
+![graz cli preview](/img/graz-cli.gif)
+
+```shell
+# using yarn
+yarn graz cli
+```
+
+#### Options:
+
+```shell
+
+  -g, --generate        Generate chain definitions and export to "graz/chains"
+  -h, --help            Show this help message
+```
+
+#### Generate options:
+
+```shell
+  -b, --best            Set REST and RPC endpoint to best available nodes instead or first listed ones
+  -M, --mainnet         Generate given mainnet chain paths seperated by commas (e.g. "axelar,cosmoshub,juno")
+  -T, --testnet         Generate given testnet chain paths seperated by commas (e.g. "atlantic,bitcannadev,cheqdtestnet")
+  --authz               Generate only authz compatible chains
+
+```
+
+#### Import generated chains
+
+After you generate `ChainInfo` you can use it in you project
+
+```ts
+import { axelar, cosmoshub, sommelier, mainnetChains, testnetChains } from "graz/chains";
+```

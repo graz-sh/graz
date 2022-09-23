@@ -1,6 +1,6 @@
 # useSuggestChainAndConnect
 
-[Suggesting a chain](useSuggestChain.md) and [connect](./useConnect.md) to keplr wallet in one hook.
+mutation hook for [Suggesting a chain](useSuggestChain.md) and [connect](./useConnect.md) to a wallet in one hook.
 
 #### Usage
 
@@ -35,7 +35,9 @@ function App() {
   const { suggestAndConnect } = useSuggestChainAndConnect();
 
   function handleSuggestAndConnect() {
-    suggestAndConnect(osmosisTestnet);
+    suggestAndConnect({
+      chainInfo: osmosisTestnet,
+    });
   }
 
   return (
@@ -46,6 +48,31 @@ function App() {
 }
 ```
 
+#### Types
+
+- `SuggestChainAndConnectArgs`
+  ```tsx
+  {
+    chainInfo: ChainInfo;
+    signerOpts?: SigningCosmWasmClientOptions;
+    walletType?: WalletType;
+    gas?: {
+      price: string;
+      denom: string;
+    };
+    rpcHeaders?: Dictionary;
+    path?: string;
+  }
+  ```
+
+#### Params
+
+Object params
+
+- onError?: `(error: unknown, data: ChainInfo) => void`
+- onMutate?: `(data: chainInfo) => void`
+- onSuccess?: `(data: chainInfo) => void`
+
 #### Return Value
 
 ```tsx
@@ -55,7 +82,11 @@ function App() {
   isSuccess: boolean;
   isSupported: boolean;
   status: "idle" | "error" | "loading" | "success";
-  suggestAndConnect: (chain: ChainInfo) => ChainInfo;
-  suggestAndConnectAsync: (chain: ChainInfo) => Promise<{ chain: ChainInfo; account: Key }>;
+  suggestAndConnect: (args: SuggestChainAndConnectArgs) => void
+  suggestAndConnectAsync: (args: SuggestChainAndConnectArgs) =>
+    Promise<{
+      chain: ChainInfo;
+      account: Key;
+    }>;
 }
 ```
