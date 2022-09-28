@@ -10,7 +10,7 @@ import { setupStakingExtension } from "@cosmjs/stargate";
 
 function App() {
   const queryClient = useQueryClient(setupStakingExtension);
-  const { data: response } = useActiveChainValidators("juno");
+  const { data: response } = useActiveChainValidators(queryClient);
 }
 ```
 
