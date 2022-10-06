@@ -25,7 +25,8 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "lint": "eslint --fix \"src/**/*.{ts,tsx}\""
   },
   "devDependencies": {
     "@chakra-ui/react": "^2",

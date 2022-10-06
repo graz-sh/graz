@@ -4,6 +4,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "lint": "eslint --fix \"**/*.{ts,tsx}\"",
     "start": "next start"
   },
   "dependencies": {
