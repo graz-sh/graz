@@ -35,7 +35,7 @@ export interface UseAccountArgs {
  * });
  * ```
  */
-export function useAccount({ onConnect, onDisconnect }: UseAccountArgs = {}) {
+export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => {
   const account = useGrazStore((x) => x.account);
   const status = useGrazStore((x) => x.status);
 
@@ -63,7 +63,7 @@ export function useAccount({ onConnect, onDisconnect }: UseAccountArgs = {}) {
     reconnect,
     status,
   };
-}
+};
 
 /**
  * graz query hook to retrieve list of balances from current account or given address.
@@ -81,7 +81,7 @@ export function useAccount({ onConnect, onDisconnect }: UseAccountArgs = {}) {
  * useBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export function useBalances(bech32Address?: string): UseQueryResult<Coin[]> {
+export const useBalances = (bech32Address?: string): UseQueryResult<Coin[]> => {
   const { data: account } = useAccount();
   const address = bech32Address || account?.bech32Address;
 
@@ -91,7 +91,7 @@ export function useBalances(bech32Address?: string): UseQueryResult<Coin[]> {
   });
 
   return query;
-}
+};
 
 /**
  * graz query hook to retrieve specific asset balance from current account or given address.
@@ -110,7 +110,7 @@ export function useBalances(bech32Address?: string): UseQueryResult<Coin[]> {
  * useBalance("atom", "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export function useBalance(denom: string, bech32Address?: string): UseQueryResult<Coin | undefined> {
+export const useBalance = (denom: string, bech32Address?: string): UseQueryResult<Coin | undefined> => {
   const { data: balances } = useBalances(bech32Address);
 
   const queryKey = ["USE_BALANCE", balances, denom, bech32Address] as const;
@@ -125,7 +125,7 @@ export function useBalance(denom: string, bech32Address?: string): UseQueryResul
   );
 
   return query;
-}
+};
 
 export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, Key>;
 
@@ -161,7 +161,7 @@ export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, Key>;
  *
  * @see {@link connect}
  */
-export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArgs = {}) {
+export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArgs = {}) => {
   const queryKey = ["USE_CONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, connect, {
     onError: (err, args) => Promise.resolve(onError?.(err, args)),
@@ -178,7 +178,7 @@ export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArg
     isSupported: Boolean(isSupported),
     status: mutation.status,
   };
-}
+};
 
 /**
  * graz mutation hook to execute wallet disconnection with optional arguments to
@@ -204,7 +204,7 @@ export function useConnect({ onError, onLoading, onSuccess }: UseConnectChainArg
  *
  * @see {@link disconnect}
  */
-export function useDisconnect({ onError, onLoading, onSuccess }: MutationEventArgs = {}) {
+export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventArgs = {}) => {
   const queryKey = ["USE_DISCONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, disconnect, {
     onError: (err) => Promise.resolve(onError?.(err, undefined)),
@@ -220,7 +220,7 @@ export function useDisconnect({ onError, onLoading, onSuccess }: MutationEventAr
     isSuccess: mutation.isSuccess,
     status: mutation.status,
   };
-}
+};
 
 /**
  * graz hook to retrieve offline signer objects (default, amino enabled, and auto).
@@ -233,8 +233,8 @@ export function useDisconnect({ onError, onLoading, onSuccess }: MutationEventAr
  * const { signer, signerAmino, signerAuto } = useOfflineSigners();
  * ```
  */
-export function useOfflineSigners() {
-  return useGrazStore(
+export const useOfflineSigners = () =>
+  useGrazStore(
     (x) => ({
       signer: x.offlineSigner,
       signerAmino: x.offlineSignerAmino,
@@ -242,7 +242,6 @@ export function useOfflineSigners() {
     }),
     shallow,
   );
-}
 
 /**
  * graz hook to retrieve offline signer objects (default, amino enabled, and auto).
@@ -250,9 +249,7 @@ export function useOfflineSigners() {
  * @deprecated prefer using {@link useOfflineSigners}
  * @see {@link useOfflineSigners}
  */
-export function useSigners() {
-  return useOfflineSigners();
-}
+export const useSigners = () => useOfflineSigners();
 
 /**
  * graz query hook to retrieve list of staked balances from current account or given address.
@@ -270,7 +267,7 @@ export function useSigners() {
  * useBalanceStaked("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export function useBalanceStaked(bech32Address?: string): UseQueryResult<Coin | null> {
+export const useBalanceStaked = (bech32Address?: string): UseQueryResult<Coin | null> => {
   const { data: account } = useAccount();
   const address = bech32Address || account?.bech32Address;
 
@@ -280,4 +277,4 @@ export function useBalanceStaked(bech32Address?: string): UseQueryResult<Coin | 
   });
 
   return query;
-}
+};

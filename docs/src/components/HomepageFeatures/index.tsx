@@ -1,10 +1,10 @@
 import clsx from "clsx";
+import type { FC } from "react";
 import React from "react";
 
 import styles from "./styles.module.css";
 
-// eslint-disable-next-line import/no-default-export
-export default function HomepageFeatures(): JSX.Element {
+const HomepageFeatures: FC = () => {
   return (
     <section className={styles.features}>
       <div className="container">
@@ -31,4 +31,6 @@ export default function HomepageFeatures(): JSX.Element {
       </div>
     </section>
   );
-}
+};
+
+export default HomepageFeatures;

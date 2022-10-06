@@ -24,7 +24,7 @@ import { useAccount } from "./account";
  *
  * @see {@link sendTokens}
  */
-export function useSendTokens({ onError, onLoading, onSuccess }: MutationEventArgs = {}) {
+export const useSendTokens = ({ onError, onLoading, onSuccess }: MutationEventArgs = {}) => {
   const { data: account } = useAccount();
   const accountAddress = account?.bech32Address;
 
@@ -47,7 +47,7 @@ export function useSendTokens({ onError, onLoading, onSuccess }: MutationEventAr
     sendTokensAsync: mutation.mutateAsync,
     status: mutation.status,
   };
-}
+};
 /**
  * graz mutation hook to send IBC tokens. Note: if `senderAddress` undefined, it will use current connected account address.
  *
@@ -66,7 +66,7 @@ export function useSendTokens({ onError, onLoading, onSuccess }: MutationEventAr
  * })
  * ```
  */
-export function useSendIbcTokens({ onError, onLoading, onSuccess }: MutationEventArgs = {}) {
+export const useSendIbcTokens = ({ onError, onLoading, onSuccess }: MutationEventArgs = {}) => {
   const { data: account } = useAccount();
   const accountAddress = account?.bech32Address;
 
@@ -89,4 +89,4 @@ export function useSendIbcTokens({ onError, onLoading, onSuccess }: MutationEven
     sendIbcTokensAsync: mutation.mutateAsync,
     status: mutation.status,
   };
-}
+};

@@ -12,7 +12,7 @@ import { WALLET_TYPES, WalletType } from "../types/wallet";
  * const isKeplrSupported = checkWallet("keplr");
  * ```
  */
-export function checkWallet(type: WalletType = useGrazStore.getState().walletType): boolean {
+export const checkWallet = (type: WalletType = useGrazStore.getState().walletType): boolean => {
   try {
     getWallet(type);
     return true;
@@ -20,7 +20,7 @@ export function checkWallet(type: WalletType = useGrazStore.getState().walletTyp
     console.error(error);
     return false;
   }
-}
+};
 
 /**
  * Function to return {@link Keplr} object and throws and error if it does not exist on `window`.
@@ -36,11 +36,11 @@ export function checkWallet(type: WalletType = useGrazStore.getState().walletTyp
  *
  * @see https://docs.keplr.app
  */
-export function getKeplr(): Keplr {
+export const getKeplr = (): Keplr => {
   if (typeof window.keplr !== "undefined") return window.keplr;
   useGrazStore.getState()._notFoundFn();
   throw new Error("window.keplr is not defined");
-}
+};
 
 /**
  * Function to return Leap object (which is {@link Keplr}) and throws and error if it does not exist on `window`.
@@ -56,11 +56,11 @@ export function getKeplr(): Keplr {
  *
  * @see https://docs.keplr.app
  */
-export function getLeap(): Keplr {
+export const getLeap = (): Keplr => {
   if (typeof window.leap !== "undefined") return window.leap;
   useGrazStore.getState()._notFoundFn();
   throw new Error("window.leap is not defined");
-}
+};
 
 /**
  * Function to return wallet object based on given {@link WalletType} or from store and throws an error if it does not
@@ -74,7 +74,7 @@ export function getLeap(): Keplr {
  *
  * @see {@link getKeplr}
  */
-export function getWallet(type: WalletType = useGrazStore.getState().walletType): Keplr {
+export const getWallet = (type: WalletType = useGrazStore.getState().walletType): Keplr => {
   switch (type) {
     case WalletType.KEPLR: {
       return getKeplr();
@@ -86,8 +86,8 @@ export function getWallet(type: WalletType = useGrazStore.getState().walletType)
       throw new Error("Unknown wallet type");
     }
   }
-}
+};
 
-export function getAvailableWallets(): Record<WalletType, boolean> {
+export const getAvailableWallets = (): Record<WalletType, boolean> => {
   return Object.fromEntries(WALLET_TYPES.map((type) => [type, checkWallet(type)])) as Record<WalletType, boolean>;
-}
+};

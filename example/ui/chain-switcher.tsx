@@ -1,7 +1,8 @@
 import { Button, ButtonGroup, FormControl, FormLabel, useToast } from "@chakra-ui/react";
 import { mainnetChainsArray, testnetChains, useAccount, useConnect, useSuggestChainAndConnect } from "graz";
+import type { FC } from "react";
 
-export function ChainSwitcher() {
+export const ChainSwitcher: FC = () => {
   const toast = useToast();
 
   const { isConnecting, isReconnecting } = useAccount({
@@ -48,4 +49,4 @@ export function ChainSwitcher() {
       </ButtonGroup>
     </FormControl>
   );
-}
+};

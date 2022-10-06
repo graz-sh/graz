@@ -10,7 +10,7 @@ export interface ConfigureGrazArgs {
   onNotFound?: () => void;
 }
 
-export function configureGraz(args: ConfigureGrazArgs = {}): ConfigureGrazArgs {
+export const configureGraz = (args: ConfigureGrazArgs = {}): ConfigureGrazArgs => {
   useGrazStore.setState((prev) => ({
     defaultChain: args.defaultChain || prev.defaultChain,
     defaultSigningClient: args.defaultSigningClient || prev.defaultSigningClient,
@@ -18,4 +18,4 @@ export function configureGraz(args: ConfigureGrazArgs = {}): ConfigureGrazArgs {
     _notFoundFn: args.onNotFound || prev._notFoundFn,
   }));
   return args;
-}
+};

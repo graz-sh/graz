@@ -1,5 +1,6 @@
 import { Center, HStack, Spacer, Stack, Text } from "@chakra-ui/react";
 import { useAccount } from "graz";
+import type { NextPage } from "next";
 import { BalanceList } from "ui/balance-list";
 import { ChainSwitcher } from "ui/chain-switcher";
 import { ConnectButton } from "ui/connect-button";
@@ -7,7 +8,7 @@ import { ConnectStatus } from "ui/connect-status";
 import { RecentChain } from "ui/recent-chain";
 import { ToggleTheme } from "ui/toggle-theme";
 
-export default function HomePage() {
+const HomePage: NextPage = () => {
   const { data: accountData, isConnecting, isReconnecting } = useAccount();
 
   return (
@@ -37,4 +38,6 @@ export default function HomePage() {
       </Stack>
     </Center>
   );
-}
+};
+
+export default HomePage;

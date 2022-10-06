@@ -17,9 +17,9 @@ import { WalletType } from "../types/wallet";
  *
  * @deprecated prefer using {@link useCheckWallet}
  */
-export function useCheckKeplr(): UseQueryResult<boolean> {
+export const useCheckKeplr = (): UseQueryResult<boolean> => {
   return useCheckWallet(WalletType.KEPLR);
-}
+};
 
 /**
  * graz query hook to check whether given {@link WalletType} or default configured wallet is supported
@@ -32,11 +32,11 @@ export function useCheckKeplr(): UseQueryResult<boolean> {
  * const { data: isKeplrSupported } = useCheckWallet("keplr");
  * ```
  */
-export function useCheckWallet(type?: WalletType): UseQueryResult<boolean> {
+export const useCheckWallet = (type?: WalletType): UseQueryResult<boolean> => {
   const walletType = useGrazStore((x) => type || x.walletType);
 
   const queryKey = ["USE_CHECK_WALLET", walletType] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _type] }) => checkWallet(_type));
 
   return query;
-}
+};

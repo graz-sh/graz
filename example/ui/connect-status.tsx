@@ -1,7 +1,8 @@
 import { Box, Tag, TagLabel, TagLeftIcon } from "@chakra-ui/react";
 import { useAccount, useActiveChain } from "graz";
+import type { FC } from "react";
 
-export function ConnectStatus() {
+export const ConnectStatus: FC = () => {
   const { isConnected } = useAccount();
   const activeChain = useActiveChain();
 
@@ -11,4 +12,4 @@ export function ConnectStatus() {
       <TagLabel>{isConnected && activeChain ? `Connected to ${activeChain.chainId}` : "Disconnected"}</TagLabel>
     </Tag>
   );
-}
+};

@@ -1,7 +1,8 @@
 import { Button, ListItem, Text, UnorderedList } from "@chakra-ui/react";
 import { useBalances } from "graz";
+import type { FC } from "react";
 
-export function BalanceList() {
+export const BalanceList: FC = () => {
   const { data: balances, isRefetching, refetch } = useBalances();
 
   const REFRESH_BUTTON = (
@@ -23,4 +24,4 @@ export function BalanceList() {
       {!balances && <ListItem ml={4}>no available balances</ListItem>}
     </UnorderedList>
   );
-}
+};

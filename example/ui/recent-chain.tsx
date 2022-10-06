@@ -1,7 +1,8 @@
 import { Button, Text } from "@chakra-ui/react";
 import { useRecentChain } from "graz";
+import type { FC } from "react";
 
-export function RecentChain() {
+export const RecentChain: FC = () => {
   const { data: recentChain, clear } = useRecentChain();
 
   if (!recentChain) return null;
@@ -15,4 +16,4 @@ export function RecentChain() {
       )
     </Text>
   );
-}
+};

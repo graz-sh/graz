@@ -1,5 +1,6 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { configureGraz, GrazProvider, mainnetChains } from "graz";
+import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 
 const theme = extendTheme();
@@ -8,7 +9,7 @@ configureGraz({
   defaultChain: mainnetChains.cosmoshub,
 });
 
-export default function CustomApp({ Component, pageProps }: AppProps) {
+const CustomApp: NextPage<AppProps> = ({ Component, pageProps }) => {
   return (
     <ChakraProvider resetCSS theme={theme}>
       <GrazProvider>
@@ -16,4 +17,6 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
       </GrazProvider>
     </ChakraProvider>
   );
-}
+};
+
+export default CustomApp;

@@ -1,7 +1,8 @@
 import { Button, ButtonGroup, IconButton, useToast } from "@chakra-ui/react";
 import { useAccount, useConnect, useDisconnect } from "graz";
+import type { FC } from "react";
 
-export function ConnectButton() {
+export const ConnectButton: FC = () => {
   const toast = useToast();
 
   const { isConnected, isConnecting, isReconnecting, reconnect } = useAccount({
@@ -42,4 +43,4 @@ export function ConnectButton() {
       {isConnected && <IconButton aria-label="refresh" icon={<>🔄</>} onClick={reconnect} />}
     </ButtonGroup>
   );
-}
+};

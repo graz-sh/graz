@@ -5,6 +5,98 @@ import { useQuery } from "@tanstack/react-query";
 import { createQueryClient } from "../../actions/chains";
 import type { ExtensionSetup } from "../../types/tendermint";
 
+// https://stackoverflow.com/a/53143568/4273667
+export interface UseQueryClient {
+  (): UseQueryResult<QueryClient>;
+  <A extends object>(setupA: ExtensionSetup<A>): UseQueryResult<QueryClient & A>;
+  <A extends object, B extends object>(setupA: ExtensionSetup<A>, setupB: ExtensionSetup<B>): UseQueryResult<
+    QueryClient & A & B
+  >;
+  <A extends object, B extends object, C extends object>(
+    setupA: ExtensionSetup<A>,
+    setupB: ExtensionSetup<B>,
+    setupC: ExtensionSetup<C>,
+  ): UseQueryResult<QueryClient & A & B & C>;
+  <A extends object, B extends object, C extends object, D extends object>(
+    setupA: ExtensionSetup<A>,
+    setupB: ExtensionSetup<B>,
+    setupC: ExtensionSetup<C>,
+    setupD: ExtensionSetup<D>,
+  ): UseQueryResult<QueryClient & A & B & C & D>;
+  <A extends object, B extends object, C extends object, D extends object, E extends object>(
+    setupA: ExtensionSetup<A>,
+    setupB: ExtensionSetup<B>,
+    setupC: ExtensionSetup<C>,
+    setupD: ExtensionSetup<D>,
+    setupE: ExtensionSetup<E>,
+  ): UseQueryResult<QueryClient & A & B & C & D & E>;
+  <A extends object, B extends object, C extends object, D extends object, E extends object, F extends object>(
+    setupA: ExtensionSetup<A>,
+    setupB: ExtensionSetup<B>,
+    setupC: ExtensionSetup<C>,
+    setupD: ExtensionSetup<D>,
+    setupE: ExtensionSetup<E>,
+    setupF: ExtensionSetup<F>,
+  ): UseQueryResult<QueryClient & A & B & C & D & E & F>;
+  <
+    A extends object,
+    B extends object,
+    C extends object,
+    D extends object,
+    E extends object,
+    F extends object,
+    G extends object,
+  >(
+    setupA: ExtensionSetup<A>,
+    setupB: ExtensionSetup<B>,
+    setupC: ExtensionSetup<C>,
+    setupD: ExtensionSetup<D>,
+    setupE: ExtensionSetup<E>,
+    setupF: ExtensionSetup<F>,
+    setupG: ExtensionSetup<G>,
+  ): UseQueryResult<QueryClient & A & B & C & D & E & F & G>;
+  <
+    A extends object,
+    B extends object,
+    C extends object,
+    D extends object,
+    E extends object,
+    F extends object,
+    G extends object,
+    H extends object,
+  >(
+    setupA: ExtensionSetup<A>,
+    setupB: ExtensionSetup<B>,
+    setupC: ExtensionSetup<C>,
+    setupD: ExtensionSetup<D>,
+    setupE: ExtensionSetup<E>,
+    setupF: ExtensionSetup<F>,
+    setupG: ExtensionSetup<G>,
+    setupH: ExtensionSetup<H>,
+  ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H>;
+  <
+    A extends object,
+    B extends object,
+    C extends object,
+    D extends object,
+    E extends object,
+    F extends object,
+    G extends object,
+    H extends object,
+    I extends object,
+  >(
+    setupA: ExtensionSetup<A>,
+    setupB: ExtensionSetup<B>,
+    setupC: ExtensionSetup<C>,
+    setupD: ExtensionSetup<D>,
+    setupE: ExtensionSetup<E>,
+    setupF: ExtensionSetup<F>,
+    setupG: ExtensionSetup<G>,
+    setupH: ExtensionSetup<H>,
+    setupI: ExtensionSetup<I>,
+  ): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I>;
+}
+
 /**
  * graz query hook to create and use {@link QueryClient} similar when using {@link QueryClient.withExtensions}.
  *
@@ -27,119 +119,7 @@ import type { ExtensionSetup } from "../../types/tendermint";
  *
  * @see {@link createQueryClient}
  */
-export function useQueryClient(): UseQueryResult<QueryClient>;
-
-export function useQueryClient<A extends object>(setupA: ExtensionSetup<A>): UseQueryResult<QueryClient & A>;
-
-export function useQueryClient<A extends object, B extends object>(
-  setupA: ExtensionSetup<A>,
-  setupB: ExtensionSetup<B>,
-): UseQueryResult<QueryClient & A & B>;
-
-export function useQueryClient<A extends object, B extends object, C extends object>(
-  setupA: ExtensionSetup<A>,
-  setupB: ExtensionSetup<B>,
-  setupC: ExtensionSetup<C>,
-): UseQueryResult<QueryClient & A & B & C>;
-
-export function useQueryClient<A extends object, B extends object, C extends object, D extends object>(
-  setupA: ExtensionSetup<A>,
-  setupB: ExtensionSetup<B>,
-  setupC: ExtensionSetup<C>,
-  setupD: ExtensionSetup<D>,
-): UseQueryResult<QueryClient & A & B & C & D>;
-
-export function useQueryClient<
-  A extends object,
-  B extends object,
-  C extends object,
-  D extends object,
-  E extends object,
->(
-  setupA: ExtensionSetup<A>,
-  setupB: ExtensionSetup<B>,
-  setupC: ExtensionSetup<C>,
-  setupD: ExtensionSetup<D>,
-  setupE: ExtensionSetup<E>,
-): UseQueryResult<QueryClient & A & B & C & D & E>;
-
-export function useQueryClient<
-  A extends object,
-  B extends object,
-  C extends object,
-  D extends object,
-  E extends object,
-  F extends object,
->(
-  setupA: ExtensionSetup<A>,
-  setupB: ExtensionSetup<B>,
-  setupC: ExtensionSetup<C>,
-  setupD: ExtensionSetup<D>,
-  setupE: ExtensionSetup<E>,
-  setupF: ExtensionSetup<F>,
-): UseQueryResult<QueryClient & A & B & C & D & E & F>;
-
-export function useQueryClient<
-  A extends object,
-  B extends object,
-  C extends object,
-  D extends object,
-  E extends object,
-  F extends object,
-  G extends object,
->(
-  setupA: ExtensionSetup<A>,
-  setupB: ExtensionSetup<B>,
-  setupC: ExtensionSetup<C>,
-  setupD: ExtensionSetup<D>,
-  setupE: ExtensionSetup<E>,
-  setupF: ExtensionSetup<F>,
-  setupG: ExtensionSetup<G>,
-): UseQueryResult<QueryClient & A & B & C & D & E & F & G>;
-
-export function useQueryClient<
-  A extends object,
-  B extends object,
-  C extends object,
-  D extends object,
-  E extends object,
-  F extends object,
-  G extends object,
-  H extends object,
->(
-  setupA: ExtensionSetup<A>,
-  setupB: ExtensionSetup<B>,
-  setupC: ExtensionSetup<C>,
-  setupD: ExtensionSetup<D>,
-  setupE: ExtensionSetup<E>,
-  setupF: ExtensionSetup<F>,
-  setupG: ExtensionSetup<G>,
-  setupH: ExtensionSetup<H>,
-): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H>;
-
-export function useQueryClient<
-  A extends object,
-  B extends object,
-  C extends object,
-  D extends object,
-  E extends object,
-  F extends object,
-  G extends object,
-  H extends object,
-  I extends object,
->(
-  setupA: ExtensionSetup<A>,
-  setupB: ExtensionSetup<B>,
-  setupC: ExtensionSetup<C>,
-  setupD: ExtensionSetup<D>,
-  setupE: ExtensionSetup<E>,
-  setupF: ExtensionSetup<F>,
-  setupG: ExtensionSetup<G>,
-  setupH: ExtensionSetup<H>,
-  setupI: ExtensionSetup<I>,
-): UseQueryResult<QueryClient & A & B & C & D & E & F & G & H & I>;
-
-export function useQueryClient(...extensionSetups: ExtensionSetup[]): any {
+export const useQueryClient: UseQueryClient = (...extensionSetups: ExtensionSetup[]) => {
   const queryKey = ["USE_QUERY_CLIENT", ...extensionSetups] as const;
   const query = useQuery(
     queryKey,
@@ -153,4 +133,4 @@ export function useQueryClient(...extensionSetups: ExtensionSetup[]): any {
     },
   );
   return query;
-}
+};

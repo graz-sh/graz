@@ -16,7 +16,7 @@ export type ConnectArgs = Maybe<
   }
 >;
 
-export async function connect(args?: ConnectArgs): Promise<Key> {
+export const connect = async (args?: ConnectArgs): Promise<Key> => {
   try {
     const { defaultChain, recentChain, walletType } = useGrazStore.getState();
 
@@ -76,17 +76,17 @@ export async function connect(args?: ConnectArgs): Promise<Key> {
     }
     throw error;
   }
-}
+};
 
-export async function disconnect(clearRecentChain = false): Promise<void> {
+export const disconnect = async (clearRecentChain = false): Promise<void> => {
   useGrazStore.setState((x) => ({
     ...defaultValues,
     recentChain: clearRecentChain ? null : x.recentChain,
   }));
   return Promise.resolve();
-}
+};
 
-export function reconnect(): void {
+export const reconnect = (): void => {
   const { activeChain } = useGrazStore.getState();
   if (activeChain) void connect(activeChain);
-}
+};

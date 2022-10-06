@@ -10,24 +10,24 @@ import { getWallet } from "./wallet";
 
 export * from "./clients/tendermint";
 
-export function clearRecentChain(): void {
+export const clearRecentChain = (): void => {
   useGrazStore.setState({ recentChain: null });
-}
+};
 
-export function getActiveChainCurrency(denom: string): AppCurrency | undefined {
+export const getActiveChainCurrency = (denom: string): AppCurrency | undefined => {
   const { activeChain } = useGrazStore.getState();
   return activeChain?.currencies.find((x) => x.coinMinimalDenom === denom);
-}
+};
 
-export function getRecentChain(): GrazChain | null {
+export const getRecentChain = (): GrazChain | null => {
   return useGrazStore.getState().recentChain;
-}
+};
 
-export async function suggestChain(chainInfo: ChainInfo): Promise<ChainInfo> {
+export const suggestChain = async (chainInfo: ChainInfo): Promise<ChainInfo> => {
   const wallet = getWallet();
   await wallet.experimentalSuggestChain(chainInfo);
   return chainInfo;
-}
+};
 
 export interface SuggestChainAndConnectArgs {
   chainInfo: ChainInfo;
@@ -41,10 +41,10 @@ export interface SuggestChainAndConnectArgs {
   path?: string;
 }
 
-export async function suggestChainAndConnect({
+export const suggestChainAndConnect = async ({
   chainInfo,
   ...rest
-}: SuggestChainAndConnectArgs): Promise<{ account: Key; chain: ChainInfo }> {
+}: SuggestChainAndConnectArgs): Promise<{ account: Key; chain: ChainInfo }> => {
   const chain = await suggestChain(chainInfo);
   const account = await connect({
     chainId: chainInfo.chainId,
@@ -54,4 +54,4 @@ export async function suggestChainAndConnect({
     ...rest,
   });
   return { account, chain };
-}
+};

@@ -21,9 +21,9 @@ import { useCheckWallet } from "./wallet";
  * const { rpc, rest, chainId, currencies } = useActiveChain();
  * ```
  */
-export function useActiveChain(): GrazChain | null {
+export const useActiveChain = (): GrazChain | null => {
   return useGrazStore((x) => x.activeChain);
-}
+};
 
 /**
  * graz hook to retrieve specific connected account's currency
@@ -36,11 +36,11 @@ export function useActiveChain(): GrazChain | null {
  * const { data: currency, ... } = useActiveChainCurrency("juno");
  * ```
  */
-export function useActiveChainCurrency(denom: string): UseQueryResult<AppCurrency | undefined> {
+export const useActiveChainCurrency = (denom: string): UseQueryResult<AppCurrency | undefined> => {
   const queryKey = ["USE_ACTIVE_CHAIN_CURRENCY", denom] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _denom] }) => getActiveChainCurrency(_denom));
   return query;
-}
+};
 
 /**
  * graz hook to retrieve active chain validators with given query client and optional bond status
@@ -57,10 +57,10 @@ export function useActiveChainCurrency(denom: string): UseQueryResult<AppCurrenc
  * const { data: response, ... } = useActiveChainValidators(queryClient);
  * ```
  */
-export function useActiveChainValidators<T extends QueryClient & StakingExtension>(
+export const useActiveChainValidators = <T extends QueryClient & StakingExtension>(
   queryClient: T | undefined,
   status: BondStatusString = "BOND_STATUS_BONDED",
-): UseQueryResult<QueryValidatorsResponse> {
+): UseQueryResult<QueryValidatorsResponse> => {
   const queryKey = ["USE_ACTIVE_CHAIN_VALIDATORS", queryClient, status] as const;
   const query = useQuery(
     queryKey,
@@ -72,7 +72,7 @@ export function useActiveChainValidators<T extends QueryClient & StakingExtensio
     },
   );
   return query;
-}
+};
 
 /**
  * graz hook to retrieve last connected chain info
@@ -90,10 +90,10 @@ export function useActiveChainValidators<T extends QueryClient & StakingExtensio
  *
  * @see {@link useActiveChain}
  */
-export function useRecentChain() {
+export const useRecentChain = () => {
   const recentChain = useGrazStore((x) => x.recentChain);
   return { data: recentChain, clear: clearRecentChain };
-}
+};
 
 export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
 
@@ -113,7 +113,7 @@ export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
  * });
  * ```
  */
-export function useSuggestChain({ onError, onLoading, onSuccess }: UseSuggestChainArgs = {}) {
+export const useSuggestChain = ({ onError, onLoading, onSuccess }: UseSuggestChainArgs = {}) => {
   const queryKey = ["USE_SUGGEST_CHAIN", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, suggestChain, {
     onError: (err, chainInfo) => Promise.resolve(onError?.(err, chainInfo)),
@@ -129,7 +129,7 @@ export function useSuggestChain({ onError, onLoading, onSuccess }: UseSuggestCha
     suggestAsync: mutation.mutateAsync,
     status: mutation.status,
   };
-}
+};
 
 export type UseSuggestChainAndConnectArgs = MutationEventArgs<
   SuggestChainAndConnectArgs,
@@ -166,7 +166,7 @@ export type UseSuggestChainAndConnectArgs = MutationEventArgs<
  * });
  * ```
  */
-export function useSuggestChainAndConnect({ onError, onLoading, onSuccess }: UseSuggestChainAndConnectArgs = {}) {
+export const useSuggestChainAndConnect = ({ onError, onLoading, onSuccess }: UseSuggestChainAndConnectArgs = {}) => {
   const queryKey = ["USE_SUGGEST_CHAIN_AND_CONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, suggestChainAndConnect, {
     onError: (err, args) => Promise.resolve(onError?.(err, args)),
@@ -183,4 +183,4 @@ export function useSuggestChainAndConnect({ onError, onLoading, onSuccess }: Use
     suggestAndConnect: mutation.mutate,
     suggestAndConnectAsync: mutation.mutateAsync,
   };
-}
+};

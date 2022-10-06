@@ -22,7 +22,7 @@ export * from "./clients/tendermint";
  * useClient({ rpc: "https://rpc.cosmoshub.strange.love", });
  * ```
  */
-export function useClients(args?: CreateClientArgs): UseQueryResult<GrazStore["clients"]> {
+export const useClients = (args?: CreateClientArgs): UseQueryResult<GrazStore["clients"]> => {
   const currentClient = useGrazStore((x) => x.clients);
 
   const queryKey = ["USE_CLIENTS", args, currentClient] as const;
@@ -38,7 +38,7 @@ export function useClients(args?: CreateClientArgs): UseQueryResult<GrazStore["c
   );
 
   return query;
-}
+};
 
 /**
  * graz query hook to retrieve a SigningCosmWasmClient. If there's no given args it will be using the current connected signer
@@ -58,7 +58,7 @@ export function useClients(args?: CreateClientArgs): UseQueryResult<GrazStore["c
  * });
  * ```
  */
-export function useSigningClients(args?: CreateSigningClientArgs): UseQueryResult<GrazStore["signingClients"]> {
+export const useSigningClients = (args?: CreateSigningClientArgs): UseQueryResult<GrazStore["signingClients"]> => {
   const currentClient = useGrazStore((x) => x.signingClients);
 
   const queryKey = ["USE_SIGNING_CLIENTS", args, currentClient] as const;
@@ -74,4 +74,4 @@ export function useSigningClients(args?: CreateSigningClientArgs): UseQueryResul
   );
 
   return query;
-}
+};

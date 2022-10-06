@@ -46,9 +46,9 @@ export interface GrazChain {
  * connect(myChains.cosmoshub);
  * ```
  */
-export function defineChains<T extends Dictionary<GrazChain>>(chains: T): T {
+export const defineChains = <T extends Dictionary<GrazChain>>(chains: T): T => {
   return chains;
-}
+};
 
 /**
  * Helper function to define chain information object.
@@ -70,9 +70,9 @@ export function defineChains<T extends Dictionary<GrazChain>>(chains: T): T {
  * connect(cosmoshub);
  * ```
  */
-export function defineChain<T extends GrazChain>(chain: T): T {
+export const defineChain = <T extends GrazChain>(chain: T): T => {
   return chain;
-}
+};
 
 /**
  * Helper function to define Keplr's `ChainInfo` object.
@@ -94,9 +94,9 @@ export function defineChain<T extends GrazChain>(chain: T): T {
  * });
  * ```
  */
-export function defineChainInfo<T extends ChainInfo | ChainInfoWithPath>(chain: T): T {
+export const defineChainInfo = <T extends ChainInfo | ChainInfoWithPath>(chain: T): T => {
   return chain;
-}
+};
 
 /**
  * Provided mainnet chains

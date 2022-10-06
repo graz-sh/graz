@@ -12,7 +12,7 @@ export * from "./clients/tendermint";
 
 export type CreateClientArgs = Pick<GrazChain, "rpc" | "rpcHeaders">;
 
-export async function createClients({ rpc, rpcHeaders }: CreateClientArgs): Promise<GrazStore["clients"]> {
+export const createClients = async ({ rpc, rpcHeaders }: CreateClientArgs): Promise<GrazStore["clients"]> => {
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
   const [cosmWasm, stargate, tendermint] = await Promise.all([
     SigningCosmWasmClient.connect(endpoint),
@@ -20,7 +20,7 @@ export async function createClients({ rpc, rpcHeaders }: CreateClientArgs): Prom
     Tendermint34Client.connect(rpc),
   ]);
   return { cosmWasm, stargate, tendermint };
-}
+};
 
 export type CreateSigningClientArgs = CreateClientArgs & {
   offlineSignerAuto: OfflineSigner | OfflineDirectSigner;
@@ -28,7 +28,7 @@ export type CreateSigningClientArgs = CreateClientArgs & {
   stargateSignerOptions?: SigningStargateClientOptions;
 };
 
-export async function createSigningClients(args: CreateSigningClientArgs): Promise<GrazStore["signingClients"]> {
+export const createSigningClients = async (args: CreateSigningClientArgs): Promise<GrazStore["signingClients"]> => {
   const { rpc, rpcHeaders, offlineSignerAuto, cosmWasmSignerOptions = {}, stargateSignerOptions = {} } = args;
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
   const [cosmWasm, stargate] = await Promise.all([
@@ -36,4 +36,4 @@ export async function createSigningClients(args: CreateSigningClientArgs): Promi
     SigningStargateClient.connectWithSigner(endpoint, offlineSignerAuto, stargateSignerOptions),
   ]);
   return { cosmWasm, stargate };
-}
+};

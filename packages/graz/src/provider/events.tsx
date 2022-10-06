@@ -1,3 +1,4 @@
+import type { FC } from "react";
 import { useEffect } from "react";
 
 import { reconnect } from "../actions/account";
@@ -8,7 +9,7 @@ import { useGrazStore } from "../store";
  *
  * **Note: only use this hook if not using graz's provider component.**
  */
-export function useGrazEvents() {
+export const useGrazEvents = () => {
   useEffect(() => {
     const { _reconnect } = useGrazStore.getState();
     if (_reconnect) reconnect();
@@ -20,14 +21,14 @@ export function useGrazEvents() {
   }, []);
 
   return null;
-}
+};
 
 /**
  * Null component to run {@link useGrazEvents} without affecting component tree.
  *
  * **Note: only use this component if not using graz's provider component.**
  */
-export function GrazEvents() {
+export const GrazEvents: FC = () => {
   useGrazEvents();
   return null;
-}
+};
