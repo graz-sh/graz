@@ -18,7 +18,7 @@
     "test": "turbo run test"
   },
   "devDependencies": {
-    "@strangelovelabs/style-guide": "latest",
+    "@strangelovelabs/style-guide": "0.0.2",
     "eslint": "^8",
     "husky": "^8",
     "lint-staged": "^13",
