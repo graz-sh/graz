@@ -1,17 +1,19 @@
-import { Button, HStack } from "@chakra-ui/react";
+import { HStack, Link } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 
 export const NavbarLeftSection = () => {
+  const router = useRouter();
   return (
-    <HStack>
-      <Button as="a" href="/">
+    <HStack fontSize="lg" gap={4}>
+      <Link fontWeight={router.pathname === "/" ? "bold" : "normal"} href="/">
         Home
-      </Button>
-      <Button as="a" href="/assets">
+      </Link>
+      <Link fontWeight={router.pathname === "/assets" ? "bold" : "normal"} href="/assets">
         Assets
-      </Button>
-      <Button as="a" href="/send-token">
+      </Link>
+      <Link fontWeight={router.pathname === "/send-token" ? "bold" : "normal"} href="/send-token">
         Send Tokens
-      </Button>
+      </Link>
     </HStack>
   );
 };
