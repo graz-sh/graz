@@ -14,6 +14,9 @@ export const NavbarLeftSection = () => {
       <Link fontWeight={router.pathname === "/send-token" ? "bold" : "normal"} href="/send-token">
         Send Tokens
       </Link>
+      <Link fontWeight={router.pathname === "/validators" ? "bold" : "normal"} href="/validators">
+        Validators
+      </Link>
     </HStack>
   );
 };

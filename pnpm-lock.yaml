@@ -195,6 +195,7 @@ importers:
       '@types/node': ^16
       '@types/react': ^18
       '@types/react-dom': 18.0.6
+      bignumber.js: ^9.1.0
       eslint: ^8
       framer-motion: ^6
       graz: '*'
@@ -207,6 +208,7 @@ importers:
       '@chakra-ui/react': 2.3.1_7mjij5crbumslchrl6x6tqkxly
       '@emotion/react': 11.10.4_7v64pk2mkrohwh22gx7lrz5ive
       '@emotion/styled': 11.10.4_kjddpxqkh75n32dccdij3kv22i
+      bignumber.js: 9.1.0
       framer-motion: 6.5.1_biqbaboplfbrettd7655fr4n2y
       graz: link:../../packages/graz
       next: 12.2.5_biqbaboplfbrettd7655fr4n2y
@@ -5974,6 +5976,10 @@ packages:
 
   /big.js/5.2.2:
     resolution: {integrity: sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==}
+    dev: false
+
+  /bignumber.js/9.1.0:
+    resolution: {integrity: sha512-4LwHK4nfDOraBCtst+wOWIHbu1vhvAPJK8g8nROd4iuc3PSEjWif/qwbkh8jwCJz6yDBvtU4KPynETgrfh7y3A==}
     dev: false
 
   /binary-extensions/2.2.0:
