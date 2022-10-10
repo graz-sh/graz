@@ -11,7 +11,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
         <meta content="minimum-scale=1, initial-scale=1, width=device-width" name="viewport" />
       </Head>
       <Stack>
-        <Navbar insetX={0} pos="sticky" top={0} zIndex="docked" />
+        <Navbar />
         <Divider />
         <Center>
           <Container maxW="4xl" mx="auto" pt={4}>
