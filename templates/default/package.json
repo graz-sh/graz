@@ -12,6 +12,7 @@
     "@chakra-ui/react": "^2",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "bignumber.js": "^9.1.0",
     "framer-motion": "^6",
     "graz": "*",
     "next": "^12",
