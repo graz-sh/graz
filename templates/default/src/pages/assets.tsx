@@ -1,12 +1,10 @@
-import { Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
-import { useAccount, useBalance, useBalances, useBalanceStaked } from "graz";
+import { Center, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { useBalances, useBalanceStaked } from "graz";
 
 const Assets = () => {
-  const account = useAccount();
   const balances = useBalances();
   const balanceStaked = useBalanceStaked();
-  const { data } = useBalance("uausdc", account.data?.bech32Address);
-  console.log(data);
+
   return (
     <Stack w="full">
       <TableContainer>
@@ -22,12 +20,29 @@ const Assets = () => {
             {balances.data?.map((balance) => (
               <Tr key={balance.denom}>
                 <Td>{balance.denom}</Td>
-                <Td isNumeric>{balanceStaked.data?.amount}</Td>
+                <Td isNumeric>
+                  {/* eslint-disable-next-line no-nested-ternary */}
+                  {balanceStaked.data?.denom === balance.denom ? (
+                    balanceStaked.isLoading ? (
+                      <Spinner />
+                    ) : (
+                      balanceStaked.data.amount
+                    )
+                  ) : (
+                    "-"
+                  )}
+                </Td>
                 <Td isNumeric>{balance.amount}</Td>
               </Tr>
             ))}
           </Tbody>
         </Table>
+
+        {balances.isLoading && (
+          <Center>
+            <Spinner />
+          </Center>
+        )}
       </TableContainer>
     </Stack>
   );
