@@ -1,5 +1,5 @@
 import { Button, Stack, Tooltip, useDisclosure, useToast } from "@chakra-ui/react";
-import { mainnetChains, useAccount, useActiveChain, useConnect, useDisconnect, WalletType } from "graz";
+import { mainnetChains, useAccount, useConnect, useDisconnect, WalletType } from "graz";
 
 import { Modal } from "../core/modal";
 
@@ -7,8 +7,7 @@ export const WalletConnectButton = () => {
   const toast = useToast();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const chain = useActiveChain();
-  const { isConnected, data } = useAccount({
+  const { isConnected, isConnecting } = useAccount({
     onConnect: ({ account, isReconnect }) => {
       if (!isReconnect) {
         toast({
@@ -40,7 +39,7 @@ export const WalletConnectButton = () => {
         <Button onClick={onOpen}>Connect Wallet</Button>
       ) : (
         <Tooltip label="Disconnect" placement="bottom">
-          <Button variant="outline" onClick={() => disconnect()}>
+          <Button variant="outline" onClick={() => disconnect()} isLoading={isConnecting}>
             Connected
           </Button>
         </Tooltip>
