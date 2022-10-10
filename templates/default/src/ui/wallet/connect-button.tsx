@@ -30,13 +30,16 @@ export const WalletConnectButton = () => {
   const { disconnect } = useDisconnect();
 
   function handleConnect(wallet: WalletType) {
+    onClose();
     return connect({ ...mainnetChains.cosmoshub, walletType: wallet });
   }
 
   return (
     <>
       {!isConnected ? (
-        <Button onClick={onOpen}>Connect Wallet</Button>
+        <Button onClick={onOpen} isLoading={isConnecting}>
+          Connect Wallet
+        </Button>
       ) : (
         <Tooltip label="Disconnect" placement="bottom">
           <Button variant="outline" onClick={() => disconnect()} isLoading={isConnecting}>
