@@ -25,7 +25,7 @@ export async function createApp({
     username: "strangelove-ventures",
     branch: "dev",
     name: "graz",
-    filePath: "example",
+    filePath: "templates/default",
   };
 
   const root = path.resolve(appPath);
