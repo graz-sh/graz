@@ -5,8 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "ncc run ./dist/index.js",
-    "dev": "ncc build ./index.ts -w -o dist/",
-    "lint": "eslint --fix \"./*.{ts}\""
+    "dev": "ncc build ./index.ts -w -o dist/"
   },
   "devDependencies": {
     "@types/async-retry": "1.4.2",
@@ -27,11 +26,6 @@
     "tar": "^6.1.11",
     "validate-npm-package-name": "^4.0.0",
     "typescript": "^4"
-  },
-  "lint-staged": {
-    "**/*.ts": [
-      "eslint --fix"
-    ]
   },
   "author": "Nur Fikri <kiki@strangelove.ventures>",
   "license": "MIT",

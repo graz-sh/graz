@@ -54,6 +54,7 @@ const run = async () => {
     });
 
     if (typeof res.path === "string") {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       projectPath = res.path.trim();
     }
   }
@@ -99,9 +100,8 @@ const run = async () => {
 run().catch((reason) => {
   console.log();
   console.log("Aborting installation.");
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
   if (reason.command) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     console.log(`  ${chalk.cyan(reason.command)} has failed.`);
   } else {
     console.log(`${chalk.red("Unexpected error. Please report it as a bug:")}\n`, reason);

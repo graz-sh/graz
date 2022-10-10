@@ -55,6 +55,7 @@ export async function createApp({
   try {
     console.log(`Downloading files from repo. This might take a moment.`);
     console.log();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await retry(() => downloadAndExtractRepo(root, repo), {
       retries: 3,
     });
@@ -64,7 +65,6 @@ export async function createApp({
       return typeof err === "object" && err !== null && typeof (err as { message?: unknown }).message === "string";
     }
 
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     throw new DownloadError(isErrorLike(reason) ? reason.message : `${reason}`);
   }
   console.log("Installing packages. This might take a couple of minutes.");
