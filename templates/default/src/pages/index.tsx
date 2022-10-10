@@ -5,23 +5,22 @@ import { ChainSwitcher } from "../ui/wallet/chain-switcher";
 import { RecentChain } from "../ui/wallet/recent-chain";
 
 const HomePage = () => {
-  const { data: accountData, isConnecting, isReconnecting } = useAccount();
+  const { data: accountData, isConnecting, isReconnecting, isConnected } = useAccount();
 
   return (
-    <Stack w="full">
+    <Stack w="full" gap={2}>
       {!accountData && (isConnecting || isReconnecting) && <RecentChain />}
-      {accountData ? (
+      {(isConnecting || isReconnecting) && <Text>Connecting</Text>}
+      {accountData && (
         <>
-          <Heading>Welcome {accountData.name}</Heading>
+          <Heading size="lg">Welcome {accountData.name}</Heading>
           <Text noOfLines={1} wordBreak="break-all">
             Wallet address: <b>{accountData.bech32Address}</b>
           </Text>
           <ChainSwitcher />
         </>
-      ) : (
-        <Heading>Welcome to Create Graz App</Heading>
       )}
-      {/* <WalletConnectButton /> */}
+      {!isConnected && !(isConnecting || isReconnecting) && <Heading>Welcome to Create Graz App</Heading>}
     </Stack>
   );
 };
