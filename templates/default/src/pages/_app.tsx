@@ -11,13 +11,13 @@ configureGraz({
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
-    <ChakraProvider resetCSS theme={theme}>
-      <GrazProvider>
+    <GrazProvider>
+      <ChakraProvider resetCSS theme={theme}>
         <Layout>
           <Component {...pageProps} />
         </Layout>
-      </GrazProvider>
-    </ChakraProvider>
+      </ChakraProvider>
+    </GrazProvider>
   );
 };
 
