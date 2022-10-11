@@ -1,3 +1,7 @@
+/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
+
 import chalk from "chalk";
 import { Command } from "commander";
 import path from "path";
@@ -54,7 +58,7 @@ const run = async () => {
     });
 
     if (typeof res.path === "string") {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+       
       projectPath = res.path.trim();
     }
   }
@@ -84,7 +88,7 @@ const run = async () => {
     process.exit(1);
   }
   const options = program.opts();
-  // eslint-disable-next-line no-nested-ternary
+   
   const packageManager = options.useNpm ? "npm" : options.usePnpm ? "pnpm" : getPkgManager();
 
   try {

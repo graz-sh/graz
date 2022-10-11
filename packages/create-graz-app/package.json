@@ -8,6 +8,7 @@
     "dev": "ncc build ./index.ts -w -o dist/"
   },
   "devDependencies": {
+    "@strangelovelabs/style-guide": "0.0.2",
     "@types/async-retry": "1.4.2",
     "@types/cross-spawn": "^6.0.2",
     "@types/node": "^16",
@@ -34,8 +35,5 @@
   },
   "files": [
     "dist"
-  ],
-  "engines": {
-    "node": ">=14.0.0"
-  }
+  ]
 }
