@@ -13,6 +13,7 @@
     "docs": "pnpm --dir docs",
     "example": "pnpm --dir example",
     "graz": "pnpm --dir packages/graz",
+    "create-graz-app": "pnpm --dir packages/create-graz-app",
     "lint": "turbo run lint",
     "prepare": "husky install",
     "release": "turbo run build --filter=graz && pnpm publish --filter graz",
