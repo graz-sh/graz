@@ -1,27 +1,14 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Heading,
-  Input,
-  Select,
-  Stack,
-  useClipboard,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Button, FormControl, FormLabel, Heading, Input, Select, Stack, useToast } from "@chakra-ui/react";
 import { useAccount, useActiveChain, useSendTokens } from "graz";
 import type { FormEvent } from "react";
-import { useMemo, useRef, useState } from "react";
+import { useState } from "react";
 
 const SendToken = () => {
   const { data } = useAccount();
   const activeChain = useActiveChain();
-  const transactionHash = useRef("");
-  const { onCopy } = useClipboard(transactionHash.current);
   const toast = useToast();
 
-  const { sendTokensAsync, isLoading, isSuccess } = useSendTokens({
+  const { sendTokensAsync, isLoading } = useSendTokens({
     onError: () => {
       toast({
         status: "error",
@@ -30,39 +17,6 @@ const SendToken = () => {
       });
     },
   });
-
-  useMemo(() => {
-    isSuccess &&
-      transactionHash.current !== "" &&
-      toast({
-        status: "success",
-        title: "Send token success",
-        description: (
-          <Box
-            as="button"
-            onClick={() => {
-              onCopy();
-              toast({
-                status: "success",
-                title: "coppied transactionHash to clipboard",
-              });
-            }}
-            bg="green.700"
-            py={1}
-            px={2}
-            textAlign="left"
-            color="white"
-            borderRadius={4}
-            noOfLines={1}
-            wordBreak="break-all"
-          >
-            Copy transactionHash: {transactionHash.current}
-          </Box>
-        ),
-      });
-
-    transactionHash.current = "";
-  }, [isSuccess, onCopy, toast]);
 
   const [formData, setFormData] = useState({
     coin: "",
@@ -91,7 +45,33 @@ const SendToken = () => {
           fee,
           memo: formData.memo,
         });
-        transactionHash.current = result.transactionHash;
+
+        toast({
+          status: "success",
+          title: "Send token success",
+          description: (
+            <Box
+              as="button"
+              onClick={() => {
+                void navigator.clipboard.writeText(result.transactionHash);
+                toast({
+                  status: "success",
+                  title: "coppied transactionHash to clipboard",
+                });
+              }}
+              bg="green.700"
+              py={1}
+              px={2}
+              textAlign="left"
+              color="white"
+              borderRadius={4}
+              noOfLines={1}
+              wordBreak="break-all"
+            >
+              Copy transactionHash: {result.transactionHash}
+            </Box>
+          ),
+        });
       } catch (error) {
         console.error(error);
       }
