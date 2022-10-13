@@ -1,18 +1,27 @@
-import { Button, FormControl, FormLabel, Heading, Input, Select, Stack, useToast } from "@chakra-ui/react";
-import { useAccount, useSendTokens } from "graz";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Select,
+  Stack,
+  useClipboard,
+  useToast,
+} from "@chakra-ui/react";
+import { useAccount, useActiveChain, useSendTokens } from "graz";
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 const SendToken = () => {
   const { data } = useAccount();
-  const { sendTokens, isLoading } = useSendTokens({
-    onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Send token success",
-        description: `Succeed send token to ${formData.recipientAddress}`,
-      });
-    },
+  const activeChain = useActiveChain();
+  const transactionHash = useRef("");
+  const { onCopy } = useClipboard(transactionHash.current);
+  const toast = useToast();
+
+  const { sendTokensAsync, isLoading, isSuccess } = useSendTokens({
     onError: () => {
       toast({
         status: "error",
@@ -21,7 +30,40 @@ const SendToken = () => {
       });
     },
   });
-  const toast = useToast();
+
+  useMemo(() => {
+    isSuccess &&
+      transactionHash.current !== "" &&
+      toast({
+        status: "success",
+        title: "Send token success",
+        description: (
+          <Box
+            as="button"
+            onClick={() => {
+              onCopy();
+              toast({
+                status: "success",
+                title: "coppied transactionHash to clipboard",
+              });
+            }}
+            bg="green.700"
+            py={1}
+            px={2}
+            textAlign="left"
+            color="white"
+            borderRadius={4}
+            noOfLines={1}
+            wordBreak="break-all"
+          >
+            Copy transactionHash: {transactionHash.current}
+          </Box>
+        ),
+      });
+
+    transactionHash.current = "";
+  }, [isSuccess, onCopy, toast]);
+
   const [formData, setFormData] = useState({
     coin: "",
     recipientAddress: "",
@@ -30,18 +72,32 @@ const SendToken = () => {
   });
 
   const handleSubmit = (event: FormEvent) => {
+    const fee = {
+      gas: "150000",
+      amount: [{ denom: formData.coin, amount: "30000" }],
+    };
     event.preventDefault();
-    sendTokens({
-      recipientAddress: formData.recipientAddress,
-      amount: [
-        {
-          denom: formData.coin,
-          amount: formData.amount,
-        },
-      ],
-      fee: "auto",
-      memo: formData.memo,
-    });
+
+    const sendToken = async () => {
+      try {
+        const result = await sendTokensAsync({
+          recipientAddress: formData.recipientAddress,
+          amount: [
+            {
+              denom: formData.coin,
+              amount: formData.amount,
+            },
+          ],
+          fee,
+          memo: formData.memo,
+        });
+        transactionHash.current = result.transactionHash;
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    void sendToken();
   };
 
   return (
@@ -58,9 +114,13 @@ const SendToken = () => {
                 coin: event.currentTarget.value,
               })
             }
+            value={formData.coin}
           >
-            <option value="somm">SOMM</option>
-            <option value="osmo">OSMO</option>
+            {activeChain?.currencies.map((currency) => (
+              <option value={currency.coinMinimalDenom} key={currency.coinMinimalDenom}>
+                {currency.coinMinimalDenom}
+              </option>
+            ))}
           </Select>
         </FormControl>
         <FormControl>
