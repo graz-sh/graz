@@ -1,19 +1,21 @@
 import { Box, Button, FormControl, FormLabel, Heading, Input, Select, Stack, useToast } from "@chakra-ui/react";
+import type { SendTokensArgs } from "graz";
 import { useAccount, useActiveChain, useSendTokens } from "graz";
 import type { FormEvent } from "react";
 import { useState } from "react";
 
 const SendToken = () => {
-  const { data } = useAccount();
+  const { data: accountData } = useAccount();
   const activeChain = useActiveChain();
   const toast = useToast();
 
   const { sendTokensAsync, isLoading } = useSendTokens({
-    onError: () => {
+    onError: (_, data) => {
+      const args = data as SendTokensArgs;
       toast({
         status: "error",
         title: "Send token fail",
-        description: `Failed send token to ${formData.recipientAddress}`,
+        description: `Failed send token to ${args.recipientAddress}`,
       });
     },
   });
@@ -105,7 +107,7 @@ const SendToken = () => {
         </FormControl>
         <FormControl>
           <FormLabel>Sender address</FormLabel>
-          <Input type="text" value={data?.bech32Address ?? ""} isDisabled />
+          <Input type="text" value={accountData?.bech32Address ?? ""} isDisabled />
         </FormControl>
         <FormControl isRequired>
           <FormLabel>Recipient address</FormLabel>
