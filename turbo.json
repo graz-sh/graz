@@ -6,11 +6,14 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "build/**", "dist/**"]
     },
+    "clean": {
+      "cache": false
+    },
     "dev": {
       "cache": false
     },
     "lint": {
-      "dependsOn": ["^lint"],
+      "dependsOn": ["^build", "^lint"],
       "outputs": []
     },
     "start": {
