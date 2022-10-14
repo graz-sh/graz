@@ -186,6 +186,43 @@ importers:
       react: 18.2.0
       typescript: 4.8.2
 
+  templates/default:
+    specifiers:
+      '@chakra-ui/react': ^2
+      '@emotion/react': ^11
+      '@emotion/styled': ^11
+      '@strangelovelabs/style-guide': 0.0.2
+      '@types/node': ^16
+      '@types/react': ^18
+      '@types/react-dom': 18.0.6
+      bignumber.js: ^9.1.0
+      eslint: ^8
+      framer-motion: ^6
+      graz: '*'
+      next: ^12
+      prettier: ^2
+      react: ^18
+      react-dom: ^18
+      typescript: ^4
+    dependencies:
+      '@chakra-ui/react': 2.3.1_7mjij5crbumslchrl6x6tqkxly
+      '@emotion/react': 11.10.4_7v64pk2mkrohwh22gx7lrz5ive
+      '@emotion/styled': 11.10.4_kjddpxqkh75n32dccdij3kv22i
+      bignumber.js: 9.1.0
+      framer-motion: 6.5.1_biqbaboplfbrettd7655fr4n2y
+      graz: link:../../packages/graz
+      next: 12.2.5_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    devDependencies:
+      '@strangelovelabs/style-guide': 0.0.2_er5sflmxjcrgfvrsp3qwdvxste
+      '@types/node': 16.11.57
+      '@types/react': 18.0.18
+      '@types/react-dom': 18.0.6
+      eslint: 8.23.0
+      prettier: 2.7.1
+      typescript: 4.8.2
+
 packages:
 
   /@algolia/autocomplete-core/1.7.1:
@@ -5057,6 +5094,12 @@ packages:
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
     dev: false
 
+  /@types/react-dom/18.0.6:
+    resolution: {integrity: sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==}
+    dependencies:
+      '@types/react': 18.0.18
+    dev: true
+
   /@types/react-router-config/5.0.6:
     resolution: {integrity: sha512-db1mx37a1EJDf1XeX8jJN7R3PZABmJQXR8r28yUjVMFSjkmnQo6X6pOEEmNl+Tp2gYQOGPdYbFIipBtdElZ3Yg==}
     dependencies:
@@ -5933,6 +5976,10 @@ packages:
 
   /big.js/5.2.2:
     resolution: {integrity: sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==}
+    dev: false
+
+  /bignumber.js/9.1.0:
+    resolution: {integrity: sha512-4LwHK4nfDOraBCtst+wOWIHbu1vhvAPJK8g8nROd4iuc3PSEjWif/qwbkh8jwCJz6yDBvtU4KPynETgrfh7y3A==}
     dev: false
 
   /binary-extensions/2.2.0:

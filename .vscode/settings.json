@@ -16,7 +16,9 @@
   "eslint.workingDirectories": [
     { "!cwd": false, "directory": "docs" },
     { "!cwd": false, "directory": "example" },
-    { "!cwd": false, "pattern": "packages/*" }
+    { "!cwd": false, "pattern": "packages/*" },
+    { "!cwd": false, "pattern": "templates/*" }
   ],
-  "npm.packageManager": "pnpm"
+  "npm.packageManager": "pnpm",
+  "editor.formatOnSave": true
 }
