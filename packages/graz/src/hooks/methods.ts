@@ -1,3 +1,4 @@
+import type { DeliverTxResponse } from "@cosmjs/stargate";
 import { useMutation } from "@tanstack/react-query";
 
 import type { SendIbcTokensArgs, SendTokensArgs } from "../actions/methods";
@@ -24,7 +25,11 @@ import { useAccount } from "./account";
  *
  * @see {@link sendTokens}
  */
-export const useSendTokens = ({ onError, onLoading, onSuccess }: MutationEventArgs = {}) => {
+export const useSendTokens = ({
+  onError,
+  onLoading,
+  onSuccess,
+}: MutationEventArgs<SendTokensArgs, DeliverTxResponse> = {}) => {
   const { data: account } = useAccount();
   const accountAddress = account?.bech32Address;
 
@@ -33,7 +38,7 @@ export const useSendTokens = ({ onError, onLoading, onSuccess }: MutationEventAr
     queryKey,
     (args: SendTokensArgs) => sendTokens({ senderAddress: accountAddress, ...args }),
     {
-      onError: (err, args) => Promise.resolve(onError?.(err, args)),
+      onError: (err, data) => Promise.resolve(onError?.(err, data)),
       onMutate: onLoading,
       onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
     },
@@ -66,7 +71,11 @@ export const useSendTokens = ({ onError, onLoading, onSuccess }: MutationEventAr
  * })
  * ```
  */
-export const useSendIbcTokens = ({ onError, onLoading, onSuccess }: MutationEventArgs = {}) => {
+export const useSendIbcTokens = ({
+  onError,
+  onLoading,
+  onSuccess,
+}: MutationEventArgs<SendIbcTokensArgs, DeliverTxResponse> = {}) => {
   const { data: account } = useAccount();
   const accountAddress = account?.bech32Address;
 
@@ -75,7 +84,7 @@ export const useSendIbcTokens = ({ onError, onLoading, onSuccess }: MutationEven
     queryKey,
     (args: SendIbcTokensArgs) => sendIbcTokens({ senderAddress: accountAddress, ...args }),
     {
-      onError: (err, txResponse) => Promise.resolve(onError?.(err, txResponse)),
+      onError: (err, data) => Promise.resolve(onError?.(err, data)),
       onMutate: onLoading,
       onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
     },
