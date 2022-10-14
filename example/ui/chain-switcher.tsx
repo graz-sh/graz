@@ -17,13 +17,9 @@ export const ChainSwitcher: FC = () => {
     },
   });
 
-  const { connect } = useConnect({
-    onSuccess: () => console.log("switched chain"),
-  });
+  const { connect } = useConnect();
 
-  const { suggestAndConnect } = useSuggestChainAndConnect({
-    onSuccess: () => console.log("switched chain"),
-  });
+  const { suggestAndConnect } = useSuggestChainAndConnect();
 
   return (
     <FormControl>
