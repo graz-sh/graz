@@ -1,0 +1,39 @@
+{
+  "name": "create-graz-app",
+  "version": "0.0.1",
+  "description": "Bootstrap your cosmos app with one command",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ncc run ./dist/index.js",
+    "dev": "ncc build ./index.ts -w -o dist/"
+  },
+  "devDependencies": {
+    "@strangelovelabs/style-guide": "0.0.2",
+    "@types/async-retry": "1.4.2",
+    "@types/cross-spawn": "^6.0.2",
+    "@types/node": "^16",
+    "@types/prompts": "^2.0.14",
+    "@types/rimraf": "^3.0.2",
+    "@types/tar": "^6.1.2",
+    "@types/validate-npm-package-name": "^4.0.0",
+    "@vercel/ncc": "^0.34.0",
+    "async-retry": "1.3.1",
+    "chalk": "^5.0.1",
+    "commander": "9.4.0",
+    "cross-spawn": "^7.0.3",
+    "got": "^12.5.0",
+    "prompts": "^2.4.2",
+    "rimraf": "^3.0.2",
+    "tar": "^6.1.11",
+    "validate-npm-package-name": "^4.0.0",
+    "typescript": "^4"
+  },
+  "author": "Nur Fikri <kiki@strangelove.ventures>",
+  "license": "MIT",
+  "bin": {
+    "create-graz-app": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ]
+}

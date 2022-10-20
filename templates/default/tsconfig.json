@@ -1,0 +1,8 @@
+{
+  "extends": "@strangelovelabs/style-guide/tsconfig/next",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "exclude": ["node_modules"],
+  "include": ["next-env.d.ts", "env.d.ts", "**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"]
+}
