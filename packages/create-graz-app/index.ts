@@ -1,13 +1,10 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
-
 import chalk from "chalk";
 import { Command } from "commander";
 import path from "path";
 import prompts from "prompts";
 
 import { createApp } from "./create-apps";
+import type { PackageManager } from "./helpers/get-pkg-manager";
 import { getPkgManager } from "./helpers/get-pkg-manager";
 import { validateNpmName } from "./helpers/validate-pkg";
 import packageJson from "./package.json";
@@ -58,7 +55,6 @@ const run = async () => {
     });
 
     if (typeof res.path === "string") {
-       
       projectPath = res.path.trim();
     }
   }
@@ -88,8 +84,15 @@ const run = async () => {
     process.exit(1);
   }
   const options = program.opts();
-   
-  const packageManager = options.useNpm ? "npm" : options.usePnpm ? "pnpm" : getPkgManager();
+
+  let packageManager: PackageManager /* = options.useNpm ? "npm" : options.usePnpm ? "pnpm" : getPkgManager() */;
+  if (options.useNpm) {
+    packageManager = "npm";
+  } else if (options.usePnpm) {
+    packageManager = "pnpm";
+  } else {
+    packageManager = getPkgManager();
+  }
 
   try {
     await createApp({
@@ -101,7 +104,7 @@ const run = async () => {
   }
 };
 
-run().catch((reason) => {
+run().catch((reason: { command: string }) => {
   console.log();
   console.log("Aborting installation.");
 
