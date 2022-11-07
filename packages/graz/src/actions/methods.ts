@@ -1,3 +1,4 @@
+import type { InstantiateOptions } from "@cosmjs/cosmwasm-stargate";
 import type { Coin } from "@cosmjs/proto-signing";
 import type { DeliverTxResponse, StdFee } from "@cosmjs/stargate";
 import type { Height } from "cosmjs-types/ibc/core/client/v1/client";
@@ -97,4 +98,40 @@ export const sendIbcTokens = async ({
     fee,
     memo,
   );
+};
+
+export interface InstantiateContractArgs<Message extends Record<string, unknown>> {
+  msg: Message;
+  label: string;
+  fee: StdFee | "auto" | number;
+  options?: InstantiateOptions;
+  senderAddress?: string;
+  codeId: number;
+}
+
+export type InstantiateContractMutationArgs<Message extends Record<string, unknown>> = Omit<
+  InstantiateContractArgs<Message>,
+  "codeId" | "senderAddress" | "fee"
+> & {
+  fee?: StdFee | "auto" | number;
+};
+
+export const instantiateContract = async <Message extends Record<string, unknown>>({
+  senderAddress,
+  msg,
+  fee,
+  options,
+  label,
+  codeId,
+}: InstantiateContractArgs<Message>) => {
+  const { signingClients } = useGrazStore.getState();
+
+  if (!signingClients?.cosmWasm) {
+    throw new Error("Stargate signing client is not ready");
+  }
+  if (!senderAddress) {
+    throw new Error("senderAddress is not defined");
+  }
+
+  return signingClients.cosmWasm.instantiate(senderAddress, codeId, msg, label, fee, options);
 };
