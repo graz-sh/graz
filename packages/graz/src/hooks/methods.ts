@@ -1,6 +1,7 @@
 import type { ExecuteResult, InstantiateResult } from "@cosmjs/cosmwasm-stargate";
 import type { DeliverTxResponse } from "@cosmjs/stargate";
-import { useMutation } from "@tanstack/react-query";
+import type { QueryKey, UseQueryOptions, UseQueryResult } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import type {
   ExecuteContractArgs,
@@ -10,7 +11,14 @@ import type {
   SendIbcTokensArgs,
   SendTokensArgs,
 } from "../actions/methods";
-import { executeContract, instantiateContract, sendIbcTokens, sendTokens } from "../actions/methods";
+import {
+  executeContract,
+  getQueryRaw,
+  getQuerySmart,
+  instantiateContract,
+  sendIbcTokens,
+  sendTokens,
+} from "../actions/methods";
 import type { MutationEventArgs } from "../types/hooks";
 import { useAccount } from "./account";
 
@@ -188,4 +196,41 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
     executeContractAsync: mutation.mutateAsync,
     status: mutation.status,
   };
+};
+
+export type QueryOptions<TQueryFnData, TError, TData, TQueryKey extends QueryKey> = Omit<
+  UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+  "queryKey" | "queryFn" | "initialData"
+> & {
+  initialData?: () => undefined;
+};
+
+export type QuerySmartKey = readonly ["USE_QUERY_SMART", string, Record<string, unknown>];
+
+export const useQuerySmart = <TQueryFnData, TError, TData>(
+  address: string,
+  queryMsg: Record<string, unknown>,
+  options?: QueryOptions<TQueryFnData, TError, TData, QuerySmartKey>,
+): UseQueryResult<TData, TError> => {
+  //TODO: error handling and options defaulting
+
+  const queryKey: QuerySmartKey = ["USE_QUERY_SMART", address, queryMsg] as const;
+  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getQuerySmart(address, queryMsg), options);
+
+  return query;
+};
+
+export type QueryRawKey = readonly ["USE_QUERY_RAW", string, Uint8Array];
+
+export const useQueryRaw = <TQueryFnData, TError, TData>(
+  address: string,
+  key: Uint8Array,
+  options?: QueryOptions<TQueryFnData, TError, TData, QueryRawKey>,
+): UseQueryResult<TData, TError> => {
+  //TODO: error handling and options defaulting
+
+  const queryKey: QueryRawKey = ["USE_QUERY_RAW", address, key] as const;
+  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getQueryRaw(address, key), options);
+
+  return query;
 };
