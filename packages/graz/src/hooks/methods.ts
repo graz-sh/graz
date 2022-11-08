@@ -1,14 +1,16 @@
-import type { InstantiateResult } from "@cosmjs/cosmwasm-stargate";
+import type { ExecuteResult, InstantiateResult } from "@cosmjs/cosmwasm-stargate";
 import type { DeliverTxResponse } from "@cosmjs/stargate";
 import { useMutation } from "@tanstack/react-query";
 
 import type {
+  ExecuteContractArgs,
+  ExecuteContractMutationArgs,
   InstantiateContractArgs,
   InstantiateContractMutationArgs,
   SendIbcTokensArgs,
   SendTokensArgs,
 } from "../actions/methods";
-import { instantiateContract, sendIbcTokens, sendTokens } from "../actions/methods";
+import { executeContract, instantiateContract, sendIbcTokens, sendTokens } from "../actions/methods";
 import type { MutationEventArgs } from "../types/hooks";
 import { useAccount } from "./account";
 
@@ -143,6 +145,47 @@ export const useInstantiateContract = <Message extends Record<string, unknown>>(
     isSuccess: mutation.isSuccess,
     instantiateContract: mutation.mutate,
     instantiateContractAsync: mutation.mutateAsync,
+    status: mutation.status,
+  };
+};
+
+export type UseExecuteContractArgs<Message extends Record<string, unknown>> = {
+  contractAddress: string;
+} & MutationEventArgs<ExecuteContractMutationArgs<Message>, ExecuteResult>;
+
+export const useExecuteContract = <Message extends Record<string, unknown>>({
+  contractAddress,
+  onError,
+  onLoading,
+  onSuccess,
+}: UseExecuteContractArgs<Message>) => {
+  const { data: account } = useAccount();
+  const accountAddress = account?.bech32Address;
+
+  const mutationFn = (args: ExecuteContractMutationArgs<Message>) => {
+    const executeArgs: ExecuteContractArgs<Message> = {
+      ...args,
+      fee: args.fee ?? "auto",
+      senderAddress: accountAddress,
+      contractAddress,
+    };
+
+    return executeContract(executeArgs);
+  };
+
+  const queryKey = ["USE_EXECUTE_CONTRACT", onError, onLoading, onSuccess, contractAddress];
+  const mutation = useMutation(queryKey, mutationFn, {
+    onError: (err, data) => Promise.resolve(onError?.(err, data)),
+    onMutate: onLoading,
+    onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
+  });
+
+  return {
+    error: mutation.error,
+    isLoading: mutation.isLoading,
+    isSuccess: mutation.isSuccess,
+    executeContract: mutation.mutate,
+    executeContractAsync: mutation.mutateAsync,
     status: mutation.status,
   };
 };

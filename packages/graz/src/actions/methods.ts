@@ -135,3 +135,35 @@ export const instantiateContract = async <Message extends Record<string, unknown
 
   return signingClients.cosmWasm.instantiate(senderAddress, codeId, msg, label, fee, options);
 };
+
+export interface ExecuteContractArgs<Message extends Record<string, unknown>> {
+  msg: Message;
+  fee: StdFee | "auto" | number;
+  senderAddress?: string;
+  contractAddress: string;
+}
+
+export type ExecuteContractMutationArgs<Message extends Record<string, unknown>> = Omit<
+  ExecuteContractArgs<Message>,
+  "contractAddress" | "senderAddress" | "fee"
+> & {
+  fee?: StdFee | "auto" | number;
+};
+
+export const executeContract = async <Message extends Record<string, unknown>>({
+  senderAddress,
+  msg,
+  fee,
+  contractAddress,
+}: ExecuteContractArgs<Message>) => {
+  const { signingClients } = useGrazStore.getState();
+
+  if (!signingClients?.cosmWasm) {
+    throw new Error("Stargate signing client is not ready");
+  }
+  if (!senderAddress) {
+    throw new Error("senderAddress is not defined");
+  }
+
+  return signingClients.cosmWasm.execute(senderAddress, contractAddress, msg, fee);
+};
