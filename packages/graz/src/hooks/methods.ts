@@ -205,19 +205,19 @@ export type QueryOptions<TQueryFnData, TError, TData, TQueryKey extends QueryKey
   initialData?: () => undefined;
 };
 
-export type QuerySmartKey = readonly ["USE_QUERY_SMART", string, Record<string, unknown>];
+export type QuerySmartKey = readonly ["USE_QUERY_SMART", string | undefined, Record<string, unknown> | undefined];
 
 export const useQuerySmart = <TQueryFnData, TError, TData>(
-  address: string,
-  queryMsg: Record<string, unknown>,
+  address?: string,
+  queryMsg?: Record<string, unknown>,
   options?: QueryOptions<TQueryFnData, TError, TData, QuerySmartKey>,
 ): UseQueryResult<TData, TError> => {
-  const queryOptions: QueryOptions<TQueryFnData, TError, TData, QuerySmartKey> = options || {
-    enabled: Boolean(address),
-  };
+  const argsPresent = Boolean(address) && Boolean(queryMsg);
+  const queryOptions: QueryOptions<TQueryFnData, TError, TData, QuerySmartKey> =
+    options !== undefined ? { ...options, enabled: Boolean(options.enabled) && argsPresent } : { enabled: argsPresent };
 
   const queryKey: QuerySmartKey = ["USE_QUERY_SMART", address, queryMsg] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getQuerySmart(address, queryMsg), options);
+  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getQuerySmart(address, queryMsg), queryOptions);
 
   return query;
 };
