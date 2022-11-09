@@ -120,6 +120,22 @@ export type UseInstantiateContractArgs<Message extends Record<string, unknown>> 
   codeId: number;
 } & MutationEventArgs<InstantiateContractMutationArgs<Message>, InstantiateResult>;
 
+/**
+ * graz mutation hook to instantiate a CosmWasm smart contract when supported.
+ *
+ * @example
+ * ```ts
+ * import { useInstantiateContract } from "graz"
+ *
+ * const { instantiateContract: instantiateMyContract } = useInstantiateContract({
+ *   codeId: 4,
+ *   onSuccess: ({ contractAddress }) => console.log('Address:', contractAddress)
+ * })
+ *
+ * const instantiateMessage = { foo: 'bar' };
+ * instantiateMyContract(instantiateMessage);
+ * ```
+ */
 export const useInstantiateContract = <Message extends Record<string, unknown>>({
   codeId,
   onError,
@@ -161,6 +177,29 @@ export type UseExecuteContractArgs<Message extends Record<string, unknown>> = {
   contractAddress: string;
 } & MutationEventArgs<ExecuteContractMutationArgs<Message>, ExecuteResult>;
 
+/**
+ * graz mutation hook for executing transactions against a CosmWasm smart
+ * contract.
+ *
+ * @example
+ * ```ts
+ * import { useInstantiateContract } from "graz"
+ *
+ * interface GreetMessage {
+ *   name: string;
+ * }
+ *
+ * interface GreetResponse {
+ *   message: string;
+ * }
+ *
+ * const contractAddress = "cosmosfoobarbaz";
+ * const { executeContract } = useExecuteContract<ExecuteMessage>({ contractAddress });
+ * executeContract({ name: 'CosmWasm' }, {
+ *   onSuccess: (data: GreetResponse) => console.log('Got message:', data.message);
+ * });
+ * ```
+ */
 export const useExecuteContract = <Message extends Record<string, unknown>>({
   contractAddress,
   onError,
@@ -207,6 +246,20 @@ export type QueryOptions<TQueryFnData, TError, TData, TQueryKey extends QueryKey
 
 export type QuerySmartKey = readonly ["USE_QUERY_SMART", string | undefined, Record<string, unknown> | undefined];
 
+/**
+ * graz query hook for dispatching a "smart" query to a CosmWasm smart
+ * contract.
+ *
+ * Note: In order to make the hook more flexible, address and queryMsg are
+ * optional, but the query will be automatically disabled if either of them are
+ * not present. This makes it possible to register the hook before the address
+ * or queryMsg are known.
+ *
+ * @param address - The address of the contract to query
+ * @param queryMsg - The query message to send to the contract
+ * @param options - Optional react-query QueryOptions
+ * @returns A query result with the result returned by the smart contract.
+ */
 export const useQuerySmart = <TQueryFnData, TError, TData>(
   address?: string,
   queryMsg?: Record<string, unknown>,
@@ -224,6 +277,18 @@ export const useQuerySmart = <TQueryFnData, TError, TData>(
 
 export type QueryRawKey = readonly ["USE_QUERY_RAW", string, string | undefined];
 
+/**
+ * graz query hook for dispatching a "raw" query to a CosmWasm smart contract.
+ *
+ * Note: In order to make the hook more flexible, address is optional, but
+ * the query will be automatically disabled if either of them are not present.
+ * This makes it possible to register the hook before the address is known.
+ *
+ * @param key - The key to lookup in the contract storage
+ * @param address - The address of the contract to query
+ * @param options - Optional react-query QueryOptions
+ * @returns A query result with raw byte array stored at the key queried.
+ */
 export const useQueryRaw = <TError>(
   key: string,
   address?: string,
