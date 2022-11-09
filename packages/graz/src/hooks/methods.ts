@@ -183,7 +183,7 @@ export type UseExecuteContractArgs<Message extends Record<string, unknown>> = {
  *
  * @example
  * ```ts
- * import { useInstantiateContract } from "graz"
+ * import { useExecuteContract } from "graz"
  *
  * interface GreetMessage {
  *   name: string;
