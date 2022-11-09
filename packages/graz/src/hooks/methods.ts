@@ -212,7 +212,9 @@ export const useQuerySmart = <TQueryFnData, TError, TData>(
   queryMsg: Record<string, unknown>,
   options?: QueryOptions<TQueryFnData, TError, TData, QuerySmartKey>,
 ): UseQueryResult<TData, TError> => {
-  //TODO: error handling and options defaulting
+  const queryOptions: QueryOptions<TQueryFnData, TError, TData, QuerySmartKey> = options || {
+    enabled: Boolean(address),
+  };
 
   const queryKey: QuerySmartKey = ["USE_QUERY_SMART", address, queryMsg] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getQuerySmart(address, queryMsg), options);
@@ -227,7 +229,7 @@ export const useQueryRaw = <TQueryFnData, TError, TData>(
   key: Uint8Array,
   options?: QueryOptions<TQueryFnData, TError, TData, QueryRawKey>,
 ): UseQueryResult<TData, TError> => {
-  //TODO: error handling and options defaulting
+  const queryOptions: QueryOptions<TQueryFnData, TError, TData, QueryRawKey> = options || { enabled: Boolean(address) };
 
   const queryKey: QueryRawKey = ["USE_QUERY_RAW", address, key] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getQueryRaw(address, key), options);
