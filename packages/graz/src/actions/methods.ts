@@ -183,15 +183,21 @@ export const getQuerySmart = async <TData>(address?: string, queryMsg?: Record<s
     throw new Error("Query message is undefined");
   }
 
-  return (await signingClients.cosmWasm.queryContractSmart(address, queryMsg)) as TData;
+  const result = (await signingClients.cosmWasm.queryContractSmart(address, queryMsg)) as TData;
+  return result;
 };
 
-export const getQueryRaw = async <TData>(address: string, key: Uint8Array): Promise<TData> => {
+export const getQueryRaw = (keyStr: string, address?: string): Promise<Uint8Array | null> => {
   const { signingClients } = useGrazStore.getState();
 
   if (!signingClients?.cosmWasm) {
     throw new Error("Stargate signing client is not ready");
   }
 
-  return (await signingClients.cosmWasm.queryContractRaw(address, key)) as TData;
+  if (address === undefined) {
+    throw new Error("Contract address is undefined");
+  }
+
+  const key = new TextEncoder().encode(keyStr);
+  return signingClients.cosmWasm.queryContractRaw(address, key);
 };

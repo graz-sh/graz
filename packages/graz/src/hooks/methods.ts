@@ -222,17 +222,19 @@ export const useQuerySmart = <TQueryFnData, TError, TData>(
   return query;
 };
 
-export type QueryRawKey = readonly ["USE_QUERY_RAW", string, Uint8Array];
+export type QueryRawKey = readonly ["USE_QUERY_RAW", string, string | undefined];
 
-export const useQueryRaw = <TQueryFnData, TError, TData>(
-  address: string,
-  key: Uint8Array,
-  options?: QueryOptions<TQueryFnData, TError, TData, QueryRawKey>,
-): UseQueryResult<TData, TError> => {
-  const queryOptions: QueryOptions<TQueryFnData, TError, TData, QueryRawKey> = options || { enabled: Boolean(address) };
+export const useQueryRaw = <TError>(
+  key: string,
+  address?: string,
+  options?: QueryOptions<Uint8Array | null, TError, Uint8Array | null, QueryRawKey>,
+): UseQueryResult<Uint8Array | null, TError> => {
+  const enabled = Boolean(address);
+  const queryOptions: QueryOptions<Uint8Array | null, TError, Uint8Array | null, QueryRawKey> =
+    options !== undefined ? { ...options, enabled: Boolean(options.enabled) && enabled } : { enabled };
 
-  const queryKey: QueryRawKey = ["USE_QUERY_RAW", address, key] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getQueryRaw(address, key), options);
+  const queryKey: QueryRawKey = ["USE_QUERY_RAW", key, address] as const;
+  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getQueryRaw(key, address), queryOptions);
 
   return query;
 };
