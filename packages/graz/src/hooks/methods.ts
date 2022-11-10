@@ -1,6 +1,6 @@
 import type { ExecuteResult, InstantiateResult } from "@cosmjs/cosmwasm-stargate";
 import type { DeliverTxResponse } from "@cosmjs/stargate";
-import type { QueryKey, UseQueryOptions, UseQueryResult } from "@tanstack/react-query";
+import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import type {
@@ -237,15 +237,6 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
   };
 };
 
-export type QueryOptions<TQueryFnData, TError, TData, TQueryKey extends QueryKey> = Omit<
-  UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
-  "queryKey" | "queryFn" | "initialData"
-> & {
-  initialData?: () => undefined;
-};
-
-export type QuerySmartKey = readonly ["USE_QUERY_SMART", string | undefined, Record<string, unknown> | undefined];
-
 /**
  * graz query hook for dispatching a "smart" query to a CosmWasm smart
  * contract.
@@ -257,25 +248,26 @@ export type QuerySmartKey = readonly ["USE_QUERY_SMART", string | undefined, Rec
  *
  * @param address - The address of the contract to query
  * @param queryMsg - The query message to send to the contract
- * @param options - Optional react-query QueryOptions
  * @returns A query result with the result returned by the smart contract.
  */
-export const useQuerySmart = <TQueryFnData, TError, TData>(
+export const useQuerySmart = <TData, TError>(
   address?: string,
   queryMsg?: Record<string, unknown>,
-  options?: QueryOptions<TQueryFnData, TError, TData, QuerySmartKey>,
 ): UseQueryResult<TData, TError> => {
-  const argsPresent = Boolean(address) && Boolean(queryMsg);
-  const queryOptions: QueryOptions<TQueryFnData, TError, TData, QuerySmartKey> =
-    options !== undefined ? { ...options, enabled: Boolean(options.enabled) && argsPresent } : { enabled: argsPresent };
-
-  const queryKey: QuerySmartKey = ["USE_QUERY_SMART", address, queryMsg] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getQuerySmart(address, queryMsg), queryOptions);
+  const queryKey = ["USE_QUERY_SMART", address, queryMsg] as const;
+  const query: UseQueryResult<TData, TError> = useQuery(
+    queryKey,
+    ({ queryKey: [, _address] }) => {
+      if (!address || !queryMsg) throw new Error("address or queryMsg undefined");
+      return getQuerySmart(address, queryMsg);
+    },
+    {
+      enabled: Boolean(address) && Boolean(queryMsg),
+    },
+  );
 
   return query;
 };
-
-export type QueryRawKey = readonly ["USE_QUERY_RAW", string, string | undefined];
 
 /**
  * graz query hook for dispatching a "raw" query to a CosmWasm smart contract.
@@ -284,22 +276,22 @@ export type QueryRawKey = readonly ["USE_QUERY_RAW", string, string | undefined]
  * the query will be automatically disabled if either of them are not present.
  * This makes it possible to register the hook before the address is known.
  *
- * @param key - The key to lookup in the contract storage
  * @param address - The address of the contract to query
- * @param options - Optional react-query QueryOptions
+ * @param key - The key to lookup in the contract storage
  * @returns A query result with raw byte array stored at the key queried.
  */
-export const useQueryRaw = <TError>(
-  key: string,
-  address?: string,
-  options?: QueryOptions<Uint8Array | null, TError, Uint8Array | null, QueryRawKey>,
-): UseQueryResult<Uint8Array | null, TError> => {
-  const enabled = Boolean(address);
-  const queryOptions: QueryOptions<Uint8Array | null, TError, Uint8Array | null, QueryRawKey> =
-    options !== undefined ? { ...options, enabled: Boolean(options.enabled) && enabled } : { enabled };
-
-  const queryKey: QueryRawKey = ["USE_QUERY_RAW", key, address] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getQueryRaw(key, address), queryOptions);
+export const useQueryRaw = <TError>(address?: string, key?: string): UseQueryResult<Uint8Array | null, TError> => {
+  const queryKey = ["USE_QUERY_RAW", key, address] as const;
+  const query: UseQueryResult<Uint8Array | null, TError> = useQuery(
+    queryKey,
+    ({ queryKey: [, _address] }) => {
+      if (!address || !key) throw new Error("address or key undefined");
+      return getQueryRaw(address, key);
+    },
+    {
+      enabled: Boolean(address) && Boolean(key),
+    },
+  );
 
   return query;
 };
