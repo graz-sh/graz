@@ -146,6 +146,7 @@ export const useInstantiateContract = <Message extends Record<string, unknown>>(
   const accountAddress = account?.bech32Address;
 
   const mutationFn = (args: InstantiateContractMutationArgs<Message>) => {
+    if (!accountAddress) throw new Error("senderAddress is undefined");
     const contractArgs: InstantiateContractArgs<Message> = {
       ...args,
       fee: args.fee ?? "auto",
@@ -210,6 +211,7 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
   const accountAddress = account?.bech32Address;
 
   const mutationFn = (args: ExecuteContractMutationArgs<Message>) => {
+    if (!accountAddress) throw new Error("senderAddress is undefined");
     const executeArgs: ExecuteContractArgs<Message> = {
       ...args,
       fee: args.fee ?? "auto",

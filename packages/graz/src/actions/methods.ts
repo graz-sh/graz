@@ -105,7 +105,7 @@ export interface InstantiateContractArgs<Message extends Record<string, unknown>
   label: string;
   fee: StdFee | "auto" | number;
   options?: InstantiateOptions;
-  senderAddress?: string;
+  senderAddress: string;
   codeId: number;
 }
 
@@ -139,7 +139,7 @@ export const instantiateContract = async <Message extends Record<string, unknown
 export interface ExecuteContractArgs<Message extends Record<string, unknown>> {
   msg: Message;
   fee: StdFee | "auto" | number;
-  senderAddress?: string;
+  senderAddress: string;
   contractAddress: string;
 }
 
