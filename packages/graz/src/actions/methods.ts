@@ -127,7 +127,7 @@ export const instantiateContract = async <Message extends Record<string, unknown
   const { signingClients } = useGrazStore.getState();
 
   if (!signingClients?.cosmWasm) {
-    throw new Error("Stargate signing client is not ready");
+    throw new Error("CosmWasm signing client is not ready");
   }
   if (!senderAddress) {
     throw new Error("senderAddress is not defined");
@@ -159,7 +159,7 @@ export const executeContract = async <Message extends Record<string, unknown>>({
   const { signingClients } = useGrazStore.getState();
 
   if (!signingClients?.cosmWasm) {
-    throw new Error("Stargate signing client is not ready");
+    throw new Error("CosmWasm signing client is not ready");
   }
   if (!senderAddress) {
     throw new Error("senderAddress is not defined");
@@ -172,7 +172,7 @@ export const getQuerySmart = async <TData>(address?: string, queryMsg?: Record<s
   const { signingClients } = useGrazStore.getState();
 
   if (!signingClients?.cosmWasm) {
-    throw new Error("Stargate signing client is not ready");
+    throw new Error("CosmWasm signing client is not ready");
   }
 
   if (address === undefined) {
@@ -191,7 +191,7 @@ export const getQueryRaw = (keyStr: string, address?: string): Promise<Uint8Arra
   const { signingClients } = useGrazStore.getState();
 
   if (!signingClients?.cosmWasm) {
-    throw new Error("Stargate signing client is not ready");
+    throw new Error("CosmWasm signing client is not ready");
   }
 
   if (address === undefined) {
