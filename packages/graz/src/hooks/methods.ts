@@ -243,11 +243,6 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
  * graz query hook for dispatching a "smart" query to a CosmWasm smart
  * contract.
  *
- * Note: In order to make the hook more flexible, address and queryMsg are
- * optional, but the query will be automatically disabled if either of them are
- * not present. This makes it possible to register the hook before the address
- * or queryMsg are known.
- *
  * @param address - The address of the contract to query
  * @param queryMsg - The query message to send to the contract
  * @returns A query result with the result returned by the smart contract.
@@ -273,10 +268,6 @@ export const useQuerySmart = <TData, TError>(
 
 /**
  * graz query hook for dispatching a "raw" query to a CosmWasm smart contract.
- *
- * Note: In order to make the hook more flexible, address and key are optional, but
- * the query will be automatically disabled if either of them are not present.
- * This makes it possible to register the hook before the address or key are known.
  *
  * @param address - The address of the contract to query
  * @param key - The key to lookup in the contract storage

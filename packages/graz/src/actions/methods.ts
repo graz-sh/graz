@@ -129,9 +129,6 @@ export const instantiateContract = async <Message extends Record<string, unknown
   if (!signingClients?.cosmWasm) {
     throw new Error("CosmWasm signing client is not ready");
   }
-  if (!senderAddress) {
-    throw new Error("senderAddress is not defined");
-  }
 
   return signingClients.cosmWasm.instantiate(senderAddress, codeId, msg, label, fee, options);
 };
@@ -160,9 +157,6 @@ export const executeContract = async <Message extends Record<string, unknown>>({
 
   if (!signingClients?.cosmWasm) {
     throw new Error("CosmWasm signing client is not ready");
-  }
-  if (!senderAddress) {
-    throw new Error("senderAddress is not defined");
   }
 
   return signingClients.cosmWasm.execute(senderAddress, contractAddress, msg, fee);
