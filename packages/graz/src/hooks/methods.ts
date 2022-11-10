@@ -156,7 +156,7 @@ export const useInstantiateContract = <Message extends Record<string, unknown>>(
     return instantiateContract(contractArgs);
   };
 
-  const queryKey = ["USE_INSTANTIATE_CONTRACT", onError, onLoading, onSuccess, codeId];
+  const queryKey = ["USE_INSTANTIATE_CONTRACT", onError, onLoading, onSuccess, codeId, accountAddress];
   const mutation = useMutation(queryKey, mutationFn, {
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
     onMutate: onLoading,
@@ -220,7 +220,7 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
     return executeContract(executeArgs);
   };
 
-  const queryKey = ["USE_EXECUTE_CONTRACT", onError, onLoading, onSuccess, contractAddress];
+  const queryKey = ["USE_EXECUTE_CONTRACT", onError, onLoading, onSuccess, contractAddress, accountAddress];
   const mutation = useMutation(queryKey, mutationFn, {
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
     onMutate: onLoading,
