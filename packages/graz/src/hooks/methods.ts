@@ -160,7 +160,7 @@ export const useInstantiateContract = <Message extends Record<string, unknown>>(
   const mutation = useMutation(queryKey, mutationFn, {
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
     onMutate: onLoading,
-    onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
+    onSuccess: (instantiateResult) => Promise.resolve(onSuccess?.(instantiateResult)),
   });
 
   return {
@@ -224,7 +224,7 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
   const mutation = useMutation(queryKey, mutationFn, {
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
     onMutate: onLoading,
-    onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
+    onSuccess: (executeResult) => Promise.resolve(onSuccess?.(executeResult)),
   });
 
   return {
