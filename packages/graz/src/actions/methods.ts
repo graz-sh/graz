@@ -168,34 +168,22 @@ export const executeContract = async <Message extends Record<string, unknown>>({
   return signingClients.cosmWasm.execute(senderAddress, contractAddress, msg, fee);
 };
 
-export const getQuerySmart = async <TData>(address?: string, queryMsg?: Record<string, unknown>): Promise<TData> => {
+export const getQuerySmart = async <TData>(address: string, queryMsg: Record<string, unknown>): Promise<TData> => {
   const { signingClients } = useGrazStore.getState();
 
   if (!signingClients?.cosmWasm) {
     throw new Error("CosmWasm signing client is not ready");
-  }
-
-  if (address === undefined) {
-    throw new Error("Contract address is undefined");
-  }
-
-  if (queryMsg === undefined) {
-    throw new Error("Query message is undefined");
   }
 
   const result = (await signingClients.cosmWasm.queryContractSmart(address, queryMsg)) as TData;
   return result;
 };
 
-export const getQueryRaw = (keyStr: string, address?: string): Promise<Uint8Array | null> => {
+export const getQueryRaw = (address: string, keyStr: string): Promise<Uint8Array | null> => {
   const { signingClients } = useGrazStore.getState();
 
   if (!signingClients?.cosmWasm) {
     throw new Error("CosmWasm signing client is not ready");
-  }
-
-  if (address === undefined) {
-    throw new Error("Contract address is undefined");
   }
 
   const key = new TextEncoder().encode(keyStr);
