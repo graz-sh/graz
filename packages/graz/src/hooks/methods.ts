@@ -133,7 +133,10 @@ export type UseInstantiateContractArgs<Message extends Record<string, unknown>> 
  * })
  *
  * const instantiateMessage = { foo: 'bar' };
- * instantiateMyContract(instantiateMessage);
+ * instantiateMyContract({
+ *  msg: instatiateMessage,
+ *  label: "test"
+ * });
  * ```
  */
 export const useInstantiateContract = <Message extends Record<string, unknown>>({
@@ -196,7 +199,9 @@ export type UseExecuteContractArgs<Message extends Record<string, unknown>> = {
  *
  * const contractAddress = "cosmosfoobarbaz";
  * const { executeContract } = useExecuteContract<ExecuteMessage>({ contractAddress });
- * executeContract({ name: 'CosmWasm' }, {
+ * executeContract({ msg: {
+ *   foo: "bar"
+ * }}, {
  *   onSuccess: (data: GreetResponse) => console.log('Got message:', data.message);
  * });
  * ```
