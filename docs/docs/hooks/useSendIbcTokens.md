@@ -40,7 +40,7 @@ Object params
 
 - onError?: `(error: unknown, args: SendIbcTokensArgs) => void`
 - onMutate?: `(data: SendIbcTokensArgs) => void`
-- onSuccess?: `(data: DeliverTxResponse, args: SendIbcTokensArgs) => void`
+- onSuccess?: `(data: DeliverTxResponse) => void`
 
 #### Return Value
 

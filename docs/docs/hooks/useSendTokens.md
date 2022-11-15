@@ -36,7 +36,7 @@ Object params
 
 - onError?: `(error: unknown, args: SendTokensArgs) => void`
 - onMutate?: `(data: SendTokensArgs) => void`
-- onSuccess?: `(data: DeliverTxResponse, args: SendTokensArgs) => void`
+- onSuccess?: `(data: DeliverTxResponse) => void`
 
 #### Return Value
 
