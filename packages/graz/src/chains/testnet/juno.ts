@@ -14,7 +14,7 @@ const currencies: AppCurrency[] = [JUNO];
 export const junoTestnet: ChainInfo = {
   rpc: "https://rpc.uni.junonetwork.io",
   rest: "https://api.uni.junonetwork.io",
-  chainId: "uni-3",
+  chainId: "uni-5",
   chainName: "Juno Testnet",
   stakeCurrency: JUNO,
   bip44: {
