@@ -18,7 +18,7 @@ function App() {
 Object params
 
 - onConnect?: `({ account: Key; isReconnect: boolean; }) => void`
-- onDisconnec?: `() => void`
+- onDisconnect?: `() => void`
 
 #### Return Value
 
