@@ -1,14 +1,14 @@
-# useIbcDomainToAddresses
+# useIbcDomainDetails
 
-Hook to retrieve an addresses from given IBC domain.
+Hook to retrieve a ibc domain details from given ibc domain.
 
 #### Usage
 
 ```tsx
-import { useIbcDomainToAddresses } from "graz";
+import { useIbcDomainDetails } from "graz";
 
 // basic example
-const { data, isFetching, refetch, ... } = useIbcDomainToAddresses({
+const { data, isFetching, refetch, ... } = useIbcDomainDetails({
  ibcDomain: "kikiding.cosmos",
 });
 
@@ -23,11 +23,26 @@ Object params
 
 Note: it will initiate if `ibcDomain` is there
 
+#### Types
+
+- `DomainDetails`
+  ```ts
+  {
+    expiration: string | null;
+    imageData: string | null;
+    twitterId: string | null;
+    discordId: string | null;
+    telegramId: string | null;
+    keybaseId: string | null;
+    pgpPublicKey: string | null;
+  }
+  ```
+
 #### Return Value
 
 ```tsx
 {
-  data: string[] | undefined | null;
+  data: DomainDetails | undefined | null;
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -46,7 +61,7 @@ Note: it will initiate if `ibcDomain` is there
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<string[] | undefined | null, unknown>>;
+  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<DomainDetails | undefined | null, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';
