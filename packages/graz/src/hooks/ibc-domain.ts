@@ -108,6 +108,23 @@ export const useIbcDomainToChainAddress = ({
   return query;
 };
 
+/**
+ * graz query hook to retrieve a ibc domain details from given ibc domain.
+ *
+ * @param ibcDomain - Optional ibc domain, if ibc domain undefined this hook won't run
+ * @param isTestnet - Optional for pointing to testnet
+ *
+ * @example
+ * ```ts
+ * import { useIbcDomainDetails } from "graz";
+ *
+ * // basic example
+ * const { data, isFetching, refetch, ... } = useIbcDomainDetails({
+ *  ibcDomain: "kikiding.cosmos",
+ * });
+ *
+ * ```
+ */
 export const useIbcDomainDetails = ({ ibcDomain, isTestnet }: { ibcDomain?: string; isTestnet?: boolean }) => {
   const queryKey = ["USE_IBC_DOMAIN_DETAILS", ibcDomain, isTestnet] as const;
   const query = useQuery(queryKey, () => getIbcDomainDetails(ibcDomain!, isTestnet), {
