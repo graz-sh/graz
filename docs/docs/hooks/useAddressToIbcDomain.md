@@ -16,6 +16,8 @@ Hook to retrieve an IBC domain from given address.
 
 #### Params
 
+Object params
+
 - address?: `string` - Optional, if `address` undefined this hook won't run
 - isTestnet?: `boolean` - Optional for pointing to testnet
 

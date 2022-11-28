@@ -17,6 +17,8 @@ const { data, isFetching, refetch, ... } = useIbcDomainToAddresses({
 
 #### Params
 
+Object params
+
 - ibcDomain?: `string` - Optional ibc domain
 - prefix? - `string` Optional string or bech32 prefix of the destination chain, for instance "cosmos", "somm", etc
 - isTestnet?: `boolean` - Optional for pointing to testnet
