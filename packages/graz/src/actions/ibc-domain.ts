@@ -60,13 +60,13 @@ export type KnownChainPrefix =
 export type ChainPrefix = (string & {}) | KnownChainPrefix;
 
 export interface DomainDetails {
-  expiration: string;
-  imageData: string;
-  twitterId: string;
-  discordId: string;
-  telegramId: string;
-  keybaseId: string;
-  pgpPublicKey: string;
+  expiration: string | null;
+  imageData: string | null;
+  twitterId: string | null;
+  discordId: string | null;
+  telegramId: string | null;
+  keybaseId: string | null;
+  pgpPublicKey: string | null;
 }
 
 export const isIbcDomainPostfix = (value: string) => {
