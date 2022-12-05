@@ -66,7 +66,7 @@ export interface SendIbcTokensArgs {
   timeoutHeight?: Height;
   timeoutTimestamp?: number;
   fee: number | StdFee | "auto";
-  memo: string;
+  memo?: string;
 }
 
 export const sendIbcTokens = async ({
