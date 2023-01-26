@@ -17,7 +17,7 @@ export const createClients = async ({ rpc, rpcHeaders }: CreateClientArgs): Prom
   const [cosmWasm, stargate, tendermint] = await Promise.all([
     SigningCosmWasmClient.connect(endpoint),
     SigningStargateClient.connect(endpoint),
-    Tendermint34Client.connect(rpc),
+    Tendermint34Client.connect(endpoint),
   ]);
   return { cosmWasm, stargate, tendermint };
 };
