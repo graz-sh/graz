@@ -139,14 +139,16 @@ export interface ExecuteContractArgs<Message extends Record<string, unknown>> {
   senderAddress: string;
   contractAddress: string;
   funds: Coin[];
-  memo: string | undefined;
+  memo: string;
 }
 
 export type ExecuteContractMutationArgs<Message extends Record<string, unknown>> = Omit<
   ExecuteContractArgs<Message>,
-  "contractAddress" | "senderAddress" | "fee"
+  "contractAddress" | "senderAddress" | "fee" | "funds" | "memo"
 > & {
   fee?: StdFee | "auto" | number;
+  funds?: Coin[];
+  memo?: string;
 };
 
 export const executeContract = async <Message extends Record<string, unknown>>({
