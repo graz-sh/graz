@@ -222,7 +222,8 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
       fee: args.fee ?? "auto",
       senderAddress: accountAddress,
       contractAddress,
-      funds: args.funds || [],
+      memo: args.memo ?? "",
+      funds: args.funds ?? [],
     };
 
     return executeContract(executeArgs);
