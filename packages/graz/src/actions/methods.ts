@@ -139,6 +139,7 @@ export interface ExecuteContractArgs<Message extends Record<string, unknown>> {
   senderAddress: string;
   contractAddress: string;
   funds: Coin[];
+  memo: string | undefined;
 }
 
 export type ExecuteContractMutationArgs<Message extends Record<string, unknown>> = Omit<
@@ -154,6 +155,7 @@ export const executeContract = async <Message extends Record<string, unknown>>({
   fee,
   contractAddress,
   funds,
+  memo,
 }: ExecuteContractArgs<Message>) => {
   const { signingClients } = useGrazStore.getState();
 
@@ -161,7 +163,7 @@ export const executeContract = async <Message extends Record<string, unknown>>({
     throw new Error("CosmWasm signing client is not ready");
   }
 
-  return signingClients.cosmWasm.execute(senderAddress, contractAddress, msg, fee, funds);
+  return signingClients.cosmWasm.execute(senderAddress, contractAddress, msg, fee, memo, funds);
 };
 
 export const getQuerySmart = async <TData>(address: string, queryMsg: Record<string, unknown>): Promise<TData> => {
