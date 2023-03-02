@@ -169,23 +169,23 @@ export const executeContract = async <Message extends Record<string, unknown>>({
 };
 
 export const getQuerySmart = async <TData>(address: string, queryMsg: Record<string, unknown>): Promise<TData> => {
-  const { signingClients } = useGrazStore.getState();
+  const { clients } = useGrazStore.getState();
 
-  if (!signingClients?.cosmWasm) {
-    throw new Error("CosmWasm signing client is not ready");
+  if (!clients?.cosmWasm) {
+    throw new Error("CosmWasm client is not ready");
   }
 
-  const result = (await signingClients.cosmWasm.queryContractSmart(address, queryMsg)) as TData;
+  const result = (await clients.cosmWasm.queryContractSmart(address, queryMsg)) as TData;
   return result;
 };
 
 export const getQueryRaw = (address: string, keyStr: string): Promise<Uint8Array | null> => {
-  const { signingClients } = useGrazStore.getState();
+  const { clients } = useGrazStore.getState();
 
-  if (!signingClients?.cosmWasm) {
-    throw new Error("CosmWasm signing client is not ready");
+  if (!clients?.cosmWasm) {
+    throw new Error("CosmWasm client is not ready");
   }
 
   const key = new TextEncoder().encode(keyStr);
-  return signingClients.cosmWasm.queryContractRaw(address, key);
+  return clients.cosmWasm.queryContractRaw(address, key);
 };
