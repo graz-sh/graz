@@ -34,6 +34,9 @@ export const useClients = (args?: CreateClientArgs): UseQueryResult<GrazStore["c
     {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
+      onSuccess: (clients) => {
+        useGrazStore.setState({ clients });
+      },
     },
   );
 
