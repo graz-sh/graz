@@ -73,6 +73,9 @@ export const useSigningClients = (args?: CreateSigningClientArgs): UseQueryResul
     {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
+      onSuccess: (signingClients) => {
+        useGrazStore.setState({ signingClients });
+      },
     },
   );
 
