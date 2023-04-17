@@ -9,6 +9,17 @@ import { fileURLToPath } from "url";
 
 import pmap from "./compiled/p-map/index.mjs";
 
+function isNumber(char) {
+  return /^\d+$/.test(char);
+}
+
+function chainNaming(name) {
+  if (isNumber(name[0])) {
+    return `_${name}`;
+  }
+  return name;
+}
+
 const HELP_MESSAGE = `Usage: graz [options]
 
 Options:
@@ -119,7 +130,7 @@ function chainsDir(...args) {
  */
 function makeChainMap(record, { testnet = false } = {}) {
   return Object.keys(record)
-    .map((k) => `  ${k}: ${k}${testnet ? "Testnet" : ""},`)
+    .map((k) => `  ${chainNaming(k)}: ${chainNaming(k)},`)
     .join("\n");
 }
 
@@ -130,7 +141,7 @@ function makeChainMap(record, { testnet = false } = {}) {
 function makeDefs(record, { mjs = false, testnet = false } = {}) {
   return Object.entries(record)
     .map(([k, v]) => {
-      const jsVariable = `${k}${testnet ? "Testnet" : ""}`;
+      const jsVariable = `${chainNaming(k)}`;
       const jsChainInfo = JSON.stringify(v, null, 2);
       return `${mjs ? "export " : ""}const ${jsVariable} = defineChainInfo(${jsChainInfo});\n`;
     })
@@ -143,7 +154,7 @@ function makeDefs(record, { mjs = false, testnet = false } = {}) {
  */
 function makeExports(record, { testnet = false } = {}) {
   return Object.keys(record)
-    .map((k) => `  ${k}${testnet ? "Testnet" : ""},`)
+    .map((k) => `  ${chainNaming(k)},`)
     .join("\n");
 }
 
