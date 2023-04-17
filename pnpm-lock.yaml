@@ -132,7 +132,6 @@ importers:
       '@types/node': ^16
       '@types/react': ^18
       arg: ^5
-      bech32: 2.0.0
       cosmos-directory-client: 0.0.6
       react: ^18
       typescript: ^4
@@ -146,7 +145,6 @@ importers:
       '@keplr-wallet/types': 0.10.23
       '@tanstack/react-query': 4.2.3_react@18.2.0
       arg: 5.0.2
-      bech32: 2.0.0
       cosmos-directory-client: 0.0.6
       zustand: 4.1.1_react@18.2.0
     devDependencies:
@@ -5969,10 +5967,6 @@ packages:
 
   /bech32/1.1.4:
     resolution: {integrity: sha512-s0IrSOzLlbvX7yp4WBfPITzpAU8sqQcpsmwXDiKwrG4r491vwCO/XpejasRNl0piBMe/DvP4Tz0mIS/X1DPJBQ==}
-    dev: false
-
-  /bech32/2.0.0:
-    resolution: {integrity: sha512-LcknSilhIGatDAsY1ak2I8VtGaHNhgMSYVxFrGLXv+xLHytaKZKcaUJJUE7qmBr7h33o5YQwP55pMI0xmkpJwg==}
     dev: false
 
   /big-integer/1.6.51:
