@@ -3,6 +3,7 @@ import { GasPrice } from "@cosmjs/stargate";
 import type { Key } from "@keplr-wallet/types";
 
 import type { GrazChain } from "../chains";
+import { RECONNECT_SESSION_KEY } from "../constant";
 import { defaultValues, useGrazStore } from "../store";
 import type { Maybe } from "../types/core";
 import type { WalletType } from "../types/wallet";
@@ -69,7 +70,7 @@ export const connect = async (args?: ConnectArgs): Promise<Key> => {
       _reconnect: Boolean(args?.autoReconnect),
       _reconnectConnector: currentWalletType,
     });
-    typeof window !== "undefined" && window.sessionStorage.setItem("graz-reconnect-session", "Active");
+    typeof window !== "undefined" && window.sessionStorage.setItem(RECONNECT_SESSION_KEY, "Active");
 
     return account;
   } catch (error) {
@@ -81,7 +82,7 @@ export const connect = async (args?: ConnectArgs): Promise<Key> => {
 };
 
 export const disconnect = async (clearRecentChain = false): Promise<void> => {
-  typeof window !== "undefined" && window.sessionStorage.removeItem("graz-reconnect-session");
+  typeof window !== "undefined" && window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
 
   useGrazStore.setState((x) => ({
     ...defaultValues,
