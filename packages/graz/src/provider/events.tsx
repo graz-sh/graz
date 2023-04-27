@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useEffect } from "react";
 
 import { reconnect } from "../actions/account";
+import { RECONNECT_SESSION_KEY } from "../constant";
 import { useGrazStore } from "../store";
 
 /**
@@ -11,7 +12,7 @@ import { useGrazStore } from "../store";
  */
 export const useGrazEvents = () => {
   const isSessionActive =
-    typeof window !== "undefined" && window.sessionStorage.getItem("graz-reconnect-session") === "Active";
+    typeof window !== "undefined" && window.sessionStorage.getItem(RECONNECT_SESSION_KEY) === "Active";
   const { activeChain, _reconnect, _onReconnectFailed } = useGrazStore.getState();
 
   useEffect(() => {
