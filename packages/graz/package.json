@@ -1,7 +1,7 @@
 {
   "name": "graz",
   "description": "React hooks for Cosmos",
-  "version": "0.0.35",
+  "version": "0.0.36",
   "author": "Griko Nibras <griko@strangelove.ventures>",
   "repository": "https://github.com/strangelove-ventures/graz.git",
   "homepage": "https://github.com/strangelove-ventures/graz",
