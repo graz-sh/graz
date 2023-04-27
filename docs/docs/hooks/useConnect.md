@@ -24,16 +24,18 @@ function App() {
 - `ConnectArgs`
   ```tsx
   {
-    chainId: string;
-    currencies: AppCurrency[];
-    path?: string;
-    rest: string;
-    rpc: string;
-    rpcHeaders?: Dictionary;
-    gas?: {
-      price: string;
-      denom: string;
-    };
+    chain?: {
+      chainId: string;
+      currencies: AppCurrency[];
+      path?: string;
+      rest: string;
+      rpc: string;
+      rpcHeaders?: Dictionary;
+      gas?: {
+        price: string;
+        denom: string;
+      }
+    }
     signerOpts?: SigningCosmWasmClientOptions;
     walletType?: WalletType;
   }

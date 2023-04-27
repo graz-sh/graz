@@ -1,5 +1,7 @@
-import { HStack, Link } from "@chakra-ui/react";
+import { HStack } from "@chakra-ui/react";
 import { useRouter } from "next/router";
+
+import { Link } from "../core/link";
 
 export const NavbarLeftSection = () => {
   const router = useRouter();

@@ -40,7 +40,7 @@ export const ChainSwitcher = () => {
           <Button
             key={chain.chainId}
             colorScheme={activeChain?.chainId === chain.chainId ? "green" : "gray"}
-            onClick={() => connect(chain)}
+            onClick={() => connect({ chain })}
           >
             {chain.chainId}
           </Button>

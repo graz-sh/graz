@@ -26,7 +26,7 @@ export const ChainSwitcher: FC = () => {
       <FormLabel>Switch Chain</FormLabel>
       <ButtonGroup flexWrap="wrap" gap={2} isDisabled={isConnecting || isReconnecting} size="sm" spacing={0}>
         {mainnetChainsArray.map((chain) => (
-          <Button key={chain.chainId} onClick={() => connect(chain)}>
+          <Button key={chain.chainId} onClick={() => connect({ chain })}>
             {chain.chainId}
           </Button>
         ))}
