@@ -33,9 +33,11 @@ export interface GrazStore {
   walletType: WalletType;
   _notFoundFn: () => void;
   _reconnect: boolean;
+  _reconnectConnector: WalletType | null;
+  _onReconnectFailed: () => void;
 }
 
-export type GrazPersistedStore = Pick<GrazStore, "activeChain" | "recentChain" | "_reconnect">;
+export type GrazPersistedStore = Pick<GrazStore, "activeChain" | "recentChain" | "_reconnect" | "_reconnectConnector">;
 
 export const defaultValues: GrazStore = {
   account: null,
@@ -52,7 +54,9 @@ export const defaultValues: GrazStore = {
   status: "disconnected",
   walletType: WalletType.KEPLR,
   _notFoundFn: () => null,
+  _onReconnectFailed: () => null,
   _reconnect: false,
+  _reconnectConnector: null,
 };
 
 const persistOptions: PersistOptions<GrazStore, GrazPersistedStore> = {
@@ -61,8 +65,9 @@ const persistOptions: PersistOptions<GrazStore, GrazPersistedStore> = {
     activeChain: x.activeChain,
     recentChain: x.recentChain,
     _reconnect: x._reconnect,
+    _reconnectConnector: x._reconnectConnector,
   }),
-  version: 1,
+  version: 2,
 };
 
 export const useGrazStore = create(subscribeWithSelector(persist(() => defaultValues, persistOptions)));

@@ -60,6 +60,7 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
     isConnecting: status === "connecting",
     isDisconnected: status === "disconnected",
     isReconnecting: status === "reconnecting",
+    isLoading: status === "connecting" || status === "reconnecting",
     reconnect,
     status,
   };
@@ -152,10 +153,12 @@ export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, Key>;
  *
  * // use custom chain information
  * connect({
- *   rpc: "https://rpc.juno.strange.love",
- *   rest: "https://api.juno.strange.love",
- *   chainId: "juno-1",
- *   ...
+ *  chain:{
+ *    rpc: "https://rpc.juno.strange.love",
+ *    rest: "https://api.juno.strange.love",
+ *    chainId: "juno-1",
+ *    ...
+ * }
  * });
  * ```
  *

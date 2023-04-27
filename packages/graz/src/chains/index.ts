@@ -107,12 +107,13 @@ export const defineChainInfo = <T extends ChainInfo | ChainInfoWithPath>(chain: 
  * connect(mainnetChains.cosmos);
  * ```
  *
+ * Try graz cli to generate ChainInfo from https://cosmos.directory/
+ * @see https://graz.strange.love/docs/generate-chain-info
+ *
  * @see {@link testnetChains}
  */
 export const mainnetChains = defineChains({
   axelar,
-  /** @deprecated kept for compatibilty purposes; change to `mainnetChains.cosmoshub` */
-  cosmos: cosmoshub,
   cosmoshub,
   juno,
   osmosis,
@@ -121,6 +122,9 @@ export const mainnetChains = defineChains({
 
 /**
  * Arary version on {@link mainnetChains}
+ *
+ * Try graz cli to generate ChainInfo from https://cosmos.directory/
+ * @see https://graz.strange.love/docs/generate-chain-info
  *
  * @see {@link mainnetChains}
  */
@@ -135,6 +139,9 @@ export const mainnetChainsArray = [axelar, cosmoshub, juno, osmosis, sommelier];
  * connect(testnetChains.osmosis);
  * ```
  *
+ * Try graz cli to generate ChainInfo from https://cosmos.directory/
+ * @see https://graz.strange.love/docs/generate-chain-info
+ *
  * @see {@link mainnetChains}
  */
 export const testnetChains = defineChains({
@@ -145,6 +152,9 @@ export const testnetChains = defineChains({
 
 /**
  * Arary version on {@link testnetChains}
+ *
+ * Try graz cli to generate ChainInfo from https://cosmos.directory/
+ * @see https://graz.strange.love/docs/generate-chain-info
  *
  * @see {@link testnetChains}
  */
