@@ -158,7 +158,7 @@ export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, Key>;
  *    rest: "https://api.juno.strange.love",
  *    chainId: "juno-1",
  *    ...
- * }
+ *   }
  * });
  * ```
  *
