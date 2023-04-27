@@ -15,7 +15,11 @@ export const getBalances = async (bech32Address: string): Promise<Coin[]> => {
   const { defaultSigningClient } = useGrazStore.getState();
   const balances = await Promise.all(
     activeChain.currencies.map(async (item) => {
-      return signingClients[defaultSigningClient].getBalance(bech32Address, item.coinMinimalDenom);
+      const isCw20 = item.coinMinimalDenom.startsWith("cw20:");
+      return signingClients[defaultSigningClient].getBalance(
+        bech32Address,
+        isCw20 ? item.coinMinimalDenom.replace("cw20:", "") : item.coinMinimalDenom,
+      );
     }),
   );
 

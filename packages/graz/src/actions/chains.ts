@@ -39,18 +39,27 @@ export interface SuggestChainAndConnectArgs {
   };
   rpcHeaders?: Dictionary;
   path?: string;
+  autoReconnect?: boolean;
 }
 
 export const suggestChainAndConnect = async ({
   chainInfo,
+  rpcHeaders,
+  gas,
+  path,
   ...rest
 }: SuggestChainAndConnectArgs): Promise<{ account: Key; chain: ChainInfo }> => {
   const chain = await suggestChain(chainInfo);
   const account = await connect({
-    chainId: chainInfo.chainId,
-    currencies: chainInfo.currencies,
-    rest: chainInfo.rest,
-    rpc: chainInfo.rpc,
+    chain: {
+      chainId: chainInfo.chainId,
+      currencies: chainInfo.currencies,
+      rest: chainInfo.rest,
+      rpc: chainInfo.rpc,
+      rpcHeaders,
+      gas,
+      path,
+    },
     ...rest,
   });
   return { account, chain };

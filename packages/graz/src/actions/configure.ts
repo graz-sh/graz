@@ -8,6 +8,11 @@ export interface ConfigureGrazArgs {
   defaultSigningClient?: GrazStore["defaultSigningClient"];
   defaultWallet?: WalletType;
   onNotFound?: () => void;
+  onReconnectFailed?: () => void;
+  /**
+   * default to true
+   */
+  autoReconnect?: boolean;
 }
 
 export const configureGraz = (args: ConfigureGrazArgs = {}): ConfigureGrazArgs => {
@@ -16,6 +21,8 @@ export const configureGraz = (args: ConfigureGrazArgs = {}): ConfigureGrazArgs =
     defaultSigningClient: args.defaultSigningClient || prev.defaultSigningClient,
     walletType: args.defaultWallet || prev.walletType,
     _notFoundFn: args.onNotFound || prev._notFoundFn,
+    _onReconnectFailed: args.onReconnectFailed || prev._onReconnectFailed,
+    _reconnect: args.autoReconnect === undefined ? true : args.autoReconnect || prev._reconnect,
   }));
   return args;
 };

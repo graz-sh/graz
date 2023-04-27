@@ -10,14 +10,43 @@ import { useGrazStore } from "../store";
  * **Note: only use this hook if not using graz's provider component.**
  */
 export const useGrazEvents = () => {
-  useEffect(() => {
-    const { _reconnect } = useGrazStore.getState();
-    if (_reconnect) reconnect();
+  const isSessionActive =
+    typeof window !== "undefined" && window.sessionStorage.getItem("graz-reconnect-session") === "Active";
+  const { activeChain, _reconnect, _onReconnectFailed } = useGrazStore.getState();
 
-    window.addEventListener("keplr_keystorechange", reconnect);
+  useEffect(() => {
+    // will reconnect on refresh
+    if (isSessionActive && Boolean(activeChain)) {
+      void reconnect({
+        onError: _onReconnectFailed,
+      });
+      // only reconnect if session is active and autoReconnect from grazOptions is true
+    } else if (!isSessionActive && _reconnect) {
+      void reconnect({
+        onError: _onReconnectFailed,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener(
+      "keplr_keystorechange",
+      () =>
+        void reconnect({
+          onError: _onReconnectFailed,
+        }),
+    );
     return () => {
-      window.removeEventListener("keplr_keystorechange", reconnect);
+      window.removeEventListener(
+        "keplr_keystorechange",
+        () =>
+          void reconnect({
+            onError: _onReconnectFailed,
+          }),
+      );
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null;
