@@ -32,7 +32,7 @@ export const ConnectButton: FC = () => {
   });
 
   function handleConnect() {
-    return (isConnected ? disconnect : connect)();
+    return isConnected ? disconnect() : connect();
   }
 
   return (
@@ -40,7 +40,7 @@ export const ConnectButton: FC = () => {
       <Button isDisabled={!isSupported} isLoading={isConnecting || isReconnecting} onClick={handleConnect}>
         {isConnected ? "Disconnect" : "Connect"} Wallet
       </Button>
-      {isConnected && <IconButton aria-label="refresh" icon={<>🔄</>} onClick={reconnect} />}
+      {isConnected && <IconButton aria-label="refresh" icon={<>🔄</>} onClick={() => void reconnect()} />}
     </ButtonGroup>
   );
 };

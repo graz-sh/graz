@@ -31,7 +31,7 @@ export const WalletConnectButton = () => {
 
   function handleConnect(wallet: WalletType) {
     onClose();
-    return connect({ ...mainnetChains.cosmoshub, walletType: wallet });
+    return connect({ chain: mainnetChains.cosmoshub, walletType: wallet });
   }
 
   return (

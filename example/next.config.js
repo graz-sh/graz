@@ -10,7 +10,7 @@ let nextConfig = {
     ignoreDuringBuilds: Boolean(process.env.VERCEL),
   },
   headers: async () => [],
-  reactStrictMode: true,
+  reactStrictMode: false,
   redirects: async () => [],
   rewrites: async () => [],
   swcMinify: false,
