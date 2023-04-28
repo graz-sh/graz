@@ -1,4 +1,4 @@
-import type { AccountData, GrazAdapter } from "graz";
+import type { AccountData, GrazAdapter } from ".";
 
 export class KeplrAdapter implements GrazAdapter {
   name = "Keplr";
@@ -19,7 +19,7 @@ export class KeplrAdapter implements GrazAdapter {
     }
   }
 
-  async connect(chainId: string): Promise<void> {
+  async connect(chainId: string) {
     try {
       const isAvailable = this.checkConnector();
       if (!isAvailable) {

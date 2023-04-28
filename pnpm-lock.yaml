@@ -171,6 +171,9 @@ importers:
       '@cosmjs/cosmwasm-stargate':
         specifier: ^0
         version: 0.28.13
+      '@cosmjs/launchpad':
+        specifier: ^0
+        version: 0.24.1
       '@cosmjs/proto-signing':
         specifier: ^0
         version: 0.28.13

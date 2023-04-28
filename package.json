@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "turbo run build --filter=!@project/docs --filter=!graz-adapter-*",
+    "build-adapter": "turbo run build --filter=graz-adapter-*",
     "clean": "turbo run clean",
     "dev": "turbo run dev --filter=!@project/docs --filter=!graz-adapter-*",
     "docs": "pnpm --dir docs",
