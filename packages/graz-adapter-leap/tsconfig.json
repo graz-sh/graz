@@ -1,0 +1,9 @@
+{
+  "extends": "@strangelovelabs/style-guide/tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "resolveJsonModule": true
+  },
+  "exclude": ["node_modules"],
+  "include": ["env.d.ts", "**/*.ts", "**/*.tsx"]
+}
