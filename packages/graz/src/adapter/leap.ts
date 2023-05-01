@@ -2,12 +2,12 @@ import type { ChainInfo } from "@keplr-wallet/types";
 
 import type { AccountData, GrazAdapter } from ".";
 
-export class KeplrAdapter implements GrazAdapter {
-  name = "Keplr";
-  id = "keplr";
+export class LeapAdapter implements GrazAdapter {
+  name = "Leap";
+  id = "leap";
 
   private getConnector() {
-    if (typeof window.keplr !== "undefined") return window.keplr;
+    if (typeof window.leap !== "undefined") return window.leap;
     throw new Error("window.keplr is not defined");
   }
 
