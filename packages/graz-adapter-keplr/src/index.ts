@@ -1,3 +1,4 @@
+import type { ChainInfo } from "@keplr-wallet/types";
 import type { AccountData, GrazAdapter } from "graz";
 
 export class KeplrAdapter implements GrazAdapter {
@@ -19,13 +20,26 @@ export class KeplrAdapter implements GrazAdapter {
     }
   }
 
-  async connect(chainId: string): Promise<void> {
+  async enable(chainId: string) {
     try {
       const isAvailable = this.checkConnector();
       if (!isAvailable) {
         throw new Error("Keplr is not available");
       }
       await this.getConnector().enable(chainId);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async experimentalSuggestChain(chainInfo: ChainInfo) {
+    try {
+      const isAvailable = this.checkConnector();
+      if (!isAvailable) {
+        throw new Error("Keplr is not available");
+      }
+      await this.getConnector().experimentalSuggestChain(chainInfo);
     } catch (error) {
       console.error(error);
       throw error;
@@ -43,6 +57,7 @@ export class KeplrAdapter implements GrazAdapter {
         address: key.address,
         bech32Address: key.bech32Address,
         pubKey: key.pubKey,
+        algo: key.algo,
       };
     } catch (error) {
       console.error(error);

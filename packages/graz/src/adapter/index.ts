@@ -5,6 +5,7 @@ export interface AccountData {
   address: Uint8Array;
   bech32Address: string;
   pubKey: Uint8Array;
+  algo: string;
 }
 
 export interface Connector {
