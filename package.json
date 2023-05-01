@@ -18,6 +18,7 @@
     "lint": "turbo run lint",
     "prepare": "husky install",
     "release": "turbo run build --filter=graz && pnpm publish --filter graz",
+    "release-adapter": "turbo run build --filter=\"graz-adapter-*\" && pnpm publish --filter=\"graz-adapter-*\"",
     "templates": "pnpm --dir templates/default",
     "test": "turbo run test"
   },
