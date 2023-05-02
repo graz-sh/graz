@@ -216,27 +216,25 @@ importers:
         version: 4.8.2
 
   packages/graz-adapter-keplr:
-    dependencies:
-      graz:
-        specifier: '*'
-        version: link:../graz
     devDependencies:
       '@types/node':
         specifier: ^16
         version: 16.11.57
+      graz:
+        specifier: '*'
+        version: link:../graz
       typescript:
         specifier: ^4
         version: 4.8.2
 
   packages/graz-adapter-leap:
-    dependencies:
-      graz:
-        specifier: '*'
-        version: link:../graz
     devDependencies:
       '@types/node':
         specifier: ^16
         version: 16.11.57
+      graz:
+        specifier: '*'
+        version: link:../graz
       typescript:
         specifier: ^4
         version: 4.8.2
