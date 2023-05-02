@@ -4,6 +4,7 @@ import type { AccountData, GrazAdapter } from "graz";
 export class LeapAdapter implements GrazAdapter {
   name = "Leap";
   id = "leap";
+  keystoreEvent = "leap_keystorechange";
 
   private getConnector() {
     if (typeof window.leap !== "undefined") return window.leap;
