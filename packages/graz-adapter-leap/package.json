@@ -1,7 +1,7 @@
 {
   "name": "graz-adapter-leap",
   "description": "Graz adapter for Leap Wallet",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": "https://github.com/strangelove-ventures/graz.git",
   "homepage": "https://github.com/strangelove-ventures/graz",
   "bugs": "https://github.com/strangelove-ventures/graz/issues",
@@ -16,11 +16,12 @@
     "dev": "tsup --watch",
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\""
   },
-  "dependencies": {
-    "graz": "*"
+  "peerDependencies": {
+    "graz": ">=0.0.37"
   },
   "devDependencies": {
     "@types/node": "^16",
+    "graz": "*",
     "typescript": "^4"
   },
   "keywords": [
