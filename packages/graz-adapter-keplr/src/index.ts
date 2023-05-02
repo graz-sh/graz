@@ -4,6 +4,7 @@ import type { AccountData, GrazAdapter } from "graz";
 export class KeplrAdapter implements GrazAdapter {
   name = "Keplr";
   id = "keplr";
+  keystoreEvent = "keplr_keystorechange";
 
   private getConnector() {
     if (typeof window.keplr !== "undefined") return window.keplr;
