@@ -8,7 +8,7 @@ export class LeapAdapter implements GrazAdapter {
 
   private getConnector() {
     if (typeof window.leap !== "undefined") return window.leap;
-    throw new Error("window.keplr is not defined");
+    throw new Error("window.leap is not defined");
   }
 
   checkConnector() {
@@ -25,7 +25,7 @@ export class LeapAdapter implements GrazAdapter {
     try {
       const isAvailable = this.checkConnector();
       if (!isAvailable) {
-        throw new Error("Keplr is not available");
+        throw new Error("Leap is not available");
       }
       await this.getConnector().enable(chainId);
     } catch (error) {
@@ -38,7 +38,7 @@ export class LeapAdapter implements GrazAdapter {
     try {
       const isAvailable = this.checkConnector();
       if (!isAvailable) {
-        throw new Error("Keplr is not available");
+        throw new Error("Leap is not available");
       }
       await this.getConnector().experimentalSuggestChain(chainInfo);
     } catch (error) {
@@ -51,7 +51,7 @@ export class LeapAdapter implements GrazAdapter {
     try {
       const isAvailable = this.checkConnector();
       if (!isAvailable) {
-        throw new Error("Keplr is not available");
+        throw new Error("Leap is not available");
       }
       const key = await this.getConnector().getKey(chainId);
       return {
@@ -70,7 +70,7 @@ export class LeapAdapter implements GrazAdapter {
     try {
       const isAvailable = this.checkConnector();
       if (!isAvailable) {
-        throw new Error("Keplr is not available");
+        throw new Error("Leap is not available");
       }
       const signer = this.getConnector().getOfflineSigner(chainId);
       return signer;
@@ -84,7 +84,7 @@ export class LeapAdapter implements GrazAdapter {
     try {
       const isAvailable = this.checkConnector();
       if (!isAvailable) {
-        throw new Error("Keplr is not available");
+        throw new Error("Leap is not available");
       }
       const signer = this.getConnector().getOfflineSignerOnlyAmino(chainId);
       return signer;
@@ -98,7 +98,7 @@ export class LeapAdapter implements GrazAdapter {
     try {
       const isAvailable = this.checkConnector();
       if (!isAvailable) {
-        throw new Error("Keplr is not available");
+        throw new Error("Leap is not available");
       }
       const signer = await this.getConnector().getOfflineSignerAuto(chainId);
       return signer;
