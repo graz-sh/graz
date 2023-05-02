@@ -19,4 +19,5 @@ export interface Connector {
 export interface GrazAdapter extends Connector {
   name: string;
   id: string;
+  keystoreEvent: string;
 }
