@@ -71,10 +71,5 @@
     "strangelove-ventures",
     "use-keplr"
   ],
-  "lint-staged": {
-    "**/*.ts": [
-      "eslint --fix"
-    ]
-  },
   "license": "MIT"
 }
