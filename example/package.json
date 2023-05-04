@@ -23,10 +23,5 @@
     "@types/node": "^18.16.3",
     "@types/react": "^18.2.5"
   },
-  "lint-staged": {
-    "**/*.{js,cjs,mjs,ts,tsx}": [
-      "eslint --fix"
-    ]
-  },
   "private": true
 }
