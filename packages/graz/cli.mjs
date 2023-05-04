@@ -1,24 +1,23 @@
 #!/usr/bin/env node
 // @ts-check
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { Bech32Address } from "@keplr-wallet/cosmos";
 import arg from "arg";
 import { createClient, createTestnetClient } from "cosmos-directory-client";
-import * as fs from "fs/promises";
-import * as path from "path";
-import { fileURLToPath } from "url";
 
 import pmap from "./compiled/p-map/index.mjs";
 
-function isNumber(char) {
-  return /^\d+$/.test(char);
-}
+const isNumber = (char) => /^\d+$/.test(char);
 
-function chainNaming(name) {
+const chainNaming = (name) => {
   if (isNumber(name[0])) {
     return `_${name}`;
   }
   return name;
-}
+};
 
 const HELP_MESSAGE = `Usage: graz [options]
 
@@ -52,7 +51,7 @@ const args = arg({
   "-h": "--help",
 });
 
-async function cli() {
+const cli = async () => {
   if (args["--help"]) {
     console.log(HELP_MESSAGE);
     return;
@@ -64,9 +63,9 @@ async function cli() {
   }
 
   console.log(HELP_MESSAGE);
-}
+};
 
-async function generate() {
+const generate = async () => {
   console.log(`⏳\tGenerating chain list from cosmos.directory...`);
   if (args["--authz"]) {
     console.log(`✍️\tDetected authz flag, generating only compatible chains...`);
@@ -117,52 +116,47 @@ async function generate() {
   ]);
 
   console.log('✨\tGenerate complete! You can import `mainnetChains` and `testnetChains` from "graz/chains".\n');
-}
+};
 
 /** @param {string[]} args */
-function chainsDir(...args) {
-  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "chains", ...args);
-}
+const chainsDir = (...args) => path.resolve(path.dirname(fileURLToPath(import.meta.url)), "chains", ...args);
 
 /**
  * @param {Record<string, import(".").ChainInfoWithPath>} record
  * @param {Record<string, boolean>} opts
  */
-function makeChainMap(record, { testnet = false } = {}) {
-  return Object.keys(record)
+const makeChainMap = (record, { testnet = false } = {}) =>
+  Object.keys(record)
     .map((k) => `  ${chainNaming(k)}: ${chainNaming(k)},`)
     .join("\n");
-}
 
 /**
  * @param {Record<string, import(".").ChainInfoWithPath>} record
  * @param {Record<string, boolean>} opts
  */
-function makeDefs(record, { mjs = false, testnet = false } = {}) {
-  return Object.entries(record)
+const makeDefs = (record, { mjs = false, testnet = false } = {}) =>
+  Object.entries(record)
     .map(([k, v]) => {
       const jsVariable = `${chainNaming(k)}`;
       const jsChainInfo = JSON.stringify(v, null, 2);
       return `${mjs ? "export " : ""}const ${jsVariable} = defineChainInfo(${jsChainInfo});\n`;
     })
     .join("");
-}
 
 /**
  * @param {Record<string, import(".").ChainInfoWithPath>} record
  * @param {Record<string, boolean>} opts
  */
-function makeExports(record, { testnet = false } = {}) {
-  return Object.keys(record)
+const makeExports = (record, { testnet = false } = {}) =>
+  Object.keys(record)
     .map((k) => `  ${chainNaming(k)},`)
     .join("\n");
-}
 
 /**
  * @param {import("cosmos-directory-client").DirectoryClient} client
  * @param {{ filter?: string }} opts
  */
-async function makeRecord(client, { filter = "" } = {}) {
+const makeRecord = async (client, { filter = "" } = {}) => {
   const paths = filter
     ? filter.split(",").map((path) => ({ path }))
     : await client.fetchChains().then((c) => c.chains.map(({ path }) => ({ path })));
@@ -220,6 +214,6 @@ async function makeRecord(client, { filter = "" } = {}) {
     }
   });
   return record;
-}
+};
 
 void cli();
