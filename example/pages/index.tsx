@@ -16,8 +16,8 @@ const HomePage: NextPage = () => {
         <HStack>
           <ConnectStatus />
         </HStack>
-        {!accountData && (isConnecting || isReconnecting) && <RecentChain />}
-        {accountData && (
+        {!accountData && (isConnecting || isReconnecting) ? <RecentChain /> : null}
+        {accountData ? (
           <>
             <Text>
               Wallet name: <b>{accountData.name}</b>
@@ -29,7 +29,7 @@ const HomePage: NextPage = () => {
             <BalanceList />
             <ChainSwitcher />
           </>
-        )}
+        ) : null}
         <HStack align="end" pt={4}>
           <ToggleTheme />
           <Spacer />
