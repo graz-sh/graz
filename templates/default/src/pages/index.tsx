@@ -9,8 +9,8 @@ const HomePage = () => {
 
   return (
     <Stack w="full" gap={2}>
-      {!accountData && (isConnecting || isReconnecting) && <RecentChain />}
-      {accountData && (
+      {!accountData && (isConnecting || isReconnecting) ? <RecentChain /> : null}
+      {accountData ? (
         <>
           <Heading size="lg">Welcome {accountData.name}</Heading>
           <Text noOfLines={1} wordBreak="break-all">
@@ -18,7 +18,7 @@ const HomePage = () => {
           </Text>
           <ChainSwitcher />
         </>
-      )}
+      ) : null}
     </Stack>
   );
 };

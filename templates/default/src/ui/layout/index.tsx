@@ -18,7 +18,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
         <Divider />
         <Center>
           <Container maxW="4xl" mx="auto" pt={4}>
-            {(isConnecting || isReconnecting) && <Text>Connecting...</Text>}
+            {isConnecting || isReconnecting ? <Text>Connecting...</Text> : null}
             {!isConnected && !(isConnecting || isReconnecting) ? (
               <Box>
                 <Heading>Welcome to Create Graz App</Heading>

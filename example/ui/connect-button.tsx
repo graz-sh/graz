@@ -31,16 +31,14 @@ export const ConnectButton: FC = () => {
     onSuccess: () => console.log("wallet disconnected"),
   });
 
-  function handleConnect() {
-    return isConnected ? disconnect() : connect();
-  }
+  const handleConnect = () => (isConnected ? disconnect() : connect());
 
   return (
     <ButtonGroup alignSelf="end" isAttached variant="outline">
       <Button isDisabled={!isSupported} isLoading={isConnecting || isReconnecting} onClick={handleConnect}>
         {isConnected ? "Disconnect" : "Connect"} Wallet
       </Button>
-      {isConnected && <IconButton aria-label="refresh" icon={<>🔄</>} onClick={() => void reconnect()} />}
+      {isConnected ? <IconButton aria-label="refresh" icon={<>🔄</>} onClick={() => void reconnect()} /> : null}
     </ButtonGroup>
   );
 };

@@ -29,10 +29,10 @@ export const WalletConnectButton = () => {
 
   const { disconnect } = useDisconnect();
 
-  function handleConnect(wallet: WalletType) {
+  const handleConnect = (wallet: WalletType) => {
     onClose();
     return connect({ chain: mainnetChains.cosmoshub, walletType: wallet });
-  }
+  };
 
   return (
     <>

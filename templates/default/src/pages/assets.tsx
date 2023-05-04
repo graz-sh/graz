@@ -43,11 +43,11 @@ const Assets = () => {
           </Tbody>
         </Table>
 
-        {balances.isLoading && (
+        {balances.isLoading ? (
           <Center>
             <Spinner />
           </Center>
-        )}
+        ) : null}
       </TableContainer>
     </Stack>
   );
