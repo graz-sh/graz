@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 import packageJson from "./package.json";
 
 export default defineConfig(({ watch }) => ({
-  clean: !watch,
+  clean: true,
   dts: true,
   entry: ["src/*.ts"],
   external: [
@@ -13,7 +13,6 @@ export default defineConfig(({ watch }) => ({
     /^@keplr-wallet\/.*/,
   ],
   format: ["cjs", "esm"],
-  inject: ["./inject-react.js"],
   minify: !watch,
   minifyIdentifiers: !watch,
   minifySyntax: !watch,
