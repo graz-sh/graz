@@ -20,9 +20,9 @@
     "graz": ">=0.0.37"
   },
   "devDependencies": {
-    "@types/node": "^16",
+    "@types/node": "^18.16.3",
     "graz": "*",
-    "typescript": "^4"
+    "typescript": "^5.0.4"
   },
   "keywords": [
     "graz",
