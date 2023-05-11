@@ -14,7 +14,7 @@ import { WalletType } from "../types/wallet";
 export const useGrazEvents = () => {
   const isSessionActive =
     typeof window !== "undefined" && window.sessionStorage.getItem(RECONNECT_SESSION_KEY) === "Active";
-  const { activeChain, _reconnect, _onReconnectFailed, _reconnectConnector } = useGrazStore.getState();
+  const { activeChain, _reconnect, _onReconnectFailed, _reconnectConnector } = useGrazStore();
 
   useEffect(() => {
     // will reconnect on refresh
