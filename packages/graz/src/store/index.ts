@@ -3,7 +3,7 @@ import type { Coin, OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-sig
 import type { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import type { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import type { Key } from "@keplr-wallet/types";
-import create from "zustand";
+import { create } from "zustand";
 import type { PersistOptions } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
