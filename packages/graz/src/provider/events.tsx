@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { reconnect } from "../actions/account";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { useGrazStore } from "../store";
+import { WalletType } from "../types/wallet";
 
 /**
  * Graz custom hook to track `keplr_keystorechange` event and reconnect state
@@ -13,7 +14,7 @@ import { useGrazStore } from "../store";
 export const useGrazEvents = () => {
   const isSessionActive =
     typeof window !== "undefined" && window.sessionStorage.getItem(RECONNECT_SESSION_KEY) === "Active";
-  const { activeChain, _reconnect, _onReconnectFailed } = useGrazStore.getState();
+  const { activeChain, _reconnect, _onReconnectFailed, _reconnectConnector } = useGrazStore.getState();
 
   useEffect(() => {
     // will reconnect on refresh
@@ -31,24 +32,27 @@ export const useGrazEvents = () => {
   }, []);
 
   useEffect(() => {
-    window.addEventListener(
-      "keplr_keystorechange",
-      () =>
-        void reconnect({
-          onError: _onReconnectFailed,
-        }),
-    );
-    return () => {
-      window.removeEventListener(
-        "keplr_keystorechange",
+    if (_reconnectConnector) {
+      window.addEventListener(
+        _reconnectConnector === WalletType.KEPLR ? "keplr_keystorechange" : "leap_keystorechange",
         () =>
           void reconnect({
             onError: _onReconnectFailed,
           }),
       );
-    };
+      return () => {
+        window.removeEventListener(
+          _reconnectConnector === WalletType.KEPLR ? "keplr_keystorechange" : "leap_keystorechange",
+          () =>
+            void reconnect({
+              onError: _onReconnectFailed,
+            }),
+        );
+      };
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [_reconnectConnector]);
 
   return null;
 };
