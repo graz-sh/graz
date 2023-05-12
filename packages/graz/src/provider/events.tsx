@@ -33,22 +33,33 @@ export const useGrazEvents = () => {
 
   useEffect(() => {
     if (_reconnectConnector) {
-      window.addEventListener(
-        _reconnectConnector === WalletType.KEPLR ? "keplr_keystorechange" : "leap_keystorechange",
-        () =>
-          void reconnect({
-            onError: _onReconnectFailed,
-          }),
-      );
-      return () => {
-        window.removeEventListener(
+      if (_reconnectConnector === WalletType.COSMOSTATION) {
+        window.cosmostation.cosmos.on(
+          "accountChanged",
+          () =>
+            void reconnect({
+              onError: _onReconnectFailed,
+            }),
+        );
+      }
+      if (_reconnectConnector === WalletType.KEPLR || _reconnectConnector === WalletType.LEAP) {
+        window.addEventListener(
           _reconnectConnector === WalletType.KEPLR ? "keplr_keystorechange" : "leap_keystorechange",
           () =>
             void reconnect({
               onError: _onReconnectFailed,
             }),
         );
-      };
+        return () => {
+          window.removeEventListener(
+            _reconnectConnector === WalletType.KEPLR ? "keplr_keystorechange" : "leap_keystorechange",
+            () =>
+              void reconnect({
+                onError: _onReconnectFailed,
+              }),
+          );
+        };
+      }
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

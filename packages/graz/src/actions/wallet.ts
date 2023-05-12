@@ -54,12 +54,32 @@ export const getKeplr = (): Keplr => {
  * }
  * ```
  *
- * @see https://docs.keplr.app
+ * @see https://docs.leapwallet.io/cosmos/for-dapps-connect-to-leap/add-leap-to-existing-keplr-integration
  */
 export const getLeap = (): Keplr => {
   if (typeof window.leap !== "undefined") return window.leap;
   useGrazStore.getState()._notFoundFn();
   throw new Error("window.leap is not defined");
+};
+
+/**
+ * Function to return cosmostation object (which is {@link Keplr}) and throws and error if it does not exist on `window`.
+ *
+ * @example
+ * ```ts
+ * try {
+ *   const cosmostation = getCosmostation();
+ * } catch (error: Error) {
+ *   console.error(error.message);
+ * }
+ * ```
+ *
+ * @see https://docs.cosmostation.io/integration-extension/cosmos/integrate-keplr
+ */
+export const getCosmostation = (): Keplr => {
+  if (typeof window.cosmostation.providers.keplr !== "undefined") return window.cosmostation.providers.keplr;
+  useGrazStore.getState()._notFoundFn();
+  throw new Error("window.cosmostation.providers.keplr is not defined");
 };
 
 /**
@@ -81,6 +101,9 @@ export const getWallet = (type: WalletType = useGrazStore.getState().walletType)
     }
     case WalletType.LEAP: {
       return getLeap();
+    }
+    case WalletType.COSMOSTATION: {
+      return getCosmostation();
     }
     default: {
       throw new Error("Unknown wallet type");
