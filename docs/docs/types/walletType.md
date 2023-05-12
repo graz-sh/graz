@@ -13,9 +13,33 @@
 </p>
 </details>
 
+#### Usage
+
+```tsx
+import { useAccount, useConnect, mainnetChains, WalletType } from "graz";
+
+function App() {
+  const { connect } = useConnect();
+  const { isConnected, account } = useAccount();
+
+  return (
+    <div>
+      {isConnected ? (
+        account.bech32Address
+      ) : (
+        <button onClick={() => connect({ chain: mainnetChains.cosmoshub, walletType: WalletType.LEAP })}>
+          Connect
+        </button>
+      )}
+    </div>
+  );
+}
+```
+
 ```tsx
 enum WalletType {
   KEPLR = "keplr",
   LEAP = "leap",
+  COSMOSTATION = "cosmostation",
 }
 ```

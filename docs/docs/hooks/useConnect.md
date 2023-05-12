@@ -13,7 +13,7 @@ function App() {
 
   return (
     <div>
-      {isConnected ? account.bech32Address : <button onClick={() => connect(mainnetChains.cosmos)}>Connect</button>}
+      {isConnected ? account.bech32Address : <button onClick={() => connect({ chain: mainnetChains.cosmoshub, walletType: wallet })>Connect</button>}
     </div>
   );
 }
