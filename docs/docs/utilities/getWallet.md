@@ -5,11 +5,11 @@ Function to return wallet object based on given `WalletType` or from store and t
 #### Usage
 
 ```tsx
-import { getWallet } from "graz";
+import { getWallet, WalletType } from "graz";
 
 try {
   const wallet = getWallet();
-  const keplr = getWallet("keplr");
+  const keplr = getWallet(WalletType.KEPLR);
 } catch (error: Error) {
   console.error(error.message);
 }

@@ -9,7 +9,7 @@ sidebar_position: 1
 ## Features
 
 - 🪝 20+ hooks for interfacing with wallets, clients, signers, etc. (connecting, view balances, send tokens, etc.)
-- 💳 Multiple wallet supports
+- 💳 Multiple wallet supports (Keplr, Leap, Cosmostation)
 - ⚙️ Generate mainnet & testnet `ChainInfo`
 - 📚 Built-in caching, request deduplication, and all the good stuff from [`@tanstack/react-query`](https://tanstack.com/query) and [`zustand`](https://github.com/pmndrs/zustand)
 - 🔄 Auto refresh on wallet and network change
