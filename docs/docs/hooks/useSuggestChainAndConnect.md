@@ -71,7 +71,14 @@ Object params
 
 - onError?: `(error: unknown, data: ChainInfo) => void`
 - onMutate?: `(data: chainInfo) => void`
-- onSuccess?: `(data: chainInfo) => void`
+- onSuccess?:
+  ```tsx
+  (data: {
+    account: Key;
+    walletType: WalletType;
+    chain: ChainInfo;
+  }) => void
+  ```
 
 #### Return Value
 

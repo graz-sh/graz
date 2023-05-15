@@ -17,8 +17,18 @@ function App() {
 
 Object params
 
-- onConnect?: `({ account: Key; isReconnect: boolean; }) => void`
+- onConnect?: `( ConnectResult & { isReconnect: boolean; }) => void`
 - onDisconnect?: `() => void`
+
+##### `ConnectResult`
+
+```tsx
+{
+  account: Key;
+  walletType: WalletType;
+  chain: GrazChain;
+}
+```
 
 #### Return Value
 
