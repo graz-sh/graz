@@ -47,7 +47,17 @@ Object params
 
 - onError?: `(error: unknown, data: ConnectArgs) => void`
 - onMutate?: `(data: ConnectArgs) => void`
-- onSuccess?: `(data: ConnectArgs) => void`
+- onSuccess?: `(data: ConnectResult) => void`
+
+##### `ConnectResult`
+
+```tsx
+{
+  account: Key;
+  walletType: WalletType;
+  chain: GrazChain;
+}
+```
 
 #### Return Value
 
