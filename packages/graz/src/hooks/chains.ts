@@ -1,10 +1,11 @@
 import type { QueryClient, StakingExtension } from "@cosmjs/stargate";
 import type { BondStatusString } from "@cosmjs/stargate/build/modules/staking/queries";
-import type { AppCurrency, ChainInfo, Key } from "@keplr-wallet/types";
+import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { QueryValidatorsResponse } from "cosmjs-types/cosmos/staking/v1beta1/query";
 
+import type { ConnectResult } from "../actions/account";
 import type { SuggestChainAndConnectArgs } from "../actions/chains";
 import { clearRecentChain, getActiveChainCurrency, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import type { GrazChain } from "../chains";
@@ -131,10 +132,7 @@ export const useSuggestChain = ({ onError, onLoading, onSuccess }: UseSuggestCha
   };
 };
 
-export type UseSuggestChainAndConnectArgs = MutationEventArgs<
-  SuggestChainAndConnectArgs,
-  { chain: ChainInfo; account: Key }
->;
+export type UseSuggestChainAndConnectArgs = MutationEventArgs<SuggestChainAndConnectArgs, ConnectResult>;
 
 /**
  * graz mutation hook to suggest chain to a Wallet and connect account
