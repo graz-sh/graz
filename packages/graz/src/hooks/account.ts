@@ -1,11 +1,10 @@
 import type { Coin } from "@cosmjs/proto-signing";
-import type { Key } from "@keplr-wallet/types";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import shallow from "zustand/shallow";
 
-import type { ConnectArgs } from "../actions/account";
+import type { ConnectArgs, ConnectResult } from "../actions/account";
 import { connect, disconnect, reconnect } from "../actions/account";
 import { getBalances, getBalanceStaked } from "../actions/methods";
 import { useGrazStore } from "../store";
@@ -13,7 +12,7 @@ import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
 
 export interface UseAccountArgs {
-  onConnect?: (args: { account: Key; isReconnect: boolean }) => void;
+  onConnect?: (args: ConnectResult & { isReconnect: boolean }) => void;
   onDisconnect?: () => void;
 }
 
@@ -45,7 +44,12 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
       (stat, prevStat) => {
         if (stat === "connected") {
           const current = useGrazStore.getState();
-          onConnect?.({ account: current.account!, isReconnect: prevStat === "reconnecting" });
+          onConnect?.({
+            account: current.account!,
+            chain: current.activeChain!,
+            walletType: current.walletType,
+            isReconnect: prevStat === "reconnecting",
+          });
         }
         if (stat === "disconnected") {
           onDisconnect?.();
@@ -128,7 +132,7 @@ export const useBalance = (denom: string, bech32Address?: string): UseQueryResul
   return query;
 };
 
-export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, Key>;
+export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, ConnectResult>;
 
 /**
  * graz mutation hook to execute wallet connection with optional arguments to
@@ -169,7 +173,7 @@ export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArg
   const mutation = useMutation(queryKey, connect, {
     onError: (err, args) => Promise.resolve(onError?.(err, args)),
     onMutate: onLoading,
-    onSuccess: (account) => Promise.resolve(onSuccess?.(account)),
+    onSuccess: (connectResult) => Promise.resolve(onSuccess?.(connectResult)),
   });
   const { data: isSupported } = useCheckWallet();
   return {

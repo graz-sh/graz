@@ -17,7 +17,13 @@ export type ConnectArgs = Maybe<{
   autoReconnect?: boolean;
 }>;
 
-export const connect = async (args?: ConnectArgs): Promise<Key> => {
+export interface ConnectResult {
+  account: Key;
+  walletType: WalletType;
+  chain: GrazChain;
+}
+
+export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   try {
     const { defaultChain, recentChain, walletType } = useGrazStore.getState();
 
@@ -72,7 +78,7 @@ export const connect = async (args?: ConnectArgs): Promise<Key> => {
     });
     typeof window !== "undefined" && window.sessionStorage.setItem(RECONNECT_SESSION_KEY, "Active");
 
-    return account;
+    return { account, walletType: currentWalletType, chain };
   } catch (error) {
     if (useGrazStore.getState().account === null) {
       useGrazStore.setState({ status: "disconnected" });
