@@ -18,14 +18,12 @@ export const ConnectButton: FC = () => {
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   const { isConnected, isConnecting, isReconnecting, reconnect } = useAccount({
-    onConnect: ({ account, isReconnect }) => {
-      if (!isReconnect) {
-        toast({
-          status: "success",
-          title: "Wallet connected!",
-          description: `Connected as ${account.name}`,
-        });
-      }
+    onConnect: ({ account, walletType, chain }) => {
+      toast({
+        status: "success",
+        title: `Wallet connected! using ${walletType} to ${chain.chainId}`,
+        description: `Connected as ${account.name}`,
+      });
     },
     onDisconnect: () => {
       toast({
