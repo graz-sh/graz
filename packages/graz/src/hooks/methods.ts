@@ -10,7 +10,9 @@ import type {
   InstantiateContractMutationArgs,
   SendIbcTokensArgs,
   SendTokensArgs,
+  SignAndBroadcastArgs,
 } from "../actions/methods";
+import { SignAndBroadcast } from "../actions/methods";
 import {
   executeContract,
   getQueryRaw,
@@ -21,6 +23,7 @@ import {
 } from "../actions/methods";
 import type { MutationEventArgs } from "../types/hooks";
 import { useAccount } from "./account";
+import { useOfflineSigners } from "./account";
 
 /**
  * graz mutation hook to send tokens. Note: if `senderAddress` undefined, it will use current connected account address.
@@ -112,6 +115,30 @@ export const useSendIbcTokens = ({
     isSuccess: mutation.isSuccess,
     sendIbcTokens: mutation.mutate,
     sendIbcTokensAsync: mutation.mutateAsync,
+    status: mutation.status,
+  };
+};
+export const useSignAndBroadcast = async ({
+  onError,
+  onLoading,
+  onSuccess,
+}: MutationEventArgs<SignAndBroadcastArgs, DeliverTxResponse> = {}) => {
+  const { signer } = useOfflineSigners();
+  const signerAddress = signer ? (await signer.getAccounts())[0]?.address : "";
+
+  const queryKey = ["USE_SIGN_AND_BROADCAST", onError, onLoading, onSuccess, signerAddress];
+  const mutation = useMutation(queryKey, (args: SignAndBroadcastArgs) => SignAndBroadcast({ signerAddress, ...args }), {
+    onError: (err, data) => Promise.resolve(onError?.(err, data)),
+    onMutate: onLoading,
+    onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
+  });
+
+  return {
+    error: mutation.error,
+    isLoading: mutation.isLoading,
+    isSuccess: mutation.isSuccess,
+    signAndBroadcast: mutation.mutate,
+    signAndBroadcastAsync: mutation.mutateAsync,
     status: mutation.status,
   };
 };

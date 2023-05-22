@@ -1,5 +1,5 @@
 import type { InstantiateOptions } from "@cosmjs/cosmwasm-stargate";
-import type { Coin } from "@cosmjs/proto-signing";
+import type { Coin, EncodeObject } from "@cosmjs/proto-signing";
 import type { DeliverTxResponse, StdFee } from "@cosmjs/stargate";
 import type { Height } from "cosmjs-types/ibc/core/client/v1/client";
 
@@ -104,6 +104,24 @@ export const sendIbcTokens = async ({
   );
 };
 
+// https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#signAndBroadcast
+export interface SignAndBroadcastArgs {
+  signerAddress?: string;
+  messages: readonly EncodeObject[];
+  fee: number | StdFee | "auto";
+  memo?: string;
+}
+
+export const SignAndBroadcast = async ({ signerAddress, messages, fee, memo }: SignAndBroadcastArgs) => {
+  const { signingClients, defaultSigningClient } = useGrazStore.getState();
+  if (!signingClients) {
+    throw new Error("No connected account detected");
+  }
+  if (!signerAddress) {
+    throw new Error("signerAddress is not defined");
+  }
+  return signingClients[defaultSigningClient].signAndBroadcast(signerAddress, messages, fee, memo);
+};
 export interface InstantiateContractArgs<Message extends Record<string, unknown>> {
   msg: Message;
   label: string;
