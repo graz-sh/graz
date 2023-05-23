@@ -26,7 +26,8 @@
     "clean": "rm -rf dist/*",
     "cli": "node cli.mjs",
     "dev": "tsup --watch",
-    "lint": "eslint --fix \"src/**/*.{ts,tsx}\""
+    "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "^0.30.1",

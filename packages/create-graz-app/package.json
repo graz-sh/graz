@@ -16,6 +16,7 @@
   "scripts": {
     "build": "ncc build index.ts -m",
     "dev": "ncc build index.ts -w",
+    "prepublishOnly": "pnpm build",
     "start": "ncc run index.ts"
   },
   "devDependencies": {
