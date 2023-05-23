@@ -1,7 +1,8 @@
+import path from "node:path";
+
 import chalk from "chalk";
 import { Command } from "commander";
-import path from "path";
-import prompts from "prompts";
+import { default as prompts } from "prompts";
 
 import { createApp } from "./create-apps";
 import type { PackageManager } from "./helpers/get-pkg-manager";

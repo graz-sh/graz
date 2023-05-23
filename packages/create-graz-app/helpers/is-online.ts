@@ -1,8 +1,8 @@
-import { execSync } from "child_process";
-import dns from "dns";
-import url from "url";
+import { execSync } from "node:child_process";
+import dns from "node:dns";
+import url from "node:url";
 
-function getProxy(): string | undefined {
+const getProxy = (): string | undefined => {
   if (process.env.https_proxy) {
     return process.env.https_proxy;
   }
@@ -13,10 +13,10 @@ function getProxy(): string | undefined {
   } catch (e) {
     return undefined;
   }
-}
+};
 
-export function getOnline(): Promise<boolean> {
-  return new Promise((resolve) => {
+export const getOnline = (): Promise<boolean> =>
+  new Promise((resolve) => {
     dns.lookup("registry.yarnpkg.com", (registryErr) => {
       if (!registryErr) {
         return resolve(true);
@@ -37,4 +37,3 @@ export function getOnline(): Promise<boolean> {
       });
     });
   });
-}

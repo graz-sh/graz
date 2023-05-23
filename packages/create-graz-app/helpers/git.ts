@@ -1,25 +1,26 @@
-import { execSync } from "child_process";
-import path from "path";
-import rimraf from "rimraf";
+import { execSync } from "node:child_process";
+import path from "node:path";
 
-function isInGitRepository(): boolean {
+import { rimraf } from "rimraf";
+
+const isInGitRepository = (): boolean => {
   try {
     execSync("git rev-parse --is-inside-work-tree", { stdio: "ignore" });
     return true;
   } catch (_) {
     return false;
   }
-}
-function isInMercurialRepository(): boolean {
+};
+const isInMercurialRepository = (): boolean => {
   try {
     execSync("hg --cwd . root", { stdio: "ignore" });
     return true;
   } catch (_) {
     return false;
   }
-}
+};
 
-export function tryGitInit(root: string): boolean {
+export const tryGitInit = (root: string): boolean => {
   let didInit = false;
   try {
     execSync("git --version", { stdio: "ignore" });
@@ -48,4 +49,4 @@ export function tryGitInit(root: string): boolean {
     }
     return false;
   }
-}
+};

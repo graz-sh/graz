@@ -1,10 +1,11 @@
-import { createWriteStream, promises as fs } from "fs";
-import got from "got";
-import { tmpdir } from "os";
-import { join } from "path";
-import { Stream } from "stream";
+import { createWriteStream, promises as fs } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { Stream } from "node:stream";
+import { promisify } from "node:util";
+
+import { got } from "got";
 import tar from "tar";
-import { promisify } from "util";
 
 const pipeline = promisify(Stream.pipeline);
 
@@ -15,13 +16,13 @@ export interface RepoInfo {
   filePath?: string;
 }
 
-async function downloadTar(url: string) {
+const downloadTar = async (url: string) => {
   const tempFile = join(tmpdir(), `next.js-cna-example.temp-${Date.now()}`);
   await pipeline(got.stream(url), createWriteStream(tempFile));
   return tempFile;
-}
+};
 
-export async function downloadAndExtractRepo(root: string, { username, name, branch, filePath }: RepoInfo) {
+export const downloadAndExtractRepo = async (root: string, { username, name, branch, filePath }: RepoInfo) => {
   const tempFile = await downloadTar(`https://codeload.github.com/${username}/${name}/tar.gz/${branch}`);
 
   await tar.x({
@@ -32,4 +33,4 @@ export async function downloadAndExtractRepo(root: string, { username, name, bra
   });
 
   await fs.unlink(tempFile);
-}
+};
