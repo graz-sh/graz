@@ -54,6 +54,7 @@ export const WalletConnectButton = () => {
             <Button onClick={() => handleConnect(WalletType.KEPLR)}>Keplr</Button>
             <Button onClick={() => handleConnect(WalletType.LEAP)}>Leap</Button>
             <Button onClick={() => handleConnect(WalletType.COSMOSTATION)}>Cosmostation</Button>
+            <Button onClick={() => handleConnect(WalletType.WALLETCONNECT)}>WalletConnect</Button>
           </Stack>
         </Modal>
       )}

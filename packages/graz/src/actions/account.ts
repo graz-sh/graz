@@ -43,15 +43,11 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
       if (isReconnecting) return { status: "reconnecting" };
       return { status: "connecting" };
     });
-
     await wallet.enable(chain.chainId);
-
     const offlineSigner = wallet.getOfflineSigner(chain.chainId);
     const offlineSignerAmino = wallet.getOfflineSignerOnlyAmino(chain.chainId);
     const offlineSignerAuto = await wallet.getOfflineSignerAuto(chain.chainId);
-
     const gasPrice = chain.gas ? GasPrice.fromString(`${chain.gas.price}${chain.gas.denom}`) : undefined;
-
     const [account, clients, signingClients] = await Promise.all([
       wallet.getKey(chain.chainId),
       createClients(chain),
@@ -61,7 +57,6 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
         cosmWasmSignerOptions: { gasPrice, ...(args?.signerOpts || {}) },
       }),
     ] as const);
-
     useGrazStore.setState({
       account,
       activeChain: chain,

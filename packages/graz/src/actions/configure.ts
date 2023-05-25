@@ -9,6 +9,7 @@ export interface ConfigureGrazArgs {
   defaultWallet?: WalletType;
   onNotFound?: () => void;
   onReconnectFailed?: () => void;
+  walletConnect?: GrazStore["walletConnect"];
   /**
    * default to true
    */
@@ -19,6 +20,7 @@ export const configureGraz = (args: ConfigureGrazArgs = {}): ConfigureGrazArgs =
   useGrazStore.setState((prev) => ({
     defaultChain: args.defaultChain || prev.defaultChain,
     defaultSigningClient: args.defaultSigningClient || prev.defaultSigningClient,
+    walletConnect: args.walletConnect || prev.walletConnect,
     walletType: args.defaultWallet || prev.walletType,
     _notFoundFn: args.onNotFound || prev._notFoundFn,
     _onReconnectFailed: args.onReconnectFailed || prev._onReconnectFailed,
