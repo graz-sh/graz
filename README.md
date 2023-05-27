@@ -111,4 +111,4 @@ You can read more about available hooks and exports on [Documentation Site](http
 
 ## License
 
-[MIT License, Copyright (c) 2022 Strangelove Ventures](./LICENSE)
+[MIT License, Copyright (c) 2023 Strangelove Ventures](./LICENSE)

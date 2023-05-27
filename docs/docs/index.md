@@ -102,4 +102,4 @@ yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr
 
 ## License
 
-[MIT License, Copyright (c) 2022 Strangelove Ventures](./license)
+[MIT License, Copyright (c) 2023 Strangelove Ventures](./license)

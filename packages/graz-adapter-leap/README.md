@@ -6,4 +6,4 @@
 
 React hooks for Cosmos. Learn more about graz on the [official GitHub repository](https://github.com/strangelove-ventures/graz).
 
-[MIT License, Copyright (c) 2022 Strangelove Ventures](./LICENSE)
+[MIT License, Copyright (c) 2023 Strangelove Ventures](./LICENSE)
