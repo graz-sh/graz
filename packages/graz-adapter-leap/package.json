@@ -21,7 +21,7 @@
     "graz": ">=0.0.37"
   },
   "devDependencies": {
-    "@types/node": "^20.2.3",
+    "@types/node": "^20.2.5",
     "graz": "*",
     "typescript": "^5.0.4"
   },
