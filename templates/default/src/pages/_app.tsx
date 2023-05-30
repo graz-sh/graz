@@ -15,7 +15,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
       grazOptions={{
         walletConnect: {
           options: {
-            projectId: "baea98874b230c2a8d9c0ae32a98677a",
+            projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
           },
         },
       }}

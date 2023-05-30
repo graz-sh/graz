@@ -105,8 +105,8 @@ interface WalletConnectSignDirectResponse {
 }
 
 export const getWalletConnect = (): Wallet => {
-  if (!useGrazStore.getState().walletConnect?.options) {
-    throw new Error("walletConnect.options is not defined");
+  if (!useGrazStore.getState().walletConnect?.options?.projectId?.trim()) {
+    throw new Error("walletConnect.options.projectId is not defined");
   }
 
   const getSession = (chainId: string) => {

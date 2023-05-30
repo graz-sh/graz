@@ -28,6 +28,12 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     const { defaultChain, recentChain, walletType } = useGrazStore.getState();
 
     const currentWalletType = args?.walletType || walletType;
+
+    const isWalletAvailable = checkWallet(currentWalletType);
+    if (!isWalletAvailable) {
+      throw new Error(`${currentWalletType} is not available`);
+    }
+
     const wallet = getWallet(currentWalletType);
 
     const chain = args?.chain || recentChain || defaultChain;
