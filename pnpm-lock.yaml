@@ -142,8 +142,8 @@ importers:
         specifier: ^7.0.3
         version: 7.0.3
       got:
-        specifier: ^13.0.0
-        version: 13.0.0
+        specifier: ^12.6.0
+        version: 12.6.0
       prompts:
         specifier: ^2.4.2
         version: 2.4.2
@@ -8630,9 +8630,9 @@ packages:
       get-intrinsic: 1.2.1
     dev: true
 
-  /got@13.0.0:
-    resolution: {integrity: sha512-XfBk1CxOOScDcMr9O1yKkNaQyy865NbYs+F7dr4H0LZMVgCj2Le59k6PqbNHoL5ToeaEQUYh6c6yMfVcc6SJxA==}
-    engines: {node: '>=16'}
+  /got@12.6.0:
+    resolution: {integrity: sha512-WTcaQ963xV97MN3x0/CbAriXFZcXCfgxVp91I+Ze6pawQOa7SgzwSx2zIJJsX+kTajMnVs0xcFD1TxZKFqhdnQ==}
+    engines: {node: '>=14.16'}
     dependencies:
       '@sindresorhus/is': 5.3.0
       '@szmarczak/http-timer': 5.0.1
