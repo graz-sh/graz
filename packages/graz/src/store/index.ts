@@ -7,13 +7,13 @@ import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import type { Web3ModalConfig } from "@web3modal/standalone";
 import { create } from "zustand";
 import type { PersistOptions } from "zustand/middleware";
+import { createJSONStorage } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
 import type { GrazChain } from "../chains";
 import { WalletType } from "../types/wallet";
 
-interface GrazInternalStore {
-  activeChain: GrazChain | null;
+export interface GrazInternalStore {
   defaultChain: GrazChain | null;
   defaultSigningClient: "cosmWasm" | "stargate";
   recentChain: GrazChain | null;
@@ -29,8 +29,9 @@ interface GrazInternalStore {
   _onReconnectFailed: () => void;
 }
 
-interface GrazUserStore {
+export interface GrazSessionStore {
   account: Key | null;
+  activeChain: GrazChain | null;
   balances: Coin[] | null;
   clients: {
     cosmWasm: CosmWasmClient;
@@ -47,15 +48,9 @@ interface GrazUserStore {
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
 }
 
-export type GrazPersistedStore = Pick<
-  GrazInternalStore,
-  "activeChain" | "recentChain" | "_reconnect" | "_reconnectConnector"
->;
+export type GrazPersistedStore = Pick<GrazInternalStore, "recentChain" | "_reconnect" | "_reconnectConnector">;
 
-export type GrazStore = GrazInternalStore & GrazUserStore;
-
-const grazInternal: GrazInternalStore = {
-  activeChain: null,
+export const grazInternalDefaultValues: GrazInternalStore = {
   recentChain: null,
   defaultChain: null,
   defaultSigningClient: "stargate",
@@ -71,8 +66,9 @@ const grazInternal: GrazInternalStore = {
   _reconnectConnector: null,
 };
 
-const grazUser: GrazUserStore = {
+export const grazSessionDefaultValues: GrazSessionStore = {
   account: null,
+  activeChain: null,
   balances: null,
   clients: null,
   offlineSigner: null,
@@ -82,20 +78,26 @@ const grazUser: GrazUserStore = {
   status: "disconnected",
 };
 
-export const defaultValues: GrazStore = {
-  ...grazInternal,
-  ...grazUser,
+const sessionOptions: PersistOptions<GrazSessionStore> = {
+  name: "graz-session",
+  version: 1,
+  storage: createJSONStorage(() => sessionStorage),
 };
 
-const persistOptions: PersistOptions<GrazStore, GrazPersistedStore> = {
-  name: "graz",
+const persistOptions: PersistOptions<GrazInternalStore, GrazPersistedStore> = {
+  name: "graz-internal",
   partialize: (x) => ({
-    activeChain: x.activeChain,
     recentChain: x.recentChain,
     _reconnect: x._reconnect,
     _reconnectConnector: x._reconnectConnector,
   }),
-  version: 2,
+  version: 1,
 };
 
-export const useGrazStore = create(subscribeWithSelector(persist(() => defaultValues, persistOptions)));
+export const useGrazSessionStore = create(
+  subscribeWithSelector(persist(() => grazSessionDefaultValues, sessionOptions)),
+);
+
+export const useGrazInternalStore = create(
+  subscribeWithSelector(persist(() => grazInternalDefaultValues, persistOptions)),
+);

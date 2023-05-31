@@ -7,7 +7,7 @@ import { getSdkError } from "@walletconnect/utils";
 // eslint-disable-next-line import/no-named-as-default
 import Long from "long";
 
-import { useGrazStore } from "../store";
+import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Wallet } from "../types/wallet";
 import { WALLET_TYPES, WalletType } from "../types/wallet";
 
@@ -20,7 +20,7 @@ import { WALLET_TYPES, WalletType } from "../types/wallet";
  * const isKeplrSupported = checkWallet("keplr");
  * ```
  */
-export const checkWallet = (type: WalletType = useGrazStore.getState().walletType): boolean => {
+export const checkWallet = (type: WalletType = useGrazInternalStore.getState().walletType): boolean => {
   try {
     getWallet(type);
     return true;
@@ -45,7 +45,7 @@ export const checkWallet = (type: WalletType = useGrazStore.getState().walletTyp
  */
 export const getKeplr = (): Wallet => {
   if (typeof window.keplr !== "undefined") return window.keplr;
-  useGrazStore.getState()._notFoundFn();
+  useGrazInternalStore.getState()._notFoundFn();
   throw new Error("window.keplr is not defined");
 };
 
@@ -65,7 +65,7 @@ export const getKeplr = (): Wallet => {
  */
 export const getLeap = (): Wallet => {
   if (typeof window.leap !== "undefined") return window.leap;
-  useGrazStore.getState()._notFoundFn();
+  useGrazInternalStore.getState()._notFoundFn();
   throw new Error("window.leap is not defined");
 };
 
@@ -85,7 +85,7 @@ export const getLeap = (): Wallet => {
  */
 export const getCosmostation = (): Wallet => {
   if (typeof window.cosmostation.providers.keplr !== "undefined") return window.cosmostation.providers.keplr;
-  useGrazStore.getState()._notFoundFn();
+  useGrazInternalStore.getState()._notFoundFn();
   throw new Error("window.cosmostation.providers.keplr is not defined");
 };
 
@@ -105,12 +105,12 @@ interface WalletConnectSignDirectResponse {
 }
 
 export const getWalletConnect = (): Wallet => {
-  if (!useGrazStore.getState().walletConnect?.options?.projectId?.trim()) {
+  if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
     throw new Error("walletConnect.options.projectId is not defined");
   }
 
   const getSession = (chainId: string) => {
-    const { walletConnect } = useGrazStore.getState();
+    const { walletConnect } = useGrazInternalStore.getState();
     if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
     const lastSession = walletConnect.signClient.session.getAll().at(-1);
 
@@ -127,15 +127,16 @@ export const getWalletConnect = (): Wallet => {
   };
 
   const init = async () => {
-    const { walletConnect } = useGrazStore.getState();
+    const { walletConnect } = useGrazInternalStore.getState();
     if (!walletConnect?.options) throw new Error("walletConnect.options is not defined");
     const signClient = await SignClient.init(walletConnect.options);
-    useGrazStore.setState({ walletConnect: { ...walletConnect, signClient } });
+    useGrazInternalStore.setState({ walletConnect: { ...walletConnect, signClient } });
     return signClient;
   };
 
   const disconnect = async (chainId: string) => {
-    const { walletConnect, account } = useGrazStore.getState();
+    const { walletConnect } = useGrazInternalStore.getState();
+    const { account } = useGrazSessionStore.getState();
     if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
     if (!account) throw new Error("account is not defined");
 
@@ -148,13 +149,13 @@ export const getWalletConnect = (): Wallet => {
   };
 
   const getPairings = () => {
-    const { walletConnect } = useGrazStore.getState();
+    const { walletConnect } = useGrazInternalStore.getState();
     if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
     walletConnect.signClient.session.getAll({});
   };
 
   const deletInactivePairings = async () => {
-    const { walletConnect } = useGrazStore.getState();
+    const { walletConnect } = useGrazInternalStore.getState();
     const signClient = walletConnect?.signClient;
     if (!signClient) throw new Error("walletConnect.signClient is not defined");
     await Promise.all(
@@ -171,7 +172,7 @@ export const getWalletConnect = (): Wallet => {
 
   const enable = async (chainId: string) => {
     const signClient = await init();
-    const { walletConnect } = useGrazStore.getState();
+    const { walletConnect } = useGrazInternalStore.getState();
     if (!walletConnect?.options?.projectId) throw new Error("walletConnect.options.projectId is not defined");
 
     const { Web3Modal } = await import("@web3modal/standalone");
@@ -216,7 +217,7 @@ export const getWalletConnect = (): Wallet => {
   };
 
   const getAccount = async (chainId: string): Promise<AccountData> => {
-    const { walletConnect } = useGrazStore.getState();
+    const { walletConnect } = useGrazInternalStore.getState();
     if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
     const topic = getSession(chainId)?.topic;
     if (!topic) throw new Error("No wallet connect session");
@@ -251,7 +252,8 @@ export const getWalletConnect = (): Wallet => {
 
   const wcSignDirect = async (...args: SignDirectParams) => {
     const [chainId, signer, signDoc] = args;
-    const { walletConnect, account } = useGrazStore.getState();
+    const { walletConnect } = useGrazInternalStore.getState();
+    const { account } = useGrazSessionStore.getState();
     if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
     if (!account) throw new Error("account is not defined");
 
@@ -296,7 +298,8 @@ export const getWalletConnect = (): Wallet => {
 
   const wcSignAmino = async (...args: SignAminoParams) => {
     const [chainId, signer, signDoc, _signOptions] = args;
-    const { walletConnect, account } = useGrazStore.getState();
+    const { walletConnect } = useGrazInternalStore.getState();
+    const { account } = useGrazSessionStore.getState();
     if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
     if (!account) throw new Error("account is not defined");
 
@@ -381,7 +384,7 @@ export const getWalletConnect = (): Wallet => {
  *
  * @see {@link getKeplr}
  */
-export const getWallet = (type: WalletType = useGrazStore.getState().walletType): Wallet => {
+export const getWallet = (type: WalletType = useGrazInternalStore.getState().walletType): Wallet => {
   switch (type) {
     case WalletType.KEPLR: {
       return getKeplr();

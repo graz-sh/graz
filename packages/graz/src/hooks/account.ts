@@ -2,12 +2,12 @@ import type { Coin } from "@cosmjs/proto-signing";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import shallow from "zustand/shallow";
+import { shallow } from "zustand/shallow";
 
 import type { ConnectArgs, ConnectResult } from "../actions/account";
 import { connect, disconnect, reconnect } from "../actions/account";
 import { getBalances, getBalanceStaked } from "../actions/methods";
-import { useGrazStore } from "../store";
+import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
 
@@ -35,19 +35,20 @@ export interface UseAccountArgs {
  * ```
  */
 export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => {
-  const account = useGrazStore((x) => x.account);
-  const status = useGrazStore((x) => x.status);
+  const _account = useGrazSessionStore((x) => x.account);
+  const status = useGrazSessionStore((x) => x.status);
 
   useEffect(() => {
-    return useGrazStore.subscribe(
+    return useGrazSessionStore.subscribe(
       (x) => x.status,
       (stat, prevStat) => {
         if (stat === "connected") {
-          const current = useGrazStore.getState();
+          const { account, activeChain } = useGrazSessionStore.getState();
+          const { walletType } = useGrazInternalStore.getState();
           onConnect?.({
-            account: current.account!,
-            chain: current.activeChain!,
-            walletType: current.walletType,
+            account: account!,
+            chain: activeChain!,
+            walletType,
             isReconnect: prevStat === "reconnecting",
           });
         }
@@ -59,8 +60,8 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
   }, [onConnect, onDisconnect]);
 
   return {
-    data: account,
-    isConnected: Boolean(account),
+    data: _account,
+    isConnected: Boolean(_account),
     isConnecting: status === "connecting",
     isDisconnected: status === "disconnected",
     isReconnecting: status === "reconnecting",
@@ -93,6 +94,9 @@ export const useBalances = (bech32Address?: string): UseQueryResult<Coin[]> => {
   const queryKey = ["USE_BALANCES", address] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalances(_address!), {
     enabled: Boolean(address),
+    refetchOnMount: false,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
   });
 
   return query;
@@ -241,7 +245,7 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
  * ```
  */
 export const useOfflineSigners = () =>
-  useGrazStore(
+  useGrazSessionStore(
     (x) => ({
       signer: x.offlineSigner,
       signerAmino: x.offlineSignerAmino,

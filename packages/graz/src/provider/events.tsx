@@ -3,18 +3,19 @@ import { useEffect } from "react";
 
 import { reconnect } from "../actions/account";
 import { RECONNECT_SESSION_KEY } from "../constant";
-import { useGrazStore } from "../store";
+import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import { WalletType } from "../types/wallet";
 
 /**
- * Graz custom hook to track `keplr_keystorechange` event and reconnect state
+ * Graz custom hook to track `keplr_keystorechange`, `leap_keystorechange`, `accountChanged` event and reconnect state
  *
  * **Note: only use this hook if not using graz's provider component.**
  */
 export const useGrazEvents = () => {
   const isSessionActive =
     typeof window !== "undefined" && window.sessionStorage.getItem(RECONNECT_SESSION_KEY) === "Active";
-  const { activeChain, _reconnect, _onReconnectFailed, _reconnectConnector } = useGrazStore();
+  const { _reconnect, _onReconnectFailed, _reconnectConnector } = useGrazInternalStore();
+  const { activeChain } = useGrazSessionStore();
 
   useEffect(() => {
     // will reconnect on refresh

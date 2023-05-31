@@ -2,11 +2,10 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 
 import type { CreateClientArgs, CreateSigningClientArgs } from "../actions/clients";
-import { createClients, createSigningClients } from "../actions/clients";
-import type { GrazStore } from "../store";
-import { useGrazStore } from "../store";
-
-export * from "./clients/tendermint";
+import { createSigningClients } from "../actions/clients";
+import { createClients } from "../actions/clients";
+import type { GrazSessionStore } from "../store";
+import { useGrazSessionStore } from "../store";
 
 /**
  * graz query hook to retrieve a CosmWasmClient, StargateClient and Tendermint34Client. If there's no given arguments it will be using the current connected client
@@ -22,8 +21,8 @@ export * from "./clients/tendermint";
  * useClient({ rpc: "https://rpc.cosmoshub.strange.love", });
  * ```
  */
-export const useClients = (args?: CreateClientArgs): UseQueryResult<GrazStore["clients"]> => {
-  const currentClient = useGrazStore((x) => x.clients);
+export const useClients = (args?: CreateClientArgs): UseQueryResult<GrazSessionStore["clients"]> => {
+  const currentClient = useGrazSessionStore((x) => x.clients);
 
   const queryKey = ["USE_CLIENTS", args, currentClient] as const;
   const query = useQuery(
@@ -35,8 +34,9 @@ export const useClients = (args?: CreateClientArgs): UseQueryResult<GrazStore["c
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       onSuccess: (clients) => {
-        useGrazStore.setState({ clients });
+        useGrazSessionStore.setState({ clients });
       },
+      initialData: currentClient,
     },
   );
 
@@ -61,10 +61,12 @@ export const useClients = (args?: CreateClientArgs): UseQueryResult<GrazStore["c
  * });
  * ```
  */
-export const useSigningClients = (args?: CreateSigningClientArgs): UseQueryResult<GrazStore["signingClients"]> => {
-  const currentClient = useGrazStore((x) => x.signingClients);
+export const useSigningClients = (
+  args?: CreateSigningClientArgs,
+): UseQueryResult<GrazSessionStore["signingClients"]> => {
+  const currentSigningClient = useGrazSessionStore((x) => x.signingClients);
 
-  const queryKey = ["USE_SIGNING_CLIENTS", args, currentClient] as const;
+  const queryKey = ["USE_SIGNING_CLIENTS", args, currentSigningClient] as const;
   const query = useQuery(
     queryKey,
     ({ queryKey: [, _args, _current] }) => {
@@ -74,8 +76,9 @@ export const useSigningClients = (args?: CreateSigningClientArgs): UseQueryResul
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       onSuccess: (signingClients) => {
-        useGrazStore.setState({ signingClients });
+        useGrazSessionStore.setState({ signingClients });
       },
+      initialData: currentSigningClient,
     },
   );
 

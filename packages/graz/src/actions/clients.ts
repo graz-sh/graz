@@ -6,13 +6,13 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 
 import type { GrazChain } from "../chains";
-import type { GrazStore } from "../store";
+import type { GrazSessionStore } from "../store";
 
 export * from "./clients/tendermint";
 
 export type CreateClientArgs = Pick<GrazChain, "rpc" | "rpcHeaders">;
 
-export const createClients = async ({ rpc, rpcHeaders }: CreateClientArgs): Promise<GrazStore["clients"]> => {
+export const createClients = async ({ rpc, rpcHeaders }: CreateClientArgs): Promise<GrazSessionStore["clients"]> => {
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
   const [cosmWasm, stargate, tendermint] = await Promise.all([
     SigningCosmWasmClient.connect(endpoint),
@@ -28,7 +28,9 @@ export type CreateSigningClientArgs = CreateClientArgs & {
   stargateSignerOptions?: SigningStargateClientOptions;
 };
 
-export const createSigningClients = async (args: CreateSigningClientArgs): Promise<GrazStore["signingClients"]> => {
+export const createSigningClients = async (
+  args: CreateSigningClientArgs,
+): Promise<GrazSessionStore["signingClients"]> => {
   const { rpc, rpcHeaders, offlineSignerAuto, cosmWasmSignerOptions = {}, stargateSignerOptions = {} } = args;
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
   const [cosmWasm, stargate] = await Promise.all([
