@@ -2,7 +2,7 @@ import type { SigningCosmWasmClientOptions } from "@cosmjs/cosmwasm-stargate";
 import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 
 import type { GrazChain } from "../chains";
-import { useGrazStore } from "../store";
+import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Dictionary } from "../types/core";
 import type { WalletType } from "../types/wallet";
 import type { ConnectResult } from "./account";
@@ -12,16 +12,16 @@ import { getWallet } from "./wallet";
 export * from "./clients/tendermint";
 
 export const clearRecentChain = (): void => {
-  useGrazStore.setState({ recentChain: null });
+  useGrazInternalStore.setState({ recentChain: null });
 };
 
 export const getActiveChainCurrency = (denom: string): AppCurrency | undefined => {
-  const { activeChain } = useGrazStore.getState();
+  const { activeChain } = useGrazSessionStore.getState();
   return activeChain?.currencies.find((x) => x.coinMinimalDenom === denom);
 };
 
 export const getRecentChain = (): GrazChain | null => {
-  return useGrazStore.getState().recentChain;
+  return useGrazInternalStore.getState().recentChain;
 };
 
 export const suggestChain = async (chainInfo: ChainInfo): Promise<ChainInfo> => {

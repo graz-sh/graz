@@ -16,6 +16,7 @@ const CustomApp: NextPage<AppProps> = ({ Component, pageProps }) => {
           },
           autoReconnect: false,
         }}
+        debug
       >
         <Component {...pageProps} />
       </GrazProvider>
