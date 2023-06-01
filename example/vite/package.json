@@ -1,5 +1,5 @@
 {
-  "name": "graz-vite-example",
+  "name": "@project/example-vite",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
