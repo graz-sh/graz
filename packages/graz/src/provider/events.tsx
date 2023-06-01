@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useEffect } from "react";
 
 import { reconnect } from "../actions/account";
+import { getCosmostation, getKeplr, getLeap } from "../actions/wallet";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import { WalletType } from "../types/wallet";
@@ -35,31 +36,21 @@ export const useGrazEvents = () => {
   useEffect(() => {
     if (_reconnectConnector) {
       if (_reconnectConnector === WalletType.COSMOSTATION) {
-        window.cosmostation.cosmos.on(
-          "accountChanged",
-          () =>
-            void reconnect({
-              onError: _onReconnectFailed,
-            }),
-        );
+        getCosmostation().subscription?.(() => {
+          void reconnect({
+            onError: _onReconnectFailed,
+          });
+        });
       }
-      if (_reconnectConnector === WalletType.KEPLR || _reconnectConnector === WalletType.LEAP) {
-        window.addEventListener(
-          _reconnectConnector === WalletType.KEPLR ? "keplr_keystorechange" : "leap_keystorechange",
-          () =>
-            void reconnect({
-              onError: _onReconnectFailed,
-            }),
-        );
-        return () => {
-          window.removeEventListener(
-            _reconnectConnector === WalletType.KEPLR ? "keplr_keystorechange" : "leap_keystorechange",
-            () =>
-              void reconnect({
-                onError: _onReconnectFailed,
-              }),
-          );
-        };
+      if (_reconnectConnector === WalletType.KEPLR) {
+        getKeplr().subscription?.(() => {
+          void reconnect({ onError: _onReconnectFailed });
+        });
+      }
+      if (_reconnectConnector === WalletType.LEAP) {
+        getLeap().subscription?.(() => {
+          void reconnect({ onError: _onReconnectFailed });
+        });
       }
     }
 

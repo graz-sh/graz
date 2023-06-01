@@ -19,4 +19,6 @@ export type Wallet = Pick<
   | "experimentalSuggestChain"
   | "signDirect"
   | "signAmino"
->;
+> & {
+  subscription?: (reconnect: () => void) => void;
+};

@@ -44,7 +44,20 @@ export const checkWallet = (type: WalletType = useGrazInternalStore.getState().w
  * @see https://docs.keplr.app
  */
 export const getKeplr = (): Wallet => {
-  if (typeof window.keplr !== "undefined") return window.keplr;
+  if (typeof window.keplr !== "undefined") {
+    const keplr = window.keplr;
+    const subscription: (reconnect: () => void) => void = (reconnect) => {
+      window.addEventListener("keplr_keystorechange", reconnect);
+      return () => {
+        window.removeEventListener("keplr_keystorechange", reconnect);
+      };
+    };
+    const res = Object.assign(keplr, {
+      subscription,
+    });
+    return res;
+  }
+
   useGrazInternalStore.getState()._notFoundFn();
   throw new Error("window.keplr is not defined");
 };
@@ -64,7 +77,20 @@ export const getKeplr = (): Wallet => {
  * @see https://docs.leapwallet.io/cosmos/for-dapps-connect-to-leap/add-leap-to-existing-keplr-integration
  */
 export const getLeap = (): Wallet => {
-  if (typeof window.leap !== "undefined") return window.leap;
+  if (typeof window.leap !== "undefined") {
+    const leap = window.leap;
+    const subscription: (reconnect: () => void) => void = (reconnect) => {
+      window.addEventListener("leap_keystorechange", reconnect);
+      return () => {
+        window.removeEventListener("leap_keystorechange", reconnect);
+      };
+    };
+    const res = Object.assign(leap, {
+      subscription,
+    });
+    return res;
+  }
+
   useGrazInternalStore.getState()._notFoundFn();
   throw new Error("window.leap is not defined");
 };
@@ -84,7 +110,17 @@ export const getLeap = (): Wallet => {
  * @see https://docs.cosmostation.io/integration-extension/cosmos/integrate-keplr
  */
 export const getCosmostation = (): Wallet => {
-  if (typeof window.cosmostation.providers.keplr !== "undefined") return window.cosmostation.providers.keplr;
+  if (typeof window.cosmostation.providers.keplr !== "undefined") {
+    const cosmostation = window.cosmostation.providers.keplr;
+    const subscription: (reconnect: () => void) => void = (reconnect) => {
+      window.cosmostation.cosmos.on("accountChanged", reconnect);
+    };
+    const res = Object.assign(cosmostation, {
+      subscription,
+    });
+    return res;
+  }
+
   useGrazInternalStore.getState()._notFoundFn();
   throw new Error("window.cosmostation.providers.keplr is not defined");
 };

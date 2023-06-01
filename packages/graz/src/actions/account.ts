@@ -100,11 +100,11 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
 
 export const disconnect = async (clearRecentChain = false): Promise<void> => {
   typeof window !== "undefined" && window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
+  useGrazSessionStore.setState(grazSessionDefaultValues);
   useGrazInternalStore.setState((x) => ({
     ...grazInternalDefaultValues,
     recentChain: clearRecentChain ? null : x.recentChain,
   }));
-  useGrazSessionStore.setState(grazSessionDefaultValues);
   return Promise.resolve();
 };
 
