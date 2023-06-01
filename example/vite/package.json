@@ -1,0 +1,27 @@
+{
+  "name": "@project/example-vite",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "graz": "^0.0.27",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.24",
+    "@types/react-dom": "^18.0.8",
+    "@vitejs/plugin-react": "^2.2.0",
+    "typescript": "^4.8.4",
+    "vite": "^3.2.2",
+    "vite-plugin-ngmi-polyfill": "^0.0.2"
+  },
+  "prettier": {
+    "printWidth": 120
+  },
+  "private": true
+}

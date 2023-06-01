@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "workspaces": [
     "docs",
-    "example",
+    "example/*",
     "packages/*",
     "templates/*"
   ],
@@ -12,7 +12,8 @@
     "clean": "turbo run clean",
     "dev": "turbo run dev --filter=!@project/docs",
     "docs": "pnpm --dir docs",
-    "example": "pnpm --dir example",
+    "example:next": "pnpm --dir example/next",
+    "example:vite": "pnpm --dir example/vite",
     "graz": "pnpm --dir packages/graz",
     "create-graz-app": "pnpm --dir packages/create-graz-app",
     "lint": "turbo run lint",

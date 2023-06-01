@@ -1,5 +1,5 @@
 {
-  "name": "@project/example",
+  "name": "@project/example-next",
   "version": "0.0.0",
   "scripts": {
     "build": "next build",
