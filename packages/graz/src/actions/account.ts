@@ -92,9 +92,12 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     const { account } = useGrazSessionStore.getState();
     return { account: account!, walletType: currentWalletType, chain };
   } catch (error) {
-    console.log(error);
+    console.log("connect ", error);
     if (useGrazSessionStore.getState().account === null) {
       useGrazSessionStore.setState({ status: "disconnected" });
+    }
+    if (useGrazSessionStore.getState().account && useGrazSessionStore.getState().activeChain) {
+      useGrazSessionStore.setState({ status: "connected" });
     }
     throw error;
   }

@@ -16,7 +16,7 @@ export const useGrazEvents = () => {
   const isSessionActive =
     typeof window !== "undefined" && window.sessionStorage.getItem(RECONNECT_SESSION_KEY) === "Active";
   const { _reconnect, _onReconnectFailed, _reconnectConnector } = useGrazInternalStore();
-  const { activeChain } = useGrazSessionStore();
+  const { activeChain, wcSignClient } = useGrazSessionStore();
 
   useEffect(() => {
     // will reconnect on refresh
@@ -56,14 +56,16 @@ export const useGrazEvents = () => {
         });
       }
       if (_reconnectConnector === WalletType.WALLETCONNECT) {
-        getWalletConnect().subscription?.(() => {
-          void reconnect({ onError: _onReconnectFailed });
-        });
+        if (wcSignClient) {
+          getWalletConnect().subscription?.(() => {
+            void reconnect({ onError: _onReconnectFailed });
+          });
+        }
       }
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [_reconnectConnector]);
+  }, [_reconnectConnector, wcSignClient]);
 
   return null;
 };

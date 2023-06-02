@@ -187,7 +187,7 @@ export const getWalletConnect = (): Wallet => {
 
       const lastSession = wcSignClient.session.getAll().at(-1);
       if (!lastSession) return;
-
+      console.log(lastSession);
       const isSameChain = wcSignClient.session
         .getAll()
         .at(-1)
@@ -217,14 +217,14 @@ export const getWalletConnect = (): Wallet => {
           return chainSession.at(-1);
         } catch (error) {
           console.log("chainsession error", error);
-          if (!/No matching key/i.test((error as Error).message)) throw error;
+          if (!(error as Error).message.toLowerCase().includes("no matching key")) throw error;
         }
       }
 
       return lastSession;
     } catch (error) {
       console.log("getSession error", error);
-      if (!/No matching key/i.test((error as Error).message)) throw error;
+      if (!(error as Error).message.toLowerCase().includes("no matching key")) throw error;
     }
   };
 
@@ -253,7 +253,7 @@ export const getWalletConnect = (): Wallet => {
       );
     } catch (error) {
       console.log("deleteInactivePairings error", error);
-      if (!/No matching key/i.test((error as Error).message)) throw error;
+      if (!(error as Error).message.toLowerCase().includes("no matching key")) throw error;
     }
   };
 
@@ -338,7 +338,7 @@ export const getWalletConnect = (): Wallet => {
       // https://walletconnect.com/explorer?type=wallet&version=2&chains=cosmos%3Acosmoshub-4
       explorerRecommendedWalletIds: [
         // keplr doesn't have complete app object better hide it for now and use getKeplr
-        "6adb6082c909901b9e7189af3a4a0223102cd6f8d5c39e39f3d49acb92b578bb",
+        // "6adb6082c909901b9e7189af3a4a0223102cd6f8d5c39e39f3d49acb92b578bb",
         "3ed8cc046c6211a798dc5ec70f1302b43e07db9639fd287de44a9aa115a21ed6",
         "feb6ff1fb426db18110f5a80c7adbde846d0a7e96b2bc53af4b73aaf32552bea",
         "afbd95522f4041c71dd4f1a065f971fd32372865b416f95a0b1db759ae33f2a7",
@@ -367,20 +367,24 @@ export const getWalletConnect = (): Wallet => {
       });
       console.log("enable1.1");
       if (!uri) throw new Error("No wallet connect uri");
+
+      await web3Modal.openModal({ uri });
       try {
         await promiseWithTimeout(
           (async () => {
-            await web3Modal.openModal({ uri });
             await approval();
           })(),
           30000,
           new Error("Modal approval timeout"),
         );
       } catch (error) {
+        console.log("enable1.2 error", error);
         web3Modal.closeModal();
+        if (!(error as Error).message.toLowerCase().includes("no matching key")) return Promise.reject(error);
       }
 
       web3Modal.closeModal();
+      return Promise.resolve();
     }
     console.log("enable2");
     try {
@@ -395,8 +399,9 @@ export const getWalletConnect = (): Wallet => {
         new Error("Connection timeout"),
       );
     } catch (error) {
+      console.log("enable2.1 error", error);
       void wcDisconnect(lastSession?.topic);
-      throw error;
+      if (!(error as Error).message.toLowerCase().includes("no matching key")) throw error;
     }
   };
 
