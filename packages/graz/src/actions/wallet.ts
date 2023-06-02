@@ -335,21 +335,32 @@ export const getWalletConnect = (): Wallet => {
       projectId: walletConnect.options.projectId,
       walletConnectVersion: 2,
       enableExplorer: true,
-      // https://walletconnect.com/explorer?type=wallet&version=2&chains=cosmos%3Acosmoshub-4
-      explorerRecommendedWalletIds: [
-        // keplr doesn't have complete app object better hide it for now and use getKeplr
-        // "6adb6082c909901b9e7189af3a4a0223102cd6f8d5c39e39f3d49acb92b578bb",
-        "3ed8cc046c6211a798dc5ec70f1302b43e07db9639fd287de44a9aa115a21ed6",
-        "feb6ff1fb426db18110f5a80c7adbde846d0a7e96b2bc53af4b73aaf32552bea",
-        "afbd95522f4041c71dd4f1a065f971fd32372865b416f95a0b1db759ae33f2a7",
-        "85db431492aa2e8672e93f4ea7acf10c88b97b867b0d373107af63dc4880f041",
-        "7674bb4e353bf52886768a3ddc2a4562ce2f4191c80831291218ebd90f5f5e26",
-        "0b415a746fb9ee99cce155c2ceca0c6f6061b1dbca2d722b3ba16381d0562150",
-        "022e8ff84519e427bff394b3a58308bc9838196a8efb45158da0ab7c3228abfb",
-        "f896cbca30cd6dc414712d3d6fcc2f8f7d35d5bd30e3b1fc5d60cf6c8926f98f",
-      ],
+
+      // // https://walletconnect.com/explorer?type=wallet&version=2&chains=cosmos%3Acosmoshub-4
+      // explorerRecommendedWalletIds: [
+      //   // keplr doesn't have complete app object better hide it for now and use getKeplr
+      //   // "6adb6082c909901b9e7189af3a4a0223102cd6f8d5c39e39f3d49acb92b578bb",
+      //   "3ed8cc046c6211a798dc5ec70f1302b43e07db9639fd287de44a9aa115a21ed6",
+      //   "feb6ff1fb426db18110f5a80c7adbde846d0a7e96b2bc53af4b73aaf32552bea",
+      //   "afbd95522f4041c71dd4f1a065f971fd32372865b416f95a0b1db759ae33f2a7",
+      //   "85db431492aa2e8672e93f4ea7acf10c88b97b867b0d373107af63dc4880f041",
+      //   "7674bb4e353bf52886768a3ddc2a4562ce2f4191c80831291218ebd90f5f5e26",
+      //   "0b415a746fb9ee99cce155c2ceca0c6f6061b1dbca2d722b3ba16381d0562150",
+      //   "022e8ff84519e427bff394b3a58308bc9838196a8efb45158da0ab7c3228abfb",
+      //   "f896cbca30cd6dc414712d3d6fcc2f8f7d35d5bd30e3b1fc5d60cf6c8926f98f",
+      // ],
 
       ...walletConnect.web3Modal,
+      mobileWallets: [
+        {
+          id: "keplr",
+          name: "Keplr",
+          links: {
+            universal: "",
+            native: "keplrwallet://",
+          },
+        },
+      ],
     });
 
     const { account, activeChain } = useGrazSessionStore.getState();
