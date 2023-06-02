@@ -357,7 +357,7 @@ export const getWalletConnect = (): Wallet => {
           name: "Keplr",
           links: {
             universal: "",
-            native: "keplrwallet://",
+            native: "keplrwallet://wcV2?",
           },
         },
       ],
@@ -378,7 +378,7 @@ export const getWalletConnect = (): Wallet => {
       });
       console.log("enable1.1");
       if (!uri) throw new Error("No wallet connect uri");
-
+      console.log("uri", uri);
       await web3Modal.openModal({ uri });
       try {
         await promiseWithTimeout(
