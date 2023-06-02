@@ -21,4 +21,5 @@ export type Wallet = Pick<
   | "signAmino"
 > & {
   subscription?: (reconnect: () => void) => void;
+  init?: () => Promise<unknown>;
 };

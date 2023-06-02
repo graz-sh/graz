@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { useEffect } from "react";
 
 import { reconnect } from "../actions/account";
-import { getCosmostation, getKeplr, getLeap } from "../actions/wallet";
+import { getCosmostation, getKeplr, getLeap, getWalletConnect } from "../actions/wallet";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import { WalletType } from "../types/wallet";
@@ -20,16 +20,19 @@ export const useGrazEvents = () => {
 
   useEffect(() => {
     // will reconnect on refresh
-    if (isSessionActive && Boolean(activeChain)) {
-      void reconnect({
-        onError: _onReconnectFailed,
-      });
-      // only reconnect if session is active and autoReconnect from grazOptions is true
-    } else if (!isSessionActive && _reconnect) {
-      void reconnect({
-        onError: _onReconnectFailed,
-      });
+    if (_reconnectConnector) {
+      if (isSessionActive && Boolean(activeChain)) {
+        void reconnect({
+          onError: _onReconnectFailed,
+        });
+        // only reconnect if session is active and autoReconnect from grazOptions is true
+      } else if (!isSessionActive && _reconnect) {
+        void reconnect({
+          onError: _onReconnectFailed,
+        });
+      }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -49,6 +52,11 @@ export const useGrazEvents = () => {
       }
       if (_reconnectConnector === WalletType.LEAP) {
         getLeap().subscription?.(() => {
+          void reconnect({ onError: _onReconnectFailed });
+        });
+      }
+      if (_reconnectConnector === WalletType.WALLETCONNECT) {
+        getWalletConnect().subscription?.(() => {
           void reconnect({ onError: _onReconnectFailed });
         });
       }

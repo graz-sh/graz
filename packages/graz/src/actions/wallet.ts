@@ -3,13 +3,16 @@ import { fromBech32 } from "@cosmjs/encoding";
 import type { AccountData, Algo, DirectSignResponse } from "@cosmjs/proto-signing";
 import type { Keplr, Key } from "@keplr-wallet/types";
 import { SignClient } from "@walletconnect/sign-client";
+import type { ISignClient } from "@walletconnect/types";
 import { getSdkError } from "@walletconnect/utils";
 // eslint-disable-next-line import/no-named-as-default
 import Long from "long";
 
-import { useGrazInternalStore, useGrazSessionStore } from "../store";
+import { RECONNECT_SESSION_KEY } from "../constant";
+import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Wallet } from "../types/wallet";
 import { WALLET_TYPES, WalletType } from "../types/wallet";
+import { promiseWithTimeout } from "../utils/timeout";
 
 /**
  * Function to check whether given {@link WalletType} or default configured wallet exists.
@@ -114,6 +117,9 @@ export const getCosmostation = (): Wallet => {
     const cosmostation = window.cosmostation.providers.keplr;
     const subscription: (reconnect: () => void) => void = (reconnect) => {
       window.cosmostation.cosmos.on("accountChanged", reconnect);
+      return () => {
+        window.cosmostation.cosmos.off("accountChanged", reconnect);
+      };
     };
     const res = Object.assign(cosmostation, {
       subscription,
@@ -145,69 +151,181 @@ export const getWalletConnect = (): Wallet => {
     throw new Error("walletConnect.options.projectId is not defined");
   }
 
-  const getSession = (chainId: string) => {
-    const { walletConnect } = useGrazInternalStore.getState();
-    if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
-    const lastSession = walletConnect.signClient.session.getAll().at(-1);
+  const _disconnect = () => {
+    console.log("_disconnect");
+    const { wcSignClient } = useGrazSessionStore.getState();
+    if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
 
-    if (!lastSession) return;
-    const isSameUser = walletConnect.signClient.session
-      .getAll()
-      .at(-1)
-      ?.namespaces.cosmos?.accounts.find((i) => i.startsWith(`cosmos:${chainId}`));
-    const isNotExpired = lastSession.expiry * 1000 > Date.now() + 1000;
-    if (!isSameUser || !isNotExpired) {
-      return;
-    }
-    return lastSession;
-  };
-
-  const init = async () => {
-    const { walletConnect } = useGrazInternalStore.getState();
-    if (!walletConnect?.options) throw new Error("walletConnect.options is not defined");
-    const signClient = await SignClient.init(walletConnect.options);
-    useGrazInternalStore.setState({ walletConnect: { ...walletConnect, signClient } });
-    return signClient;
-  };
-
-  const disconnect = async (chainId: string) => {
-    const { walletConnect } = useGrazInternalStore.getState();
-    const { account } = useGrazSessionStore.getState();
-    if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
-    if (!account) throw new Error("account is not defined");
-
-    const topic = getSession(chainId)?.topic;
-    if (!topic) throw new Error("No wallet connect session");
-    await walletConnect.signClient.disconnect({
-      topic,
-      reason: getSdkError("USER_DISCONNECTED"),
+    window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
+    useGrazSessionStore.setState(grazSessionDefaultValues);
+    useGrazInternalStore.setState({
+      _reconnect: false,
+      _reconnectConnector: null,
+      recentChain: null,
     });
   };
 
-  const getPairings = () => {
-    const { walletConnect } = useGrazInternalStore.getState();
-    if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
-    walletConnect.signClient.session.getAll({});
+  const wcDisconnect = async (topic?: string) => {
+    console.log("wcDisconnect");
+    const { wcSignClient } = useGrazSessionStore.getState();
+    if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
+    if (!topic) throw new Error("No wallet connect session");
+
+    await wcSignClient.disconnect({
+      topic,
+      reason: getSdkError("USER_DISCONNECTED"),
+    });
+    await deleteInactivePairings(wcSignClient);
+    _disconnect();
   };
 
-  const deletInactivePairings = async () => {
-    const { walletConnect } = useGrazInternalStore.getState();
-    const signClient = walletConnect?.signClient;
-    if (!signClient) throw new Error("walletConnect.signClient is not defined");
-    await Promise.all(
-      signClient.core.pairing.pairings.getAll({ active: false }).map(async (pairing) => {
-        await signClient.core.pairing.pairings.delete(pairing.topic, {
-          code: 7001,
-          message: "clear pairing",
-        });
-      }),
-    );
+  const getSession = (chainId: string) => {
+    console.log("getSession");
+    try {
+      const { wcSignClient } = useGrazSessionStore.getState();
+      if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
+
+      const lastSession = wcSignClient.session.getAll().at(-1);
+      if (!lastSession) return;
+
+      const isSameChain = wcSignClient.session
+        .getAll()
+        .at(-1)
+        ?.namespaces.cosmos?.accounts.find((i) => i.startsWith(`cosmos:${chainId}`));
+      const isNotExpired = lastSession.expiry * 1000 > Date.now() + 1000;
+      if (!isNotExpired) {
+        console.log("session expired");
+        void wcDisconnect(lastSession.topic);
+        throw new Error("invalid session");
+      }
+      if (!isSameChain) {
+        console.log("different user");
+        try {
+          const chainSession = wcSignClient.find({
+            requiredNamespaces: {
+              cosmos: {
+                methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
+                chains: [`cosmos:${chainId}`],
+                events: ["chainChanged", "accountsChanged"],
+              },
+            },
+          });
+          if (!chainSession.length) {
+            console.log("no session");
+            throw new Error("no session");
+          }
+          return chainSession.at(-1);
+        } catch (error) {
+          console.log("chainsession error", error);
+          if (!/No matching key/i.test((error as Error).message)) throw error;
+        }
+      }
+
+      return lastSession;
+    } catch (error) {
+      console.log("getSession error", error);
+      if (!/No matching key/i.test((error as Error).message)) throw error;
+    }
   };
 
-  // const subscribeEvents = () => {};
+  const checkSession = (chainId: string) => {
+    try {
+      const lastSession = getSession(chainId);
+      return lastSession;
+    } catch (error) {
+      console.log("checkSession error", error);
+      return undefined;
+    }
+  };
+
+  const deleteInactivePairings = async (signClient: ISignClient) => {
+    console.log("deleteInactivePairings");
+    try {
+      const pairings = signClient.core.pairing.pairings.getAll({ active: false });
+      if (!pairings.length) return;
+      await Promise.all(
+        pairings.map(async (pairing) => {
+          await signClient.core.pairing.pairings.delete(pairing.topic, {
+            code: 7001,
+            message: "clear pairing",
+          });
+        }),
+      );
+    } catch (error) {
+      console.log("deleteInactivePairings error", error);
+      if (!/No matching key/i.test((error as Error).message)) throw error;
+    }
+  };
+
+  const init = async () => {
+    console.log("init");
+    const { walletConnect } = useGrazInternalStore.getState();
+    if (!walletConnect?.options) throw new Error("walletConnect.options is not defined");
+    console.log(1);
+    const { wcSignClient } = useGrazSessionStore.getState();
+    if (wcSignClient) {
+      useGrazSessionStore.setState({ wcSignClient });
+      return wcSignClient;
+    }
+    const signClient = await SignClient.init(walletConnect.options);
+    console.log(2, signClient);
+    useGrazSessionStore.setState({ wcSignClient: signClient });
+    console.log(3);
+    return signClient;
+  };
+
+  const subscription: (reconnect: () => void) => void = (reconnect) => {
+    const { wcSignClient } = useGrazSessionStore.getState();
+    if (!wcSignClient) return;
+
+    wcSignClient.events.on("session_delete", (args) => {
+      console.log("session_delete");
+      _disconnect();
+    });
+    wcSignClient.events.on("session_expire", (args) => {
+      console.log("session_expire");
+      _disconnect();
+    });
+    wcSignClient.events.on("session_event", (args) => {
+      console.log("session_event");
+      if (
+        args.params.event.name === "accountsChanged" &&
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        args.params.event.data?.[0] !== useGrazSessionStore.getState().account?.bech32Address
+      ) {
+        const chainId = args.params.chainId.split(":")[1];
+        chainId && void enable(chainId);
+      } else {
+        reconnect();
+      }
+    });
+
+    return () => {
+      wcSignClient.events.off("session_delete", (args) => {
+        _disconnect();
+      });
+      wcSignClient.events.off("session_expire", (args) => {
+        _disconnect();
+      });
+      wcSignClient.events.off("session_event", (args) => {
+        if (
+          args.params.event.name === "accountsChanged" &&
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          args.params.event.data?.[0] !== useGrazSessionStore.getState().account?.bech32Address
+        ) {
+          const chainId = args.params.chainId.split(":")[1];
+          chainId && void enable(chainId);
+        } else {
+          reconnect();
+        }
+      });
+    };
+  };
 
   const enable = async (chainId: string) => {
-    const signClient = await init();
+    console.log("enable");
+    const { wcSignClient: signClient } = useGrazSessionStore.getState();
+    if (!signClient) throw new Error("enable walletConnect.signClient is not defined");
     const { walletConnect } = useGrazInternalStore.getState();
     if (!walletConnect?.options?.projectId) throw new Error("walletConnect.options.projectId is not defined");
 
@@ -234,8 +352,10 @@ export const getWalletConnect = (): Wallet => {
       ...walletConnect.web3Modal,
     });
 
-    const lastSession = getSession(chainId);
-    if (!lastSession) {
+    const { account, activeChain } = useGrazSessionStore.getState();
+    const lastSession = checkSession(chainId);
+    if ((activeChain?.chainId !== chainId && !lastSession) || !account) {
+      console.log("enable1");
       const { uri, approval } = await signClient.connect({
         requiredNamespaces: {
           cosmos: {
@@ -245,19 +365,48 @@ export const getWalletConnect = (): Wallet => {
           },
         },
       });
+      console.log("enable1.1");
       if (!uri) throw new Error("No wallet connect uri");
-      await web3Modal.openModal({ uri });
-      await approval();
+      try {
+        await promiseWithTimeout(
+          (async () => {
+            await web3Modal.openModal({ uri });
+            await approval();
+          })(),
+          30000,
+          new Error("Modal approval timeout"),
+        );
+      } catch (error) {
+        web3Modal.closeModal();
+      }
+
       web3Modal.closeModal();
+    }
+    console.log("enable2");
+    try {
+      await promiseWithTimeout(
+        (async () => {
+          const wcAccount = await getKey(chainId);
+          useGrazSessionStore.setState({
+            account: wcAccount,
+          });
+        })(),
+        10000,
+        new Error("Connection timeout"),
+      );
+    } catch (error) {
+      void wcDisconnect(lastSession?.topic);
+      throw error;
     }
   };
 
   const getAccount = async (chainId: string): Promise<AccountData> => {
-    const { walletConnect } = useGrazInternalStore.getState();
-    if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
+    console.log("getAccount");
+    const { wcSignClient } = useGrazSessionStore.getState();
+    if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
     const topic = getSession(chainId)?.topic;
     if (!topic) throw new Error("No wallet connect session");
-    const result: { address: string; algo: string; pubkey: string }[] = await walletConnect.signClient.request({
+    const result: { address: string; algo: string; pubkey: string }[] = await wcSignClient.request({
       topic,
       chainId: `cosmos:${chainId}`,
       request: {
@@ -274,6 +423,7 @@ export const getWalletConnect = (): Wallet => {
   };
 
   const getKey = async (chainId: string): Promise<Key> => {
+    console.log("getKey");
     const { address, algo, pubkey } = await getAccount(chainId);
     return {
       address: fromBech32(address).data,
@@ -288,9 +438,8 @@ export const getWalletConnect = (): Wallet => {
 
   const wcSignDirect = async (...args: SignDirectParams) => {
     const [chainId, signer, signDoc] = args;
-    const { walletConnect } = useGrazInternalStore.getState();
-    const { account } = useGrazSessionStore.getState();
-    if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
+    const { account, wcSignClient } = useGrazSessionStore.getState();
+    if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
     if (!account) throw new Error("account is not defined");
 
     const topic = getSession(chainId)?.topic;
@@ -314,7 +463,7 @@ export const getWalletConnect = (): Wallet => {
         },
       },
     };
-    const result: WalletConnectSignDirectResponse = await walletConnect.signClient.request(req);
+    const result: WalletConnectSignDirectResponse = await wcSignClient.request(req);
     return result;
   };
 
@@ -334,15 +483,15 @@ export const getWalletConnect = (): Wallet => {
 
   const wcSignAmino = async (...args: SignAminoParams) => {
     const [chainId, signer, signDoc, _signOptions] = args;
-    const { walletConnect } = useGrazInternalStore.getState();
+    const { wcSignClient } = useGrazSessionStore.getState();
     const { account } = useGrazSessionStore.getState();
-    if (!walletConnect?.signClient) throw new Error("walletConnect.signClient is not defined");
+    if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
     if (!account) throw new Error("account is not defined");
 
     const topic = getSession(chainId)?.topic;
     if (!topic) throw new Error("No wallet connect session");
 
-    const result: AminoSignResponse = await walletConnect.signClient.request({
+    const result: AminoSignResponse = await wcSignClient.request({
       topic,
       chainId: `cosmos:${chainId}`,
       request: {
@@ -398,13 +547,15 @@ export const getWalletConnect = (): Wallet => {
 
   return {
     enable,
+    experimentalSuggestChain,
     getKey,
     getOfflineSigner,
     getOfflineSignerAuto,
     getOfflineSignerOnlyAmino,
     signAmino,
     signDirect,
-    experimentalSuggestChain,
+    subscription,
+    init,
   };
 };
 

@@ -20,7 +20,6 @@ export interface GrazInternalStore {
   walletType: WalletType;
   walletConnect: {
     options: SignClientTypes.Options | null;
-    signClient?: ISignClient | null;
     web3Modal?: Pick<Web3ModalConfig, "themeVariables" | "themeMode" | "privacyPolicyUrl" | "termsOfServiceUrl"> | null;
   } | null;
   _notFoundFn: () => void;
@@ -46,9 +45,12 @@ export interface GrazSessionStore {
     stargate: SigningStargateClient;
   } | null;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
+  wcSignClient?: ISignClient | null;
 }
 
-export type GrazPersistedStore = Pick<GrazInternalStore, "recentChain" | "_reconnect" | "_reconnectConnector">;
+export type GrazSessionPersistedStore = Pick<GrazSessionStore, "account" | "activeChain">;
+
+export type GrazInternalPersistedStore = Pick<GrazInternalStore, "recentChain" | "_reconnect" | "_reconnectConnector">;
 
 export const grazInternalDefaultValues: GrazInternalStore = {
   recentChain: null,
@@ -57,7 +59,6 @@ export const grazInternalDefaultValues: GrazInternalStore = {
   walletType: WalletType.KEPLR,
   walletConnect: {
     options: null,
-    signClient: null,
     web3Modal: null,
   },
   _notFoundFn: () => null,
@@ -76,15 +77,20 @@ export const grazSessionDefaultValues: GrazSessionStore = {
   offlineSignerAuto: null,
   signingClients: null,
   status: "disconnected",
+  wcSignClient: null,
 };
 
-const sessionOptions: PersistOptions<GrazSessionStore> = {
+const sessionOptions: PersistOptions<GrazSessionStore, GrazSessionPersistedStore> = {
   name: "graz-session",
   version: 1,
+  partialize: (x) => ({
+    account: x.account,
+    activeChain: x.activeChain,
+  }),
   storage: createJSONStorage(() => sessionStorage),
 };
 
-const persistOptions: PersistOptions<GrazInternalStore, GrazPersistedStore> = {
+const persistOptions: PersistOptions<GrazInternalStore, GrazInternalPersistedStore> = {
   name: "graz-internal",
   partialize: (x) => ({
     recentChain: x.recentChain,
