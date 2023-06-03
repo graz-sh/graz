@@ -7,6 +7,7 @@ export default defineConfig(({ watch }) => [
     entry: ["src/*.ts"],
     external: [/^@cosmjs\/.*/, /^@keplr-wallet\/.*/],
     format: ["cjs", "esm"],
+    minify: !watch,
   },
   {
     // https://github.com/evanw/esbuild/issues/1921#issuecomment-1491470829
