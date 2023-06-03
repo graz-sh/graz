@@ -2,9 +2,11 @@
 
 const mainnetChains = {};
 const testnetChains = {};
+const chains = {};
 
 const mainnetChainNames = [];
 const testnetChainNames = [];
+const chainNames = [];
 
 const getChainData = (pathOrPaths) => {
   const paths = Array.isArray(pathOrPaths) ? pathOrPaths : [pathOrPaths];
@@ -47,8 +49,10 @@ const getChainDataArray = (pathOrPaths) => {
 module.exports = {
   mainnetChains,
   testnetChains,
+  chains,
   mainnetChainNames,
   testnetChainNames,
+  chainNames,
   getChainData,
   getChainDataArray,
 };
