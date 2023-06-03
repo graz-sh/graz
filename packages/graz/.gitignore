@@ -1,5 +1,6 @@
 /chains/*
 /dist/**/*
+/registry/**/*
 
 !/**/.gitkeep
 !/**/*.stub

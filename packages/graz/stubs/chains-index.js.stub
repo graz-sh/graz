@@ -1,0 +1,42 @@
+/* eslint-disable */
+
+const mainnetChains = {};
+const testnetChains = {};
+
+const mainnetChainNames = [];
+const testnetChainNames = [];
+
+const getChainData = (pathOrPaths) => {
+  const paths = Array.isArray(pathOrPaths) ? pathOrPaths : [pathOrPaths];
+  const chainData = {};
+  for (const path of paths) {
+    chainData[path] = {
+      chainInfo: require(`./${path}`),
+      chain: require(`./${path}/chain`),
+      assetlist: require(`./${path}/assetlist`),
+    };
+  }
+  return chainData;
+};
+
+const getChainDataArray = (pathOrPaths) => {
+  const paths = Array.isArray(pathOrPaths) ? pathOrPaths : [pathOrPaths];
+  const chainData = [];
+  for (const path of paths) {
+    chainData.push({
+      chainInfo: require(`./${path}`),
+      chain: require(`./${path}/chain`),
+      assetlist: require(`./${path}/assetlist`),
+    });
+  }
+  return chainData;
+};
+
+module.exports = {
+  mainnetChains,
+  testnetChains,
+  mainnetChainNames,
+  testnetChainNames,
+  getChainData,
+  getChainDataArray,
+};

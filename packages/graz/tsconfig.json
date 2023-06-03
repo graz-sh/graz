@@ -1,6 +1,7 @@
 {
   "extends": "@strangelovelabs/style-guide/tsconfig.json",
   "compilerOptions": {
+    "downlevelIteration": true,
     "jsx": "react-jsx",
     "moduleResolution": "node",
     "resolveJsonModule": true,

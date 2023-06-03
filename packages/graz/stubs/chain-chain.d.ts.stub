@@ -1,0 +1,4 @@
+/* eslint-disable */
+import type { Chain } from "../../dist";
+declare const chain: Chain;
+export default chain;

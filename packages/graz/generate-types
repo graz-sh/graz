@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+quicktype \
+  --src-lang schema \
+  --src registry/*.schema.json \
+  --out src/types/registry.ts \
+  --alphabetize-properties --no-runtime-typecheck
