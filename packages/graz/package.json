@@ -28,6 +28,7 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
+    "@clack/prompts": "^0.6.3",
     "@cosmjs/cosmwasm-stargate": "^0.30.1",
     "@cosmjs/launchpad": "^0.27.1",
     "@cosmjs/proto-signing": "^0.30.1",
@@ -41,8 +42,7 @@
     "@walletconnect/types": "^2.7.7",
     "@walletconnect/utils": "^2.7.7",
     "@web3modal/standalone": "^2.4.1",
-    "arg": "^5.0.2",
-    "cosmos-directory-client": "0.0.6",
+    "commander": "10.0.1",
     "zustand": "^4.3.8"
   },
   "devDependencies": {
