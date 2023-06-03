@@ -10,15 +10,13 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "bin": {
-    "graz": "./cli.mjs"
+    "graz": "./dist/cli/index.mjs"
   },
   "files": [
-    "chains/*.stub",
-    "cli.js",
-    "compiled/**",
-    "dist/*.d.ts",
-    "dist/*.js",
-    "dist/*.mjs"
+    "**/*.stub",
+    "dist/**/*.d.ts",
+    "dist/**/*.js",
+    "dist/**/*.mjs"
   ],
   "sideEffects": false,
   "scripts": {

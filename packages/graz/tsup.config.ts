@@ -1,20 +1,19 @@
 import { defineConfig } from "tsup";
 
-import packageJson from "./package.json";
-
-export default defineConfig(({ watch }) => ({
-  clean: true,
-  dts: true,
-  entry: ["src/*.ts"],
-  external: [
-    ...Object.keys(packageJson.dependencies),
-    ...Object.keys(packageJson.peerDependencies),
-    /^@cosmjs\/.*/,
-    /^@keplr-wallet\/.*/,
-  ],
-  format: ["cjs", "esm"],
-  minify: !watch,
-  minifyIdentifiers: !watch,
-  minifySyntax: !watch,
-  minifyWhitespace: !watch,
-}));
+export default defineConfig(({ watch }) => [
+  {
+    clean: true,
+    dts: true,
+    entry: ["src/*.ts"],
+    external: [/^@cosmjs\/.*/, /^@keplr-wallet\/.*/],
+    format: ["cjs", "esm"],
+  },
+  {
+    clean: true,
+    dts: false,
+    entry: ["src/cli/*.mjs", "src/cli/*.ts"],
+    format: ["esm"],
+    minify: !watch,
+    outDir: "dist/cli/",
+  },
+]);

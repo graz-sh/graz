@@ -1,14 +1,13 @@
 #!/usr/bin/env node
 // @ts-check
 import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { Bech32Address } from "@keplr-wallet/cosmos";
 import arg from "arg";
 import { createClient, createTestnetClient } from "cosmos-directory-client";
-
-import pmap from "./compiled/p-map/index.mjs";
+import pMap from "p-map";
 
 const isNumber = (char) => /^\d+$/.test(char);
 
@@ -119,10 +118,10 @@ const generate = async () => {
 };
 
 /** @param {string[]} args */
-const chainsDir = (...args) => path.resolve(path.dirname(fileURLToPath(import.meta.url)), "chains", ...args);
+const chainsDir = (...args) => path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../chains", ...args);
 
 /**
- * @param {Record<string, import(".").ChainInfoWithPath>} record
+ * @param {Record<string, import("../../dist").ChainInfoWithPath>} record
  * @param {Record<string, boolean>} opts
  */
 const makeChainMap = (record, { testnet = false } = {}) =>
@@ -131,7 +130,7 @@ const makeChainMap = (record, { testnet = false } = {}) =>
     .join("\n");
 
 /**
- * @param {Record<string, import(".").ChainInfoWithPath>} record
+ * @param {Record<string, import("../../dist").ChainInfoWithPath>} record
  * @param {Record<string, boolean>} opts
  */
 const makeDefs = (record, { mjs = false, testnet = false } = {}) =>
@@ -144,7 +143,7 @@ const makeDefs = (record, { mjs = false, testnet = false } = {}) =>
     .join("");
 
 /**
- * @param {Record<string, import(".").ChainInfoWithPath>} record
+ * @param {Record<string, import("../../dist").ChainInfoWithPath>} record
  * @param {Record<string, boolean>} opts
  */
 const makeExports = (record, { testnet = false } = {}) =>
@@ -161,9 +160,9 @@ const makeRecord = async (client, { filter = "" } = {}) => {
     ? filter.split(",").map((path) => ({ path }))
     : await client.fetchChains().then((c) => c.chains.map(({ path }) => ({ path })));
 
-  const chains = await pmap(paths, async (c) => client.fetchChain(c.path).then((x) => x.chain), { concurrency: 4 });
+  const chains = await pMap(paths, async (c) => client.fetchChain(c.path).then((x) => x.chain), { concurrency: 4 });
 
-  /** @type {Record<string, import(".").ChainInfoWithPath>} */
+  /** @type {Record<string, import("../../dist").ChainInfoWithPath>} */
   const record = {};
 
   chains.forEach((chain) => {

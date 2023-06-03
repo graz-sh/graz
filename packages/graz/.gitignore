@@ -1,4 +1,5 @@
 /chains/*
 /dist/**/*
-!/chains/*.stub
-!/dist/**/.gitkeep
+
+!/**/.gitkeep
+!/**/*.stub
