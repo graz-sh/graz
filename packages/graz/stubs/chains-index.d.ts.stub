@@ -1,14 +1,20 @@
 /* eslint-disable */
-import type { Chain } from "../dist";
+import type { ChainInfo } from "@keplr-wallet/types";
+import type { AssetList, Chain } from "../dist";
 export type ChainName = "REPLACE_ME_PLS";
-type ReturnTupleChainName<T> = T extends readonly [ChainName, ...infer Rest]
-  ? [Chain, ...ReturnTupleChainName<Rest>]
+export interface ChainData {
+  assetlist: AssetList;
+  chain: Chain;
+  chainInfo: ChainInfo;
+}
+type ReturnTuple<T> = T extends readonly [ChainName, ...infer Rest]
+  ? [ChainData, ...ReturnTuple<Rest>]
   : [];
 export const mainnetChains: Record<ChainName, Chain>;
 export const testnetChains: Record<ChainName, Chain>;
 export const mainnetChainNames: ChainName[];
 export const testnetChainNames: ChainName[];
-export const getChainData: <T extends ChainName>(chainName: T | T[]) => Record<T, Chain>;
+export const getChainData: <T extends ChainName>(chainName: T | T[]) => Record<T, ChainData>;
 export const getChainDataArray: <T extends ChainName, const U extends T | readonly T[]>(
   chainName: U,
-) => U extends T ? [Chain] : U extends readonly T[] ? ReturnTupleChainName<U> : never;
+) => U extends T ? [ChainData] : U extends readonly T[] ? ReturnTuple<U> : never;
