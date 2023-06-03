@@ -11,9 +11,15 @@ const getChainData = (pathOrPaths) => {
   const chainData = {};
   for (const path of paths) {
     chainData[path] = {
-      chainInfo: require(`./${path}`),
-      chain: require(`./${path}/chain`),
-      assetlist: require(`./${path}/assetlist`),
+      get chainInfo() {
+        return require(`./${path}`);
+      },
+      get chain() {
+        return require(`./${path}/chain`);
+      },
+      get assetlist() {
+        return require(`./${path}/assetlist`);
+      },
     };
   }
   return chainData;
@@ -24,9 +30,15 @@ const getChainDataArray = (pathOrPaths) => {
   const chainData = [];
   for (const path of paths) {
     chainData.push({
-      chainInfo: require(`./${path}`),
-      chain: require(`./${path}/chain`),
-      assetlist: require(`./${path}/assetlist`),
+      get chainInfo() {
+        return require(`./${path}`);
+      },
+      get chain() {
+        return require(`./${path}/chain`);
+      },
+      get assetlist() {
+        return require(`./${path}/assetlist`);
+      },
     });
   }
   return chainData;
