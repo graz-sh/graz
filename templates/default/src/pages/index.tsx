@@ -1,12 +1,13 @@
 import { Heading, Stack, Text } from "@chakra-ui/react";
-import { useAccount } from "graz";
+import { useAccount, useOfflineSigners } from "graz";
 
 import { ChainSwitcher } from "../ui/wallet/chain-switcher";
 import { RecentChain } from "../ui/wallet/recent-chain";
 
 const HomePage = () => {
   const { data: accountData, isConnecting, isReconnecting } = useAccount();
-
+  const { signer } = useOfflineSigners();
+  console.log("signer", signer);
   return (
     <Stack w="full" gap={2}>
       {!accountData && (isConnecting || isReconnecting) ? <RecentChain /> : null}

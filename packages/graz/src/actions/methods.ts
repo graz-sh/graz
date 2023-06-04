@@ -3,16 +3,16 @@ import type { Coin } from "@cosmjs/proto-signing";
 import type { DeliverTxResponse, StdFee } from "@cosmjs/stargate";
 import type { Height } from "cosmjs-types/ibc/core/client/v1/client";
 
-import { useGrazStore } from "../store";
+import { useGrazInternalStore, useGrazSessionStore } from "../store";
 
 export const getBalances = async (bech32Address: string): Promise<Coin[]> => {
-  const { activeChain, signingClients } = useGrazStore.getState();
+  const { activeChain, signingClients } = useGrazSessionStore.getState();
 
   if (!activeChain || !signingClients) {
     throw new Error("No connected account detected");
   }
 
-  const { defaultSigningClient } = useGrazStore.getState();
+  const { defaultSigningClient } = useGrazInternalStore.getState();
   const balances = await Promise.all(
     activeChain.currencies.map(async (item) => {
       const isCw20 = item.coinMinimalDenom.startsWith("cw20:");
@@ -27,7 +27,8 @@ export const getBalances = async (bech32Address: string): Promise<Coin[]> => {
 };
 
 export const getBalanceStaked = async (bech32Address: string): Promise<Coin | null> => {
-  const { clients } = useGrazStore.getState();
+  const { clients } = useGrazSessionStore.getState();
+  console.log(clients);
   if (!clients?.stargate) {
     throw new Error("Stargate client is not ready");
   }
@@ -50,7 +51,8 @@ export const sendTokens = async ({
   fee,
   memo,
 }: SendTokensArgs): Promise<DeliverTxResponse> => {
-  const { signingClients, defaultSigningClient } = useGrazStore.getState();
+  const { defaultSigningClient } = useGrazInternalStore.getState();
+  const { signingClients } = useGrazSessionStore.getState();
   if (!signingClients) {
     throw new Error("No connected account detected");
   }
@@ -84,7 +86,7 @@ export const sendIbcTokens = async ({
   fee,
   memo,
 }: SendIbcTokensArgs) => {
-  const { signingClients } = useGrazStore.getState();
+  const { signingClients } = useGrazSessionStore.getState();
   if (!signingClients?.stargate) {
     throw new Error("Stargate signing client is not ready");
   }
@@ -128,7 +130,7 @@ export const instantiateContract = async <Message extends Record<string, unknown
   label,
   codeId,
 }: InstantiateContractArgs<Message>) => {
-  const { signingClients } = useGrazStore.getState();
+  const { signingClients } = useGrazSessionStore.getState();
 
   if (!signingClients?.cosmWasm) {
     throw new Error("CosmWasm signing client is not ready");
@@ -163,7 +165,7 @@ export const executeContract = async <Message extends Record<string, unknown>>({
   funds,
   memo,
 }: ExecuteContractArgs<Message>) => {
-  const { signingClients } = useGrazStore.getState();
+  const { signingClients } = useGrazSessionStore.getState();
 
   if (!signingClients?.cosmWasm) {
     throw new Error("CosmWasm signing client is not ready");
@@ -173,7 +175,7 @@ export const executeContract = async <Message extends Record<string, unknown>>({
 };
 
 export const getQuerySmart = async <TData>(address: string, queryMsg: Record<string, unknown>): Promise<TData> => {
-  const { clients } = useGrazStore.getState();
+  const { clients } = useGrazSessionStore.getState();
 
   if (!clients?.cosmWasm) {
     throw new Error("CosmWasm client is not ready");
@@ -184,7 +186,7 @@ export const getQuerySmart = async <TData>(address: string, queryMsg: Record<str
 };
 
 export const getQueryRaw = (address: string, keyStr: string): Promise<Uint8Array | null> => {
-  const { clients } = useGrazStore.getState();
+  const { clients } = useGrazSessionStore.getState();
 
   if (!clients?.cosmWasm) {
     throw new Error("CosmWasm client is not ready");

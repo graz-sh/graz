@@ -9,7 +9,7 @@ import type { ConnectResult } from "../actions/account";
 import type { SuggestChainAndConnectArgs } from "../actions/chains";
 import { clearRecentChain, getActiveChainCurrency, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import type { GrazChain } from "../chains";
-import { useGrazStore } from "../store";
+import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
 
@@ -23,7 +23,7 @@ import { useCheckWallet } from "./wallet";
  * ```
  */
 export const useActiveChain = (): GrazChain | null => {
-  return useGrazStore((x) => x.activeChain);
+  return useGrazSessionStore((x) => x.activeChain);
 };
 
 /**
@@ -92,7 +92,7 @@ export const useActiveChainValidators = <T extends QueryClient & StakingExtensio
  * @see {@link useActiveChain}
  */
 export const useRecentChain = () => {
-  const recentChain = useGrazStore((x) => x.recentChain);
+  const recentChain = useGrazInternalStore((x) => x.recentChain);
   return { data: recentChain, clear: clearRecentChain };
 };
 
