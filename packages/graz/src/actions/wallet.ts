@@ -12,6 +12,7 @@ import { RECONNECT_SESSION_KEY } from "../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Wallet } from "../types/wallet";
 import { WALLET_TYPES, WalletType } from "../types/wallet";
+import { isAndroid, isIos, isMobile } from "../utils/os";
 import { promiseWithTimeout } from "../utils/timeout";
 
 /**
@@ -146,10 +147,46 @@ interface WalletConnectSignDirectResponse {
   signed: WalletConnectSignDirectSigned;
 }
 
-export const getWalletConnect = (): Wallet => {
+export interface GetWalletConnectParams {
+  encoding: BufferEncoding;
+  walletType: WalletType.WC_KEPLR_MOBILE | WalletType.WC_LEAP_MOBILE;
+  appUrl: {
+    mobile: {
+      ios: string;
+      android: string;
+    };
+  };
+  formatNativeUrl: (appUrl: string, wcUri: string, os?: "android" | "ios") => string;
+}
+
+export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
     throw new Error("walletConnect.options.projectId is not defined");
   }
+
+  const encoding = params?.encoding || "base64";
+
+  const redirectToApp = (wcUri?: string) => {
+    if (!params) return;
+    const { appUrl, formatNativeUrl } = params;
+    if (!isMobile()) return;
+    if (isAndroid()) {
+      if (!wcUri) {
+        window.open(appUrl.mobile.android, "_self", "noreferrer noopener");
+      } else {
+        const href = formatNativeUrl(appUrl.mobile.android, wcUri, "android");
+        window.open(href, "_self", "noreferrer noopener");
+      }
+    }
+    if (isIos()) {
+      if (!wcUri) {
+        window.open(appUrl.mobile.ios, "_self", "noreferrer noopener");
+      } else {
+        const href = formatNativeUrl(appUrl.mobile.ios, wcUri, "ios");
+        window.open(href, "_self", "noreferrer noopener");
+      }
+    }
+  };
 
   const _disconnect = () => {
     const { wcSignClient } = useGrazSessionStore.getState();
@@ -346,25 +383,26 @@ export const getWalletConnect = (): Wallet => {
         },
       });
       if (!uri) throw new Error("No wallet connect uri");
-      // console.log("uri", uri);
-      // const enc = encodeURIComponent(uri);
-      // console.log("enc", enc);
-      // window.open(`leapcosmos://wcV2?${g}`, "_self", "noreferrer noopener");
-      await web3Modal.openModal({ uri });
+      if (!params) {
+        await web3Modal.openModal({ uri });
+      } else {
+        redirectToApp(uri);
+      }
       try {
         await promiseWithTimeout(
           (async () => {
             await approval();
           })(),
-          30000,
+          40000,
           new Error("Modal approval timeout"),
         );
       } catch (error) {
         web3Modal.closeModal();
         if (!(error as Error).message.toLowerCase().includes("no matching key")) return Promise.reject(error);
       }
-
-      web3Modal.closeModal();
+      if (!params) {
+        web3Modal.closeModal();
+      }
       return Promise.resolve();
     }
     try {
@@ -389,6 +427,7 @@ export const getWalletConnect = (): Wallet => {
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
     const topic = getSession(chainId)?.topic;
     if (!topic) throw new Error("No wallet connect session");
+    redirectToApp();
     const result: { address: string; algo: string; pubkey: string }[] = await wcSignClient.request({
       topic,
       chainId: `cosmos:${chainId}`,
@@ -397,11 +436,12 @@ export const getWalletConnect = (): Wallet => {
         params: {},
       },
     });
+
     if (!result[0]) throw new Error("No wallet connect account");
     return {
       address: result[0].address,
       algo: result[0].algo as Algo,
-      pubkey: new Uint8Array(Buffer.from(result[0].pubkey, "base64")),
+      pubkey: new Uint8Array(Buffer.from(result[0].pubkey, encoding)),
     };
   };
 
@@ -438,13 +478,14 @@ export const getWalletConnect = (): Wallet => {
           signerAddress: signer,
           signDoc: {
             ...signDoc,
-            bodyBytes: Buffer.from(signDoc.bodyBytes).toString("base64"),
-            authInfoBytes: Buffer.from(signDoc.authInfoBytes).toString("base64"),
+            bodyBytes: Buffer.from(signDoc.bodyBytes).toString(encoding),
+            authInfoBytes: Buffer.from(signDoc.authInfoBytes).toString(encoding),
             accountNumber: signDoc.accountNumber?.toString(),
           },
         },
       },
     };
+    redirectToApp();
     const result: WalletConnectSignDirectResponse = await wcSignClient.request(req);
     return result;
   };
@@ -456,8 +497,8 @@ export const getWalletConnect = (): Wallet => {
       signed: {
         chainId: signed.chainId,
         accountNumber: Long.fromString(signed.accountNumber, false),
-        authInfoBytes: new Uint8Array(Buffer.from(signed.authInfoBytes, "base64")),
-        bodyBytes: new Uint8Array(Buffer.from(signed.bodyBytes, "base64")),
+        authInfoBytes: new Uint8Array(Buffer.from(signed.authInfoBytes, encoding)),
+        bodyBytes: new Uint8Array(Buffer.from(signed.bodyBytes, encoding)),
       },
       signature,
     };
@@ -473,6 +514,7 @@ export const getWalletConnect = (): Wallet => {
     const topic = getSession(chainId)?.topic;
     if (!topic) throw new Error("No wallet connect session");
 
+    redirectToApp();
     const result: AminoSignResponse = await wcSignClient.request({
       topic,
       chainId: `cosmos:${chainId}`,
@@ -541,6 +583,97 @@ export const getWalletConnect = (): Wallet => {
   };
 };
 
+export const getWCKeplr = (): Wallet => {
+  if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
+    throw new Error("walletConnect.options.projectId is not defined");
+  }
+
+  if (!isMobile()) throw new Error("WalletConnect Keplr mobile is only supported in mobile");
+
+  const params: GetWalletConnectParams = {
+    encoding: "base64",
+    appUrl: {
+      mobile: {
+        ios: "keplrwallet://",
+        android: "intent://",
+      },
+    },
+    walletType: WalletType.WC_KEPLR_MOBILE,
+    formatNativeUrl: (appUrl, wcUri, os) => {
+      const plainAppUrl = appUrl.replaceAll("/", "").replaceAll(":", "");
+      const encoded = encodeURIComponent(wcUri);
+      switch (os) {
+        case "ios":
+          return `${plainAppUrl}://wcV2?${encoded}`;
+        case "android":
+          return `${plainAppUrl}://wcV2?${encoded}#Intent;package=com.chainapsis.keplr;scheme=keplrwallet;end;`;
+        default:
+          return `${plainAppUrl}://wc?uri=${encoded}`;
+      }
+    },
+  };
+
+  return getWalletConnect(params);
+};
+
+export const getWCLeap = (): Wallet => {
+  if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
+    throw new Error("walletConnect.options.projectId is not defined");
+  }
+
+  if (!isMobile()) throw new Error("WalletConnect Leap mobile is only supported in mobile");
+
+  const params: GetWalletConnectParams = {
+    encoding: "base64",
+    appUrl: {
+      mobile: {
+        ios: "leapcosmos://",
+        android: "intent://",
+      },
+    },
+    walletType: WalletType.WC_LEAP_MOBILE,
+    formatNativeUrl: (appUrl, wcUri, os) => {
+      const plainAppUrl = appUrl.replaceAll("/", "").replaceAll(":", "");
+      const encoded = encodeURIComponent(wcUri);
+      switch (os) {
+        case "ios":
+          return `${plainAppUrl}://wcV2?${encoded}`;
+        case "android":
+          return `${plainAppUrl}://wcV2?${encoded}#Intent;package=io.leapwallet.cosmos;scheme=leapwallet;end;`;
+        default:
+          return `${plainAppUrl}://wc?uri=${encoded}`;
+      }
+    },
+  };
+
+  return getWalletConnect(params);
+};
+
+export const getWCCosmostation = (): Wallet => {
+  if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
+    throw new Error("walletConnect.options.projectId is not defined");
+  }
+
+  if (!isMobile()) throw new Error("WalletConnect Leap mobile is only supported in mobile");
+
+  const params: GetWalletConnectParams = {
+    encoding: "hex",
+    appUrl: {
+      mobile: {
+        ios: "cosmostation://",
+        android: "cosmostation://",
+      },
+    },
+    walletType: WalletType.WC_LEAP_MOBILE,
+    formatNativeUrl: (appUrl, wcUri, _os) => {
+      const plainAppUrl = appUrl.replaceAll("/", "").replaceAll(":", "");
+      return `${plainAppUrl}://wc?${wcUri}`;
+    },
+  };
+
+  return getWalletConnect(params);
+};
+
 /**
  * Function to return wallet object based on given {@link WalletType} or from store and throws an error if it does not
  * exist on `window` or unknown wallet type.
@@ -566,6 +699,15 @@ export const getWallet = (type: WalletType = useGrazInternalStore.getState().wal
     }
     case WalletType.WALLETCONNECT: {
       return getWalletConnect();
+    }
+    case WalletType.WC_KEPLR_MOBILE: {
+      return getWCKeplr();
+    }
+    case WalletType.WC_LEAP_MOBILE: {
+      return getWCLeap();
+    }
+    case WalletType.WC_COSMOSTATION_MOBILE: {
+      return getWCCosmostation();
     }
     default: {
       throw new Error("Unknown wallet type");

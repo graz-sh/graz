@@ -1,5 +1,5 @@
 import { Button, Stack, Tooltip, useDisclosure, useToast } from "@chakra-ui/react";
-import { mainnetChains, useAccount, useConnect, useDisconnect, WalletType } from "graz";
+import { getAvailableWallets, mainnetChains, useAccount, useConnect, useDisconnect, WalletType } from "graz";
 
 import { Modal } from "../core/modal";
 
@@ -34,6 +34,8 @@ export const WalletConnectButton = () => {
     return connect({ chain: mainnetChains.cosmoshub, walletType: wallet });
   };
 
+  const wallets = getAvailableWallets();
+
   return (
     <>
       {!isConnected ? (
@@ -51,10 +53,23 @@ export const WalletConnectButton = () => {
       {!isConnected && (
         <Modal isOpen={isOpen} onClose={onClose} modalHeader="Select a wallet">
           <Stack spacing={3}>
-            <Button onClick={() => handleConnect(WalletType.KEPLR)}>Keplr</Button>
-            <Button onClick={() => handleConnect(WalletType.LEAP)}>Leap</Button>
-            <Button onClick={() => handleConnect(WalletType.COSMOSTATION)}>Cosmostation</Button>
-            <Button onClick={() => handleConnect(WalletType.WALLETCONNECT)}>WalletConnect</Button>
+            {wallets.keplr ? <Button onClick={() => handleConnect(WalletType.KEPLR)}>Keplr</Button> : null}
+            {wallets.leap ? <Button onClick={() => handleConnect(WalletType.LEAP)}>Leap</Button> : null}
+            {wallets.cosmostation ? (
+              <Button onClick={() => handleConnect(WalletType.COSMOSTATION)}>Cosmostation</Button>
+            ) : null}
+            {wallets.walletconnect ? (
+              <Button onClick={() => handleConnect(WalletType.WALLETCONNECT)}>WalletConnect</Button>
+            ) : null}
+            {wallets.wc_keplr_mobile ? (
+              <Button onClick={() => handleConnect(WalletType.WC_KEPLR_MOBILE)}>Keplr Mobile</Button>
+            ) : null}
+            {wallets.wc_leap_mobile ? (
+              <Button onClick={() => handleConnect(WalletType.WC_LEAP_MOBILE)}>LEAP Mobile</Button>
+            ) : null}
+            {wallets.wc_cosmostation_mobile ? (
+              <Button onClick={() => handleConnect(WalletType.WC_COSMOSTATION_MOBILE)}>Cosmostation Mobile</Button>
+            ) : null}
           </Stack>
         </Modal>
       )}
