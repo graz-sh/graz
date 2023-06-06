@@ -13,15 +13,16 @@ import { persist, subscribeWithSelector } from "zustand/middleware";
 import type { GrazChain } from "../chains";
 import { WalletType } from "../types/wallet";
 
+export interface WalletConnectStore {
+  options: SignClientTypes.Options | null;
+  web3Modal?: Pick<Web3ModalConfig, "themeVariables" | "themeMode" | "privacyPolicyUrl" | "termsOfServiceUrl"> | null;
+}
 export interface GrazInternalStore {
   defaultChain: GrazChain | null;
   defaultSigningClient: "cosmWasm" | "stargate";
   recentChain: GrazChain | null;
   walletType: WalletType;
-  walletConnect: {
-    options: SignClientTypes.Options | null;
-    web3Modal?: Pick<Web3ModalConfig, "themeVariables" | "themeMode" | "privacyPolicyUrl" | "termsOfServiceUrl"> | null;
-  } | null;
+  walletConnect: WalletConnectStore | null;
   _notFoundFn: () => void;
   _reconnect: boolean;
   _reconnectConnector: WalletType | null;
