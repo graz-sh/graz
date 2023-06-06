@@ -9,8 +9,8 @@
 ## Features
 
 - 🪝 20+ hooks for interfacing with wallets, clients, signers, etc. (connecting, view balances, send tokens, etc.)
-- 💳 Multiple wallet supports (Keplr, Leap, Cosmostation)
-- ⚙️ Generate mainnet & testnet `ChainInfo`
+- 💳 Multiple wallet supports (Keplr, Leap, Cosmostation, WalletConnect )
+- ⚙️ Generate mainnet & testnet `ChainInfo` from chain registry
 - 📚 Built-in caching, request deduplication, and all the good stuff from [`@tanstack/react-query`](https://tanstack.com/query) and [`zustand`](https://github.com/pmndrs/zustand)
 - 🔄 Auto refresh on wallet and network change
 - 👏 Fully typed and tree-shakeable
@@ -77,10 +77,47 @@ function Wallet() {
 }
 ```
 
+## Generate ChainInfo
+
+with `graz generate` you can generate mainnet and testnet chains directly from [Cosmos chain registry](https://github.com/cosmos/chain-registry), To generate `ChainInfo` `graz` is required in your project.
+
+```shell
+# using yarn
+yarn graz generate
+
+# using npm
+npm graz generate
+
+# using pnpm
+pnpm graz generate
+```
+
+### Usage
+
+FYI: it's fully typed❤️
+
+```tsx
+import { mainnetChains, getChainData, getChainDataArray } from "graz/chains";
+
+mainnetChains.cosmoshub;
+
+// Get chains only what you need
+const { cosmoshub } = getChainData("cosmoshub");
+const { cosmoshub, juno } = getChainData(["cosmoshub", "juno"]);
+
+const [cosmoshub] = getChainData("cosmoshub");
+const [cosmoshub, juno] = getChainDataArray(["cosmoshub", "juno"]);
+
+// usage
+cosmoshub.chainInfo;
+cosmoshub.assetList;
+cosmoshub.registry;
+```
+
 ## Examples
 
-- Next.js + Chakra UI: https://graz-example.vercel.app
-- Vite: https://graz-vite-example.vercel.app
+- Next.js + Chakra UI: https://graz-example.vercel ([source code](./example/next/))
+- Vite: https://graz-vite-example.vercel.app ([source code](./example/vite/))
 
 ## Third-party dependencies
 

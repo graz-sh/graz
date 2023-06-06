@@ -4,37 +4,51 @@ sidebar_position: 3
 
 # Generate ChainInfo
 
-With `graz cli` you can generate mainnet and testnet chain `ChainInfo` directly from https://cosmos.directory
-
-![graz cli preview](/img/graz-cli.gif)
+with `graz generate` you can generate mainnet and testnet chains directly from [Cosmos chain registry](https://github.com/cosmos/chain-registry), To generate `ChainInfo` `graz` is required in your project.
 
 ```shell
 # using yarn
-yarn graz cli
+yarn graz generate
+
+# using npm
+npm graz generate
+
+# using pnpm
+pnpm graz generate
 ```
 
-#### Options:
+### Auto generate
 
-```shell
+in your `package.json` add it to in your `install` or `postInstall` scripts
 
-  -g, --generate        Generate chain definitions and export to "graz/chains"
-  -h, --help            Show this help message
+```json
+{
+  // ...
+  "scripts": {
+    "install": "graz generate"
+  }
+  // ...
+}
 ```
 
-#### Generate options:
+### Usage
 
-```shell
-  -b, --best            Set REST and RPC endpoint to best available nodes instead or first listed ones
-  -M, --mainnet         Generate given mainnet chain paths seperated by commas (e.g. "axelar,cosmoshub,juno")
-  -T, --testnet         Generate given testnet chain paths seperated by commas (e.g. "atlantic,bitcannadev,cheqdtestnet")
-  --authz               Generate only authz compatible chains
+FYI: it's fully typed❤️
 
-```
+```tsx
+import { mainnetChains, getChainData, getChainDataArray } from "graz/chains";
 
-#### Import generated chains
+mainnetChains.cosmoshub;
 
-After you generate `ChainInfo` you can use it in you project
+// Get chains only what you need
+const { cosmoshub } = getChainData("cosmoshub");
+const { cosmoshub, juno } = getChainData(["cosmoshub", "juno"]);
 
-```ts
-import { axelar, cosmoshub, sommelier, mainnetChains, testnetChains } from "graz/chains";
+const [cosmoshub] = getChainData("cosmoshub");
+const [cosmoshub, juno] = getChainDataArray(["cosmoshub", "juno"]);
+
+// usage
+cosmoshub.chainInfo;
+cosmoshub.assetList;
+cosmoshub.registry;
 ```

@@ -11,9 +11,9 @@ export const SupportedWallet = () => {
   const { connect } = useConnect();
   return (
     <div>
-      {WALLET_TYPES.map((item) => (
-        <button onClick={connect({ chain: mainnetChains.cosmoshub, walletType: item })} key={item}>
-          {item}
+      {WALLET_TYPES.map((name) => (
+        <button onClick={connect({ chain: mainnetChains.cosmoshub, walletType: name })} key={name}>
+          {name}
         </button>
       ))}
     </div>

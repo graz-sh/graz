@@ -41,5 +41,9 @@ enum WalletType {
   KEPLR = "keplr",
   LEAP = "leap",
   COSMOSTATION = "cosmostation",
+  WALLETCONNECT = "walletconnect",
+  WC_KEPLR_MOBILE = "wc_keplr_mobile",
+  WC_LEAP_MOBILE = "wc_leap_mobile",
+  WC_COSMOSTATION_MOBILE = "wc_cosmostation_mobile",
 }
 ```
