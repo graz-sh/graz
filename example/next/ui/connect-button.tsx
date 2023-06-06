@@ -33,7 +33,7 @@ export const ConnectButton: FC = () => {
     },
   });
 
-  const { connect, isSupported } = useConnect({
+  const { connect } = useConnect({
     onSuccess: () => console.log("wallet connected"),
   });
 
@@ -50,7 +50,6 @@ export const ConnectButton: FC = () => {
     <>
       <ButtonGroup alignSelf="end" isAttached variant="outline">
         <Button
-          isDisabled={!isSupported}
           isLoading={isConnecting || isReconnecting}
           onClick={() => (isConnected ? disconnect() : onOpen())}
         >
