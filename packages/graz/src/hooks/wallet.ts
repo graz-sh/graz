@@ -2,7 +2,7 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 
 import { checkWallet } from "../actions/wallet";
-import { useGrazStore } from "../store";
+import { useGrazInternalStore } from "../store";
 import type { WalletType } from "../types/wallet";
 
 /**
@@ -17,7 +17,7 @@ import type { WalletType } from "../types/wallet";
  * ```
  */
 export const useCheckWallet = (type?: WalletType): UseQueryResult<boolean> => {
-  const walletType = useGrazStore((x) => type || x.walletType);
+  const walletType = useGrazInternalStore((x) => type || x.walletType);
 
   const queryKey = ["USE_CHECK_WALLET", walletType] as const;
   const query = useQuery(queryKey, ({ queryKey: [, _type] }) => checkWallet(_type));

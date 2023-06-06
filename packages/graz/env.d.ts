@@ -5,6 +5,7 @@ declare interface Window extends KeplrWindow {
   cosmostation: {
     cosmos: {
       on: (type: string, listener: EventListenerOrEventListenerObject) => void;
+      off: (type: string, listener: EventListenerOrEventListenerObject) => void;
     };
     providers: {
       keplr: KeplrWindow["keplr"];

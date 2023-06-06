@@ -3,7 +3,7 @@
 import { QueryClient } from "@cosmjs/stargate";
 import { assert, isNonNullObject } from "@cosmjs/utils";
 
-import { useGrazStore } from "../../store";
+import { useGrazSessionStore } from "../../store";
 import type { ExtensionSetup } from "../../types/tendermint";
 
 // https://stackoverflow.com/a/53143568/4273667
@@ -101,7 +101,7 @@ export interface CreateQueryClient {
  * NOT to be confused with \@tanstack/react-query query client
  */
 export const createQueryClient: CreateQueryClient = (...extensionSetups: ExtensionSetup[]) => {
-  const { tendermint } = useGrazStore.getState().clients!;
+  const { tendermint } = useGrazSessionStore.getState().clients!;
   const queryClient = new QueryClient(tendermint);
   const exts = extensionSetups.map((setup) => setup(queryClient));
   for (const ext of exts) {

@@ -31,3 +31,5 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
 - defaultWallet?: `WalletType`;
 - onNotFound?: () => void;
 - autoReconnect?: boolean; -> Defaults to `true`, will try to reconnect when initial start(session empty)
+- onReconnectFailed?: () => void;
+- walletConnect?: [`WalletConnectStore`](../types/WalletConnectStore.md) | null

@@ -10,7 +10,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { useAccount, useConnect, useDisconnect, WalletType } from "graz";
+import { getAvailableWallets, useAccount, useConnect, useDisconnect, WalletType } from "graz";
 import type { FC } from "react";
 
 export const ConnectButton: FC = () => {
@@ -45,7 +45,7 @@ export const ConnectButton: FC = () => {
     connect({ walletType: wallet });
     onClose();
   };
-
+  const wallets = getAvailableWallets();
   return (
     <>
       <ButtonGroup alignSelf="end" isAttached variant="outline">
@@ -64,9 +64,23 @@ export const ConnectButton: FC = () => {
         <ModalContent>
           <ModalHeader>Select a wallet</ModalHeader>
           <Stack spacing={3} p={4}>
-            <Button onClick={() => handleConnect(WalletType.KEPLR)}>Keplr</Button>
-            <Button onClick={() => handleConnect(WalletType.LEAP)}>Leap</Button>
-            <Button onClick={() => handleConnect(WalletType.COSMOSTATION)}>Cosmostation</Button>
+            {wallets.keplr ? <Button onClick={() => handleConnect(WalletType.KEPLR)}>Keplr</Button> : null}
+            {wallets.leap ? <Button onClick={() => handleConnect(WalletType.LEAP)}>Leap</Button> : null}
+            {wallets.cosmostation ? (
+              <Button onClick={() => handleConnect(WalletType.COSMOSTATION)}>Cosmostation</Button>
+            ) : null}
+            {wallets.walletconnect ? (
+              <Button onClick={() => handleConnect(WalletType.WALLETCONNECT)}>WalletConnect</Button>
+            ) : null}
+            {wallets.wc_keplr_mobile ? (
+              <Button onClick={() => handleConnect(WalletType.WC_KEPLR_MOBILE)}>Keplr Mobile</Button>
+            ) : null}
+            {wallets.wc_leap_mobile ? (
+              <Button onClick={() => handleConnect(WalletType.WC_LEAP_MOBILE)}>LEAP Mobile</Button>
+            ) : null}
+            {wallets.wc_cosmostation_mobile ? (
+              <Button onClick={() => handleConnect(WalletType.WC_COSMOSTATION_MOBILE)}>Cosmostation Mobile</Button>
+            ) : null}
           </Stack>
         </ModalContent>
       </Modal>
