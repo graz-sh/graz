@@ -40,7 +40,7 @@ export const GrazProvider: FC<GrazProviderProps> = ({ children, grazOptions, deb
     configureGraz(grazOptions);
   }
   return (
-    <QueryClientProvider client={queryClient} {...props}>
+    <QueryClientProvider key="graz-provider" client={queryClient} {...props}>
       <ClientOnly>
         <GrazEvents />
         {children}
