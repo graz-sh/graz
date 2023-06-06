@@ -1,10 +1,11 @@
 import { Button, Center, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import BigNumber from "bignumber.js";
-import { useActiveChain, useActiveChainValidators, useBalances } from "graz";
+import { useAccount, useActiveChain, useActiveChainValidators, useBalances } from "graz";
 import { useQueryClient } from "src/hooks/use-query-client";
 import { numberWithCommas } from "src/utils/numberWithCommas";
 
 const Validators = () => {
+  const { isConnected } = useAccount();
   const balances = useBalances();
   const queryClient = useQueryClient();
   const { data } = useActiveChainValidators(queryClient.data);
@@ -45,54 +46,58 @@ const Validators = () => {
 
   return (
     <Stack w="full">
-      <TableContainer>
-        <Table size="sm" variant="simple">
-          <Thead>
-            <Tr>
-              <Th isNumeric>#</Th>
-              <Th>Name</Th>
-              <Th isNumeric>Voting Power</Th>
-              <Th isNumeric>Comission</Th>
-              <Th />
-            </Tr>
-          </Thead>
-          <Tbody>
-            {validators?.map((validator, index) => {
-              const votingPower = Number(new BigNumber(validator.tokens).shiftedBy(-stakeCurrencyDecimal!))
-                .toFixed()
-                .toString();
-              const commissionRates = `${Number(
-                Number(
-                  new BigNumber(validator.commission!.commissionRates!.rate).div(1e18).toFixed(2, BigNumber.ROUND_CEIL),
-                ) * 100,
-              ).toFixed()}%`;
-              return (
-                <Tr key={validator.description?.moniker}>
-                  <Td isNumeric>{index + 1}</Td>
-                  <Td>{validator.description?.moniker}</Td>
-                  <Td isNumeric fontFamily="mono">
-                    {numberWithCommas(votingPower)} {stakeCurrencyDenom}
-                  </Td>
-                  <Td isNumeric fontFamily="mono">
-                    {commissionRates}
-                  </Td>
-                  <Td>
-                    <Button as="a" href={url} target="_blank" size="xs">
-                      Manage
-                    </Button>
-                  </Td>
-                </Tr>
-              );
-            })}
-          </Tbody>
-        </Table>
+      {isConnected ? (
+        <TableContainer>
+          <Table size="sm" variant="simple">
+            <Thead>
+              <Tr>
+                <Th isNumeric>#</Th>
+                <Th>Name</Th>
+                <Th isNumeric>Voting Power</Th>
+                <Th isNumeric>Comission</Th>
+                <Th />
+              </Tr>
+            </Thead>
+            <Tbody>
+              {validators?.map((validator, index) => {
+                const votingPower = Number(new BigNumber(validator.tokens).shiftedBy(-stakeCurrencyDecimal!))
+                  .toFixed()
+                  .toString();
+                const commissionRates = `${Number(
+                  Number(
+                    new BigNumber(validator.commission!.commissionRates!.rate)
+                      .div(1e18)
+                      .toFixed(2, BigNumber.ROUND_CEIL),
+                  ) * 100,
+                ).toFixed()}%`;
+                return (
+                  <Tr key={validator.description?.moniker}>
+                    <Td isNumeric>{index + 1}</Td>
+                    <Td>{validator.description?.moniker}</Td>
+                    <Td isNumeric fontFamily="mono">
+                      {numberWithCommas(votingPower)} {stakeCurrencyDenom}
+                    </Td>
+                    <Td isNumeric fontFamily="mono">
+                      {commissionRates}
+                    </Td>
+                    <Td>
+                      <Button as="a" href={url} target="_blank" size="xs">
+                        Manage
+                      </Button>
+                    </Td>
+                  </Tr>
+                );
+              })}
+            </Tbody>
+          </Table>
 
-        {balances.isLoading ? (
-          <Center>
-            <Spinner />
-          </Center>
-        ) : null}
-      </TableContainer>
+          {balances.isLoading ? (
+            <Center>
+              <Spinner />
+            </Center>
+          ) : null}
+        </TableContainer>
+      ) : null}
     </Stack>
   );
 };
