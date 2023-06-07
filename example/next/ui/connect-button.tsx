@@ -49,10 +49,7 @@ export const ConnectButton: FC = () => {
   return (
     <>
       <ButtonGroup alignSelf="end" isAttached variant="outline">
-        <Button
-          isLoading={isConnecting || isReconnecting}
-          onClick={() => (isConnected ? disconnect() : onOpen())}
-        >
+        <Button isLoading={isConnecting || isReconnecting} onClick={() => (isConnected ? disconnect() : onOpen())}>
           {isConnected ? "Disconnect" : "Connect"} Wallet
         </Button>
         {isConnected ? <IconButton aria-label="refresh" icon={<>🔄</>} onClick={() => void reconnect()} /> : null}

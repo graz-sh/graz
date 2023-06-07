@@ -1,18 +1,17 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { configureGraz, GrazProvider, mainnetChains } from "graz";
+import { GrazProvider } from "graz";
+import { getChainData } from "graz/chains";
 import type { AppProps } from "next/app";
 import { Layout } from "src/ui/layout";
 
 const theme = extendTheme();
 
-configureGraz({
-  defaultChain: mainnetChains.cosmoshub,
-});
-
 const MyApp = ({ Component, pageProps }: AppProps) => {
+  const { cosmoshub } = getChainData("cosmoshub");
   return (
     <GrazProvider
       grazOptions={{
+        defaultChain: cosmoshub.chainInfo,
         walletConnect: {
           options: {
             projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
@@ -22,6 +21,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
     >
       <ChakraProvider resetCSS theme={theme}>
         <Layout>
+          {/* @ts-expect-error typing mismatch */}
           <Component {...pageProps} />
         </Layout>
       </ChakraProvider>

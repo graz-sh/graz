@@ -1,12 +1,6 @@
 import { Button, ButtonGroup, FormControl, FormLabel, useToast } from "@chakra-ui/react";
-import {
-  mainnetChainsArray,
-  testnetChains,
-  useAccount,
-  useActiveChain,
-  useConnect,
-  useSuggestChainAndConnect,
-} from "graz";
+import { useAccount, useActiveChain, useConnect, useSuggestChainAndConnect } from "graz";
+import { getChainData, getChainDataArray } from "graz/chains";
 
 export const ChainSwitcher = () => {
   const toast = useToast();
@@ -32,11 +26,13 @@ export const ChainSwitcher = () => {
     onSuccess: () => console.log("switched chain"),
   });
 
+  const chains = getChainDataArray(["cosmoshub", "juno", "osmosis", "stargaze"]).map((c) => c.chainInfo);
+  const { osmosistestnet } = getChainData("osmosistestnet");
   return (
     <FormControl>
       <FormLabel my={4}>Switch Chain</FormLabel>
       <ButtonGroup flexWrap="wrap" gap={2} isDisabled={isConnecting || isReconnecting} size="sm" spacing={0}>
-        {mainnetChainsArray.map((chain) => (
+        {chains.map((chain) => (
           <Button
             key={chain.chainId}
             colorScheme={activeChain?.chainId === chain.chainId ? "green" : "gray"}
@@ -49,14 +45,14 @@ export const ChainSwitcher = () => {
       <FormLabel my={4}>Suggest and connect chain</FormLabel>
       <ButtonGroup isDisabled={isConnecting || isReconnecting} size="sm">
         <Button
-          colorScheme={activeChain?.chainId === testnetChains.osmosis.chainId ? "green" : "gray"}
+          colorScheme={activeChain?.chainId === osmosistestnet.chainInfo.chainId ? "green" : "gray"}
           onClick={() =>
             suggestAndConnect({
-              chainInfo: testnetChains.osmosis,
+              chainInfo: osmosistestnet.chainInfo,
             })
           }
         >
-          {testnetChains.osmosis.chainId}
+          {osmosistestnet.chainInfo.chainId}
         </Button>
       </ButtonGroup>
     </FormControl>
