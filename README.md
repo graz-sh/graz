@@ -79,22 +79,39 @@ function Wallet() {
 
 ## Generate ChainInfo
 
-with `graz generate` you can generate mainnet and testnet chains directly from [Cosmos chain registry](https://github.com/cosmos/chain-registry), To generate `ChainInfo` `graz` is required in your project.
+with `graz cli generate` you can generate mainnet and testnet chains directly from [Cosmos chain registry](https://github.com/cosmos/chain-registry), To generate `ChainInfo` `graz` is required in your project.
 
 ```shell
 # using yarn
-yarn graz generate
+yarn graz cli generate
 
 # using npm
-npm graz generate
+npm graz cli generate
 
 # using pnpm
-pnpm graz generate
+pnpm graz cli generate
+```
+
+#### Options:
+
+```shell
+generate [options]  generate chain definitions and export to "graz/chains"
+help [command]      display help for command
+```
+
+#### Generate options:
+
+```shell
+-R, --registry <url>           specify a custom chain registry namespace (e.g. org/repo, github:org/repo,
+                                 gitlab:org/repo)
+-M, --mainnet <chainPaths...>  generate given mainnet chain paths separated by spaces (e.g. "axelar cosmoshub juno")
+-T, --testnet <chainPaths...>  generate given testnet chain paths separated by spaces (e.g. "atlantic bitcannadev")
+-h, --help                     display help for command
 ```
 
 ### Usage
 
-FYI: it's fully typed❤️
+All accessible chains are exported in `graz/chains` directory, you can import them directly from there.
 
 ```tsx
 import { mainnetChains, getChainData, getChainDataArray } from "graz/chains";
@@ -113,6 +130,8 @@ cosmoshub.chainInfo;
 cosmoshub.assetList;
 cosmoshub.registry;
 ```
+
+Full docs about graz cli: https://graz.strange.love/docs/generate-chain-info
 
 ## Examples
 
