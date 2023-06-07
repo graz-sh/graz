@@ -18,6 +18,9 @@
   --ifm-breadcrumb-color-active: rgb(96, 159, 107);
   --ifm-link-color: rgb(96, 159, 107);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  --aa-primary-color-rgb: 4, 29, 18 !important;
+  --aa-muted-color-rgb: 4, 29, 18 !important;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -32,6 +35,9 @@
   --ifm-menu-color-active: #b7fcc2;
   --ifm-link-color: #b7fcc2;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  --aa-primary-color-rgb: 183, 252, 194 !important;
+  --aa-muted-color-rgb: 183, 252, 194 !important;
 }
 
 .navbar {
