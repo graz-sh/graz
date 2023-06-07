@@ -1,5 +1,6 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { GrazProvider, mainnetChains } from "graz";
+import { defaultChain } from "config/graz";
+import { GrazProvider } from "graz";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 
@@ -10,18 +11,20 @@ const CustomApp: NextPage<AppProps> = ({ Component, pageProps }) => {
     <ChakraProvider resetCSS theme={theme}>
       <GrazProvider
         grazOptions={{
-          defaultChain: mainnetChains.cosmoshub,
+          defaultChain,
           onReconnectFailed: () => {
             console.log("reconnect failed");
           },
-          autoReconnect: false, walletConnect: {
-          options: {
-            projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+          autoReconnect: false,
+          walletConnect: {
+            options: {
+              projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+            },
           },
-        },
         }}
         debug
       >
+        {/* @ts-expect-error typing mismatch */}
         <Component {...pageProps} />
       </GrazProvider>
     </ChakraProvider>

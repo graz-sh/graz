@@ -1,5 +1,7 @@
 import { Button, ButtonGroup, FormControl, FormLabel, useToast } from "@chakra-ui/react";
-import { mainnetChainsArray, testnetChains, useAccount, useConnect, useSuggestChainAndConnect } from "graz";
+import { mainnetChainsArray } from "config/graz";
+import { useAccount, useConnect, useSuggestChainAndConnect } from "graz";
+import osmosisTestnetChainInfo from "graz/chains/osmosistestnet";
 import type { FC } from "react";
 
 export const ChainSwitcher: FC = () => {
@@ -25,9 +27,9 @@ export const ChainSwitcher: FC = () => {
     <FormControl>
       <FormLabel>Switch Chain</FormLabel>
       <ButtonGroup flexWrap="wrap" gap={2} isDisabled={isConnecting || isReconnecting} size="sm" spacing={0}>
-        {mainnetChainsArray.map((chain) => (
-          <Button key={chain.chainId} onClick={() => connect({ chain })}>
-            {chain.chainId}
+        {mainnetChainsArray.map(({ chainInfo }) => (
+          <Button key={chainInfo.chainId} onClick={() => connect({ chain: chainInfo })}>
+            {chainInfo.chainId}
           </Button>
         ))}
       </ButtonGroup>
@@ -36,11 +38,11 @@ export const ChainSwitcher: FC = () => {
         <Button
           onClick={() =>
             suggestAndConnect({
-              chainInfo: testnetChains.osmosis,
+              chainInfo: osmosisTestnetChainInfo,
             })
           }
         >
-          {testnetChains.osmosis.chainId}
+          {osmosisTestnetChainInfo.chainId}
         </Button>
       </ButtonGroup>
     </FormControl>
