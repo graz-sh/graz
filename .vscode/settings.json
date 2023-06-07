@@ -15,7 +15,7 @@
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "eslint.workingDirectories": [
     { "!cwd": false, "directory": "docs" },
-    { "!cwd": false, "directory": "example" },
+    { "!cwd": false, "pattern": "example/*" },
     { "!cwd": false, "pattern": "packages/*" },
     { "!cwd": false, "pattern": "templates/*" }
   ],
