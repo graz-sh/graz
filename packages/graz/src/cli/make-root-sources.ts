@@ -73,22 +73,12 @@ export const makeRootSources = async ({
   const { code: chainsIndexCode } = new CodeGenerator(chainsIndexAst).generate();
   await fs.writeFile(path.resolve(__dirname, "../../chains/index.js"), chainsIndexCode, "utf-8");
 
-  const chainsDtsStub = await fs.readFile(path.resolve(__dirname, "../../stubs/chains-index.d.ts.stub"), "utf-8");
-  const chainsDtsAst = parse(chainsDtsStub, { sourceType: "module", plugins: [["typescript", { dts: true }]] });
+  let chainsDtsStub = await fs.readFile(path.resolve(__dirname, "../../stubs/chains-index.d.ts.stub"), "utf-8");
 
-  traverse(chainsDtsAst, {
-    TSTypeAliasDeclaration: (current) => {
-      if (t.isIdentifier(current.node.id, { name: "MainnetChainName" })) {
-        current.node.typeAnnotation = t.tsUnionType(mainnetPaths.map((p) => t.tsLiteralType(t.stringLiteral(p))));
-        current.skip();
-      }
-      if (t.isIdentifier(current.node.id, { name: "TestnetChainName" })) {
-        current.node.typeAnnotation = t.tsUnionType(testnetPaths.map((p) => t.tsLiteralType(t.stringLiteral(p))));
-        current.skip();
-      }
-    },
-  });
+  // replace via string due to @babel/parser doesn't recognize `const` keyword on generics
+  // todo: find a way to replace via ast
+  chainsDtsStub = chainsDtsStub.replace('"REPLACE_MAINNET_CHAIN_NAME"', mainnetPaths.map((p) => `"${p}"`).join(" | "));
+  chainsDtsStub = chainsDtsStub.replace('"REPLACE_TESTNET_CHAIN_NAME"', testnetPaths.map((p) => `"${p}"`).join(" | "));
 
-  const { code: chainsDtsCode } = new CodeGenerator(chainsDtsAst).generate();
-  await fs.writeFile(path.resolve(__dirname, "../../chains/index.d.ts"), chainsDtsCode, "utf-8");
+  await fs.writeFile(path.resolve(__dirname, "../../chains/index.d.ts"), chainsDtsStub, "utf-8");
 };

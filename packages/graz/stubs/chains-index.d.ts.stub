@@ -1,8 +1,8 @@
 /* eslint-disable */
 import type { ChainInfo } from "@keplr-wallet/types";
 import type { AssetList, Chain } from "../dist";
-export type MainnetChainName = "TODO";
-export type TestnetChainName = "TODO";
+export type MainnetChainName = "REPLACE_MAINNET_CHAIN_NAME";
+export type TestnetChainName = "REPLACE_TESTNET_CHAIN_NAME";
 export type ChainName = MainnetChainName | TestnetChainName;
 export interface ChainData {
   assetlist: AssetList;
