@@ -17,7 +17,7 @@
     "graz": "pnpm --dir packages/graz",
     "create-graz-app": "pnpm --dir packages/create-graz-app",
     "lint": "turbo run lint",
-    "prepare": "husky uninstall",
+    "postinstall": "pnpm -F graz build && pnpm -F graz cli generate",
     "release": "turbo run build --filter=graz && pnpm publish --filter graz",
     "release-adapter": "turbo run build --filter=\"graz-adapter-*\" && pnpm publish --filter=\"graz-adapter-*\"",
     "templates": "pnpm --dir templates/default",
