@@ -22,7 +22,7 @@
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist/*",
-    "cli": "node cli.mjs",
+    "cli": "node dist/cli/index.mjs",
     "dev": "tsup --watch",
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
     "prepublishOnly": "pnpm build"
