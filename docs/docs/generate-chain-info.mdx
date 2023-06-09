@@ -4,17 +4,17 @@ sidebar_position: 3
 
 # Generate ChainInfo
 
-with `graz cli` you can generate mainnet and testnet chains directly from [Cosmos chain registry](https://github.com/cosmos/chain-registry), To generate `ChainInfo` `graz` is required in your project.
+with `graz` you can generate mainnet and testnet chains directly from [Cosmos chain registry](https://github.com/cosmos/chain-registry), To generate `ChainInfo` `graz` is required in your project.
 
 ```shell
 # using yarn
-yarn graz cli generate
+yarn graz generate
 
 # using npm
-npm graz cli generate
+npm graz generate
 
 # using pnpm
-pnpm graz cli generate
+pnpm graz generate
 ```
 
 #### Options:
@@ -42,7 +42,7 @@ in your `package.json` add it to in your `install` or `postInstall` scripts
 {
   // ...
   "scripts": {
-    "install": "graz cli generate"
+    "install": "graz generate"
   }
   // ...
 }

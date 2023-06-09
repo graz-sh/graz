@@ -79,17 +79,17 @@ function Wallet() {
 
 ## Generate ChainInfo
 
-with `graz cli generate` you can generate mainnet and testnet chains directly from [Cosmos chain registry](https://github.com/cosmos/chain-registry), To generate `ChainInfo` `graz` is required in your project.
+with `graz generate` you can generate mainnet and testnet chains directly from [Cosmos chain registry](https://github.com/cosmos/chain-registry), To generate `ChainInfo` `graz` is required in your project.
 
 ```shell
 # using yarn
-yarn graz cli generate
+yarn graz generate
 
 # using npm
-npm graz cli generate
+npm graz generate
 
 # using pnpm
-pnpm graz cli generate
+pnpm graz generate
 ```
 
 #### Options:
@@ -131,7 +131,7 @@ cosmoshub.assetList;
 cosmoshub.registry;
 ```
 
-Full docs about graz cli: https://graz.strange.love/docs/generate-chain-info
+Full docs about `graz generate`: https://graz.strange.love/docs/generate-chain-info
 
 ## Examples
 
