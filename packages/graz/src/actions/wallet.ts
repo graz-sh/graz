@@ -33,6 +33,11 @@ export const checkWallet = (type: WalletType = useGrazInternalStore.getState().w
   }
 };
 
+const clearSession = () => {
+  window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
+  useGrazSessionStore.setState(grazSessionDefaultValues);
+};
+
 /**
  * Function to return {@link Wallet} object and throws and error if it does not exist on `window`.
  *
@@ -51,9 +56,15 @@ export const getKeplr = (): Wallet => {
   if (typeof window.keplr !== "undefined") {
     const keplr = window.keplr;
     const subscription: (reconnect: () => void) => void = (reconnect) => {
-      window.addEventListener("keplr_keystorechange", reconnect);
+      window.addEventListener("keplr_keystorechange", () => {
+        clearSession();
+        reconnect();
+      });
       return () => {
-        window.removeEventListener("keplr_keystorechange", reconnect);
+        window.removeEventListener("keplr_keystorechange", () => {
+          clearSession();
+          reconnect();
+        });
       };
     };
     const res = Object.assign(keplr, {
@@ -84,9 +95,15 @@ export const getLeap = (): Wallet => {
   if (typeof window.leap !== "undefined") {
     const leap = window.leap;
     const subscription: (reconnect: () => void) => void = (reconnect) => {
-      window.addEventListener("leap_keystorechange", reconnect);
+      window.addEventListener("leap_keystorechange", () => {
+        clearSession();
+        reconnect();
+      });
       return () => {
-        window.removeEventListener("leap_keystorechange", reconnect);
+        window.removeEventListener("leap_keystorechange", () => {
+          clearSession();
+          reconnect();
+        });
       };
     };
     const res = Object.assign(leap, {
@@ -117,9 +134,15 @@ export const getCosmostation = (): Wallet => {
   if (typeof window.cosmostation.providers.keplr !== "undefined") {
     const cosmostation = window.cosmostation.providers.keplr;
     const subscription: (reconnect: () => void) => void = (reconnect) => {
-      window.cosmostation.cosmos.on("accountChanged", reconnect);
+      window.cosmostation.cosmos.on("accountChanged", () => {
+        clearSession();
+        reconnect();
+      });
       return () => {
-        window.cosmostation.cosmos.off("accountChanged", reconnect);
+        window.cosmostation.cosmos.off("accountChanged", () => {
+          clearSession();
+          reconnect();
+        });
       };
     };
     const res = Object.assign(cosmostation, {
@@ -192,8 +215,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     const { wcSignClient } = useGrazSessionStore.getState();
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
 
-    window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
-    useGrazSessionStore.setState(grazSessionDefaultValues);
+    clearSession();
     useGrazInternalStore.setState({
       _reconnect: false,
       _reconnectConnector: null,

@@ -54,7 +54,9 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
 
     const { account: _account, activeChain } = useGrazSessionStore.getState();
     await wallet.init?.();
+    console.log(1);
     if (!_account || activeChain?.chainId !== chain.chainId) {
+      console.log(2);
       await wallet.enable(chain.chainId);
       const account = await wallet.getKey(chain.chainId);
       useGrazSessionStore.setState({ account });
@@ -120,7 +122,9 @@ export const reconnect = async (args?: ReconnectArgs) => {
   const { recentChain, _reconnectConnector, _reconnect } = useGrazInternalStore.getState();
   try {
     const isWalletReady = checkWallet(_reconnectConnector || undefined);
+    console.log("reconnecting");
     if (recentChain && isWalletReady && _reconnectConnector) {
+      console.log("connecting");
       const key = await connect({
         chain: recentChain,
         walletType: _reconnectConnector,
