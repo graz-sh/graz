@@ -77,43 +77,6 @@ function Wallet() {
 }
 ```
 
-## Generate ChainInfo
-
-with `graz generate` you can generate mainnet and testnet chains directly from [Cosmos chain registry](https://github.com/cosmos/chain-registry), To generate `ChainInfo` `graz` is required in your project.
-
-```shell
-# using yarn
-yarn graz generate
-
-# using npm
-npm graz generate
-
-# using pnpm
-pnpm graz generate
-```
-
-### Usage
-
-FYI: it's fully typed❤️
-
-```tsx
-import { mainnetChains, getChainData, getChainDataArray } from "graz/chains";
-
-mainnetChains.cosmoshub;
-
-// Get chains only what you need
-const { cosmoshub } = getChainData("cosmoshub");
-const { cosmoshub, juno } = getChainData(["cosmoshub", "juno"]);
-
-const [cosmoshub] = getChainData("cosmoshub");
-const [cosmoshub, juno] = getChainDataArray(["cosmoshub", "juno"]);
-
-// usage
-cosmoshub.chainInfo;
-cosmoshub.assetList;
-cosmoshub.registry;
-```
-
 ## Examples
 
 - Next.js + Chakra UI: https://graz-example.vercel ([source code](./example/next/))
