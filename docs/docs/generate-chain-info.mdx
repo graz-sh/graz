@@ -4,24 +4,38 @@ sidebar_position: 3
 
 # Generate ChainInfo
 
-with `graz generate` you can generate mainnet and testnet chains directly from [Cosmos chain registry](https://github.com/cosmos/chain-registry), To generate `ChainInfo` `graz` is required in your project.
+With `graz generate` you can generate mainnet and testnet chain `ChainInfo` directly from https://cosmos.directory
+
+![graz cli preview](/img/graz-cli.gif)
 
 ```shell
 # using yarn
 yarn graz generate
-
-# using npm
-npm graz generate
-
-# using pnpm
-pnpm graz generate
 ```
 
-### Auto generate
+#### Options:
 
-in your `package.json` add it to in your `install` or `postInstall` scripts
+```shell
 
-```json
+  -g, --generate        Generate chain definitions and export to "graz/chains"
+  -h, --help            Show this help message
+```
+
+#### Generate options:
+
+```shell
+  -b, --best            Set REST and RPC endpoint to best available nodes instead or first listed ones
+  -M, --mainnet         Generate given mainnet chain paths seperated by commas (e.g. "axelar,cosmoshub,juno")
+  -T, --testnet         Generate given testnet chain paths seperated by commas (e.g. "atlantic,bitcannadev,cheqdtestnet")
+  --authz               Generate only authz compatible chains
+
+```
+
+#### Add it to your project
+
+in your package.json add it to in your install or postInstall scripts
+
+```ts
 {
   // ...
   "scripts": {
@@ -31,24 +45,10 @@ in your `package.json` add it to in your `install` or `postInstall` scripts
 }
 ```
 
-### Usage
+#### Import generated chains
 
-FYI: it's fully typed❤️
+After you generate `ChainInfo` you can use it in you project
 
-```tsx
-import { mainnetChains, getChainData, getChainDataArray } from "graz/chains";
-
-mainnetChains.cosmoshub;
-
-// Get chains only what you need
-const { cosmoshub } = getChainData("cosmoshub");
-const { cosmoshub, juno } = getChainData(["cosmoshub", "juno"]);
-
-const [cosmoshub] = getChainData("cosmoshub");
-const [cosmoshub, juno] = getChainDataArray(["cosmoshub", "juno"]);
-
-// usage
-cosmoshub.chainInfo;
-cosmoshub.assetList;
-cosmoshub.registry;
+```ts
+import { axelar, cosmoshub, sommelier, mainnetChains, testnetChains } from "graz/chains";
 ```
