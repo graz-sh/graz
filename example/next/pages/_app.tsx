@@ -14,11 +14,12 @@ const CustomApp: NextPage<AppProps> = ({ Component, pageProps }) => {
           onReconnectFailed: () => {
             console.log("reconnect failed");
           },
-          autoReconnect: false, walletConnect: {
-          options: {
-            projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+          autoReconnect: false,
+          walletConnect: {
+            options: {
+              projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+            },
           },
-        },
         }}
         debug
       >
