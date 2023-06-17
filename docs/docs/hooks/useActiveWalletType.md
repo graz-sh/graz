@@ -1,6 +1,6 @@
 # useActiveWalletType
 
-hook to retrieve current active [`WalletType`](../docs/types/walletType.md)
+hook to retrieve current active [`WalletType`](../types/walletType.md)
 
 #### Usage
 
