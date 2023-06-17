@@ -1,11 +1,12 @@
 {
   "extends": "@strangelovelabs/style-guide/tsconfig.json",
   "compilerOptions": {
+    "downlevelIteration": true,
     "jsx": "react-jsx",
+    "module": "Node16",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "module": "Node16"
+    "resolveJsonModule": true
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "chains"],
   "include": ["env.d.ts", "**/*.ts", "**/*.tsx"]
 }

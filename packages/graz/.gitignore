@@ -1,4 +1,7 @@
+/*_experimental/*
 /chains/*
 /dist/**/*
-!/chains/*.stub
-!/dist/**/.gitkeep
+/registry/**/*
+
+!/**/.gitkeep
+!/**/*.stub
