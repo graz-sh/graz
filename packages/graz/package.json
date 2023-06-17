@@ -43,6 +43,7 @@
     "@walletconnect/utils": "^2.8.1",
     "@web3modal/standalone": "^2.4.3",
     "commander": "^11.0.0",
+    "esbuild": "^0.18.4",
     "zustand": "^4.3.8"
   },
   "devDependencies": {

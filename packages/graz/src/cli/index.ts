@@ -3,8 +3,10 @@ import os from "node:os";
 
 import * as p from "@clack/prompts";
 import { Command } from "commander";
+import type { Format } from "esbuild";
 import pMap from "p-map";
 
+import { buildJs } from "./build-js";
 import { cloneRegistry } from "./clone-registry";
 import { getChainPaths } from "./get-chain-paths";
 import { makeRootSources } from "./make-root-sources";
@@ -33,25 +35,25 @@ const cli = async () => {
       "-T, --testnet <chainPaths...>",
       'generate given testnet chain paths separated by spaces (e.g. "atlantic bitcannadev cheqdtestnet")',
     )
+    .option("--format <format>", "specify javascript module format: cjs, esm (defaults to cjs)")
     .action(async (options) => {
       const customRegistry = options.registry as string | undefined;
       const mainnetFilter = options.mainnet as string[] | undefined;
       const testnetFilter = options.testnet as string[] | undefined;
 
+      const jsFormat: Format = options.format === "esm" || options.format === "cjs" ? options.format : "cjs";
+
       p.intro("graz generate");
       const s = p.spinner();
 
-      // p.log.step("Cloning chain registry...");
       s.start(`Cloning chain registry`);
       await cloneRegistry(customRegistry);
       s.stop("Cloned chain registry ✅");
 
-      // p.log.step("Retrieving chain paths...");
       s.start("Retrieving chain paths");
       const { mainnetPaths, testnetPaths } = await getChainPaths({ mainnetFilter, testnetFilter });
       s.stop("Retrieved chain paths ✅");
 
-      // p.log.step("Generating chain sources...");
       s.start("Generating chain sources");
       await fs.rm("chains/", { recursive: true, force: true });
       await pMap([...mainnetPaths, ...testnetPaths], makeSources, {
@@ -59,10 +61,13 @@ const cli = async () => {
       });
       s.stop("Generated chain sources ✅");
 
-      // p.log.step("Generating chain index...");
       s.start("Generating chain index");
       await makeRootSources({ mainnetPaths, testnetPaths });
       s.stop("Generated chain index ✅");
+
+      s.start("Compiling typescript sources to javascript");
+      await buildJs(jsFormat);
+      s.stop("Compiled sources ✅");
 
       p.outro('Generate complete! You can import `mainnetChains` and `testnetChains` from "graz/chains". 🎉');
     });

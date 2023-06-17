@@ -1,8 +1,4 @@
-import { createRequire } from "node:module";
-
 import type { ChainData, ChainName, ReturnTuple } from "./generated";
-
-const require = createRequire(import.meta.url);
 
 export * from "./generated";
 
