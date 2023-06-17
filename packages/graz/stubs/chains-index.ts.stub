@@ -1,0 +1,45 @@
+import { createRequire } from "node:module";
+
+import type { ChainData, ChainName, ReturnTuple } from "./generated";
+
+const require = createRequire(import.meta.url);
+
+export * from "./generated";
+
+export const getChainData = <T extends ChainName>(pathOrPaths: T | T[]) => {
+  const paths = Array.isArray(pathOrPaths) ? pathOrPaths : [pathOrPaths];
+  const chainData: any = {};
+  for (const path of paths) {
+    chainData[path] = {
+      get chainInfo() {
+        return require(`./${path}`).default;
+      },
+      get chain() {
+        return require(`./${path}/chain`).default;
+      },
+      get assetlist() {
+        return require(`./${path}/assetlist`).default;
+      },
+    };
+  }
+  return chainData as Record<T, ChainData>;
+};
+
+export const getChainDataArray = <T extends ChainName, const U extends T | readonly T[]>(pathOrPaths: U) => {
+  const paths = Array.isArray(pathOrPaths) ? pathOrPaths : [pathOrPaths];
+  const chainData: any[] = [];
+  for (const path of paths) {
+    chainData.push({
+      get chainInfo() {
+        return require(`./${path}`).default;
+      },
+      get chain() {
+        return require(`./${path}/chain`).default;
+      },
+      get assetlist() {
+        return require(`./${path}/assetlist`).default;
+      },
+    });
+  }
+  return chainData as U extends T ? [ChainData] : U extends readonly T[] ? ReturnTuple<U> : never;
+};
