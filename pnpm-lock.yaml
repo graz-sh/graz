@@ -239,6 +239,9 @@ importers:
 
   packages/graz:
     dependencies:
+      '@clack/prompts':
+        specifier: ^0.6.3
+        version: 0.6.3
       '@cosmjs/cosmwasm-stargate':
         specifier: ^0.30.1
         version: 0.30.1
@@ -278,12 +281,9 @@ importers:
       '@web3modal/standalone':
         specifier: ^2.4.3
         version: 2.4.3(react@18.2.0)
-      arg:
-        specifier: ^5.0.2
-        version: 5.0.2
-      cosmos-directory-client:
-        specifier: 0.0.6
-        version: 0.0.6
+      commander:
+        specifier: ^11.0.0
+        version: 11.0.0
       zustand:
         specifier: ^4.3.8
         version: 4.3.8(react@18.2.0)
@@ -4328,6 +4328,23 @@ packages:
       '@chakra-ui/system': 2.5.8(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(react@18.2.0)
       react: 18.2.0
     dev: false
+
+  /@clack/core@0.3.2:
+    resolution: {integrity: sha512-FZnsNynwGDIDktx6PEZK1EuCkFpY4ldEX6VYvfl0dqeoLPb9Jpw1xoUXaVcGR8ExmYNm1w2vdGdJkEUYD/2pqg==}
+    dependencies:
+      picocolors: 1.0.0
+      sisteransi: 1.0.5
+    dev: false
+
+  /@clack/prompts@0.6.3:
+    resolution: {integrity: sha512-AM+kFmAHawpUQv2q9+mcB6jLKxXGjgu/r2EQjEwujgpCdzrST6BJqYw00GRn56/L/Izw5U7ImoLmy00X/r80Pw==}
+    dependencies:
+      '@clack/core': 0.3.2
+      picocolors: 1.0.0
+      sisteransi: 1.0.5
+    dev: false
+    bundledDependencies:
+      - is-unicode-supported
 
   /@cmfcmf/docusaurus-search-local@1.1.0(@docusaurus/core@2.4.1)(search-insights@2.6.0):
     resolution: {integrity: sha512-0IVb/aA0IK8ZlktuxmgXmluXfcSpo6Vdd2nG21y1aOH9nVYnPP231Dn0H8Ng9Qf9ronQQCDWHnuWpYOr9rUrEQ==}
@@ -8917,7 +8934,6 @@ packages:
   /commander@11.0.0:
     resolution: {integrity: sha512-9HMlXtt/BNoYr8ooyjjNRdIilOTkVJXB+GhxMTtOKwk0R4j4lS4NpjuqmRxroBfnfTSHQIHQB7wryHhXarNjmQ==}
     engines: {node: '>=16'}
-    dev: true
 
   /commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
@@ -9122,17 +9138,6 @@ packages:
     dependencies:
       long: 4.0.0
       protobufjs: 6.11.3
-    dev: false
-
-  /cosmos-directory-client@0.0.6:
-    resolution: {integrity: sha512-WIdaQ8uW1vIbYvNnAVunkC6yxTrneJC7VQ5UUQ0kuw8b0C0A39KTIpoQHCfc8tV7o9vF4niwRhdXEdfAgQEsQQ==}
-    dependencies:
-      cosmos-directory-types: 0.0.6
-      node-fetch-native: 1.2.0
-    dev: false
-
-  /cosmos-directory-types@0.0.6:
-    resolution: {integrity: sha512-9qlQ3kTNTHvhYglTXSnllGqKhrtGB08Weatw56ZqV5OqcmjuZdlY9iMtD00odgQLTEpTSQQL3gFGuqTkGdIDPA==}
     dev: false
 
   /create-ecdh@4.0.4:
@@ -12739,10 +12744,6 @@ packages:
     resolution: {integrity: sha512-wo2DpQkQp7Sjm2A0cq+sN7EHKO6Sl0ctXeBdFZrL9T9+UywORbufTcTZxom8YqpLQt/FqNMUkOpkZrJVYSKD3A==}
     dependencies:
       lodash: 4.17.21
-    dev: false
-
-  /node-fetch-native@1.2.0:
-    resolution: {integrity: sha512-5IAMBTl9p6PaAjYCnMv5FmqIF6GcZnawAVnzaCG0rX2aYZJ4CxEkZNtVPuTRug7fL7wyM5BQYTlAzcyMPi6oTQ==}
     dev: false
 
   /node-fetch@2.6.11:
