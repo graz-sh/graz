@@ -1,8 +1,7 @@
-import { defineConfig } from "vite";
-
-import { NgmiPolyfill } from "vite-plugin-ngmi-polyfill";
 import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import nodeStdlibBrowser from "vite-plugin-node-stdlib-browser";
 
 export default defineConfig({
-  plugins: [NgmiPolyfill(), react()],
+  plugins: [nodeStdlibBrowser(), react()],
 });
