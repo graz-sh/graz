@@ -6,9 +6,9 @@ export type MainnetChainName = "REPLACE_MAINNET_CHAIN_NAME";
 export type TestnetChainName = "REPLACE_TESTNET_CHAIN_NAME";
 export type ChainName = MainnetChainName | TestnetChainName;
 export interface ChainData {
-  assetlist: Promise<AssetList>;
-  chain: Promise<Chain>;
-  chainInfo: Promise<ChainInfo>;
+  assetlist: AssetList;
+  chain: Chain;
+  chainInfo: ChainInfo;
 }
 export type ReturnTuple<T> = T extends readonly [ChainName, ...infer Rest] ? [ChainData, ...ReturnTuple<Rest>] : [];
 
