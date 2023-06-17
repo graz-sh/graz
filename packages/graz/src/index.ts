@@ -18,4 +18,5 @@ export * from "./registry";
 export * from "./registry/keplr";
 export * from "./types/core";
 export * from "./types/keplr";
+export * from "./types/registry";
 export * from "./types/wallet";
