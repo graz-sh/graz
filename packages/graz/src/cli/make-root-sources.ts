@@ -22,7 +22,7 @@ export const makeRootSources = async ({ mainnetPaths, testnetPaths }: MakeRootSo
 };
 
 const makeGeneratedJs = async ({ mainnetPaths, testnetPaths }: MakeRootSourcesArgs) => {
-  const mainnetAstKeyvals = mainnetPaths.map((chainPath) => {
+  const makeGetters = ({ chainPath = "", suffix = "" }) => {
     return t.objectMethod(
       "get",
       t.stringLiteral(chainPath),
@@ -30,29 +30,13 @@ const makeGeneratedJs = async ({ mainnetPaths, testnetPaths }: MakeRootSourcesAr
       t.blockStatement([
         t.returnStatement(
           t.memberExpression(
-            t.callExpression(t.identifier("require"), [t.stringLiteral(`./${chainPath}`)]),
+            t.callExpression(t.identifier("require"), [t.stringLiteral(`./${chainPath}${suffix}`)]),
             t.identifier("default"),
           ),
         ),
       ]),
     );
-  });
-
-  const testnetAstKeyvals = testnetPaths.map((chainPath) => {
-    return t.objectMethod(
-      "get",
-      t.stringLiteral(chainPath),
-      [],
-      t.blockStatement([
-        t.returnStatement(
-          t.memberExpression(
-            t.callExpression(t.identifier("require"), [t.stringLiteral(`./${chainPath}`)]),
-            t.identifier("default"),
-          ),
-        ),
-      ]),
-    );
-  });
+  };
 
   const chainsGeneratedStub = await fs.readFile(
     path.resolve(__dirname, "../../stubs/chains-generated.js.stub"),
@@ -63,15 +47,35 @@ const makeGeneratedJs = async ({ mainnetPaths, testnetPaths }: MakeRootSourcesAr
   traverse(chainsGeneratedAst, {
     VariableDeclarator: (current) => {
       if (t.isIdentifier(current.node.id, { name: "mainnetChains" })) {
-        current.node.init = t.objectExpression(mainnetAstKeyvals.sort());
+        current.node.init = t.objectExpression(
+          mainnetPaths.sort().map((chainPath) => makeGetters({ chainPath, suffix: "/chain" })),
+        );
         current.skip();
       }
       if (t.isIdentifier(current.node.id, { name: "testnetChains" })) {
-        current.node.init = t.objectExpression(testnetAstKeyvals.sort());
+        current.node.init = t.objectExpression(
+          testnetPaths.sort().map((chainPath) => makeGetters({ chainPath, suffix: "/chain" })),
+        );
         current.skip();
       }
       if (t.isIdentifier(current.node.id, { name: "chains" })) {
-        current.node.init = t.objectExpression([...mainnetAstKeyvals, ...testnetAstKeyvals].sort());
+        current.node.init = t.objectExpression(
+          [...mainnetPaths, ...testnetPaths].sort().map((chainPath) => makeGetters({ chainPath, suffix: "/chain" })),
+        );
+        current.skip();
+      }
+      if (t.isIdentifier(current.node.id, { name: "mainnetChainInfos" })) {
+        current.node.init = t.objectExpression(mainnetPaths.sort().map((chainPath) => makeGetters({ chainPath })));
+        current.skip();
+      }
+      if (t.isIdentifier(current.node.id, { name: "testnetChainInfos" })) {
+        current.node.init = t.objectExpression(testnetPaths.sort().map((chainPath) => makeGetters({ chainPath })));
+        current.skip();
+      }
+      if (t.isIdentifier(current.node.id, { name: "chainInfos" })) {
+        current.node.init = t.objectExpression(
+          [...mainnetPaths, ...testnetPaths].sort().map((chainPath) => makeGetters({ chainPath })),
+        );
         current.skip();
       }
       if (t.isIdentifier(current.node.id, { name: "mainnetChainNames" })) {

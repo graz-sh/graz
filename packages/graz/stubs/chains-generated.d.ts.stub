@@ -15,6 +15,9 @@ export type ReturnTuple<T, U> = U extends readonly [T, ...infer Rest]
 export const mainnetChains: Record<MainnetChainName, Chain>;
 export const testnetChains: Record<TestnetChainName, Chain>;
 export const chains: Record<ChainName, Chain>;
+export const mainnetChainInfos: Record<MainnetChainName, ChainInfo>;
+export const testnetChainInfos: Record<TestnetChainName, ChainInfo>;
+export const chainInfos: Record<ChainName, ChainInfo>;
 export const mainnetChainNames: MainnetChainName[];
 export const testnetChainNames: TestnetChainName[];
 export const chainNames: ChainName[];
