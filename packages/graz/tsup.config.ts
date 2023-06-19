@@ -8,6 +8,7 @@ export default defineConfig(({ watch }) => [
     external: [/^@cosmjs\/.*/, /^@keplr-wallet\/.*/],
     format: ["cjs", "esm"],
     minify: !watch,
+    treeshake: true,
   },
   {
     // https://github.com/evanw/esbuild/issues/1921#issuecomment-1491470829
@@ -21,5 +22,6 @@ export default defineConfig(({ watch }) => [
     minify: !watch,
     outDir: "dist/cli/",
     shims: true,
+    treeshake: true,
   },
 ]);
