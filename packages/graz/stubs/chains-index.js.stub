@@ -1,10 +1,8 @@
-import type { ChainData, ChainName, ReturnTuple } from "./generated";
-
+/* eslint-disable */
 export * from "./generated";
-
-export const getChainData = <T extends ChainName>(pathOrPaths: T | T[]) => {
+export const getChainData = (pathOrPaths) => {
   const paths = Array.isArray(pathOrPaths) ? pathOrPaths : [pathOrPaths];
-  const chainData: any = {};
+  const chainData = {};
   for (const path of paths) {
     chainData[path] = {
       get chainInfo() {
@@ -18,12 +16,11 @@ export const getChainData = <T extends ChainName>(pathOrPaths: T | T[]) => {
       },
     };
   }
-  return chainData as Record<T, ChainData>;
+  return chainData;
 };
-
-export const getChainDataArray = <T extends ChainName, const U extends T | readonly T[]>(pathOrPaths: U) => {
+export const getChainDataArray = (pathOrPaths) => {
   const paths = Array.isArray(pathOrPaths) ? pathOrPaths : [pathOrPaths];
-  const chainData: any[] = [];
+  const chainData = [];
   for (const path of paths) {
     chainData.push({
       get chainInfo() {
@@ -37,5 +34,5 @@ export const getChainDataArray = <T extends ChainName, const U extends T | reado
       },
     });
   }
-  return chainData as U extends T ? [ChainData] : U extends readonly T[] ? ReturnTuple<U> : never;
+  return chainData;
 };

@@ -1,0 +1,6 @@
+export const mainnetChains = {};
+export const testnetChains = {};
+export const chains = {};
+export const mainnetChainNames = [];
+export const testnetChainNames = [];
+export const chainNames = [];

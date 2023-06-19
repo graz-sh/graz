@@ -1,3 +1,5 @@
+// @ts-check
+
 import fs from "node:fs/promises";
 import os from "node:os";
 
@@ -6,11 +8,11 @@ import { Command } from "commander";
 import type { Format } from "esbuild";
 import pMap from "p-map";
 
-import { buildJs } from "./build-js";
 import { cloneRegistry } from "./clone-registry";
 import { getChainPaths } from "./get-chain-paths";
 import { makeRootSources } from "./make-root-sources";
 import { makeSources } from "./make-sources";
+import { transpileSources } from "./transpile-sources";
 
 const cli = async () => {
   const program = new Command();
@@ -22,7 +24,7 @@ const cli = async () => {
 
   program
     .command("generate")
-    .description('generate typescript chain definitions and export to "graz/chains"')
+    .description('generate chain definitions and export to "graz/chains"')
     .option(
       "-R, --registry <url>",
       "specify a custom chain registry namespace (e.g. org/repo, github:org/repo, gitlab:org/repo)",
@@ -41,6 +43,7 @@ const cli = async () => {
       const mainnetFilter = options.mainnet as string[] | undefined;
       const testnetFilter = options.testnet as string[] | undefined;
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const jsFormat: Format = options.format === "esm" || options.format === "cjs" ? options.format : "cjs";
 
       p.intro("graz generate");
@@ -65,9 +68,11 @@ const cli = async () => {
       await makeRootSources({ mainnetPaths, testnetPaths });
       s.stop("Generated chain index ✅");
 
-      s.start("Compiling typescript sources to javascript");
-      await buildJs(jsFormat);
-      s.stop("Compiled sources ✅");
+      if (jsFormat === "cjs") {
+        s.start("Transpiling javascript esm sources to cjs");
+        await transpileSources("cjs");
+        s.stop("Transpiled sources ✅");
+      }
 
       p.outro('Generate complete! You can import `mainnetChains` and `testnetChains` from "graz/chains". 🎉');
     });

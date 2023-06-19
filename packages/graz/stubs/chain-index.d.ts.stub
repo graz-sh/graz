@@ -1,0 +1,4 @@
+/* eslint-disable */
+import type { ChainInfo } from "@keplr-wallet/types";
+declare const chainInfo: ChainInfo;
+export default chainInfo;
