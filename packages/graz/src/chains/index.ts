@@ -2,14 +2,6 @@ import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 
 import type { Dictionary } from "../types/core";
 import type { ChainInfoWithPath } from "../types/keplr";
-import { axelar } from "./mainnet/axelar";
-import { cosmoshub } from "./mainnet/cosmoshub";
-import { juno } from "./mainnet/juno";
-import { osmosis } from "./mainnet/osmosis";
-import { sommelier } from "./mainnet/sommelier";
-import { crescentTestnet } from "./testnet/crescent";
-import { junoTestnet } from "./testnet/juno";
-import { osmosisTestnet } from "./testnet/osmosis";
 
 export interface GrazChain {
   chainId: string;
@@ -97,64 +89,3 @@ export const defineChain = <T extends GrazChain>(chain: T): T => {
 export const defineChainInfo = <T extends ChainInfo | ChainInfoWithPath>(chain: T): T => {
   return chain;
 };
-
-/**
- * Provided mainnet chains
- *
- * @example
- * ```ts
- * import { connect, mainnetChains } from "graz";
- * connect(mainnetChains.cosmos);
- * ```
- *
- * @see {@link testnetChains}
- *
- * @deprecated will be removed in the next version use `generate chain` https://graz.strange.love/docs/generate-chain-info
- */
-export const mainnetChains = defineChains({
-  axelar,
-  cosmoshub,
-  juno,
-  osmosis,
-  sommelier,
-});
-
-/**
- * Arary version on {@link mainnetChains}
- *
- * Try graz cli to generate ChainInfo from https://cosmos.directory/
- * @see https://graz.strange.love/docs/generate-chain-info
- *
- * @see {@link mainnetChains}
- *
- * @deprecated will be removed in the next version use `generate chain` https://graz.strange.love/docs/generate-chain-info
- */
-export const mainnetChainsArray = [axelar, cosmoshub, juno, osmosis, sommelier];
-
-/**
- * Provided testnet chains
- *
- * @example
- * ```ts
- * import { connect, testnetChains } from "graz";
- * connect(testnetChains.osmosis);
- * ```
- *
- * @see {@link mainnetChains}
- *
- * @deprecated will be removed in the next version use `generate chain` https://graz.strange.love/docs/generate-chain-info
- */
-export const testnetChains = defineChains({
-  crescent: crescentTestnet,
-  juno: junoTestnet,
-  osmosis: osmosisTestnet,
-});
-
-/**
- * Arary version on {@link testnetChains}
- *
- * @see {@link testnetChains}
- *
- * @deprecated will be removed in the next version use `generate chain` https://graz.strange.love/docs/generate-chain-info
- */
-export const testnetChainsArray = [crescentTestnet, junoTestnet, osmosisTestnet];
