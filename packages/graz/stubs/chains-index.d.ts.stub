@@ -1,7 +1,7 @@
 /* eslint-disable */
-import type { ChainData, ChainName, ReturnTuple } from "./generated";
+import type { ChainData, ChainDataTuple, ChainName } from "./generated";
 export * from "./generated";
 export const getChainData: <T extends ChainName>(pathOrPaths: T | T[]) => Record<T, ChainData>;
 export const getChainDataArray: <T extends ChainName, const U extends T | readonly T[]>(
   pathOrPaths: U,
-) => U extends T ? [ChainData] : U extends readonly T[] ? ReturnTuple<ChainName, U> : never;
+) => U extends T ? [ChainData] : U extends readonly T[] ? ChainDataTuple<U> : never;

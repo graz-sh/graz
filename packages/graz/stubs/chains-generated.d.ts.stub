@@ -9,9 +9,7 @@ export interface ChainData {
   chain: Chain;
   chainInfo: ChainInfo;
 }
-export type ReturnTuple<T, U> = U extends readonly [T, ...infer Rest]
-  ? [T, ...ReturnTuple<T, Rest>]
-  : [];
+export type ChainDataTuple<T> = T extends readonly [ChainName, ...infer Rest] ? [ChainData, ...ChainDataTuple<Rest>] : [];
 export const mainnetChains: Record<MainnetChainName, Chain>;
 export const testnetChains: Record<TestnetChainName, Chain>;
 export const chains: Record<ChainName, Chain>;
