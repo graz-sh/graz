@@ -17,6 +17,7 @@
     "graz": "pnpm --dir packages/graz",
     "create-graz-app": "pnpm --dir packages/create-graz-app",
     "lint": "turbo run lint",
+    "postinstall": "pnpm -F graz exec tsx src/cli generate",
     "prepare": "husky uninstall",
     "release": "turbo run build --filter=graz && pnpm publish --filter graz",
     "release-adapter": "turbo run build --filter=\"graz-adapter-*\" && pnpm publish --filter=\"graz-adapter-*\"",
