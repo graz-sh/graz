@@ -1,13 +1,13 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { configureGraz, GrazProvider } from "graz";
-import { getChainData } from "graz/chains";
+import cosmoshub from "graz/chains/cosmoshub";
 import type { AppProps } from "next/app";
 import { Layout } from "src/ui/layout";
 
 const theme = extendTheme();
 
 configureGraz({
-  defaultChain: getChainData("cosmoshub").cosmoshub.chainInfo,
+  defaultChain: cosmoshub,
 });
 
 const MyApp = ({ Component, pageProps }: AppProps) => {

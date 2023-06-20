@@ -1,6 +1,6 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { GrazProvider } from "graz";
-import { getChainData } from "graz/chains";
+import cosmoshub from "graz/chains/cosmoshub";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 
@@ -11,7 +11,7 @@ const CustomApp: NextPage<AppProps> = ({ Component, pageProps }) => {
     <ChakraProvider resetCSS theme={theme}>
       <GrazProvider
         grazOptions={{
-          defaultChain: getChainData("cosmoshub").cosmoshub.chainInfo,
+          defaultChain: cosmoshub,
           onReconnectFailed: () => {
             console.log("reconnect failed");
           },
