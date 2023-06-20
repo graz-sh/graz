@@ -2,11 +2,11 @@ import { Button, ButtonGroup, FormControl, FormLabel, useToast } from "@chakra-u
 import { useAccount, useActiveChain, useConnect, useSuggestChainAndConnect } from "graz";
 import { getChainData, getChainDataArray } from "graz/chains";
 
+const mainnetChainsArray = getChainDataArray(["cosmoshub", "juno", "sommelier", "stargaze", "osmosis"]);
+const { osmosistestnet } = getChainData("osmosistestnet");
+
 export const ChainSwitcher = () => {
   const toast = useToast();
-
-  const mainnetChainsArray = getChainDataArray(["cosmoshub", "juno", "sommelier", "stargaze", "osmosis"]);
-  const { osmosistestnet } = getChainData("osmosistestnet");
 
   const activeChain = useActiveChain();
   const { isConnecting, isReconnecting } = useAccount({

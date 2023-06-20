@@ -3,6 +3,9 @@ import { useAccount, useConnect, useSuggestChainAndConnect } from "graz";
 import { getChainData, getChainDataArray } from "graz/chains";
 import type { FC } from "react";
 
+const mainnetChainsArray = getChainDataArray(["cosmoshub", "juno", "sommelier", "stargaze", "osmosis"]);
+const { osmosistestnet } = getChainData("osmosistestnet");
+
 export const ChainSwitcher: FC = () => {
   const toast = useToast();
 
@@ -17,9 +20,6 @@ export const ChainSwitcher: FC = () => {
       }
     },
   });
-
-  const mainnetChainsArray = getChainDataArray(["cosmoshub", "juno", "sommelier", "stargaze", "osmosis"]);
-  const { osmosistestnet } = getChainData("osmosistestnet");
 
   const { connect } = useConnect();
 
