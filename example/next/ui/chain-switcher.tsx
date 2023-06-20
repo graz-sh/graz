@@ -1,5 +1,6 @@
 import { Button, ButtonGroup, FormControl, FormLabel, useToast } from "@chakra-ui/react";
-import { mainnetChainsArray, testnetChains, useAccount, useConnect, useSuggestChainAndConnect } from "graz";
+import { useAccount, useConnect, useSuggestChainAndConnect } from "graz";
+import { getChainData, getChainDataArray } from "graz/chains";
 import type { FC } from "react";
 
 export const ChainSwitcher: FC = () => {
@@ -17,6 +18,9 @@ export const ChainSwitcher: FC = () => {
     },
   });
 
+  const mainnetChainsArray = getChainDataArray(["cosmoshub", "juno", "sommelier", "stargaze", "osmosis"]);
+  const { osmosistestnet } = getChainData("osmosistestnet");
+
   const { connect } = useConnect();
 
   const { suggestAndConnect } = useSuggestChainAndConnect();
@@ -26,8 +30,8 @@ export const ChainSwitcher: FC = () => {
       <FormLabel>Switch Chain</FormLabel>
       <ButtonGroup flexWrap="wrap" gap={2} isDisabled={isConnecting || isReconnecting} size="sm" spacing={0}>
         {mainnetChainsArray.map((chain) => (
-          <Button key={chain.chainId} onClick={() => connect({ chain })}>
-            {chain.chainId}
+          <Button key={chain.chainInfo.chainId} onClick={() => connect({ chain: chain.chainInfo })}>
+            {chain.chainInfo.chainId}
           </Button>
         ))}
       </ButtonGroup>
@@ -36,11 +40,11 @@ export const ChainSwitcher: FC = () => {
         <Button
           onClick={() =>
             suggestAndConnect({
-              chainInfo: testnetChains.osmosis,
+              chainInfo: osmosistestnet.chainInfo,
             })
           }
         >
-          {testnetChains.osmosis.chainId}
+          {osmosistestnet.chainInfo.chainId}
         </Button>
       </ButtonGroup>
     </FormControl>

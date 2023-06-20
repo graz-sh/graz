@@ -1,15 +1,12 @@
 import { Button, ButtonGroup, FormControl, FormLabel, useToast } from "@chakra-ui/react";
-import {
-  mainnetChainsArray,
-  testnetChains,
-  useAccount,
-  useActiveChain,
-  useConnect,
-  useSuggestChainAndConnect,
-} from "graz";
+import { useAccount, useActiveChain, useConnect, useSuggestChainAndConnect } from "graz";
+import { getChainData, getChainDataArray } from "graz/chains";
 
 export const ChainSwitcher = () => {
   const toast = useToast();
+
+  const mainnetChainsArray = getChainDataArray(["cosmoshub", "juno", "sommelier", "stargaze", "osmosis"]);
+  const { osmosistestnet } = getChainData("osmosistestnet");
 
   const activeChain = useActiveChain();
   const { isConnecting, isReconnecting } = useAccount({
@@ -38,25 +35,25 @@ export const ChainSwitcher = () => {
       <ButtonGroup flexWrap="wrap" gap={2} isDisabled={isConnecting || isReconnecting} size="sm" spacing={0}>
         {mainnetChainsArray.map((chain) => (
           <Button
-            key={chain.chainId}
-            colorScheme={activeChain?.chainId === chain.chainId ? "green" : "gray"}
-            onClick={() => connect({ chain })}
+            key={chain.chainInfo.chainId}
+            colorScheme={activeChain?.chainId === chain.chainInfo.chainId ? "green" : "gray"}
+            onClick={() => connect({ chain: chain.chainInfo })}
           >
-            {chain.chainId}
+            {chain.chainInfo.chainId}
           </Button>
         ))}
       </ButtonGroup>
       <FormLabel my={4}>Suggest and connect chain</FormLabel>
       <ButtonGroup isDisabled={isConnecting || isReconnecting} size="sm">
         <Button
-          colorScheme={activeChain?.chainId === testnetChains.osmosis.chainId ? "green" : "gray"}
+          colorScheme={activeChain?.chainId === osmosistestnet.chainInfo.chainId ? "green" : "gray"}
           onClick={() =>
             suggestAndConnect({
-              chainInfo: testnetChains.osmosis,
+              chainInfo: osmosistestnet.chainInfo,
             })
           }
         >
-          {testnetChains.osmosis.chainId}
+          {osmosistestnet.chainInfo.chainId}
         </Button>
       </ButtonGroup>
     </FormControl>
