@@ -155,6 +155,45 @@ export const getCosmostation = (): Wallet => {
   throw new Error("window.cosmostation.providers.keplr is not defined");
 };
 
+/**
+ * Function to return {@link Wallet} object and throws and error if it does not exist on `window`.
+ *
+ * @example
+ * ```ts
+ * try {
+ *   const vectis = getVectis();
+ * } catch (error: Error) {
+ *   console.error(error.message);
+ * }
+ * ```
+ *
+ *
+ */
+export const getVectis = (): Wallet => {
+  if (typeof window.vectis !== "undefined") {
+    const vectis = window.vectis.cosmos;
+    const subscription: (reconnect: () => void) => void = (reconnect) => {
+      window.addEventListener("vectis_accountChanged", () => {
+        clearSession();
+        reconnect();
+      });
+      return () => {
+        window.removeEventListener("vectis_accountChanged", () => {
+          clearSession();
+          reconnect();
+        });
+      };
+    };
+    const res = Object.assign(vectis, {
+      subscription,
+    });
+    return res;
+  }
+
+  useGrazInternalStore.getState()._notFoundFn();
+  throw new Error("window.keplr is not defined");
+};
+
 type SignDirectParams = Parameters<Wallet["signDirect"]>;
 type SignAminoParams = Parameters<Wallet["signAmino"]>;
 
@@ -718,6 +757,9 @@ export const getWallet = (type: WalletType = useGrazInternalStore.getState().wal
     }
     case WalletType.COSMOSTATION: {
       return getCosmostation();
+    }
+    case WalletType.VECTIS: {
+      return getVectis();
     }
     case WalletType.WALLETCONNECT: {
       return getWalletConnect();

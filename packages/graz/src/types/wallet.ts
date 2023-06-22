@@ -3,6 +3,7 @@ import type { Keplr } from "@keplr-wallet/types";
 export enum WalletType {
   KEPLR = "keplr",
   LEAP = "leap",
+  VECTIS = "vectis",
   COSMOSTATION = "cosmostation",
   WALLETCONNECT = "walletconnect",
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -16,6 +17,7 @@ export enum WalletType {
 export const WALLET_TYPES = [
   WalletType.KEPLR,
   WalletType.LEAP,
+  WalletType.VECTIS,
   WalletType.COSMOSTATION,
   WalletType.WALLETCONNECT,
   WalletType.WC_KEPLR_MOBILE,

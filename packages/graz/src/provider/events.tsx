@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { useEffect } from "react";
 
 import { reconnect } from "../actions/account";
-import { getCosmostation, getKeplr, getLeap, getWalletConnect } from "../actions/wallet";
+import { getCosmostation, getKeplr, getLeap, getVectis, getWalletConnect } from "../actions/wallet";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import { WalletType } from "../types/wallet";
@@ -52,6 +52,11 @@ export const useGrazEvents = () => {
       }
       if (_reconnectConnector === WalletType.LEAP) {
         getLeap().subscription?.(() => {
+          void reconnect({ onError: _onReconnectFailed });
+        });
+      }
+      if (_reconnectConnector === WalletType.VECTIS) {
+        getVectis().subscription?.(() => {
           void reconnect({ onError: _onReconnectFailed });
         });
       }

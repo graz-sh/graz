@@ -28,6 +28,7 @@ function App() {
   isKeplr: boolean;
   isKeplrMobile: boolean;
   isLeap: boolean;
+  isVectis: boolean;
   isLeapMobile: boolean;
   isWalletConnect: boolean;
 }
