@@ -233,6 +233,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^4.29.14
         version: 4.29.14(@tanstack/react-query@4.29.14)(react-dom@18.2.0)(react@18.2.0)
+      '@vectis/extension-client':
+        specifier: ^0.7.1
+        version: 0.7.1
       '@walletconnect/sign-client':
         specifier: ^2.8.1
         version: 2.8.1
@@ -7428,6 +7431,10 @@ packages:
 
   /@vectis/extension-client@0.7.0:
     resolution: {integrity: sha512-7JErrElxiuKUw/GaW2YpjkxxVKjUmEsrANfW6VZPkKBPTFokpJxO03Uo8hxPVfQu1IiwR1rReQSeckfTGZW5RA==}
+    dev: false
+
+  /@vectis/extension-client@0.7.1:
+    resolution: {integrity: sha512-vuXHcM3xKYg46d7ANhAoPzOFwrjKvUfFvmD/XGwm0H/1KfR29tzkOGhLjzL04HkXuKqwxMEpd+0Fvh1H7l2JWQ==}
     dev: false
 
   /@vercel/ncc@0.36.1:

@@ -184,14 +184,62 @@ export const getVectis = (): Wallet => {
         });
       };
     };
-    const res = Object.assign(vectis, {
+    const getOfflineSignerOnlyAmino = (...args: Parameters<Wallet["getOfflineSignerOnlyAmino"]>) => {
+      return vectis.getOfflineSignerAmino(...args);
+    };
+
+    const experimentalSuggestChain = async (...args: Parameters<Wallet["experimentalSuggestChain"]>) => {
+      const [chainInfo] = args;
+      const adaptChainInfo = {
+        ...chainInfo,
+        rpcUrl: chainInfo.rpc,
+        restUrl: chainInfo.rest,
+        prettyName: chainInfo.chainName.replace(" ", ""),
+        bech32Prefix: chainInfo.bech32Config.bech32PrefixAccAddr,
+      };
+      return vectis.suggestChains([adaptChainInfo]);
+    };
+
+    const getKey = async (chainId: string): Promise<Key> => {
+      const key = await vectis.getKey(chainId);
+      return {
+        address: Uint8Array.from([]),
+        algo: key.algo,
+        bech32Address: key.address,
+        name: key.name,
+        pubKey: key.pubKey,
+        isKeystone: false,
+        isNanoLedger: key.isNanoLedger,
+      };
+    };
+
+    const signDirect = async (...args: SignDirectParams): Promise<DirectSignResponse> => {
+      const { 1: signer, 2: signDoc } = args;
+      return vectis.signDirect(signer, {
+        bodyBytes: signDoc.bodyBytes || Uint8Array.from([]),
+        authInfoBytes: signDoc.authInfoBytes || Uint8Array.from([]),
+        accountNumber: Long.fromString(signDoc.accountNumber?.toString() || "", false),
+        chainId: signDoc.chainId || "",
+      });
+    };
+
+    const signAmino = async (...args: SignAminoParams): Promise<AminoSignResponse> => {
+      const { 1: signer, 2: signDoc } = args;
+      return vectis.signAmino(signer, signDoc);
+    };
+
+    return Object.assign(vectis, {
       subscription,
+      getOfflineSignerOnlyAmino,
+      experimentalSuggestChain,
+      getKey,
+      signDirect,
+      signAmino,
     });
-    return res;
   }
 
   useGrazInternalStore.getState()._notFoundFn();
-  throw new Error("window.keplr is not defined");
+  throw new Error("window.vectis is not defined");
 };
 
 type SignDirectParams = Parameters<Wallet["signDirect"]>;
