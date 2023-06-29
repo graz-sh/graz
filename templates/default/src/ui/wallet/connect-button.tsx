@@ -58,9 +58,7 @@ export const WalletConnectButton = () => {
             {wallets.cosmostation ? (
               <Button onClick={() => handleConnect(WalletType.COSMOSTATION)}>Cosmostation</Button>
             ) : null}
-            {wallets.vectis ? (
-              <Button onClick={() => handleConnect(WalletType.WC_COSMOSTATION_MOBILE)}>Vectis</Button>
-            ) : null}
+            {wallets.vectis ? <Button onClick={() => handleConnect(WalletType.VECTIS)}>Vectis</Button> : null}
             {wallets.walletconnect ? (
               <Button onClick={() => handleConnect(WalletType.WALLETCONNECT)}>WalletConnect</Button>
             ) : null}

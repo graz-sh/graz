@@ -203,7 +203,7 @@ export const getVectis = (): Wallet => {
     const getKey = async (chainId: string): Promise<Key> => {
       const key = await vectis.getKey(chainId);
       return {
-        address: Uint8Array.from([]),
+        address: fromBech32("").data,
         algo: key.algo,
         bech32Address: key.address,
         name: key.name,
