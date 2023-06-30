@@ -8,9 +8,9 @@
     "templates/*"
   ],
   "scripts": {
-    "build": "turbo run build --filter=!@project/docs",
+    "build": "turbo run build --filter=!@project/example-vite",
     "clean": "turbo run clean",
-    "dev": "turbo run dev --filter=!@project/docs",
+    "dev": "turbo run dev --filter=!@project/docs --filter=!@project/example-vite",
     "docs": "pnpm --dir docs",
     "example:next": "pnpm --dir example/next",
     "example:vite": "pnpm --dir example/vite",
