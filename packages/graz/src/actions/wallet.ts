@@ -203,7 +203,7 @@ export const getVectis = (): Wallet => {
     const getKey = async (chainId: string): Promise<Key> => {
       const key = await vectis.getKey(chainId);
       return {
-        address: fromBech32("").data,
+        address: fromBech32(key.address).data,
         algo: key.algo,
         bech32Address: key.address,
         name: key.name,
@@ -228,14 +228,17 @@ export const getVectis = (): Wallet => {
       return vectis.signAmino(signer, signDoc);
     };
 
-    return Object.assign(vectis, {
+    return {
+      enable: (chainId: string) => vectis.enable(chainId),
+      getOfflineSigner: (chainId: string) => vectis.getOfflineSigner(chainId),
+      getOfflineSignerAuto: (chainId: string) => vectis.getOfflineSignerAuto(chainId),
+      getKey,
       subscription,
       getOfflineSignerOnlyAmino,
       experimentalSuggestChain,
-      getKey,
       signDirect,
       signAmino,
-    });
+    };
   }
 
   useGrazInternalStore.getState()._notFoundFn();
