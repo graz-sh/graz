@@ -40,6 +40,7 @@ function App() {
 enum WalletType {
   KEPLR = "keplr",
   LEAP = "leap",
+  VECTIS = "vectis",
   COSMOSTATION = "cosmostation",
   WALLETCONNECT = "walletconnect",
   WC_KEPLR_MOBILE = "wc_keplr_mobile",

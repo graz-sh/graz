@@ -1,0 +1,40 @@
+{
+  "name": "graz-adapter-vectis",
+  "description": "Graz adapter for Vectis Wallet",
+  "version": "0.0.2",
+  "repository": "https://github.com/strangelove-ventures/graz.git",
+  "homepage": "https://github.com/strangelove-ventures/graz",
+  "bugs": "https://github.com/strangelove-ventures/graz/issues",
+  "files": [
+    "dist/*.d.ts",
+    "dist/*.js",
+    "dist/*.mjs"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
+    "prepublishOnly": "pnpm build"
+  },
+  "peerDependencies": {
+    "graz": ">=0.0.37"
+  },
+  "devDependencies": {
+    "@types/node": "^20.3.1",
+    "graz": "*",
+    "typescript": "^5.1.3"
+  },
+  "keywords": [
+    "graz",
+    "graz-adapter",
+    "graz-adapter-vectis",
+    "vectis-wallet",
+    "vectis",
+    "use-vectis"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@vectis/extension-client": "^0.7.0"
+  }
+}

@@ -1,4 +1,5 @@
 type KeplrWindow = import("@keplr-wallet/types").Window;
+type VectisWindow = import("@vectis/extension-client").VectisWindow;
 
 declare interface Window extends KeplrWindow {
   leap: KeplrWindow["keplr"];
@@ -11,4 +12,5 @@ declare interface Window extends KeplrWindow {
       keplr: KeplrWindow["keplr"];
     };
   };
+  vectis: VectisWindow["vectis"];
 }

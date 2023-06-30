@@ -25,6 +25,7 @@ export const useActiveWalletType = () => {
       isKeplrMobile: x.walletType === WalletType.WC_KEPLR_MOBILE,
       isLeap: x.walletType === WalletType.LEAP,
       isLeapMobile: x.walletType === WalletType.WC_LEAP_MOBILE,
+      isVectis: x.walletType === WalletType.VECTIS,
       isWalletConnect: x.walletType === WalletType.WALLETCONNECT,
     }),
     shallow,

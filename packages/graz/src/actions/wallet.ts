@@ -155,6 +155,96 @@ export const getCosmostation = (): Wallet => {
   throw new Error("window.cosmostation.providers.keplr is not defined");
 };
 
+/**
+ * Function to return {@link Wallet} object and throws and error if it does not exist on `window`.
+ *
+ * @example
+ * ```ts
+ * try {
+ *   const vectis = getVectis();
+ * } catch (error: Error) {
+ *   console.error(error.message);
+ * }
+ * ```
+ *
+ *
+ */
+export const getVectis = (): Wallet => {
+  if (typeof window.vectis !== "undefined") {
+    const vectis = window.vectis.cosmos;
+    const subscription: (reconnect: () => void) => void = (reconnect) => {
+      window.addEventListener("vectis_accountChanged", () => {
+        clearSession();
+        reconnect();
+      });
+      return () => {
+        window.removeEventListener("vectis_accountChanged", () => {
+          clearSession();
+          reconnect();
+        });
+      };
+    };
+    const getOfflineSignerOnlyAmino = (...args: Parameters<Wallet["getOfflineSignerOnlyAmino"]>) => {
+      return vectis.getOfflineSignerAmino(...args);
+    };
+
+    const experimentalSuggestChain = async (...args: Parameters<Wallet["experimentalSuggestChain"]>) => {
+      const [chainInfo] = args;
+      const adaptChainInfo = {
+        ...chainInfo,
+        rpcUrl: chainInfo.rpc,
+        restUrl: chainInfo.rest,
+        prettyName: chainInfo.chainName.replace(" ", ""),
+        bech32Prefix: chainInfo.bech32Config.bech32PrefixAccAddr,
+      };
+      return vectis.suggestChains([adaptChainInfo]);
+    };
+
+    const getKey = async (chainId: string): Promise<Key> => {
+      const key = await vectis.getKey(chainId);
+      return {
+        address: fromBech32(key.address).data,
+        algo: key.algo,
+        bech32Address: key.address,
+        name: key.name,
+        pubKey: key.pubKey,
+        isKeystone: false,
+        isNanoLedger: key.isNanoLedger,
+      };
+    };
+
+    const signDirect = async (...args: SignDirectParams): Promise<DirectSignResponse> => {
+      const { 1: signer, 2: signDoc } = args;
+      return vectis.signDirect(signer, {
+        bodyBytes: signDoc.bodyBytes || Uint8Array.from([]),
+        authInfoBytes: signDoc.authInfoBytes || Uint8Array.from([]),
+        accountNumber: Long.fromString(signDoc.accountNumber?.toString() || "", false),
+        chainId: signDoc.chainId || "",
+      });
+    };
+
+    const signAmino = async (...args: SignAminoParams): Promise<AminoSignResponse> => {
+      const { 1: signer, 2: signDoc } = args;
+      return vectis.signAmino(signer, signDoc);
+    };
+
+    return {
+      enable: (chainId: string) => vectis.enable(chainId),
+      getOfflineSigner: (chainId: string) => vectis.getOfflineSigner(chainId),
+      getOfflineSignerAuto: (chainId: string) => vectis.getOfflineSignerAuto(chainId),
+      getKey,
+      subscription,
+      getOfflineSignerOnlyAmino,
+      experimentalSuggestChain,
+      signDirect,
+      signAmino,
+    };
+  }
+
+  useGrazInternalStore.getState()._notFoundFn();
+  throw new Error("window.vectis is not defined");
+};
+
 type SignDirectParams = Parameters<Wallet["signDirect"]>;
 type SignAminoParams = Parameters<Wallet["signAmino"]>;
 
@@ -718,6 +808,9 @@ export const getWallet = (type: WalletType = useGrazInternalStore.getState().wal
     }
     case WalletType.COSMOSTATION: {
       return getCosmostation();
+    }
+    case WalletType.VECTIS: {
+      return getVectis();
     }
     case WalletType.WALLETCONNECT: {
       return getWalletConnect();
