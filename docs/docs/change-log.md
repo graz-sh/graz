@@ -4,6 +4,14 @@ sidebar_position: 15
 
 # Changelog
 
+## Version 0.0.44
+
+- ✅ Added Vectis Wallet integration
+
+## Version 0.0.43
+
+- ✅ Added `useActiveWalletType` hook
+
 ## Version 0.0.42
 
 - ✅ [WalletConnect v2 support](./wallet-connect.md)
