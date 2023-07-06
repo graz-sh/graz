@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import spawn from "cross-spawn";
+import { spawn } from "cross-spawn";
 
 import type { PackageManager } from "./get-pkg-manager";
 
@@ -23,11 +23,11 @@ interface InstallArgs {
  *
  * @returns A Promise that resolves once the installation is finished.
  */
-export function install(
+export const install = (
   root: string,
   dependencies: string[] | null,
   { packageManager, isOnline, devDependencies }: InstallArgs,
-): Promise<void> {
+): Promise<void> => {
   /**
    * (p)npm-specific command-line flags.
    */
@@ -112,4 +112,4 @@ export function install(
       resolve();
     });
   });
-}
+};

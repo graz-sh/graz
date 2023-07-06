@@ -1,8 +1,8 @@
-import { execSync } from "child_process";
+import { execSync } from "node:child_process";
 
 export type PackageManager = "npm" | "pnpm" | "yarn";
 
-export function getPkgManager(): PackageManager {
+export const getPkgManager = (): PackageManager => {
   try {
     const userAgent = process.env.npm_config_user_agent;
     if (userAgent) {
@@ -22,4 +22,4 @@ export function getPkgManager(): PackageManager {
   } catch {
     return "npm";
   }
-}
+};

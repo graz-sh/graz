@@ -12,14 +12,14 @@ interface TData {
   // ...
 }
 
-const { data, isLoading } = useQueryRaw<TData>(address, key);
+const { data, isLoading } = useQuerySmart<TData>(address, queryMsg);
 console.log(data);
 ```
 
 #### Params
 
 - address?: `string` - The address of the contract to query
-- key?: `string` - The key to lookup in the contract storage
+- queryMsg?: `string` - The key to lookup in the contract storage
 
 #### Return Value
 

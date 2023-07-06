@@ -4,13 +4,11 @@ sidebar_position: 3
 
 # Generate ChainInfo
 
-With `graz cli` you can generate mainnet and testnet chain `ChainInfo` directly from https://cosmos.directory
-
-![graz cli preview](/img/graz-cli.gif)
+With `graz generate` you can generate mainnet and testnet chain `ChainInfo` directly from https://cosmos.directory
 
 ```shell
 # using yarn
-yarn graz cli
+yarn graz generate
 ```
 
 #### Options:
@@ -29,6 +27,20 @@ yarn graz cli
   -T, --testnet         Generate given testnet chain paths seperated by commas (e.g. "atlantic,bitcannadev,cheqdtestnet")
   --authz               Generate only authz compatible chains
 
+```
+
+#### Add it to your project
+
+in your package.json add it to in your install or postInstall scripts
+
+```ts
+{
+  // ...
+  "scripts": {
+    "install": "graz generate -g"
+  }
+  // ...
+}
 ```
 
 #### Import generated chains

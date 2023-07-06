@@ -4,7 +4,7 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 
 const SendToken = () => {
-  const { data: accountData } = useAccount();
+  const { data: accountData, isConnected } = useAccount();
   const activeChain = useActiveChain();
   const toast = useToast();
 
@@ -84,70 +84,72 @@ const SendToken = () => {
   return (
     <Stack w="full" spacing={6}>
       <Heading>Send Token</Heading>
-      <Stack spacing={4} as="form" onSubmit={handleSubmit}>
-        <FormControl isRequired>
-          <FormLabel>Coin</FormLabel>
-          <Select
-            placeholder="Select option"
-            onChange={(event) =>
-              setFormData({
-                ...formData,
-                coin: event.currentTarget.value,
-              })
-            }
-            value={formData.coin}
-          >
-            {activeChain?.currencies.map((currency) => (
-              <option value={currency.coinMinimalDenom} key={currency.coinMinimalDenom}>
-                {currency.coinMinimalDenom}
-              </option>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl>
-          <FormLabel>Sender address</FormLabel>
-          <Input type="text" value={accountData?.bech32Address ?? ""} isDisabled />
-        </FormControl>
-        <FormControl isRequired>
-          <FormLabel>Recipient address</FormLabel>
-          <Input
-            type="text"
-            onChange={(event) =>
-              setFormData({
-                ...formData,
-                recipientAddress: event.currentTarget.value,
-              })
-            }
-          />
-        </FormControl>
-        <FormControl isRequired>
-          <FormLabel>Amount</FormLabel>
-          <Input
-            type="text"
-            onChange={(event) =>
-              setFormData({
-                ...formData,
-                amount: event.currentTarget.value,
-              })
-            }
-          />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Memo</FormLabel>
-          <Input
-            type="text"
-            onChange={(event) =>
-              setFormData({
-                ...formData,
-                memo: event.currentTarget.value,
-              })
-            }
-          />
-        </FormControl>
-        <Button width="full" mt={4} type="submit" isLoading={isLoading}>
-          Send
-        </Button>
-      </Stack>
+      {isConnected ? (
+        <Stack spacing={4} as="form" onSubmit={handleSubmit}>
+          <FormControl isRequired>
+            <FormLabel>Coin</FormLabel>
+            <Select
+              placeholder="Select option"
+              onChange={(event) =>
+                setFormData({
+                  ...formData,
+                  coin: event.currentTarget.value,
+                })
+              }
+              value={formData.coin}
+            >
+              {activeChain?.currencies.map((currency) => (
+                <option value={currency.coinMinimalDenom} key={currency.coinMinimalDenom}>
+                  {currency.coinMinimalDenom}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Sender address</FormLabel>
+            <Input type="text" value={accountData?.bech32Address ?? ""} isDisabled />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Recipient address</FormLabel>
+            <Input
+              type="text"
+              onChange={(event) =>
+                setFormData({
+                  ...formData,
+                  recipientAddress: event.currentTarget.value,
+                })
+              }
+            />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Amount</FormLabel>
+            <Input
+              type="text"
+              onChange={(event) =>
+                setFormData({
+                  ...formData,
+                  amount: event.currentTarget.value,
+                })
+              }
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Memo</FormLabel>
+            <Input
+              type="text"
+              onChange={(event) =>
+                setFormData({
+                  ...formData,
+                  memo: event.currentTarget.value,
+                })
+              }
+            />
+          </FormControl>
+          <Button width="full" mt={4} type="submit" isLoading={isLoading}>
+            Send
+          </Button>
+        </Stack>
+      ) : null}
     </Stack>
   );
 };

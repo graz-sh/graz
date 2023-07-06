@@ -1,6 +1,7 @@
+import path from "node:path";
+
 import retry from "async-retry";
 import chalk from "chalk";
-import path from "path";
 
 import type { PackageManager } from "./helpers/get-pkg-manager";
 import { tryGitInit } from "./helpers/git";
@@ -14,13 +15,13 @@ import { downloadAndExtractRepo } from "./helpers/repo";
 
 export class DownloadError extends Error {}
 
-export async function createApp({
+export const createApp = async ({
   appPath,
   packageManager,
 }: {
   appPath: string;
   packageManager: PackageManager;
-}): Promise<void> {
+}): Promise<void> => {
   const repo: RepoInfo = {
     username: "strangelove-ventures",
     branch: "dev",
@@ -55,15 +56,13 @@ export async function createApp({
   try {
     console.log(`Downloading files from repo. This might take a moment.`);
     console.log();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+
     await retry(() => downloadAndExtractRepo(root, repo), {
       retries: 3,
     });
   } catch (reason) {
-    // eslint-disable-next-line no-inner-declarations
-    function isErrorLike(err: unknown): err is { message: string } {
-      return typeof err === "object" && err !== null && typeof (err as { message?: unknown }).message === "string";
-    }
+    const isErrorLike = (err: unknown): err is { message: string } =>
+      typeof err === "object" && err !== null && typeof (err as { message?: unknown }).message === "string";
 
     throw new DownloadError(isErrorLike(reason) ? reason.message : `${reason}`);
   }
@@ -100,4 +99,4 @@ export async function createApp({
   console.log();
   console.log(chalk.cyan("  cd"), cdpath);
   console.log(`  ${chalk.cyan(`${packageManager} ${useYarn ? "" : "run "}dev`)}`);
-}
+};

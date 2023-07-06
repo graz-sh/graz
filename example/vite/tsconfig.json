@@ -1,0 +1,10 @@
+{
+  "extends": "@strangelovelabs/style-guide/tsconfig/next",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "rootDir": ".",
+    "target": "esnext"
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+}

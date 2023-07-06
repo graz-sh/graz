@@ -1,8 +1,9 @@
-import chalk from "chalk";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
-export function isFolderEmpty(root: string, name: string): boolean {
+import chalk from "chalk";
+
+export const isFolderEmpty = (root: string, name: string): boolean => {
   const validFiles = [
     ".DS_Store",
     ".git",
@@ -54,4 +55,4 @@ export function isFolderEmpty(root: string, name: string): boolean {
   }
 
   return true;
-}
+};

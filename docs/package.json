@@ -15,18 +15,19 @@
     "write-translations": "docusaurus write-translations"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.4.0",
-    "@docusaurus/preset-classic": "^2.4.0",
+    "@cmfcmf/docusaurus-search-local": "^1.1.0",
+    "@docusaurus/core": "^2.4.1",
+    "@docusaurus/preset-classic": "^2.4.1",
     "@mdx-js/react": "^1.6.22",
     "clsx": "^1.2.1",
     "prism-react-renderer": "^1.3.5",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "^17",
+    "react-dom": "^17"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^2.4.0",
+    "@docusaurus/module-type-aliases": "^2.4.1",
     "@tsconfig/docusaurus": "^1.0.7",
-    "typescript": "^5.0.4"
+    "typescript": "^5.1.3"
   },
   "browserslist": {
     "production": [

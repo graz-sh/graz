@@ -1,17 +1,13 @@
 {
   "extends": "@strangelovelabs/style-guide/tsconfig.json",
   "compilerOptions": {
-    "target": "es2019",
-    "moduleResolution": "node",
-    "strict": true,
-    "resolveJsonModule": true,
     "esModuleInterop": true,
-    "skipLibCheck": false
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "skipLibCheck": false,
+    "strict": true,
+    "target": "es2019"
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "**/*.ts",
-  ]
+  "exclude": ["node_modules"],
+  "include": ["**/*.ts"]
 }

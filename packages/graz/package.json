@@ -1,8 +1,8 @@
 {
   "name": "graz",
   "description": "React hooks for Cosmos",
-  "version": "0.0.41",
-  "author": "Griko Nibras <griko@strangelove.ventures>",
+  "version": "0.0.44",
+  "author": "Griko Nibras <griko@strange.love>",
   "repository": "https://github.com/strangelove-ventures/graz.git",
   "homepage": "https://github.com/strangelove-ventures/graz",
   "bugs": "https://github.com/strangelove-ventures/graz/issues",
@@ -26,7 +26,8 @@
     "clean": "rm -rf dist/*",
     "cli": "node cli.mjs",
     "dev": "tsup --watch",
-    "lint": "eslint --fix \"src/**/*.{ts,tsx}\""
+    "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "^0.30.1",
@@ -34,18 +35,24 @@
     "@cosmjs/proto-signing": "^0.30.1",
     "@cosmjs/stargate": "^0.30.1",
     "@cosmjs/tendermint-rpc": "^0.30.1",
-    "@keplr-wallet/cosmos": "^0.11.59",
-    "@keplr-wallet/types": "^0.11.59",
-    "@tanstack/react-query": "^4.29.5",
+    "@keplr-wallet/cosmos": "^0.12.10",
+    "@keplr-wallet/types": "^0.12.10",
+    "@tanstack/react-query": "^4.29.14",
+    "@tanstack/react-query-devtools": "^4.29.14",
+    "@vectis/extension-client": "^0.7.1",
+    "@walletconnect/sign-client": "^2.8.1",
+    "@walletconnect/types": "^2.8.1",
+    "@walletconnect/utils": "^2.8.1",
+    "@web3modal/standalone": "^2.4.3",
     "arg": "^5.0.2",
     "cosmos-directory-client": "0.0.6",
     "zustand": "^4.3.8"
   },
   "devDependencies": {
-    "@types/node": "^18.16.3",
-    "@types/react": "^18.2.5",
+    "@types/node": "^20.3.1",
+    "@types/react": "^18.2.12",
     "react": "^18.2.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.1.3"
   },
   "peerDependencies": {
     "react": ">=17"

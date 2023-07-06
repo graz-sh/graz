@@ -9,7 +9,7 @@ sidebar_position: 1
 ## Features
 
 - 🪝 20+ hooks for interfacing with wallets, clients, signers, etc. (connecting, view balances, send tokens, etc.)
-- 💳 Multiple wallet supports (Keplr, Leap, Cosmostation)
+- 💳 Multiple wallet supports (Keplr, Leap, Cosmostation, WalletConnect)
 - ⚙️ Generate mainnet & testnet `ChainInfo`
 - 📚 Built-in caching, request deduplication, and all the good stuff from [`@tanstack/react-query`](https://tanstack.com/query) and [`zustand`](https://github.com/pmndrs/zustand)
 - 🔄 Auto refresh on wallet and network change
@@ -74,8 +74,8 @@ function Wallet() {
 
 ## Examples
 
-- Next.js + Chakra UI: https://graz-example.vercel.app
-- Vite: https://graz-vite-example.vercel.app
+- Next.js + Chakra UI: https://graz-example.vercel ([source code](https://github.com/strangelove-ventures/graz/tree/dev/example/next))
+- Vite: https://graz-vite-example.vercel.app ([source code](https://github.com/strangelove-ventures/graz/tree/dev/example/vite/))
 
 ## Third-party dependencies
 
@@ -102,4 +102,4 @@ yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr
 
 ## License
 
-[MIT License, Copyright (c) 2022 Strangelove Ventures](./license)
+[MIT License, Copyright (c) 2023 Strangelove Ventures](./license)

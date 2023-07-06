@@ -107,10 +107,9 @@ export const defineChainInfo = <T extends ChainInfo | ChainInfoWithPath>(chain: 
  * connect(mainnetChains.cosmos);
  * ```
  *
- * Try graz cli to generate ChainInfo from https://cosmos.directory/
- * @see https://graz.strange.love/docs/generate-chain-info
- *
  * @see {@link testnetChains}
+ *
+ * @deprecated will be removed in the next version use `generate chain` https://graz.strange.love/docs/generate-chain-info
  */
 export const mainnetChains = defineChains({
   axelar,
@@ -127,6 +126,8 @@ export const mainnetChains = defineChains({
  * @see https://graz.strange.love/docs/generate-chain-info
  *
  * @see {@link mainnetChains}
+ *
+ * @deprecated will be removed in the next version use `generate chain` https://graz.strange.love/docs/generate-chain-info
  */
 export const mainnetChainsArray = [axelar, cosmoshub, juno, osmosis, sommelier];
 
@@ -139,10 +140,9 @@ export const mainnetChainsArray = [axelar, cosmoshub, juno, osmosis, sommelier];
  * connect(testnetChains.osmosis);
  * ```
  *
- * Try graz cli to generate ChainInfo from https://cosmos.directory/
- * @see https://graz.strange.love/docs/generate-chain-info
- *
  * @see {@link mainnetChains}
+ *
+ * @deprecated will be removed in the next version use `generate chain` https://graz.strange.love/docs/generate-chain-info
  */
 export const testnetChains = defineChains({
   crescent: crescentTestnet,
@@ -153,9 +153,8 @@ export const testnetChains = defineChains({
 /**
  * Arary version on {@link testnetChains}
  *
- * Try graz cli to generate ChainInfo from https://cosmos.directory/
- * @see https://graz.strange.love/docs/generate-chain-info
- *
  * @see {@link testnetChains}
+ *
+ * @deprecated will be removed in the next version use `generate chain` https://graz.strange.love/docs/generate-chain-info
  */
 export const testnetChainsArray = [crescentTestnet, junoTestnet, osmosisTestnet];

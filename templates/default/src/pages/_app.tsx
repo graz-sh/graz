@@ -11,7 +11,15 @@ configureGraz({
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
-    <GrazProvider>
+    <GrazProvider
+      grazOptions={{
+        walletConnect: {
+          options: {
+            projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+          },
+        },
+      }}
+    >
       <ChakraProvider resetCSS theme={theme}>
         <Layout>
           <Component {...pageProps} />
