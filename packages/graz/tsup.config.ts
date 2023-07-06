@@ -13,8 +13,5 @@ export default defineConfig(({ watch }) => ({
     /^@keplr-wallet\/.*/,
   ],
   format: ["cjs", "esm"],
-  minify: !watch,
-  minifyIdentifiers: !watch,
-  minifySyntax: !watch,
-  minifyWhitespace: !watch,
+  minify: false,
 }));

@@ -1,9 +1,28 @@
 import { Button, ListItem, Text, UnorderedList } from "@chakra-ui/react";
-import { useBalances } from "graz";
+import { useAccount, useBalances } from "graz";
 import type { FC } from "react";
 
 export const BalanceList: FC = () => {
-  const { data: balances, isRefetching, refetch } = useBalances();
+  const account = useAccount();
+
+  const {
+    data: balances,
+    isRefetching,
+    refetch,
+  } = useBalances({
+    client: "stargate",
+    rpc: "https://rpc.cosmoshub.strange.love",
+    bech32Address: account.data?.bech32Address,
+    currencies: [
+      {
+        coinDenom: "ATOM",
+        coinMinimalDenom: "uatom",
+        coinDecimals: 6,
+        coinGeckoId: "cosmos",
+        coinImageUrl: "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
+      },
+    ],
+  });
 
   const REFRESH_BUTTON = (
     <Button colorScheme="blue" onClick={() => void refetch()} variant="link">

@@ -1,11 +1,17 @@
+import { GasPrice } from "@cosmjs/stargate";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 
-import type { CreateClientArgs, CreateSigningClientArgs } from "../actions/clients";
-import { createSigningClients } from "../actions/clients";
-import { createClients } from "../actions/clients";
-import type { GrazSessionStore } from "../store";
-import { useGrazSessionStore } from "../store";
+import { getOfflineSigners } from "../actions/account";
+import type { GrazConnectClient, GrazSigningClients } from "../actions/clients";
+import {
+  connectClient,
+  connectSigningClient,
+  type GrazClients,
+  type GrazConnectSigningClientArgs,
+} from "../actions/clients";
+import { useGrazInternalStore, useGrazSessionStore } from "../store";
+import type { ChainIdArgs, HookArgs, HookResultDataWithChainId } from "../types/data";
 
 /**
  * graz query hook to retrieve a CosmWasmClient, StargateClient and Tendermint34Client. If there's no given arguments it will be using the current connected client
@@ -21,26 +27,54 @@ import { useGrazSessionStore } from "../store";
  * useClient({ rpc: "https://rpc.cosmoshub.strange.love", });
  * ```
  */
-export const useClients = (args?: CreateClientArgs): UseQueryResult<GrazSessionStore["clients"]> => {
-  const currentClient = useGrazSessionStore((x) => x.clients);
-
-  const queryKey = ["USE_CLIENTS", args, currentClient] as const;
-  const query = useQuery(
-    queryKey,
-    ({ queryKey: [, _args, _current] }) => {
-      return _args?.rpc ? createClients(_args) : _current;
-    },
+export const useConnectClient = <T extends GrazClients, U extends ChainIdArgs>(
+  args?: HookArgs<
     {
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      onSuccess: (clients) => {
-        useGrazSessionStore.setState({ clients });
-      },
-      initialData: currentClient,
+      client?: T;
+      /**
+       *
+       *  if true, it will only return the client of the given chainId
+       */
+      onlyConnectedChains?: boolean;
     },
+    U
+  >,
+) => {
+  const _client = (args?.client ?? useGrazInternalStore.getState().defaultClient) as T;
+  const _chains = useGrazInternalStore.getState().chains;
+  const sessionChainIds = useGrazSessionStore.getState().sessions?.map((i) => i.chainId);
+  const singleChain = _chains?.find((i) => i.chainId === args?.chainId);
+  const sessionChains = sessionChainIds?.map((i) => _chains!.find((x) => x.chainId === i)!);
+  const chains = args?.onlyConnectedChains ? sessionChains : _chains;
+
+  const query = useQuery(
+    ["USE_CLIENTS", args],
+    async () => {
+      if (singleChain) {
+        const client = await connectClient({
+          client: _client,
+          rpc: singleChain.rpc,
+          rpcHeaders: singleChain.rpcHeaders,
+        });
+        return client;
+      }
+      const res: Record<string, GrazConnectClient<T>> = {};
+      if (!chains) return undefined;
+      chains.map(async (chain) => {
+        const client = await connectClient({
+          client: _client,
+          rpc: chain.rpc,
+          rpcHeaders: chain.rpcHeaders,
+        });
+        res[chain.chainId] = client;
+      });
+
+      return res;
+    },
+    { enabled: Boolean(_chains), refetchOnMount: false, refetchOnWindowFocus: false },
   );
 
-  return query;
+  return query as UseQueryResult<HookResultDataWithChainId<GrazConnectClient<T>, U> | undefined>;
 };
 
 /**
@@ -61,24 +95,77 @@ export const useClients = (args?: CreateClientArgs): UseQueryResult<GrazSessionS
  * });
  * ```
  */
-export const useSigningClients = (
-  args?: CreateSigningClientArgs,
-): UseQueryResult<GrazSessionStore["signingClients"]> => {
-  const currentSigningClient = useGrazSessionStore((x) => x.signingClients);
+export const useConnectSigningClient = <T extends GrazSigningClients, U extends ChainIdArgs>(
+  args?: HookArgs<
+    {
+      client?: T;
+      options?: U["chainId"] extends string
+        ? GrazConnectSigningClientArgs<T>["options"]
+        : Record<string, GrazConnectSigningClientArgs<T>["options"]>;
+    },
+    U
+  >,
+) => {
+  const _client = (args?.client ?? useGrazInternalStore.getState().defaultClient) as T;
 
-  const queryKey = ["USE_SIGNING_CLIENTS", args, currentSigningClient] as const;
+  const _chains = useGrazInternalStore.getState().chains;
+  const sessionChainIds = useGrazSessionStore.getState().sessions?.map((i) => i.chainId);
+  const singleChain = _chains?.find((i) => i.chainId === args?.chainId);
+  const sessionChains = sessionChainIds?.map((i) => _chains!.find((x) => x.chainId === i)!);
+
+  const queryKey = ["USE_SIGNING_CLIENTS", args] as const;
   const query = useQuery(
     queryKey,
-    ({ queryKey: [, _args, _current] }) => {
-      return _args?.rpc ? createSigningClients(_args) : _current;
+    async () => {
+      if (singleChain) {
+        const offlineSignerAuto = await getOfflineSigners().offlineSignerAuto(singleChain.chainId);
+        const gasPrice = singleChain.gas
+          ? GasPrice.fromString(`${singleChain.gas.price}${singleChain.gas.denom}`)
+          : undefined;
+        const options = (
+          _client === "cosmWasm" ? { gasPrice, ...(args?.options || {}) } : args?.options
+        ) as GrazConnectSigningClientArgs<T>["options"];
+        const client = await connectSigningClient({
+          client: _client,
+          rpc: singleChain.rpc,
+          rpcHeaders: singleChain.rpcHeaders,
+          offlineSignerAuto,
+          options,
+        });
+        return client;
+      }
+      const res: Record<string, GrazConnectClient<T>> = {};
+      if (!sessionChains) return undefined;
+      sessionChains.map(async (chain) => {
+        const offlineSignerAuto = await getOfflineSigners().offlineSignerAuto(chain.chainId);
+        const gasPrice = chain.gas ? GasPrice.fromString(`${chain.gas.price}${chain.gas.denom}`) : undefined;
+
+        const options = (
+          _client === "cosmWasm"
+            ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-expect-error
+              { gasPrice, ...(args?.options?.[chain.chainId] || {}) }
+            : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-expect-error
+              args?.options?.[chain.chainId]
+        ) as GrazConnectSigningClientArgs<T>["options"];
+
+        const client = await connectSigningClient({
+          client: _client,
+          rpc: chain.rpc,
+          rpcHeaders: chain.rpcHeaders,
+          offlineSignerAuto,
+          options,
+        });
+        res[chain.chainId] = client;
+      });
+
+      return res;
     },
     {
+      enabled: Boolean(_chains),
       refetchOnMount: false,
       refetchOnWindowFocus: false,
-      onSuccess: (signingClients) => {
-        useGrazSessionStore.setState({ signingClients });
-      },
-      initialData: currentSigningClient,
     },
   );
 

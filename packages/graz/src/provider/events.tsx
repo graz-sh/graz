@@ -16,12 +16,12 @@ export const useGrazEvents = () => {
   const isSessionActive =
     typeof window !== "undefined" && window.sessionStorage.getItem(RECONNECT_SESSION_KEY) === "Active";
   const { _reconnect, _onReconnectFailed, _reconnectConnector } = useGrazInternalStore();
-  const { activeChain, wcSignClient } = useGrazSessionStore();
+  const { sessions, wcSignClient } = useGrazSessionStore();
 
   useEffect(() => {
     // will reconnect on refresh
     if (_reconnectConnector) {
-      if (isSessionActive && Boolean(activeChain)) {
+      if (isSessionActive && Boolean(sessions)) {
         void reconnect({
           onError: _onReconnectFailed,
         });
@@ -38,16 +38,16 @@ export const useGrazEvents = () => {
 
   useEffect(() => {
     if (_reconnectConnector) {
+      if (_reconnectConnector === WalletType.KEPLR) {
+        getKeplr().subscription?.(() => {
+          void reconnect({ onError: _onReconnectFailed });
+        });
+      }
       if (_reconnectConnector === WalletType.COSMOSTATION) {
         getCosmostation().subscription?.(() => {
           void reconnect({
             onError: _onReconnectFailed,
           });
-        });
-      }
-      if (_reconnectConnector === WalletType.KEPLR) {
-        getKeplr().subscription?.(() => {
-          void reconnect({ onError: _onReconnectFailed });
         });
       }
       if (_reconnectConnector === WalletType.LEAP) {

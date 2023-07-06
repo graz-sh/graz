@@ -1,18 +1,16 @@
-import type { Coin } from "@cosmjs/proto-signing";
-import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { shallow } from "zustand/shallow";
 
 import type { ConnectArgs, ConnectResult } from "../actions/account";
-import { connect, disconnect, reconnect } from "../actions/account";
-import { getBalances, getBalanceStaked } from "../actions/methods";
-import { useGrazInternalStore, useGrazSessionStore } from "../store";
+import { connect, disconnect, getOfflineSigners } from "../actions/account";
+import type { GrazAccountSession } from "../store";
+import { useGrazSessionStore } from "../store";
+import type { ChainIdArgs, HookArgs } from "../types/data";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
 
 export interface UseAccountArgs {
-  onConnect?: (args: ConnectResult & { isReconnect: boolean }) => void;
+  onConnect?: (args: GrazAccountSession & { isReconnect: boolean }) => void;
   onDisconnect?: () => void;
 }
 
@@ -34,106 +32,71 @@ export interface UseAccountArgs {
  * });
  * ```
  */
-export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => {
-  const _account = useGrazSessionStore((x) => x.account);
-  const status = useGrazSessionStore((x) => x.status);
+export const useAccount = <T extends ChainIdArgs>(args?: HookArgs<UseAccountArgs, T>) => {
+  const sessions = useGrazSessionStore((x) => x.sessions);
 
   useEffect(() => {
     return useGrazSessionStore.subscribe(
-      (x) => x.status,
+      (x) => x.sessions,
       (stat, prevStat) => {
-        if (stat === "connected") {
-          const { account, activeChain } = useGrazSessionStore.getState();
-          const { walletType } = useGrazInternalStore.getState();
-          onConnect?.({
-            account: account!,
-            chain: activeChain!,
-            walletType,
-            isReconnect: prevStat === "reconnecting",
-          });
-        }
-        if (stat === "disconnected") {
-          onDisconnect?.();
-        }
+        stat?.forEach((i) => {
+          if (prevStat?.find((y) => y.chainId === i.chainId)?.status !== "connected" && i.status === "connected") {
+            args?.onConnect?.({
+              account: i.account,
+              chainId: i.chainId,
+              status: i.status,
+              isReconnect: prevStat?.find((j) => j.chainId === i.chainId)?.status === "reconnecting",
+            });
+          }
+          if (i.status === "disconnected") {
+            args?.onDisconnect?.();
+          }
+        });
       },
     );
-  }, [onConnect, onDisconnect]);
+  }, [args, args?.onConnect, args?.onDisconnect]);
 
-  return {
-    data: _account,
-    isConnected: Boolean(_account),
-    isConnecting: status === "connecting",
-    isDisconnected: status === "disconnected",
-    isReconnecting: status === "reconnecting",
-    isLoading: status === "connecting" || status === "reconnecting",
-    reconnect,
-    status,
-  };
-};
+  const singleChain = sessions?.find((i) => i.chainId === args?.chainId);
 
-/**
- * graz query hook to retrieve list of balances from current account or given address.
- *
- * @param bech32Address - Optional bech32 account address, defaults to connected account address
- *
- * @example
- * ```ts
- * import { useBalances } from "graz";
- *
- * // basic example
- * const { data, isFetching, refetch, ... } = useBalances();
- *
- * // with custom bech32 address
- * useBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
- * ```
- */
-export const useBalances = (bech32Address?: string): UseQueryResult<Coin[]> => {
-  const { data: account } = useAccount();
-  const address = bech32Address || account?.bech32Address;
+  const res = args?.chainId
+    ? {
+        data: singleChain,
+        isConnected: Boolean(singleChain?.account),
+        isConnecting: singleChain?.status === "connecting",
+        isDisconnected: singleChain?.status === "disconnected",
+        isReconnecting: singleChain?.status === "reconnecting",
+        isLoading: singleChain?.status === "connecting" || status === "reconnecting",
+        status: singleChain?.status,
+      }
+    : sessions?.map((i) => ({
+        data: i,
+        isConnected: Boolean(i.account),
+        isConnecting: i.status === "connecting",
+        isDisconnected: i.status === "disconnected",
+        isReconnecting: i.status === "reconnecting",
+        isLoading: i.status === "connecting" || status === "reconnecting",
+        status: i.status,
+      }));
 
-  const queryKey = ["USE_BALANCES", address] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalances(_address!), {
-    enabled: Boolean(address),
-    refetchOnMount: false,
-    refetchOnReconnect: true,
-    refetchOnWindowFocus: false,
-  });
-
-  return query;
-};
-
-/**
- * graz query hook to retrieve specific asset balance from current account or given address.
- *
- * @param denom - Asset denom to search
- * @param bech32Address - Optional bech32 account address, defaults to connected account address
- *
- * @example
- * ```ts
- * import { useBalance } from "graz";
- *
- * // basic example
- * const { data, isFetching, refetch, ... } = useBalance("atom");
- *
- * // with custom bech32 address
- * useBalance("atom", "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
- * ```
- */
-export const useBalance = (denom: string, bech32Address?: string): UseQueryResult<Coin | undefined> => {
-  const { data: balances } = useBalances(bech32Address);
-
-  const queryKey = ["USE_BALANCE", balances, denom, bech32Address] as const;
-  const query = useQuery(
-    queryKey,
-    ({ queryKey: [, _balances] }) => {
-      return _balances?.find((x) => x.denom === denom);
-    },
-    {
-      enabled: Boolean(balances),
-    },
-  );
-
-  return query;
+  return res as T["chainId"] extends string
+    ? {
+        data: GrazAccountSession;
+        isConnected: boolean;
+        isConnecting: boolean;
+        isDisconnected: boolean;
+        isReconnecting: boolean;
+        isLoading: boolean;
+        status: GrazAccountSession["status"];
+      }
+    : {
+        data: GrazAccountSession;
+        isConnected: boolean;
+        isConnecting: boolean;
+        isDisconnected: boolean;
+        isReconnecting: boolean;
+        isLoading: boolean;
+        status: GrazAccountSession["status"];
+      }[];
 };
 
 export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, ConnectResult>;
@@ -244,23 +207,25 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
  * const { signer, signerAmino, signerAuto } = useOfflineSigners();
  * ```
  */
-export const useOfflineSigners = () =>
-  useGrazSessionStore(
-    (x) => ({
-      signer: x.offlineSigner,
-      signerAmino: x.offlineSignerAmino,
-      signerAuto: x.offlineSignerAuto,
-    }),
-    shallow,
+export const useOfflineSigners = ({ chainId }: { chainId?: string }) => {
+  useQuery(
+    [
+      "USE_OFFLINE_SIGNERS",
+      {
+        chainId,
+      },
+    ],
+    async () => {
+      const offlineSigners = getOfflineSigners();
+      return {
+        offlineSigner: offlineSigners.offlineSigner(chainId!),
+        offlineSignerAmino: offlineSigners.offlineSignerAmino(chainId!),
+        offlineSignerAuto: await offlineSigners.offlineSignerAuto(chainId!),
+      };
+    },
+    { enabled: Boolean(chainId) },
   );
-
-/**
- * graz hook to retrieve offline signer objects (default, amino enabled, and auto).
- *
- * @deprecated prefer using {@link useOfflineSigners}
- * @see {@link useOfflineSigners}
- */
-export const useSigners = () => useOfflineSigners();
+};
 
 /**
  * graz query hook to retrieve list of staked balances from current account or given address.
@@ -278,14 +243,14 @@ export const useSigners = () => useOfflineSigners();
  * useBalanceStaked("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export const useBalanceStaked = (bech32Address?: string): UseQueryResult<Coin | null> => {
-  const { data: account } = useAccount();
-  const address = bech32Address || account?.bech32Address;
+// export const useBalanceStaked = (bech32Address?: string): UseQueryResult<Coin | null> => {
+//   const { data: account } = useAccount();
+//   const address = bech32Address || account?.bech32Address;
 
-  const queryKey = ["USE_BALANCE_STAKED", address] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalanceStaked(address!), {
-    enabled: Boolean(address),
-  });
+//   const queryKey = ["USE_BALANCE_STAKED", address] as const;
+//   const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalanceStaked(address), {
+//     enabled: Boolean(address),
+//   });
 
-  return query;
-};
+//   return query;
+// };

@@ -13,7 +13,7 @@ export const ConnectStatus: FC = () => {
       ) : (
         <>
           <TagLeftIcon as={Box} bgColor={isConnected ? "green.500" : "red.500"} boxSize={3} rounded="full" />
-          <TagLabel>{isConnected && activeChain ? `Connected to ${activeChain.chainId}` : "Disconnected"}</TagLabel>
+          <TagLabel>{isConnected && activeChain ? `Connected to ${activeChain}` : "Disconnected"}</TagLabel>
         </>
       )}
     </Tag>

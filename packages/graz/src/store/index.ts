@@ -1,7 +1,3 @@
-import type { CosmWasmClient, SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import type { Coin, OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-signing";
-import type { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
-import type { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import type { Key } from "@keplr-wallet/types";
 import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import type { Web3ModalConfig } from "@web3modal/standalone";
@@ -10,6 +6,7 @@ import type { PersistOptions } from "zustand/middleware";
 import { createJSONStorage } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
+import type { GrazClients, GrazSigningClients } from "../actions/clients";
 import type { GrazChain } from "../chains";
 import { WalletType } from "../types/wallet";
 
@@ -18,9 +15,10 @@ export interface WalletConnectStore {
   web3Modal?: Pick<Web3ModalConfig, "themeVariables" | "themeMode" | "privacyPolicyUrl" | "termsOfServiceUrl"> | null;
 }
 export interface GrazInternalStore {
-  defaultChain: GrazChain | null;
-  defaultSigningClient: "cosmWasm" | "stargate";
-  recentChain: GrazChain | null;
+  chains: GrazChain[] | null;
+  recentChains: string[] | null;
+  defaultClient: GrazClients;
+  defaultSigningClient: GrazSigningClients;
   walletType: WalletType;
   walletConnect: WalletConnectStore | null;
   _notFoundFn: () => void;
@@ -29,33 +27,24 @@ export interface GrazInternalStore {
   _onReconnectFailed: () => void;
 }
 
-export interface GrazSessionStore {
+export interface GrazAccountSession {
   account: Key | null;
-  activeChain: GrazChain | null;
-  balances: Coin[] | null;
-  clients: {
-    cosmWasm: CosmWasmClient;
-    stargate: StargateClient;
-    tendermint: Tendermint34Client;
-  } | null;
-  offlineSigner: (OfflineSigner & OfflineDirectSigner) | null;
-  offlineSignerAmino: OfflineSigner | null;
-  offlineSignerAuto: (OfflineSigner | OfflineDirectSigner) | null;
-  signingClients: {
-    cosmWasm: SigningCosmWasmClient;
-    stargate: SigningStargateClient;
-  } | null;
+  chainId: string;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
+}
+export interface GrazSessionStore {
+  sessions: GrazAccountSession[] | null;
   wcSignClient?: ISignClient | null;
 }
 
-export type GrazSessionPersistedStore = Pick<GrazSessionStore, "account" | "activeChain">;
+export type GrazSessionPersistedStore = Pick<GrazSessionStore, "sessions">;
 
-export type GrazInternalPersistedStore = Pick<GrazInternalStore, "recentChain" | "_reconnect" | "_reconnectConnector">;
+export type GrazInternalPersistedStore = Pick<GrazInternalStore, "_reconnect" | "_reconnectConnector">;
 
 export const grazInternalDefaultValues: GrazInternalStore = {
-  recentChain: null,
-  defaultChain: null,
+  chains: null,
+  recentChains: null,
+  defaultClient: "stargate",
   defaultSigningClient: "stargate",
   walletType: WalletType.KEPLR,
   walletConnect: {
@@ -69,24 +58,15 @@ export const grazInternalDefaultValues: GrazInternalStore = {
 };
 
 export const grazSessionDefaultValues: GrazSessionStore = {
-  account: null,
-  activeChain: null,
-  balances: null,
-  clients: null,
-  offlineSigner: null,
-  offlineSignerAmino: null,
-  offlineSignerAuto: null,
-  signingClients: null,
-  status: "disconnected",
+  sessions: null,
   wcSignClient: null,
 };
 
 const sessionOptions: PersistOptions<GrazSessionStore, GrazSessionPersistedStore> = {
   name: "graz-session",
-  version: 1,
+  version: 2,
   partialize: (x) => ({
-    account: x.account,
-    activeChain: x.activeChain,
+    sessions: x.sessions,
   }),
   storage: createJSONStorage(() => sessionStorage),
 };
@@ -94,11 +74,11 @@ const sessionOptions: PersistOptions<GrazSessionStore, GrazSessionPersistedStore
 const persistOptions: PersistOptions<GrazInternalStore, GrazInternalPersistedStore> = {
   name: "graz-internal",
   partialize: (x) => ({
-    recentChain: x.recentChain,
+    recentChains: x.recentChains,
     _reconnect: x._reconnect,
     _reconnectConnector: x._reconnectConnector,
   }),
-  version: 1,
+  version: 2,
 };
 
 export const useGrazSessionStore = create(

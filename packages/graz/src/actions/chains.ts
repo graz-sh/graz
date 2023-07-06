@@ -1,27 +1,17 @@
-import type { SigningCosmWasmClientOptions } from "@cosmjs/cosmwasm-stargate";
-import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
+import type { ChainInfo } from "@keplr-wallet/types";
 
-import type { GrazChain } from "../chains";
-import { useGrazInternalStore, useGrazSessionStore } from "../store";
-import type { Dictionary } from "../types/core";
+import { useGrazInternalStore } from "../store";
 import type { WalletType } from "../types/wallet";
 import type { ConnectResult } from "./account";
 import { connect } from "./account";
 import { getWallet } from "./wallet";
 
-export * from "./clients/tendermint";
-
 export const clearRecentChain = (): void => {
-  useGrazInternalStore.setState({ recentChain: null });
+  useGrazInternalStore.setState({ recentChains: null });
 };
 
-export const getActiveChainCurrency = (denom: string): AppCurrency | undefined => {
-  const { activeChain } = useGrazSessionStore.getState();
-  return activeChain?.currencies.find((x) => x.coinMinimalDenom === denom);
-};
-
-export const getRecentChain = (): GrazChain | null => {
-  return useGrazInternalStore.getState().recentChain;
+export const getRecentChains = (): string[] | null => {
+  return useGrazInternalStore.getState().recentChains;
 };
 
 export const suggestChain = async (chainInfo: ChainInfo): Promise<ChainInfo> => {
@@ -32,36 +22,16 @@ export const suggestChain = async (chainInfo: ChainInfo): Promise<ChainInfo> => 
 
 export interface SuggestChainAndConnectArgs {
   chainInfo: ChainInfo;
-  signerOpts?: SigningCosmWasmClientOptions;
-  walletType?: WalletType;
-  gas?: {
-    price: string;
-    denom: string;
-  };
-  rpcHeaders?: Dictionary;
-  path?: string;
   autoReconnect?: boolean;
+  walletType?: WalletType;
 }
 
-export const suggestChainAndConnect = async ({
-  chainInfo,
-  rpcHeaders,
-  gas,
-  path,
-  ...rest
-}: SuggestChainAndConnectArgs): Promise<ConnectResult> => {
-  const chain = await suggestChain(chainInfo);
+export const suggestChainAndConnect = async (args: SuggestChainAndConnectArgs): Promise<ConnectResult> => {
+  await suggestChain(args.chainInfo);
   const result = await connect({
-    chain: {
-      chainId: chainInfo.chainId,
-      currencies: chainInfo.currencies,
-      rest: chainInfo.rest,
-      rpc: chainInfo.rpc,
-      rpcHeaders,
-      gas,
-      path,
-    },
-    ...rest,
+    chainId: [args.chainInfo.chainId],
+    autoReconnect: args.autoReconnect,
+    walletType: args.walletType,
   });
-  return { ...result, chain };
+  return result;
 };

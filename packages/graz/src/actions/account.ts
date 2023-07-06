@@ -1,31 +1,25 @@
-import type { SigningCosmWasmClientOptions } from "@cosmjs/cosmwasm-stargate";
-import { GasPrice } from "@cosmjs/stargate";
-import type { Key } from "@keplr-wallet/types";
-
-import type { GrazChain } from "../chains";
 import { RECONNECT_SESSION_KEY } from "../constant";
+import type { GrazAccountSession } from "../store";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Maybe } from "../types/core";
 import type { WalletType } from "../types/wallet";
-import { createClients, createSigningClients } from "./clients";
+import { mergeSessions } from "../utils/mergeSessions";
 import { checkWallet, getWallet } from "./wallet";
 
 export type ConnectArgs = Maybe<{
-  chain?: GrazChain;
-  signerOpts?: SigningCosmWasmClientOptions;
+  chainId: string[];
   walletType?: WalletType;
   autoReconnect?: boolean;
 }>;
 
 export interface ConnectResult {
-  account: Key;
   walletType: WalletType;
-  chain: GrazChain;
+  sessions: GrazAccountSession[];
 }
 
 export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   try {
-    const { defaultChain, recentChain, walletType } = useGrazInternalStore.getState();
+    const { recentChains, walletType } = useGrazInternalStore.getState();
 
     const currentWalletType = args?.walletType || walletType;
 
@@ -36,71 +30,66 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
 
     const wallet = getWallet(currentWalletType);
 
-    const chain = args?.chain || recentChain || defaultChain;
-    if (!chain) {
-      throw new Error("No last known connected chain, connect action requires chain info");
+    const chainId = args?.chainId || recentChains;
+    if (!chainId) {
+      throw new Error("No last known connected chain, connect action requires chain id");
     }
 
-    useGrazSessionStore.setState((x) => {
-      const isReconnecting =
-        useGrazInternalStore.getState()._reconnect ||
-        Boolean(useGrazInternalStore.getState()._reconnectConnector) ||
-        Boolean(chain);
-      const isSwitchingChain = x.activeChain && x.activeChain.chainId !== chain.chainId;
-      if (isSwitchingChain) return { status: "connecting" };
-      if (isReconnecting) return { status: "reconnecting" };
-      return { status: "connecting" };
-    });
-
-    const { account: _account, activeChain } = useGrazSessionStore.getState();
     await wallet.init?.();
-    if (!_account || activeChain?.chainId !== chain.chainId) {
-      await wallet.enable(chain.chainId);
-      const account = await wallet.getKey(chain.chainId);
-      useGrazSessionStore.setState({ account });
-    }
-
-    const offlineSigner = wallet.getOfflineSigner(chain.chainId);
-    const offlineSignerAmino = wallet.getOfflineSignerOnlyAmino(chain.chainId);
-    const offlineSignerAuto = await wallet.getOfflineSignerAuto(chain.chainId);
-    const gasPrice = chain.gas ? GasPrice.fromString(`${chain.gas.price}${chain.gas.denom}`) : undefined;
-    const [clients, signingClients] = await Promise.all([
-      createClients(chain),
-      createSigningClients({
-        ...chain,
-        offlineSignerAuto,
-        cosmWasmSignerOptions: { gasPrice, ...(args?.signerOpts || {}) },
+    await wallet.enable(chainId);
+    const { sessions: _sessions } = useGrazSessionStore.getState();
+    const sessions = await Promise.all(
+      chainId.map(async (i) => {
+        const account = await wallet.getKey(i);
+        return { account, chainId: i, status: "connected" } as GrazAccountSession;
       }),
-    ] as const);
+    );
+    useGrazSessionStore.setState((prev) => ({ sessions: mergeSessions({ prev: prev.sessions, next: sessions }) }));
 
     useGrazInternalStore.setState({
-      recentChain: chain,
+      recentChains: sessions.map((session) => session.chainId),
       walletType: currentWalletType,
       _reconnect: Boolean(args?.autoReconnect),
       _reconnectConnector: currentWalletType,
     });
-    useGrazSessionStore.setState({
-      activeChain: chain,
-      clients,
-      offlineSigner,
-      offlineSignerAmino,
-      offlineSignerAuto,
-      signingClients,
-      status: "connected",
-    });
     typeof window !== "undefined" && window.sessionStorage.setItem(RECONNECT_SESSION_KEY, "Active");
-    const { account } = useGrazSessionStore.getState();
-    return { account: account!, walletType: currentWalletType, chain };
+
+    return { walletType: currentWalletType, sessions };
   } catch (error) {
     console.error("connect ", error);
-    if (useGrazSessionStore.getState().account === null) {
-      useGrazSessionStore.setState({ status: "disconnected" });
-    }
-    if (useGrazSessionStore.getState().account && useGrazSessionStore.getState().activeChain) {
-      useGrazSessionStore.setState({ status: "connected" });
-    }
+    useGrazSessionStore.setState((prev) => ({
+      sessions: prev.sessions?.map((item) =>
+        item.account
+          ? { ...item, status: "connected" }
+          : {
+              ...item,
+              status: "disconnected",
+            },
+      ),
+    }));
+
     throw error;
   }
+};
+
+export const getOfflineSigners = (args?: { walletType?: WalletType; chainId: string }) => {
+  if (!args?.chainId) throw new Error("chainId is required");
+
+  const { walletType } = useGrazInternalStore.getState();
+
+  const currentWalletType = args.walletType || walletType;
+  const isWalletAvailable = checkWallet(currentWalletType);
+  if (!isWalletAvailable) {
+    throw new Error(`${currentWalletType} is not available`);
+  }
+
+  const wallet = getWallet(currentWalletType);
+
+  const offlineSigner = wallet.getOfflineSigner;
+  const offlineSignerAmino = wallet.getOfflineSignerOnlyAmino;
+  const offlineSignerAuto = wallet.getOfflineSignerAuto;
+
+  return { offlineSigner, offlineSignerAmino, offlineSignerAuto };
 };
 
 export const disconnect = async (clearRecentChain = false): Promise<void> => {
@@ -109,7 +98,7 @@ export const disconnect = async (clearRecentChain = false): Promise<void> => {
   useGrazInternalStore.setState((x) => ({
     _reconnect: false,
     _reconnectConnector: null,
-    recentChain: clearRecentChain ? null : x.recentChain,
+    recentChains: clearRecentChain ? null : x.recentChains,
   }));
   return Promise.resolve();
 };
@@ -117,12 +106,12 @@ export const disconnect = async (clearRecentChain = false): Promise<void> => {
 export type ReconnectArgs = Maybe<{ onError?: (error: unknown) => void }>;
 
 export const reconnect = async (args?: ReconnectArgs) => {
-  const { recentChain, _reconnectConnector, _reconnect } = useGrazInternalStore.getState();
+  const { recentChains, _reconnectConnector, _reconnect } = useGrazInternalStore.getState();
   try {
     const isWalletReady = checkWallet(_reconnectConnector || undefined);
-    if (recentChain && isWalletReady && _reconnectConnector) {
+    if (recentChains && isWalletReady && _reconnectConnector) {
       const key = await connect({
-        chain: recentChain,
+        chainId: recentChains,
         walletType: _reconnectConnector,
         autoReconnect: _reconnect,
       });

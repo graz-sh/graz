@@ -9,9 +9,11 @@ import { getSdkError } from "@walletconnect/utils";
 import Long from "long";
 
 import { RECONNECT_SESSION_KEY } from "../constant";
+import type { GrazAccountSession } from "../store";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Wallet } from "../types/wallet";
 import { WALLET_TYPES, WalletType } from "../types/wallet";
+import { mergeSessions } from "../utils/mergeSessions";
 import { isAndroid, isIos, isMobile } from "../utils/os";
 import { promiseWithTimeout } from "../utils/timeout";
 
@@ -309,7 +311,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     useGrazInternalStore.setState({
       _reconnect: false,
       _reconnectConnector: null,
-      recentChain: null,
+      recentChains: null,
     });
   };
 
@@ -326,40 +328,36 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     _disconnect();
   };
 
-  const getSession = (chainId: string) => {
+  const getSession = (chainId: string[]) => {
     try {
       const { wcSignClient } = useGrazSessionStore.getState();
       if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
 
       const lastSession = wcSignClient.session.getAll().at(-1);
       if (!lastSession) return;
-      const isSameChain = wcSignClient.session
-        .getAll()
-        .at(-1)
-        ?.namespaces.cosmos?.accounts.find((i) => i.startsWith(`cosmos:${chainId}`));
-      const isNotExpired = lastSession.expiry * 1000 > Date.now() + 1000;
-      if (!isNotExpired) {
+
+      const isValid = lastSession.expiry * 1000 > Date.now() + 1000;
+      if (!isValid) {
         void wcDisconnect(lastSession.topic);
         throw new Error("invalid session");
       }
-      if (!isSameChain) {
-        try {
-          const chainSession = wcSignClient.find({
-            requiredNamespaces: {
-              cosmos: {
-                methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
-                chains: [`cosmos:${chainId}`],
-                events: ["chainChanged", "accountsChanged"],
-              },
+
+      try {
+        const chainSession = wcSignClient.find({
+          requiredNamespaces: {
+            cosmos: {
+              methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
+              chains: chainId.map((i) => `cosmos:${i}`),
+              events: ["chainChanged", "accountsChanged"],
             },
-          });
-          if (!chainSession.length) {
-            throw new Error("no session");
-          }
-          return chainSession.at(-1);
-        } catch (error) {
-          if (!(error as Error).message.toLowerCase().includes("no matching key")) throw error;
+          },
+        });
+        if (!chainSession.length) {
+          throw new Error("no session");
         }
+        return chainSession.at(-1);
+      } catch (error) {
+        if (!(error as Error).message.toLowerCase().includes("no matching key")) throw error;
       }
 
       return lastSession;
@@ -368,7 +366,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     }
   };
 
-  const checkSession = (chainId: string) => {
+  const checkSession = (chainId: string[]) => {
     try {
       const lastSession = getSession(chainId);
       return lastSession;
@@ -420,11 +418,14 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     wcSignClient.events.on("session_event", (args) => {
       if (
         args.params.event.name === "accountsChanged" &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        args.params.event.data?.[0] !== useGrazSessionStore.getState().account?.bech32Address
+        !useGrazSessionStore
+          .getState()
+          .sessions?.map((i) => i.account?.bech32Address)
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+          .includes(args.params.event.data?.[0])
       ) {
         const chainId = args.params.chainId.split(":")[1];
-        chainId && void enable(chainId);
+        chainId && void enable([chainId]);
       } else {
         reconnect();
       }
@@ -440,11 +441,14 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       wcSignClient.events.off("session_event", (args) => {
         if (
           args.params.event.name === "accountsChanged" &&
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          args.params.event.data?.[0] !== useGrazSessionStore.getState().account?.bech32Address
+          !useGrazSessionStore
+            .getState()
+            .sessions?.map((i) => i.account?.bech32Address)
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+            .includes(args.params.event.data?.[0])
         ) {
           const chainId = args.params.chainId.split(":")[1];
-          chainId && void enable(chainId);
+          chainId && void enable([chainId]);
         } else {
           reconnect();
         }
@@ -452,7 +456,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     };
   };
 
-  const enable = async (chainId: string) => {
+  const enable = async (chainId: string[]) => {
     const { wcSignClient: signClient } = useGrazSessionStore.getState();
     if (!signClient) throw new Error("enable walletConnect.signClient is not defined");
     const { walletConnect } = useGrazInternalStore.getState();
@@ -482,14 +486,13 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       // ],
     });
 
-    const { account, activeChain } = useGrazSessionStore.getState();
     const lastSession = checkSession(chainId);
-    if ((activeChain?.chainId !== chainId && !lastSession) || !account) {
+    if (!lastSession) {
       const { uri, approval } = await signClient.connect({
         requiredNamespaces: {
           cosmos: {
             methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
-            chains: [`cosmos:${chainId}`],
+            chains: chainId.map((i) => `cosmos:${i}`),
             events: ["chainChanged", "accountsChanged"],
           },
         },
@@ -520,16 +523,21 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     try {
       await promiseWithTimeout(
         (async () => {
-          const wcAccount = await getKey(chainId);
-          useGrazSessionStore.setState({
-            account: wcAccount,
-          });
+          const sessions = await Promise.all(
+            chainId.map(async (i) => {
+              const wcAccount = await getKey(i);
+              return { account: wcAccount, chainId: i, status: "connected" } as GrazAccountSession;
+            }),
+          );
+          useGrazSessionStore.setState((prev) => ({
+            sessions: mergeSessions({ prev: prev.sessions, next: sessions }),
+          }));
         })(),
-        10000,
+        10000 * chainId.length,
         new Error("Connection timeout"),
       );
     } catch (error) {
-      void wcDisconnect(lastSession?.topic);
+      void wcDisconnect(lastSession.topic);
       if (!(error as Error).message.toLowerCase().includes("no matching key")) throw error;
     }
   };
@@ -537,7 +545,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   const getAccount = async (chainId: string): Promise<AccountData> => {
     const { wcSignClient } = useGrazSessionStore.getState();
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
-    const topic = getSession(chainId)?.topic;
+    const topic = getSession([chainId])?.topic;
     if (!topic) throw new Error("No wallet connect session");
     redirectToApp();
     const result: { address: string; algo: string; pubkey: string }[] = await wcSignClient.request({
@@ -572,11 +580,10 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
   const wcSignDirect = async (...args: SignDirectParams) => {
     const [chainId, signer, signDoc] = args;
-    const { account, wcSignClient } = useGrazSessionStore.getState();
+    const { wcSignClient } = useGrazSessionStore.getState();
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
-    if (!account) throw new Error("account is not defined");
 
-    const topic = getSession(chainId)?.topic;
+    const topic = getSession([chainId])?.topic;
     if (!topic) throw new Error("No wallet connect session");
 
     if (!signDoc.bodyBytes) throw new Error("No bodyBytes");
@@ -619,11 +626,9 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   const wcSignAmino = async (...args: SignAminoParams) => {
     const [chainId, signer, signDoc, _signOptions] = args;
     const { wcSignClient } = useGrazSessionStore.getState();
-    const { account } = useGrazSessionStore.getState();
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
-    if (!account) throw new Error("account is not defined");
 
-    const topic = getSession(chainId)?.topic;
+    const topic = getSession([chainId])?.topic;
     if (!topic) throw new Error("No wallet connect session");
 
     redirectToApp();

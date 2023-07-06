@@ -1,47 +1,16 @@
 import type { QueryClient, StakingExtension } from "@cosmjs/stargate";
 import type { BondStatusString } from "@cosmjs/stargate/build/modules/staking/queries";
-import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
+import type { ChainInfo } from "@keplr-wallet/types";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { QueryValidatorsResponse } from "cosmjs-types/cosmos/staking/v1beta1/query";
 
 import type { ConnectResult } from "../actions/account";
 import type { SuggestChainAndConnectArgs } from "../actions/chains";
-import { clearRecentChain, getActiveChainCurrency, suggestChain, suggestChainAndConnect } from "../actions/chains";
-import type { GrazChain } from "../chains";
-import { useGrazInternalStore, useGrazSessionStore } from "../store";
+import { clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
+import { useGrazInternalStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
-
-/**
- * graz hook to retrieve connected account's active chain
- *
- * @example
- * ```ts
- * import { useActiveChain } from "graz";
- * const { rpc, rest, chainId, currencies } = useActiveChain();
- * ```
- */
-export const useActiveChain = (): GrazChain | null => {
-  return useGrazSessionStore((x) => x.activeChain);
-};
-
-/**
- * graz hook to retrieve specific connected account's currency
- *
- * @param denom - Currency denom to search
- *
- * @example
- * ```ts
- * import { useActiveChainCurrency } from "graz";
- * const { data: currency, ... } = useActiveChainCurrency("juno");
- * ```
- */
-export const useActiveChainCurrency = (denom: string): UseQueryResult<AppCurrency | undefined> => {
-  const queryKey = ["USE_ACTIVE_CHAIN_CURRENCY", denom] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _denom] }) => getActiveChainCurrency(_denom));
-  return query;
-};
 
 /**
  * graz hook to retrieve active chain validators with given query client and optional bond status
@@ -92,8 +61,8 @@ export const useActiveChainValidators = <T extends QueryClient & StakingExtensio
  * @see {@link useActiveChain}
  */
 export const useRecentChain = () => {
-  const recentChain = useGrazInternalStore((x) => x.recentChain);
-  return { data: recentChain, clear: clearRecentChain };
+  const recentChains = useGrazInternalStore((x) => x.recentChains);
+  return { data: recentChains, clear: clearRecentChain };
 };
 
 export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;

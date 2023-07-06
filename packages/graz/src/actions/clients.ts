@@ -1,41 +1,73 @@
 import type { HttpEndpoint, SigningCosmWasmClientOptions } from "@cosmjs/cosmwasm-stargate";
-import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { CosmWasmClient, SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import type { OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-signing";
-import type { SigningStargateClientOptions } from "@cosmjs/stargate";
-import { SigningStargateClient } from "@cosmjs/stargate";
+import type { StargateClientOptions } from "@cosmjs/stargate";
+import { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 
 import type { GrazChain } from "../chains";
-import type { GrazSessionStore } from "../store";
 
-export * from "./clients/tendermint";
+export type GrazClients = "cosmWasm" | "stargate" | "tendermint";
 
-export type CreateClientArgs = Pick<GrazChain, "rpc" | "rpcHeaders">;
-
-export const createClients = async ({ rpc, rpcHeaders }: CreateClientArgs): Promise<GrazSessionStore["clients"]> => {
-  const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
-  const [cosmWasm, stargate, tendermint] = await Promise.all([
-    SigningCosmWasmClient.connect(endpoint),
-    SigningStargateClient.connect(endpoint),
-    Tendermint34Client.connect(rpc),
-  ]);
-  return { cosmWasm, stargate, tendermint };
+export type GrazConnectClientArgs<T extends GrazClients> = Pick<GrazChain, "rpc" | "rpcHeaders"> & {
+  client: T;
 };
 
-export type CreateSigningClientArgs = CreateClientArgs & {
+export type GrazConnectClient<T> = T extends "cosmWasm"
+  ? CosmWasmClient
+  : T extends "stargate"
+  ? StargateClient
+  : T extends "tendermint"
+  ? Tendermint34Client
+  : never;
+
+export const connectClient = async <T extends GrazClients>({ rpc, rpcHeaders, client }: GrazConnectClientArgs<T>) => {
+  const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
+  const result = await (async () => {
+    switch (client) {
+      case "cosmWasm":
+        return CosmWasmClient.connect(endpoint);
+      case "stargate":
+        return StargateClient.connect(endpoint);
+      case "tendermint":
+        return Tendermint34Client.connect(rpc);
+      default:
+        throw new Error(`Unknown client: ${client}`);
+    }
+  })();
+  return result as GrazConnectClient<T>;
+};
+
+export type GrazSigningClients = "cosmWasm" | "stargate";
+
+export type GrazConnectSigningClientArgs<T extends GrazSigningClients> = Pick<GrazChain, "rpc" | "rpcHeaders"> & {
+  client: T;
   offlineSignerAuto: OfflineSigner | OfflineDirectSigner;
-  cosmWasmSignerOptions?: SigningCosmWasmClientOptions;
-  stargateSignerOptions?: SigningStargateClientOptions;
+  options?: T extends "cosmWasm" ? SigningCosmWasmClientOptions : T extends "stargate" ? StargateClientOptions : never;
 };
 
-export const createSigningClients = async (
-  args: CreateSigningClientArgs,
-): Promise<GrazSessionStore["signingClients"]> => {
-  const { rpc, rpcHeaders, offlineSignerAuto, cosmWasmSignerOptions = {}, stargateSignerOptions = {} } = args;
+export type GrazConnectSigningClient<T> = T extends "cosmWasm"
+  ? SigningCosmWasmClient
+  : T extends "stargate"
+  ? SigningStargateClient
+  : never;
+
+export const connectSigningClient = async <T extends GrazSigningClients>(args: GrazConnectSigningClientArgs<T>) => {
+  const { rpc, rpcHeaders, offlineSignerAuto, client, options = {} } = args;
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
-  const [cosmWasm, stargate] = await Promise.all([
-    SigningCosmWasmClient.connectWithSigner(endpoint, offlineSignerAuto, cosmWasmSignerOptions),
-    SigningStargateClient.connectWithSigner(endpoint, offlineSignerAuto, stargateSignerOptions),
-  ]);
-  return { cosmWasm, stargate };
+  const result = await (async () => {
+    switch (client) {
+      case "cosmWasm":
+        return SigningCosmWasmClient.connectWithSigner(
+          endpoint,
+          offlineSignerAuto,
+          options as SigningCosmWasmClientOptions,
+        );
+      case "stargate":
+        return SigningStargateClient.connectWithSigner(endpoint, offlineSignerAuto, options as StargateClientOptions);
+      default:
+        throw new Error(`Unknown client: ${client}`);
+    }
+  })();
+  return result as GrazConnectSigningClient<T>;
 };

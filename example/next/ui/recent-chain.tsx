@@ -9,7 +9,7 @@ export const RecentChain: FC = () => {
 
   return (
     <Text>
-      Recent chain: <b>{recentChain.chainId}</b> (
+      Recent chain: <b>{recentChain}</b> (
       <Button colorScheme="blue" onClick={clear} variant="link">
         clear
       </Button>

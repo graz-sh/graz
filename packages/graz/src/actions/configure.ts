@@ -4,7 +4,8 @@ import { useGrazInternalStore } from "../store";
 import type { WalletType } from "../types/wallet";
 
 export interface ConfigureGrazArgs {
-  defaultChain?: GrazChain;
+  chains?: GrazChain[];
+  defaultClient?: GrazInternalStore["defaultClient"];
   defaultSigningClient?: GrazInternalStore["defaultSigningClient"];
   defaultWallet?: WalletType;
   onNotFound?: () => void;
@@ -18,7 +19,8 @@ export interface ConfigureGrazArgs {
 
 export const configureGraz = (args: ConfigureGrazArgs = {}): ConfigureGrazArgs => {
   useGrazInternalStore.setState((prev) => ({
-    defaultChain: args.defaultChain || prev.defaultChain,
+    chains: args.chains || prev.chains,
+    defaultClient: args.defaultClient || prev.defaultClient,
     defaultSigningClient: args.defaultSigningClient || prev.defaultSigningClient,
     walletConnect: args.walletConnect || prev.walletConnect,
     walletType: args.defaultWallet || prev.walletType,

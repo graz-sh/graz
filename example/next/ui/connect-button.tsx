@@ -1,7 +1,6 @@
 import {
   Button,
   ButtonGroup,
-  IconButton,
   Modal,
   ModalContent,
   ModalHeader,
@@ -17,12 +16,13 @@ export const ConnectButton: FC = () => {
   const toast = useToast();
   const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const { isConnected, isConnecting, isReconnecting, reconnect } = useAccount({
-    onConnect: ({ account, walletType, chain }) => {
+  const { isConnected, isConnecting, isReconnecting } = useAccount({
+    chainId: "cosmoshub-4",
+    onConnect: ({ account, chainId }) => {
       toast({
         status: "success",
-        title: `Wallet connected! using ${walletType} to ${chain.chainId}`,
-        description: `Connected as ${account.name}`,
+        title: `Wallet connected! to ${chainId}`,
+        description: `Connected as ${account?.name}`,
       });
     },
     onDisconnect: () => {
@@ -42,7 +42,7 @@ export const ConnectButton: FC = () => {
   });
 
   const handleConnect = (wallet: WalletType) => {
-    connect({ walletType: wallet });
+    connect({ walletType: wallet, chainId: ["cosmoshub-4"] });
     onClose();
   };
   const wallets = getAvailableWallets();
@@ -52,7 +52,6 @@ export const ConnectButton: FC = () => {
         <Button isLoading={isConnecting || isReconnecting} onClick={() => (isConnected ? disconnect() : onOpen())}>
           {isConnected ? "Disconnect" : "Connect"} Wallet
         </Button>
-        {isConnected ? <IconButton aria-label="refresh" icon={<>🔄</>} onClick={() => void reconnect()} /> : null}
       </ButtonGroup>
 
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
