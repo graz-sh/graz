@@ -9,7 +9,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { getAvailableWallets, useAccount, useConnect, useDisconnect, WalletType } from "graz";
+import { getAvailableWallets, mainnetChains, useAccount, useConnect, useDisconnect, WalletType } from "graz";
 import type { FC } from "react";
 
 export const ConnectButton: FC = () => {
@@ -42,7 +42,15 @@ export const ConnectButton: FC = () => {
   });
 
   const handleConnect = (wallet: WalletType) => {
-    connect({ walletType: wallet, chainId: ["cosmoshub-4"] });
+    connect({
+      walletType: wallet,
+      chainId: [
+        mainnetChains.cosmoshub.chainId,
+        mainnetChains.juno.chainId,
+        mainnetChains.osmosis.chainId,
+        mainnetChains.axelar.chainId,
+      ],
+    });
     onClose();
   };
   const wallets = getAvailableWallets();

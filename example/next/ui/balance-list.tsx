@@ -3,7 +3,9 @@ import { useAccount, useBalances } from "graz";
 import type { FC } from "react";
 
 export const BalanceList: FC = () => {
-  const account = useAccount();
+  const account = useAccount({
+    chainId: "cosmoshub-4",
+  });
 
   const {
     data: balances,
@@ -11,18 +13,15 @@ export const BalanceList: FC = () => {
     refetch,
   } = useBalances({
     client: "stargate",
-    rpc: "https://rpc.cosmoshub.strange.love",
-    bech32Address: account.data?.bech32Address,
-    currencies: [
-      {
-        coinDenom: "ATOM",
-        coinMinimalDenom: "uatom",
-        coinDecimals: 6,
-        coinGeckoId: "cosmos",
-        coinImageUrl: "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
-      },
-    ],
+    bech32Address: account?.data?.account?.bech32Address,
+    chainId: "cosmoshub-4",
   });
+
+  const tes = useBalances({
+    client: "stargate",
+    bech32Address: account?.data?.account?.bech32Address,
+  });
+  console.log("multib", tes.data);
 
   const REFRESH_BUTTON = (
     <Button colorScheme="blue" onClick={() => void refetch()} variant="link">

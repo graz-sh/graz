@@ -17,7 +17,7 @@ export interface ConfigureGrazArgs {
   autoReconnect?: boolean;
 }
 
-export const configureGraz = (args: ConfigureGrazArgs = {}): ConfigureGrazArgs => {
+export const configureGraz = (args: ConfigureGrazArgs): ConfigureGrazArgs => {
   useGrazInternalStore.setState((prev) => ({
     chains: args.chains || prev.chains,
     defaultClient: args.defaultClient || prev.defaultClient,

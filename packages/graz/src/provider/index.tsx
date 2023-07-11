@@ -4,6 +4,7 @@ import type { FC } from "react";
 
 import type { ConfigureGrazArgs } from "../actions/configure";
 import { configureGraz } from "../actions/configure";
+import type { GrazChain } from "../chains";
 import { ClientOnly } from "./client-only";
 import { GrazEvents } from "./events";
 
@@ -12,7 +13,7 @@ const queryClient = new QueryClient({
 });
 
 export type GrazProviderProps = Partial<QueryClientProviderProps> & {
-  grazOptions?: ConfigureGrazArgs;
+  grazConfig: Omit<ConfigureGrazArgs, "chains"> & { chains: GrazChain[] };
 };
 
 /**
@@ -33,10 +34,9 @@ export type GrazProviderProps = Partial<QueryClientProviderProps> & {
  *
  * @see https://tanstack.com/query
  */
-export const GrazProvider: FC<GrazProviderProps> = ({ children, grazOptions, ...props }) => {
-  if (grazOptions) {
-    configureGraz(grazOptions);
-  }
+export const GrazProvider: FC<GrazProviderProps> = ({ children, grazConfig, ...props }) => {
+  configureGraz(grazConfig);
+
   return (
     <QueryClientProvider key="graz-provider" client={queryClient} {...props}>
       <ClientOnly>

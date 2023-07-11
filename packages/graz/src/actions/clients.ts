@@ -7,13 +7,13 @@ import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 
 import type { GrazChain } from "../chains";
 
-export type GrazClients = "cosmWasm" | "stargate" | "tendermint";
+export type Clients = "cosmWasm" | "stargate" | "tendermint";
 
-export type GrazConnectClientArgs<T extends GrazClients> = Pick<GrazChain, "rpc" | "rpcHeaders"> & {
+export type ConnectClientArgs<T extends Clients> = Pick<GrazChain, "rpc" | "rpcHeaders"> & {
   client: T;
 };
 
-export type GrazConnectClient<T> = T extends "cosmWasm"
+export type ConnectClient<T> = T extends "cosmWasm"
   ? CosmWasmClient
   : T extends "stargate"
   ? StargateClient
@@ -21,7 +21,7 @@ export type GrazConnectClient<T> = T extends "cosmWasm"
   ? Tendermint34Client
   : never;
 
-export const connectClient = async <T extends GrazClients>({ rpc, rpcHeaders, client }: GrazConnectClientArgs<T>) => {
+export const connectClient = async <T extends Clients>({ rpc, rpcHeaders, client }: ConnectClientArgs<T>) => {
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
   const result = await (async () => {
     switch (client) {
@@ -35,24 +35,24 @@ export const connectClient = async <T extends GrazClients>({ rpc, rpcHeaders, cl
         throw new Error(`Unknown client: ${client}`);
     }
   })();
-  return result as GrazConnectClient<T>;
+  return result as ConnectClient<T>;
 };
 
-export type GrazSigningClients = "cosmWasm" | "stargate";
+export type SigningClients = "cosmWasm" | "stargate";
 
-export type GrazConnectSigningClientArgs<T extends GrazSigningClients> = Pick<GrazChain, "rpc" | "rpcHeaders"> & {
+export type ConnectSigningClientArgs<T extends SigningClients> = Pick<GrazChain, "rpc" | "rpcHeaders"> & {
   client: T;
   offlineSignerAuto: OfflineSigner | OfflineDirectSigner;
   options?: T extends "cosmWasm" ? SigningCosmWasmClientOptions : T extends "stargate" ? StargateClientOptions : never;
 };
 
-export type GrazConnectSigningClient<T> = T extends "cosmWasm"
+export type ConnectSigningClient<T> = T extends "cosmWasm"
   ? SigningCosmWasmClient
   : T extends "stargate"
   ? SigningStargateClient
   : never;
 
-export const connectSigningClient = async <T extends GrazSigningClients>(args: GrazConnectSigningClientArgs<T>) => {
+export const connectSigningClient = async <T extends SigningClients>(args: ConnectSigningClientArgs<T>) => {
   const { rpc, rpcHeaders, offlineSignerAuto, client, options = {} } = args;
   const endpoint: HttpEndpoint = { url: rpc, headers: { ...(rpcHeaders || {}) } };
   const result = await (async () => {
@@ -69,5 +69,5 @@ export const connectSigningClient = async <T extends GrazSigningClients>(args: G
         throw new Error(`Unknown client: ${client}`);
     }
   })();
-  return result as GrazConnectSigningClient<T>;
+  return result as ConnectSigningClient<T>;
 };

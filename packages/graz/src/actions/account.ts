@@ -1,3 +1,5 @@
+import type { OfflineAminoSigner, OfflineDirectSigner } from "@keplr-wallet/types";
+
 import { RECONNECT_SESSION_KEY } from "../constant";
 import type { GrazAccountSession } from "../store";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
@@ -20,7 +22,9 @@ export interface ConnectResult {
 export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   try {
     const { recentChains, walletType } = useGrazInternalStore.getState();
-
+    if (args?.walletType && args.walletType !== walletType) {
+      await disconnect();
+    }
     const currentWalletType = args?.walletType || walletType;
 
     const isWalletAvailable = checkWallet(currentWalletType);
@@ -47,7 +51,7 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     useGrazSessionStore.setState((prev) => ({ sessions: mergeSessions({ prev: prev.sessions, next: sessions }) }));
 
     useGrazInternalStore.setState({
-      recentChains: sessions.map((session) => session.chainId),
+      recentChains: useGrazSessionStore.getState().sessions?.map((session) => session.chainId),
       walletType: currentWalletType,
       _reconnect: Boolean(args?.autoReconnect),
       _reconnectConnector: currentWalletType,
@@ -72,7 +76,16 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   }
 };
 
-export const getOfflineSigners = (args?: { walletType?: WalletType; chainId: string }) => {
+export interface OfflineSigners {
+  offlineSigner: OfflineAminoSigner & OfflineDirectSigner;
+  offlineSignerAmino: OfflineAminoSigner;
+  offlineSignerAuto: OfflineAminoSigner | OfflineDirectSigner;
+}
+
+export const getOfflineSigners = async (args?: {
+  walletType?: WalletType;
+  chainId: string;
+}): Promise<OfflineSigners> => {
   if (!args?.chainId) throw new Error("chainId is required");
 
   const { walletType } = useGrazInternalStore.getState();
@@ -85,21 +98,33 @@ export const getOfflineSigners = (args?: { walletType?: WalletType; chainId: str
 
   const wallet = getWallet(currentWalletType);
 
-  const offlineSigner = wallet.getOfflineSigner;
-  const offlineSignerAmino = wallet.getOfflineSignerOnlyAmino;
-  const offlineSignerAuto = wallet.getOfflineSignerAuto;
+  const offlineSigner = wallet.getOfflineSigner(args.chainId);
+  const offlineSignerAmino = wallet.getOfflineSignerOnlyAmino(args.chainId);
+  const offlineSignerAuto = await wallet.getOfflineSignerAuto(args.chainId);
 
   return { offlineSigner, offlineSignerAmino, offlineSignerAuto };
 };
 
-export const disconnect = async (clearRecentChain = false): Promise<void> => {
+export const disconnect = async (args?: { chainId?: string[] }): Promise<void> => {
   typeof window !== "undefined" && window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
-  useGrazSessionStore.setState(grazSessionDefaultValues);
-  useGrazInternalStore.setState((x) => ({
-    _reconnect: false,
-    _reconnectConnector: null,
-    recentChains: clearRecentChain ? null : x.recentChains,
-  }));
+  if (args?.chainId) {
+    useGrazSessionStore.setState((x) => ({
+      sessions: x.sessions?.filter((item) => !args.chainId?.includes(item.chainId)),
+    }));
+    useGrazInternalStore.setState((x) => ({
+      _reconnect: false,
+      _reconnectConnector: null,
+      recentChains: x.recentChains?.filter((item) => !args.chainId?.includes(item)),
+    }));
+  } else {
+    useGrazSessionStore.setState(grazSessionDefaultValues);
+    useGrazInternalStore.setState({
+      _reconnect: false,
+      _reconnectConnector: null,
+      recentChains: null,
+    });
+  }
+
   return Promise.resolve();
 };
 

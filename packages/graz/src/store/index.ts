@@ -6,7 +6,7 @@ import type { PersistOptions } from "zustand/middleware";
 import { createJSONStorage } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
-import type { GrazClients, GrazSigningClients } from "../actions/clients";
+import type { Clients, SigningClients } from "../actions/clients";
 import type { GrazChain } from "../chains";
 import { WalletType } from "../types/wallet";
 
@@ -17,8 +17,8 @@ export interface WalletConnectStore {
 export interface GrazInternalStore {
   chains: GrazChain[] | null;
   recentChains: string[] | null;
-  defaultClient: GrazClients;
-  defaultSigningClient: GrazSigningClients;
+  defaultClient: Clients;
+  defaultSigningClient: SigningClients;
   walletType: WalletType;
   walletConnect: WalletConnectStore | null;
   _notFoundFn: () => void;

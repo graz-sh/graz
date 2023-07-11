@@ -1,13 +1,24 @@
+import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
-import type { ConnectArgs, ConnectResult } from "../actions/account";
+import type { ConnectArgs, ConnectResult, OfflineSigners } from "../actions/account";
 import { connect, disconnect, getOfflineSigners } from "../actions/account";
 import type { GrazAccountSession } from "../store";
 import { useGrazSessionStore } from "../store";
-import type { ChainIdArgs, HookArgs } from "../types/data";
+import type { ChainIdArgs, HookResultDataWithChainId } from "../types/data";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
+
+export interface UseAccount {
+  data?: GrazAccountSession;
+  isConnected: boolean;
+  isConnecting: boolean;
+  isDisconnected: boolean;
+  isReconnecting: boolean;
+  isLoading: boolean;
+  status?: GrazAccountSession["status"];
+}
 
 export interface UseAccountArgs {
   onConnect?: (args: GrazAccountSession & { isReconnect: boolean }) => void;
@@ -32,7 +43,7 @@ export interface UseAccountArgs {
  * });
  * ```
  */
-export const useAccount = <T extends ChainIdArgs>(args?: HookArgs<UseAccountArgs, T>) => {
+export const useAccount = <T extends ChainIdArgs>(args?: UseAccountArgs & T) => {
   const sessions = useGrazSessionStore((x) => x.sessions);
 
   useEffect(() => {
@@ -56,19 +67,23 @@ export const useAccount = <T extends ChainIdArgs>(args?: HookArgs<UseAccountArgs
     );
   }, [args, args?.onConnect, args?.onDisconnect]);
 
-  const singleChain = sessions?.find((i) => i.chainId === args?.chainId);
-
-  const res = args?.chainId
-    ? {
-        data: singleChain,
-        isConnected: Boolean(singleChain?.account),
-        isConnecting: singleChain?.status === "connecting",
-        isDisconnected: singleChain?.status === "disconnected",
-        isReconnecting: singleChain?.status === "reconnecting",
-        isLoading: singleChain?.status === "connecting" || status === "reconnecting",
-        status: singleChain?.status,
-      }
-    : sessions?.map((i) => ({
+  const res = useMemo(() => {
+    if (args?.chainId) {
+      const singleChainRes = sessions?.find((i) => i.chainId === args.chainId);
+      return {
+        data: singleChainRes,
+        isConnected: Boolean(singleChainRes?.account),
+        isConnecting: singleChainRes?.status === "connecting",
+        isDisconnected: singleChainRes?.status === "disconnected",
+        isReconnecting: singleChainRes?.status === "reconnecting",
+        isLoading: singleChainRes?.status === "connecting" || status === "reconnecting",
+        status: singleChainRes?.status,
+      };
+    }
+    if (!sessions) return undefined;
+    const multiChainRes: Record<string, UseAccount> = {};
+    sessions.forEach((i) => {
+      multiChainRes[i.chainId] = {
         data: i,
         isConnected: Boolean(i.account),
         isConnecting: i.status === "connecting",
@@ -76,27 +91,12 @@ export const useAccount = <T extends ChainIdArgs>(args?: HookArgs<UseAccountArgs
         isReconnecting: i.status === "reconnecting",
         isLoading: i.status === "connecting" || status === "reconnecting",
         status: i.status,
-      }));
+      };
+    });
+    return multiChainRes;
+  }, [args?.chainId, sessions]);
 
-  return res as T["chainId"] extends string
-    ? {
-        data: GrazAccountSession;
-        isConnected: boolean;
-        isConnecting: boolean;
-        isDisconnected: boolean;
-        isReconnecting: boolean;
-        isLoading: boolean;
-        status: GrazAccountSession["status"];
-      }
-    : {
-        data: GrazAccountSession;
-        isConnected: boolean;
-        isConnecting: boolean;
-        isDisconnected: boolean;
-        isReconnecting: boolean;
-        isLoading: boolean;
-        status: GrazAccountSession["status"];
-      }[];
+  return res as HookResultDataWithChainId<UseAccount, T> | undefined;
 };
 
 export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, ConnectResult>;
@@ -187,8 +187,11 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
   });
 
   return {
-    disconnect: (forget?: boolean) => mutation.mutate(forget),
-    disconnectAsync: (forget?: boolean) => mutation.mutateAsync(forget),
+    disconnect: (args?: { chainid?: string[] }) =>
+      mutation.mutate({
+        chainId: args?.chainid,
+      }),
+    disconnectAsync: (args?: { chainid?: string[] }) => mutation.mutateAsync({ chainId: args?.chainid }),
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
@@ -207,50 +210,65 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
  * const { signer, signerAmino, signerAuto } = useOfflineSigners();
  * ```
  */
-export const useOfflineSigners = ({ chainId }: { chainId?: string }) => {
-  useQuery(
+export const useOfflineSigners = <T extends ChainIdArgs>(args?: T) => {
+  const accounts = useAccount();
+
+  const { data } = useQuery(
+    ["OFFLINE_SIGNERS", { accounts }],
+    async () => {
+      if (!accounts) return undefined;
+      const connectedChainIds = Object.values(accounts)
+        .map((i) => i.data?.chainId)
+        .filter((i) => i) as string[];
+      const res: Record<string, OfflineSigners> = {};
+      await Promise.all(
+        connectedChainIds.map(async (_chainId) => {
+          const signers = await getOfflineSigners({
+            chainId: _chainId,
+          });
+          res[_chainId] = signers;
+        }),
+      );
+      return res;
+    },
+    {
+      enabled: Boolean(accounts),
+    },
+  );
+
+  const query = useQuery(
     [
       "USE_OFFLINE_SIGNERS",
       {
-        chainId,
+        args,
+        offlineSigners: data,
       },
     ],
     async () => {
-      const offlineSigners = getOfflineSigners();
-      return {
-        offlineSigner: offlineSigners.offlineSigner(chainId!),
-        offlineSignerAmino: offlineSigners.offlineSignerAmino(chainId!),
-        offlineSignerAuto: await offlineSigners.offlineSignerAuto(chainId!),
-      };
+      if (!data) return undefined;
+      const connectedChainIds = Object.keys(data)
+        .map(([chainId]) => chainId)
+        .filter((i) => i) as string[];
+
+      if (args?.chainId) {
+        const offlineSigners = await getOfflineSigners({
+          chainId: args.chainId,
+        });
+        return offlineSigners;
+      }
+      const res: Record<string, OfflineSigners> = {};
+
+      await Promise.all(
+        connectedChainIds.map(async (_chainId) => {
+          const signers = await getOfflineSigners({
+            chainId: _chainId,
+          });
+          res[_chainId] = signers;
+        }),
+      );
+      return res;
     },
-    { enabled: Boolean(chainId) },
+    { enabled: Boolean(data), refetchOnMount: false, refetchOnWindowFocus: false },
   );
+  return query as UseQueryResult<HookResultDataWithChainId<OfflineSigners, T> | undefined>;
 };
-
-/**
- * graz query hook to retrieve list of staked balances from current account or given address.
- *
- * @param bech32Address - Optional bech32 account address, defaults to connected account address
- *
- * @example
- * ```ts
- * import { useBalanceStaked } from "graz";
- *
- * // basic example
- * const { data, isFetching, refetch, ... } = useBalanceStaked();
- *
- * // with custom bech32 address
- * useBalanceStaked("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
- * ```
- */
-// export const useBalanceStaked = (bech32Address?: string): UseQueryResult<Coin | null> => {
-//   const { data: account } = useAccount();
-//   const address = bech32Address || account?.bech32Address;
-
-//   const queryKey = ["USE_BALANCE_STAKED", address] as const;
-//   const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalanceStaked(address), {
-//     enabled: Boolean(address),
-//   });
-
-//   return query;
-// };

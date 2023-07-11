@@ -1,10 +1,10 @@
-import type { InstantiateOptions } from "@cosmjs/cosmwasm-stargate";
+import { type InstantiateOptions } from "@cosmjs/cosmwasm-stargate";
 import type { Coin } from "@cosmjs/proto-signing";
 import type { DeliverTxResponse, StdFee } from "@cosmjs/stargate";
 import type { AppCurrency } from "@keplr-wallet/types";
 import type { Height } from "cosmjs-types/ibc/core/client/v1/client";
 
-import type { GrazConnectClient, GrazConnectSigningClient, GrazSigningClients } from "./clients";
+import type { ConnectClient, ConnectSigningClient, SigningClients } from "./clients";
 
 export const getBalances = async <T extends "cosmWasm" | "stargate">({
   bech32Address,
@@ -13,16 +13,14 @@ export const getBalances = async <T extends "cosmWasm" | "stargate">({
 }: {
   currencies: AppCurrency[];
   bech32Address: string;
-  client: GrazConnectClient<T>;
+  client: ConnectClient<T>;
 }): Promise<Coin[]> => {
   const balances = await Promise.all(
-    currencies.map(async (item) => {
-      const isCw20 = item.coinMinimalDenom.startsWith("cw20:");
-      return client.getBalance(
-        bech32Address,
-        isCw20 ? item.coinMinimalDenom.replace("cw20:", "") : item.coinMinimalDenom,
-      );
-    }),
+    currencies
+      .filter((i) => !i.coinMinimalDenom.startsWith("cw20:"))
+      .map(async (item) => {
+        return client.getBalance(bech32Address, item.coinMinimalDenom);
+      }),
   );
 
   return balances;
@@ -33,14 +31,14 @@ export const getBalanceStaked = async ({
   client,
 }: {
   bech32Address: string;
-  client: GrazConnectClient<"stargate">;
+  client: ConnectClient<"stargate">;
 }): Promise<Coin | null> => {
   return client.getBalanceStaked(bech32Address);
 };
 
 // https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendTokens
 export interface SendTokensArgs<T> {
-  signingClient: GrazConnectSigningClient<T>;
+  signingClient: ConnectSigningClient<T>;
   senderAddress: string;
   recipientAddress: string;
   amount: Coin[];
@@ -48,7 +46,7 @@ export interface SendTokensArgs<T> {
   memo?: string;
 }
 
-export const sendTokens = async <T extends GrazSigningClients>({
+export const sendTokens = async <T extends SigningClients>({
   senderAddress,
   recipientAddress,
   amount,
@@ -61,7 +59,7 @@ export const sendTokens = async <T extends GrazSigningClients>({
 
 // https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendIbcTokens
 export interface SendIbcTokensArgs {
-  signingClient: GrazConnectSigningClient<"stargate">;
+  signingClient: ConnectSigningClient<"stargate">;
   senderAddress: string;
   recipientAddress: string;
   transferAmount: Coin;
@@ -99,7 +97,7 @@ export const sendIbcTokens = async ({
 };
 
 export interface InstantiateContractArgs<Message extends Record<string, unknown>> {
-  signingClient: GrazConnectSigningClient<"cosmWasm">;
+  signingClient: ConnectSigningClient<"cosmWasm">;
   msg: Message;
   label: string;
   fee: StdFee | "auto" | number;
@@ -128,7 +126,7 @@ export const instantiateContract = async <Message extends Record<string, unknown
 };
 
 export interface ExecuteContractArgs<Message extends Record<string, unknown>> {
-  signingClient: GrazConnectSigningClient<"cosmWasm">;
+  signingClient: ConnectSigningClient<"cosmWasm">;
   msg: Message;
   fee: StdFee | "auto" | number;
   senderAddress: string;
@@ -163,7 +161,7 @@ export const getQuerySmart = async <TData>({
   address,
   queryMsg,
 }: {
-  client: GrazConnectClient<"cosmWasm">;
+  client: ConnectClient<"cosmWasm">;
   address: string;
   queryMsg: Record<string, unknown>;
 }): Promise<TData> => {
@@ -176,7 +174,7 @@ export const getQueryRaw = ({
   address,
   keyStr,
 }: {
-  client: GrazConnectClient<"cosmWasm">;
+  client: ConnectClient<"cosmWasm">;
   address: string;
   keyStr: string;
 }): Promise<Uint8Array | null> => {

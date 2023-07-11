@@ -1,7 +1,8 @@
 export interface ChainIdArgs {
+  /**
+   * if provided, it will only return the data of the given chainId
+   */
   chainId?: string | undefined;
 }
-
-export type HookArgs<T, U> = T & U;
 
 export type HookResultDataWithChainId<T, U extends ChainIdArgs> = U["chainId"] extends string ? T : Record<string, T>;

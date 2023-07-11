@@ -1,11 +1,15 @@
-import type { Coin } from "@cosmjs/stargate";
+import { fromBech32, toBech32 } from "@cosmjs/encoding";
+import type { Coin, DeliverTxResponse } from "@cosmjs/stargate";
 import type { UseQueryResult } from "@tanstack/react-query";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-import type { GrazConnectClient } from "../actions/clients";
-import { getBalances } from "../actions/methods";
+import type { ConnectClient, ConnectSigningClientArgs, SigningClients } from "../actions/clients";
+import type { SendTokensArgs } from "../actions/methods";
+import { getBalances, getBalanceStaked, sendTokens } from "../actions/methods";
 import { useGrazInternalStore } from "../store";
-import { useConnectClient } from "./clients";
+import type { ChainIdArgs, HookResultDataWithChainId } from "../types/data";
+import type { MutationEventArgs } from "../types/hooks";
+import { useConnectClient, useConnectSigningClient } from "./clients";
 
 /**
  * graz query hook to retrieve list of balances from current account or given address.
@@ -23,39 +27,158 @@ import { useConnectClient } from "./clients";
  * useBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export const useBalances = <T extends "cosmWasm" | "stargate">(args: {
-  bech32Address?: string;
-  client?: T;
-  chainId: string;
-}): UseQueryResult<Coin[]> => {
+export const useBalances = <T extends "cosmWasm" | "stargate", U extends ChainIdArgs>(
+  args: {
+    bech32Address?: string;
+    client?: T;
+  } & U,
+) => {
   const _client = (args.client ?? useGrazInternalStore.getState().defaultClient) as T;
   const _chains = useGrazInternalStore.getState().chains;
-  const singleChain = _chains?.find((i) => i.chainId === args.chainId);
 
-  const { data } = useConnectClient({
+  const { data: singleClient } = useConnectClient({
     client: _client,
-    chainId: args.chainId,
+    chainId: args.chainId!,
+    enabled: Boolean(args.chainId),
+  });
+
+  const { data: multiClient } = useConnectClient({
+    client: _client,
+    enabled: !args.chainId,
   });
 
   const query = useQuery(
-    ["USE_BALANCES", args],
+    [
+      "USE_BALANCES",
+      {
+        singleClient,
+        multiClient,
+        ...args,
+        _chains,
+      },
+    ],
     async () => {
-      const res = await getBalances({
-        client: data as unknown as GrazConnectClient<T>,
-        bech32Address: args.bech32Address!,
-        currencies: singleChain!.currencies,
-      });
-      return res;
+      if (args.chainId && singleClient) {
+        const singleChain = _chains?.find((i) => i.chainId === args.chainId);
+        const res = await getBalances({
+          client: singleClient as unknown as ConnectClient<T>,
+          bech32Address: toBech32(singleChain!.bech32Config.bech32PrefixAccAddr, fromBech32(args.bech32Address!).data),
+          currencies: singleChain!.currencies,
+        });
+        return res;
+      }
+      if (!args.chainId && multiClient) {
+        const multiChain = Object.entries(multiClient);
+        const res: Record<string, Coin[]> = {};
+        await Promise.all(
+          multiChain.map(async ([chainId, client]) => {
+            const chain = _chains?.find((i) => i.chainId === chainId);
+            if (!chain) return;
+            const _res = await getBalances({
+              client: client as unknown as ConnectClient<T>,
+              bech32Address: toBech32(chain.bech32Config.bech32PrefixAccAddr, fromBech32(args.bech32Address!).data),
+              currencies: chain.currencies,
+            });
+            res[chainId] = _res;
+          }),
+        );
+        return res;
+      }
+      return undefined;
     },
     {
-      enabled: Boolean(args.bech32Address) && Boolean(data) && Boolean(singleChain?.currencies),
+      enabled: Boolean(args.bech32Address) && Boolean(_chains) && (Boolean(singleClient) || Boolean(multiClient)),
       refetchOnMount: false,
       refetchOnReconnect: true,
       refetchOnWindowFocus: false,
     },
   );
 
-  return query;
+  return query as UseQueryResult<HookResultDataWithChainId<Coin[], U>>;
+};
+
+/**
+ * graz query hook to retrieve list of staked balances from current account or given address.
+ *
+ * @param bech32Address - Optional bech32 account address, defaults to connected account address
+ *
+ * @example
+ * ```ts
+ * import { useBalanceStaked } from "graz";
+ *
+ * // basic example
+ * const { data, isFetching, refetch, ... } = useBalanceStaked();
+ *
+ * // with custom bech32 address
+ * useBalanceStaked("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
+ * ```
+ */
+export const useBalanceStaked = <T extends "stargate", U extends ChainIdArgs>(
+  args: {
+    bech32Address?: string;
+    client?: T;
+  } & U,
+) => {
+  const _chains = useGrazInternalStore.getState().chains;
+
+  const { data: singleClient } = useConnectClient({
+    client: "stargate",
+    chainId: args.chainId!,
+    enabled: Boolean(args.chainId),
+  });
+
+  const { data: multiClient } = useConnectClient({
+    client: "stargate",
+    enabled: !args.chainId,
+  });
+
+  const query = useQuery(
+    [
+      "USE_BALANCE_STAKED",
+      {
+        singleClient,
+        multiClient,
+        ...args,
+        _chains,
+      },
+    ],
+    async () => {
+      if (args.chainId && singleClient) {
+        const singleChain = _chains?.find((i) => i.chainId === args.chainId);
+        if (!singleChain) throw new Error(`${args.chainId} Chain not found`);
+        const res = await getBalanceStaked({
+          client: singleClient,
+          bech32Address: toBech32(singleChain.bech32Config.bech32PrefixAccAddr, fromBech32(args.bech32Address!).data),
+        });
+        return res;
+      }
+      if (!args.chainId && multiClient) {
+        const multiChain = Object.entries(multiClient);
+        const res: Record<string, Coin | null> = {};
+        await Promise.all(
+          multiChain.map(async ([chainId, client]) => {
+            const chain = _chains?.find((i) => i.chainId === chainId);
+            if (!chain) return;
+            const _res = await getBalanceStaked({
+              client,
+              bech32Address: toBech32(chain.bech32Config.bech32PrefixAccAddr, fromBech32(args.bech32Address!).data),
+            });
+            res[chainId] = _res;
+          }),
+        );
+        return res;
+      }
+      return undefined;
+    },
+    {
+      enabled: Boolean(args.bech32Address) && Boolean(_chains) && (Boolean(singleClient) || Boolean(multiClient)),
+      refetchOnMount: false,
+      refetchOnReconnect: true,
+      refetchOnWindowFocus: false,
+    },
+  );
+
+  return query as UseQueryResult<HookResultDataWithChainId<Coin | null, U>>;
 };
 
 // /**
@@ -77,34 +200,50 @@ export const useBalances = <T extends "cosmWasm" | "stargate">(args: {
 //  *
 //  * @see {@link sendTokens}
 //  */
-// export const useSendTokens = ({
-//   onError,
-//   onLoading,
-//   onSuccess,
-// }: MutationEventArgs<SendTokensArgs, DeliverTxResponse> = {}) => {
-//   const { data: account } = useAccount();
-//   const accountAddress = account?.bech32Address;
+export const useSendTokens = <T extends SigningClients>({
+  signingClient,
+  signingClientOptions,
+  chainId,
+  onError,
+  onLoading,
+  onSuccess,
+}: MutationEventArgs<SendTokensArgs<T>, DeliverTxResponse> & {
+  signingClient?: T;
+  signingClientOptions?: ConnectSigningClientArgs<T>["options"];
+  chainId: string;
+}) => {
+  const _client = (signingClient ?? useGrazInternalStore.getState().defaultSigningClient) as T;
 
-//   const queryKey = ["USE_SEND_TOKENS", onError, onLoading, onSuccess, accountAddress];
-//   const mutation = useMutation(
-//     queryKey,
-//     (args: SendTokensArgs) => sendTokens({ senderAddress: accountAddress, ...args }),
-//     {
-//       onError: (err, data) => Promise.resolve(onError?.(err, data)),
-//       onMutate: onLoading,
-//       onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
-//     },
-//   );
+  const { data: _signingClient } = useConnectSigningClient({
+    chainId,
+    client: _client,
+    options: signingClientOptions,
+  });
 
-//   return {
-//     error: mutation.error,
-//     isLoading: mutation.isLoading,
-//     isSuccess: mutation.isSuccess,
-//     sendTokens: mutation.mutate,
-//     sendTokensAsync: mutation.mutateAsync,
-//     status: mutation.status,
-//   };
-// };
+  const queryKey = ["USE_SEND_TOKENS", { onError, onLoading, onSuccess, chainId }];
+  const mutation = useMutation(
+    queryKey,
+    async (args: Omit<SendTokensArgs<T>, "signingClient">) => {
+      if (!_signingClient) throw new Error("Signing client is not available");
+      const res = await sendTokens({ signingClient: _signingClient, ...args });
+      return res;
+    },
+    {
+      onError: (err, data) => Promise.resolve(onError?.(err, data)),
+      onMutate: onLoading,
+      onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
+    },
+  );
+
+  return {
+    error: mutation.error,
+    isLoading: mutation.isLoading,
+    isSuccess: mutation.isSuccess,
+    sendTokens: mutation.mutate,
+    sendTokensAsync: mutation.mutateAsync,
+    status: mutation.status,
+  };
+};
 // /**
 //  * graz mutation hook to send IBC tokens. Note: if `senderAddress` undefined, it will use current connected account address.
 //  *
