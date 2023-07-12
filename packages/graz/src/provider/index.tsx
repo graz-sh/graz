@@ -12,8 +12,10 @@ const queryClient = new QueryClient({
   //
 });
 
+export type GrazConfig = Omit<ConfigureGrazArgs, "chains"> & { chains: GrazChain[] };
+
 export type GrazProviderProps = Partial<QueryClientProviderProps> & {
-  grazConfig: Omit<ConfigureGrazArgs, "chains"> & { chains: GrazChain[] };
+  grazConfig: GrazConfig;
 };
 
 /**
