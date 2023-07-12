@@ -10,18 +10,10 @@ import type { ChainIdArgs, HookResultDataWithChainId } from "../types/data";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
 
-export interface UseAccount {
-  data?: GrazAccountSession;
-  isConnected: boolean;
-  isConnecting: boolean;
-  isDisconnected: boolean;
-  isReconnecting: boolean;
-  isLoading: boolean;
-  status?: GrazAccountSession["status"];
-}
+type UseConnectOnConnect = GrazAccountSession & { isReconnect: boolean };
 
 export interface UseAccountArgs {
-  onConnect?: (args: GrazAccountSession & { isReconnect: boolean }) => void;
+  onConnect?: (args: UseConnectOnConnect) => void;
   onDisconnect?: () => void;
 }
 
@@ -68,35 +60,19 @@ export const useAccount = <T extends ChainIdArgs>(args?: UseAccountArgs & T) => 
   }, [args, args?.onConnect, args?.onDisconnect]);
 
   const res = useMemo(() => {
-    if (args?.chainId) {
-      const singleChainRes = sessions?.find((i) => i.chainId === args.chainId);
-      return {
-        data: singleChainRes,
-        isConnected: Boolean(singleChainRes?.account),
-        isConnecting: singleChainRes?.status === "connecting",
-        isDisconnected: singleChainRes?.status === "disconnected",
-        isReconnecting: singleChainRes?.status === "reconnecting",
-        isLoading: singleChainRes?.status === "connecting" || status === "reconnecting",
-        status: singleChainRes?.status,
-      };
-    }
     if (!sessions) return undefined;
-    const multiChainRes: Record<string, UseAccount> = {};
+    if (args?.chainId) {
+      const singleChainRes = sessions.find((i) => i.chainId === args.chainId);
+      return singleChainRes;
+    }
+    const multiChainRes: Record<string, GrazAccountSession> = {};
     sessions.forEach((i) => {
-      multiChainRes[i.chainId] = {
-        data: i,
-        isConnected: Boolean(i.account),
-        isConnecting: i.status === "connecting",
-        isDisconnected: i.status === "disconnected",
-        isReconnecting: i.status === "reconnecting",
-        isLoading: i.status === "connecting" || status === "reconnecting",
-        status: i.status,
-      };
+      multiChainRes[i.chainId] = i;
     });
     return multiChainRes;
   }, [args?.chainId, sessions]);
 
-  return res as HookResultDataWithChainId<UseAccount, T> | undefined;
+  return res as HookResultDataWithChainId<GrazAccountSession | undefined, T> | undefined;
 };
 
 export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, ConnectResult>;
@@ -218,8 +194,8 @@ export const useOfflineSigners = <T extends ChainIdArgs>(args?: T) => {
     async () => {
       if (!accounts) return undefined;
       const connectedChainIds = Object.values(accounts)
-        .map((i) => i.data?.chainId)
-        .filter((i) => i) as string[];
+        .map((i) => i?.chainId)
+        .filter(Boolean) as string[];
       const res: Record<string, OfflineSigners> = {};
       await Promise.all(
         connectedChainIds.map(async (_chainId) => {
