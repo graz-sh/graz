@@ -16,7 +16,7 @@ export const ConnectButton: FC = () => {
   const toast = useToast();
   const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const { isConnected, isConnecting, isReconnecting } = useAccount({
+  const acc = useAccount({
     chainId: "cosmoshub-4",
     onConnect: ({ account, chainId }) => {
       toast({
@@ -33,7 +33,7 @@ export const ConnectButton: FC = () => {
     },
   });
 
-  const { connect } = useConnect({
+  const { connect, isLoading } = useConnect({
     onSuccess: () => console.log("wallet connected"),
   });
 
@@ -57,8 +57,8 @@ export const ConnectButton: FC = () => {
   return (
     <>
       <ButtonGroup alignSelf="end" isAttached variant="outline">
-        <Button isLoading={isConnecting || isReconnecting} onClick={() => (isConnected ? disconnect() : onOpen())}>
-          {isConnected ? "Disconnect" : "Connect"} Wallet
+        <Button isLoading={isLoading} onClick={() => (acc ? disconnect() : onOpen())}>
+          {acc ? "Disconnect" : "Connect"} Wallet
         </Button>
       </ButtonGroup>
 

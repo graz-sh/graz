@@ -16,9 +16,9 @@ export const convertFromMicroDenom = (denom: string): string => {
   return denom.substring(1).toUpperCase();
 };
 
-export const convertToFixedDecimals = (value: number | string): string => {
+export const convertToFixedDecimals = (value: number | string, fractionDigits = 2): string => {
   const amount = Number(value);
-  return amount > 0.01 ? amount.toFixed(2) : String(amount);
+  return amount > 0.01 ? amount.toFixed(fractionDigits) : String(amount);
 };
 
 export const formatTokenName = (name: string): string => {
@@ -30,4 +30,13 @@ export const formatTokenName = (name: string): string => {
 
 export const handleNaN = (value: number): number => {
   return isNaN(value) ? 0 : value;
+};
+
+export const truncate = (string?: string, slice?: number): string => {
+  if (string && slice && string.length <= slice) return string;
+
+  const pre = string?.slice(0, slice || 8);
+  const post = string?.slice((slice || 8) * -1);
+
+  return `${pre}...${post}`;
 };

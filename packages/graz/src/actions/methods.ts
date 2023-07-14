@@ -1,28 +1,31 @@
 import { type InstantiateOptions } from "@cosmjs/cosmwasm-stargate";
 import type { Coin } from "@cosmjs/proto-signing";
 import type { DeliverTxResponse, StdFee } from "@cosmjs/stargate";
-import type { AppCurrency } from "@keplr-wallet/types";
 import type { Height } from "cosmjs-types/ibc/core/client/v1/client";
 
 import type { ConnectClient, ConnectSigningClient, SigningClients } from "./clients";
 
-export const getBalances = async <T extends "cosmWasm" | "stargate">({
+export const getAllBalance = async <T extends "stargate">({
   bech32Address,
   client,
-  currencies,
 }: {
-  currencies: AppCurrency[];
   bech32Address: string;
   client: ConnectClient<T>;
-}): Promise<Coin[]> => {
-  const balances = await Promise.all(
-    currencies
-      .filter((i) => !i.coinMinimalDenom.startsWith("cw20:"))
-      .map(async (item) => {
-        return client.getBalance(bech32Address, item.coinMinimalDenom);
-      }),
-  );
+}) => {
+  const balances = (await client.getAllBalances(bech32Address)) as Coin[];
+  return balances;
+};
 
+export const getBalance = async <T extends "cosmWasm" | "stargate">({
+  bech32Address,
+  client,
+  searchDenom,
+}: {
+  searchDenom: string;
+  bech32Address: string;
+  client: ConnectClient<T>;
+}): Promise<Coin> => {
+  const balances = await client.getBalance(bech32Address, searchDenom);
   return balances;
 };
 
@@ -108,7 +111,7 @@ export interface InstantiateContractArgs<Message extends Record<string, unknown>
 
 export type InstantiateContractMutationArgs<Message extends Record<string, unknown>> = Omit<
   InstantiateContractArgs<Message>,
-  "codeId" | "senderAddress" | "fee"
+  "codeId" | "senderAddress" | "fee" | "signingClient"
 > & {
   fee?: StdFee | "auto" | number;
 };
@@ -137,7 +140,7 @@ export interface ExecuteContractArgs<Message extends Record<string, unknown>> {
 
 export type ExecuteContractMutationArgs<Message extends Record<string, unknown>> = Omit<
   ExecuteContractArgs<Message>,
-  "contractAddress" | "senderAddress" | "fee" | "funds" | "memo"
+  "contractAddress" | "senderAddress" | "fee" | "funds" | "memo" | "signingClient"
 > & {
   fee?: StdFee | "auto" | number;
   funds?: Coin[];

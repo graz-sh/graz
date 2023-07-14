@@ -1,50 +1,140 @@
+import type { ExecuteResult, InstantiateResult } from "@cosmjs/cosmwasm-stargate";
 import { fromBech32, toBech32 } from "@cosmjs/encoding";
 import type { Coin, DeliverTxResponse } from "@cosmjs/stargate";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import type { ConnectClient, ConnectSigningClientArgs, SigningClients } from "../actions/clients";
-import type { SendTokensArgs } from "../actions/methods";
-import { getBalances, getBalanceStaked, sendTokens } from "../actions/methods";
+import type {
+  ExecuteContractMutationArgs,
+  InstantiateContractMutationArgs,
+  SendIbcTokensArgs,
+  SendTokensArgs,
+} from "../actions/methods";
+import {
+  executeContract,
+  getAllBalance,
+  getBalance,
+  getBalanceStaked,
+  getQueryRaw,
+  getQuerySmart,
+  instantiateContract,
+  sendIbcTokens,
+  sendTokens,
+} from "../actions/methods";
 import { useGrazInternalStore } from "../store";
 import type { ChainIdArgs, HookResultDataWithChainId } from "../types/data";
 import type { MutationEventArgs } from "../types/hooks";
+import { useAccount } from "./account";
 import { useConnectClient, useConnectSigningClient } from "./clients";
 
 /**
- * graz query hook to retrieve list of balances from current account or given address.
+ * graz query hook to retrieve balance from given address, denom and chainId
  *
- * @param bech32Address - Optional bech32 account address, defaults to connected account address
+ * @param bech32Address - Optional bech32 address, if not provided will return undefined
+ * @param searchDenom - Optional search denom, if not provided will return undefined
+ * @param chainId - Required chainId to retrieve the balances from given address
+ * @param client - Optional client, if not provided will use the default client
  *
  * @example
  * ```ts
- * import { useBalances } from "graz";
+ * import { useBalance } from "graz";
  *
- * // basic example
- * const { data, isFetching, refetch, ... } = useBalances();
+ * const { data, isFetching, refetch, ... } = useBalance({
+ *  client: "stargate",
+ *  chainId: "cosmoshub-4",
+ *  bech32Address: "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu",
+ * })
  *
- * // with custom bech32 address
- * useBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export const useBalances = <T extends "cosmWasm" | "stargate", U extends ChainIdArgs>(
+export const useBalance = <T extends "stargate" | "cosmWasm">(args: {
+  bech32Address?: string;
+  client?: T;
+  chainId: string;
+  searchDenom?: string;
+}) => {
+  const _chains = useGrazInternalStore.getState().chains;
+  const chain = _chains?.find((i) => i.chainId === args.chainId);
+
+  const { data: client } = useConnectClient({
+    client: "stargate",
+    chainId: args.chainId,
+    enabled: Boolean(chain) && Boolean(args.bech32Address),
+  });
+
+  const query = useQuery(
+    [
+      "USE_BALANCES",
+      {
+        client,
+        ...args,
+        _chains,
+      },
+    ],
+    async () => {
+      if (client) {
+        const res = await getBalance({
+          client: client as unknown as ConnectClient<T>,
+          bech32Address: toBech32(chain!.bech32Config.bech32PrefixAccAddr, fromBech32(args.bech32Address!).data),
+          searchDenom: args.searchDenom!,
+        });
+        return res;
+      }
+      return undefined;
+    },
+    {
+      enabled: Boolean(args.bech32Address) && Boolean(chain) && (Boolean(client) || Boolean(args.searchDenom)),
+      refetchOnMount: false,
+      refetchOnReconnect: true,
+      refetchOnWindowFocus: false,
+    },
+  );
+
+  return query as UseQueryResult<Coin | undefined>;
+};
+
+/**
+ * graz query hook to retrieve list of balances from given address.
+ *
+ * @param bech32Address - Optional bech32 address, if not provided will return undefined
+ * @param chainId - Optional chainId to retrieve the balances from given address and chainId, if not provided will return all balances currencies from all chains provided from GrazProvider
+ * @param client - Optional client, if not provided will use the default client
+ *
+ * @example
+ * ```ts
+ * import { useAllBalances } from "graz";
+ *
+ * // single chain example
+ * const { data, isFetching, refetch, ... } = useAllBalances({
+ *  client: "stargate",
+ *  chainId: "cosmoshub-4",
+ *  bech32Address: "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu",
+ * })
+ *
+ * // all chains from GrazProvider example
+ * const { data, isFetching, refetch, ... } = useAllBalances({
+ *  client: "stargate",
+ *  bech32Address: "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu",
+ * })
+ * ```
+ */
+export const useAllBalances = <U extends ChainIdArgs>(
   args: {
     bech32Address?: string;
-    client?: T;
   } & U,
 ) => {
-  const _client = (args.client ?? useGrazInternalStore.getState().defaultClient) as T;
   const _chains = useGrazInternalStore.getState().chains;
 
   const { data: singleClient } = useConnectClient({
-    client: _client,
+    client: "stargate",
     chainId: args.chainId!,
-    enabled: Boolean(args.chainId),
+    enabled: Boolean(args.chainId) && Boolean(args.bech32Address),
   });
 
   const { data: multiClient } = useConnectClient({
-    client: _client,
-    enabled: !args.chainId,
+    client: "stargate",
+    enabled: !args.chainId && Boolean(args.bech32Address),
   });
 
   const query = useQuery(
@@ -60,10 +150,9 @@ export const useBalances = <T extends "cosmWasm" | "stargate", U extends ChainId
     async () => {
       if (args.chainId && singleClient) {
         const singleChain = _chains?.find((i) => i.chainId === args.chainId);
-        const res = await getBalances({
-          client: singleClient as unknown as ConnectClient<T>,
+        const res = await getAllBalance({
+          client: singleClient,
           bech32Address: toBech32(singleChain!.bech32Config.bech32PrefixAccAddr, fromBech32(args.bech32Address!).data),
-          currencies: singleChain!.currencies,
         });
         return res;
       }
@@ -74,11 +163,121 @@ export const useBalances = <T extends "cosmWasm" | "stargate", U extends ChainId
           multiChain.map(async ([chainId, client]) => {
             const chain = _chains?.find((i) => i.chainId === chainId);
             if (!chain) return;
-            const _res = await getBalances({
-              client: client as unknown as ConnectClient<T>,
+            const _res = await getAllBalance({
+              client,
               bech32Address: toBech32(chain.bech32Config.bech32PrefixAccAddr, fromBech32(args.bech32Address!).data),
-              currencies: chain.currencies,
             });
+            res[chainId] = _res;
+          }),
+        );
+        return res;
+      }
+      return undefined;
+    },
+    {
+      enabled: Boolean(args.bech32Address) && Boolean(_chains) && (Boolean(singleClient) || Boolean(multiClient)),
+      refetchOnMount: false,
+      refetchOnReconnect: true,
+      refetchOnWindowFocus: false,
+    },
+  );
+
+  return query as UseQueryResult<HookResultDataWithChainId<Coin[] | undefined, U>>;
+};
+
+/**
+ * graz query hook to retrieve list of currencies from defined chains in GrazProvider and given address.
+ *
+ * @param bech32Address - Optional bech32 address, if not provided will return undefined
+ * @param client - Optional client, if not provided will use the default client
+ * @param chainId - Optional chainId to retrieve the balances from given address and chainId, if not provided will return all balances currencies from all chains provided from GrazProvider
+ *
+ * @example
+ * ```ts
+ * import { useChainBalances } from "graz";
+ *
+ * // single chain example
+ * const { data, isFetching, refetch, ... } = useChainBalances({
+ *  client: "stargate",
+ *  chainId: "cosmoshub-4",
+ *  bech32Address: "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu",
+ * })
+ *
+ * // all chains from GrazProvider example
+ * const { data, isFetching, refetch, ... } = useChainBalances({
+ *  client: "stargate",
+ *  bech32Address: "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu",
+ * })
+ * ```
+ */
+export const useChainBalances = <T extends "cosmWasm" | "stargate", U extends ChainIdArgs>(
+  args: {
+    bech32Address?: string;
+    client?: T;
+  } & U,
+) => {
+  const _client = (args.client ?? useGrazInternalStore.getState().defaultClient) as T;
+  const _chains = useGrazInternalStore.getState().chains;
+
+  const { data: singleClient } = useConnectClient({
+    client: _client,
+    chainId: args.chainId!,
+    enabled: Boolean(args.chainId) && Boolean(args.bech32Address),
+  });
+
+  const { data: multiClient } = useConnectClient({
+    client: _client,
+    enabled: !args.chainId && Boolean(args.bech32Address),
+  });
+
+  const query = useQuery(
+    [
+      "USE_BALANCES",
+      {
+        singleClient,
+        multiClient,
+        ...args,
+        _chains,
+      },
+    ],
+    async () => {
+      if (args.chainId && singleClient) {
+        const singleChain = _chains?.find((i) => i.chainId === args.chainId);
+        const res = await Promise.all(
+          singleChain!.currencies.map((currency) =>
+            getBalance({
+              client: singleClient as unknown as ConnectClient<T>,
+              bech32Address: toBech32(
+                singleChain!.bech32Config.bech32PrefixAccAddr,
+                fromBech32(args.bech32Address!).data,
+              ),
+              searchDenom: currency.coinMinimalDenom,
+            }),
+          ),
+        );
+        return res;
+      }
+      if (!args.chainId && multiClient) {
+        const multiChain = Object.entries(multiClient);
+        const res: Record<string, Coin[]> = {};
+        await Promise.all(
+          multiChain.map(async ([chainId, client]) => {
+            const chain = _chains?.find((i) => i.chainId === chainId);
+            if (!chain) return;
+            const _res = await Promise.all(
+              chain.currencies
+                .filter((i) => !i.coinMinimalDenom.startsWith("cw20:"))
+                .map((currency) =>
+                  getBalance({
+                    client: client as unknown as ConnectClient<T>,
+                    bech32Address: toBech32(
+                      chain.bech32Config.bech32PrefixAccAddr,
+                      fromBech32(args.bech32Address!).data,
+                    ),
+                    searchDenom: currency.coinMinimalDenom,
+                  }),
+                ),
+            );
             res[chainId] = _res;
           }),
         );
@@ -100,23 +299,28 @@ export const useBalances = <T extends "cosmWasm" | "stargate", U extends ChainId
 /**
  * graz query hook to retrieve list of staked balances from current account or given address.
  *
- * @param bech32Address - Optional bech32 account address, defaults to connected account address
+ * @param bech32Address - Optional bech32 account address, if not provided will return undefined
+ * @param chainId - Optional chainId to retrieve the balances from given address and chainId, if not provided will return all balances currencies from all chains provided from GrazProvider
  *
  * @example
  * ```ts
  * import { useBalanceStaked } from "graz";
  *
- * // basic example
- * const { data, isFetching, refetch, ... } = useBalanceStaked();
+ * // single chain example
+ * const { data, isFetching, refetch, ... } = useBalanceStaked({
+ *  chainId: "cosmoshub-4",
+ *  bech32Address: "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu",
+ * });
  *
- * // with custom bech32 address
- * useBalanceStaked("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
+ * // all chains from GrazProvider example
+ * const { data, isFetching, refetch, ... } = useBalanceStaked({
+ *  bech32Address: "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu",
+ * });
  * ```
  */
-export const useBalanceStaked = <T extends "stargate", U extends ChainIdArgs>(
+export const useBalanceStaked = <U extends ChainIdArgs>(
   args: {
     bech32Address?: string;
-    client?: T;
   } & U,
 ) => {
   const _chains = useGrazInternalStore.getState().chains;
@@ -124,12 +328,12 @@ export const useBalanceStaked = <T extends "stargate", U extends ChainIdArgs>(
   const { data: singleClient } = useConnectClient({
     client: "stargate",
     chainId: args.chainId!,
-    enabled: Boolean(args.chainId),
+    enabled: Boolean(args.chainId) && Boolean(args.bech32Address),
   });
 
   const { data: multiClient } = useConnectClient({
     client: "stargate",
-    enabled: !args.chainId,
+    enabled: !args.chainId && Boolean(args.bech32Address),
   });
 
   const query = useQuery(
@@ -181,25 +385,38 @@ export const useBalanceStaked = <T extends "stargate", U extends ChainIdArgs>(
   return query as UseQueryResult<HookResultDataWithChainId<Coin | null, U>>;
 };
 
-// /**
-//  * graz mutation hook to send tokens. Note: if `senderAddress` undefined, it will use current connected account address.
-//  *
-//  * @example
-//  * ```ts
-//  * import { useSendTokens } from "graz";
-//  *
-//  * // basic example
-//  * const { sendTokens } = useSendTokens();
-//  *
-//  * sendTokens({
-//  *    recipientAddress: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430";
-//  *    amount: [coin];
-//  *    ...
-//  * })
-//  * ```
-//  *
-//  * @see {@link sendTokens}
-//  */
+interface UseSendTokens<T extends SigningClients> {
+  signingClient?: T;
+  signingClientOptions?: ConnectSigningClientArgs<T>["options"];
+  chainId: string;
+}
+
+/**
+ * graz mutation hook to send tokens.
+ *
+ * @param signingClient - Optional ("stargate" | "cosmWasm") signing client to use, if not provided will use default signing client from GrazProvider
+ * @param signingClientOptions - Optional signing client options to use.
+ * @param chainId - Required chainId to send tokens to.
+ * @param onError - Optional error callback function.
+ * @param onLoading - Optional loading callback function.
+ * @param onSuccess - Optional success callback function.
+ *
+ * @example
+ * ```ts
+ * import { useSendTokens } from "graz";
+ *
+ * // basic example
+ * const { sendTokens } = useSendTokens();
+ *
+ * sendTokens({
+ *    recipientAddress: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430";
+ *    amount: [coin];
+ *    ...
+ * })
+ * ```
+ *
+ * @see {@link sendTokens}
+ */
 export const useSendTokens = <T extends SigningClients>({
   signingClient,
   signingClientOptions,
@@ -207,11 +424,7 @@ export const useSendTokens = <T extends SigningClients>({
   onError,
   onLoading,
   onSuccess,
-}: MutationEventArgs<SendTokensArgs<T>, DeliverTxResponse> & {
-  signingClient?: T;
-  signingClientOptions?: ConnectSigningClientArgs<T>["options"];
-  chainId: string;
-}) => {
+}: MutationEventArgs<SendTokensArgs<T>, DeliverTxResponse> & UseSendTokens<T>) => {
   const _client = (signingClient ?? useGrazInternalStore.getState().defaultSigningClient) as T;
 
   const { data: _signingClient } = useConnectSigningClient({
@@ -244,229 +457,315 @@ export const useSendTokens = <T extends SigningClients>({
     status: mutation.status,
   };
 };
-// /**
-//  * graz mutation hook to send IBC tokens. Note: if `senderAddress` undefined, it will use current connected account address.
-//  *
-//  *
-//  * @example
-//  * ```ts
-//  * import { useSendIbcTokens } from "graz";
-//  *
-//  * // basic example
-//  * const { sendIbcTokens } = useSendIbcTokens();
-//  *
-//  * sendIbcTokens({
-//  *    recipientAddress: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
-//  *    transferAmount: coin,
-//  *    ...
-//  * })
-//  * ```
-//  */
-// export const useSendIbcTokens = ({
-//   onError,
-//   onLoading,
-//   onSuccess,
-// }: MutationEventArgs<SendIbcTokensArgs, DeliverTxResponse> = {}) => {
-//   const { data: account } = useAccount();
-//   const accountAddress = account?.bech32Address;
 
-//   const queryKey = ["USE_SEND_IBC_TOKENS", onError, onLoading, onSuccess, accountAddress];
-//   const mutation = useMutation(
-//     queryKey,
-//     (args: SendIbcTokensArgs) => sendIbcTokens({ senderAddress: accountAddress, ...args }),
-//     {
-//       onError: (err, data) => Promise.resolve(onError?.(err, data)),
-//       onMutate: onLoading,
-//       onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
-//     },
-//   );
+export interface UseSendIbcTokens {
+  signingClientOptions?: ConnectSigningClientArgs<"stargate">["options"];
+  chainId: string;
+}
 
-//   return {
-//     error: mutation.error,
-//     isLoading: mutation.isLoading,
-//     isSuccess: mutation.isSuccess,
-//     sendIbcTokens: mutation.mutate,
-//     sendIbcTokensAsync: mutation.mutateAsync,
-//     status: mutation.status,
-//   };
-// };
+/**
+ * graz mutation hook to send IBC tokens.
+ *
+ * @param chainId - Required chainId to send tokens to.
+ * @param signingClientOptions - Optional signing client options to use.
+ * @param onError - Optional error callback function.
+ * @param onLoading - Optional loading callback function.
+ * @param onSuccess - Optional success callback function.
+ *
+ * @example
+ * ```ts
+ * import { useSendIbcTokens } from "graz";
+ *
+ * // basic example
+ * const { sendIbcTokens } = useSendIbcTokens();
+ *
+ * sendIbcTokens({
+ *    recipientAddress: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
+ *    transferAmount: coin,
+ *    ...
+ * })
+ * ```
+ */
+export const useSendIbcTokens = ({
+  chainId,
+  signingClientOptions,
+  onError,
+  onLoading,
+  onSuccess,
+}: MutationEventArgs<SendIbcTokensArgs, DeliverTxResponse> & UseSendIbcTokens) => {
+  const { data: _signingClient } = useConnectSigningClient({
+    chainId,
+    client: "stargate",
+    options: signingClientOptions,
+  });
 
-// export type UseInstantiateContractArgs<Message extends Record<string, unknown>> = {
-//   codeId: number;
-// } & MutationEventArgs<InstantiateContractMutationArgs<Message>, InstantiateResult>;
+  const queryKey = [
+    "USE_SEND_IBC_TOKENS",
+    { onError, onLoading, onSuccess, _signingClient, chainId, signingClientOptions },
+  ];
+  const mutation = useMutation(
+    queryKey,
+    async (args: Omit<SendIbcTokensArgs, "signingClient">) => {
+      if (!_signingClient) throw new Error("Signing client is not available");
+      const res = await sendIbcTokens({ signingClient: _signingClient, ...args });
+      return res;
+    },
+    {
+      onError: (err, data) => Promise.resolve(onError?.(err, data)),
+      onMutate: onLoading,
+      onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
+    },
+  );
 
-// /**
-//  * graz mutation hook to instantiate a CosmWasm smart contract when supported.
-//  *
-//  * @example
-//  * ```ts
-//  * import { useInstantiateContract } from "graz"
-//  *
-//  * const { instantiateContract: instantiateMyContract } = useInstantiateContract({
-//  *   codeId: 4,
-//  *   onSuccess: ({ contractAddress }) => console.log('Address:', contractAddress)
-//  * })
-//  *
-//  * const instantiateMessage = { foo: 'bar' };
-//  * instantiateMyContract({
-//  *  msg: instatiateMessage,
-//  *  label: "test"
-//  * });
-//  * ```
-//  */
-// export const useInstantiateContract = <Message extends Record<string, unknown>>({
-//   codeId,
-//   onError,
-//   onLoading,
-//   onSuccess,
-// }: UseInstantiateContractArgs<Message>) => {
-//   const { data: account } = useAccount();
-//   const accountAddress = account?.bech32Address;
+  return {
+    error: mutation.error,
+    isLoading: mutation.isLoading,
+    isSuccess: mutation.isSuccess,
+    sendIbcTokens: mutation.mutate,
+    sendIbcTokensAsync: mutation.mutateAsync,
+    status: mutation.status,
+  };
+};
 
-//   const mutationFn = (args: InstantiateContractMutationArgs<Message>) => {
-//     if (!accountAddress) throw new Error("senderAddress is undefined");
-//     const contractArgs: InstantiateContractArgs<Message> = {
-//       ...args,
-//       fee: args.fee ?? "auto",
-//       senderAddress: accountAddress,
-//       codeId,
-//     };
+export type UseInstantiateContractArgs<Message extends Record<string, unknown>> = {
+  codeId: number;
+  chainId: string;
+  signingClientOptions?: ConnectSigningClientArgs<"cosmWasm">["options"];
+} & MutationEventArgs<InstantiateContractMutationArgs<Message>, InstantiateResult>;
 
-//     return instantiateContract(contractArgs);
-//   };
+/**
+ * graz mutation hook to instantiate a CosmWasm smart contract when supported.
+ *
+ * @param codeId - Required codeId to instantiate.
+ * @param chainId - Required chainId to instantiate contract on.
+ * @param signingClientOptions - Optional signing client options to use.
+ * @param onError - Optional error callback function.
+ * @param onLoading - Optional loading callback function.
+ * @param onSuccess - Optional success callback function.
+ *
+ * @example
+ * ```ts
+ * import { useInstantiateContract } from "graz"
+ *
+ * const { instantiateContract: instantiateMyContract } = useInstantiateContract({
+ *   codeId: 4,
+ *   onSuccess: ({ contractAddress }) => console.log('Address:', contractAddress)
+ * })
+ *
+ * const instantiateMessage = { foo: 'bar' };
+ * instantiateMyContract({
+ *  msg: instatiateMessage,
+ *  label: "test"
+ * });
+ * ```
+ */
+export const useInstantiateContract = <Message extends Record<string, unknown>>({
+  chainId,
+  codeId,
+  signingClientOptions,
+  onError,
+  onLoading,
+  onSuccess,
+}: UseInstantiateContractArgs<Message>) => {
+  const account = useAccount({
+    chainId,
+  });
+  const accountAddress = account?.account?.bech32Address;
+  const { data: _signingClient } = useConnectSigningClient({
+    chainId,
+    client: "cosmWasm",
+    options: signingClientOptions,
+  });
 
-//   const queryKey = ["USE_INSTANTIATE_CONTRACT", onError, onLoading, onSuccess, codeId, accountAddress];
-//   const mutation = useMutation(queryKey, mutationFn, {
-//     onError: (err, data) => Promise.resolve(onError?.(err, data)),
-//     onMutate: onLoading,
-//     onSuccess: (instantiateResult) => Promise.resolve(onSuccess?.(instantiateResult)),
-//   });
+  const mutationFn = (args: InstantiateContractMutationArgs<Message>) => {
+    if (!accountAddress) throw new Error("senderAddress is undefined");
+    if (!_signingClient) throw new Error("Signing client is not available");
 
-//   return {
-//     error: mutation.error,
-//     isLoading: mutation.isLoading,
-//     isSuccess: mutation.isSuccess,
-//     instantiateContract: mutation.mutate,
-//     instantiateContractAsync: mutation.mutateAsync,
-//     status: mutation.status,
-//   };
-// };
+    return instantiateContract({
+      ...args,
+      signingClient: _signingClient,
+      fee: args.fee ?? "auto",
+      senderAddress: accountAddress,
+      codeId,
+    });
+  };
+  const queryKey = ["USE_INSTANTIATE_CONTRACT", onError, onLoading, onSuccess, codeId, accountAddress];
+  const mutation = useMutation(queryKey, mutationFn, {
+    onError: (err, data) => Promise.resolve(onError?.(err, data)),
+    onMutate: onLoading,
+    onSuccess: (instantiateResult) => Promise.resolve(onSuccess?.(instantiateResult)),
+  });
 
-// export type UseExecuteContractArgs<Message extends Record<string, unknown>> = {
-//   contractAddress: string;
-// } & MutationEventArgs<ExecuteContractMutationArgs<Message>, ExecuteResult>;
+  return {
+    error: mutation.error,
+    isLoading: mutation.isLoading,
+    isSuccess: mutation.isSuccess,
+    instantiateContract: mutation.mutate,
+    instantiateContractAsync: mutation.mutateAsync,
+    status: mutation.status,
+  };
+};
 
-// /**
-//  * graz mutation hook for executing transactions against a CosmWasm smart
-//  * contract.
-//  *
-//  * @example
-//  * ```ts
-//  * import { useExecuteContract } from "graz"
-//  *
-//  * interface GreetMessage {
-//  *   name: string;
-//  * }
-//  *
-//  * interface GreetResponse {
-//  *   message: string;
-//  * }
-//  *
-//  * const contractAddress = "cosmosfoobarbaz";
-//  * const { executeContract } = useExecuteContract<ExecuteMessage>({ contractAddress });
-//  * executeContract({ msg: {
-//  *   foo: "bar"
-//  * }}, {
-//  *   onSuccess: (data: GreetResponse) => console.log('Got message:', data.message);
-//  * });
-//  * ```
-//  */
-// export const useExecuteContract = <Message extends Record<string, unknown>>({
-//   contractAddress,
-//   onError,
-//   onLoading,
-//   onSuccess,
-// }: UseExecuteContractArgs<Message>) => {
-//   const { data: account } = useAccount();
-//   const accountAddress = account?.bech32Address;
+export type UseExecuteContractArgs<Message extends Record<string, unknown>> = {
+  contractAddress: string;
+  chainId: string;
+  signingClientOptions?: ConnectSigningClientArgs<"cosmWasm">["options"];
+} & MutationEventArgs<ExecuteContractMutationArgs<Message>, ExecuteResult>;
 
-//   const mutationFn = (args: ExecuteContractMutationArgs<Message>) => {
-//     if (!accountAddress) throw new Error("senderAddress is undefined");
-//     const executeArgs: ExecuteContractArgs<Message> = {
-//       ...args,
-//       fee: args.fee ?? "auto",
-//       senderAddress: accountAddress,
-//       contractAddress,
-//       memo: args.memo ?? "",
-//       funds: args.funds ?? [],
-//     };
+/**
+ * graz mutation hook for executing transactions against a CosmWasm smart
+ * contract.
+ *
+ * @param contractAddress - Required contractAddress to execute against.
+ * @param chainId - Required chainId to execute contract on.
+ * @param signingClientOptions - Optional signing client options to use.
+ * @param onError - Optional error callback function.
+ * @param onLoading - Optional loading callback function.
+ * @param onSuccess - Optional success callback function.
+ *
+ * @example
+ * ```ts
+ * import { useExecuteContract } from "graz"
+ *
+ * interface GreetMessage {
+ *   name: string;
+ * }
+ *
+ * interface GreetResponse {
+ *   message: string;
+ * }
+ *
+ * const contractAddress = "cosmosfoobarbaz";
+ * const { executeContract } = useExecuteContract<ExecuteMessage>({ contractAddress });
+ * executeContract({ msg: {
+ *   foo: "bar"
+ * }}, {
+ *   onSuccess: (data: GreetResponse) => console.log('Got message:', data.message);
+ * });
+ * ```
+ */
+export const useExecuteContract = <Message extends Record<string, unknown>>({
+  chainId,
+  contractAddress,
+  signingClientOptions,
+  onError,
+  onLoading,
+  onSuccess,
+}: UseExecuteContractArgs<Message>) => {
+  const account = useAccount({
+    chainId,
+  });
+  const accountAddress = account?.account?.bech32Address;
+  const { data: _signingClient } = useConnectSigningClient({
+    chainId,
+    client: "cosmWasm",
+    options: signingClientOptions,
+  });
 
-//     return executeContract(executeArgs);
-//   };
+  const mutationFn = (args: ExecuteContractMutationArgs<Message>) => {
+    if (!accountAddress) throw new Error("senderAddress is undefined");
+    if (!_signingClient) throw new Error("Signing client is not available");
 
-//   const queryKey = ["USE_EXECUTE_CONTRACT", onError, onLoading, onSuccess, contractAddress, accountAddress];
-//   const mutation = useMutation(queryKey, mutationFn, {
-//     onError: (err, data) => Promise.resolve(onError?.(err, data)),
-//     onMutate: onLoading,
-//     onSuccess: (executeResult) => Promise.resolve(onSuccess?.(executeResult)),
-//   });
+    return executeContract({
+      ...args,
+      signingClient: _signingClient,
+      fee: args.fee ?? "auto",
+      senderAddress: accountAddress,
+      contractAddress,
+      memo: args.memo ?? "",
+      funds: args.funds ?? [],
+    });
+  };
 
-//   return {
-//     error: mutation.error,
-//     isLoading: mutation.isLoading,
-//     isSuccess: mutation.isSuccess,
-//     executeContract: mutation.mutate,
-//     executeContractAsync: mutation.mutateAsync,
-//     status: mutation.status,
-//   };
-// };
+  const queryKey = ["USE_EXECUTE_CONTRACT", onError, onLoading, onSuccess, contractAddress, accountAddress];
+  const mutation = useMutation(queryKey, mutationFn, {
+    onError: (err, data) => Promise.resolve(onError?.(err, data)),
+    onMutate: onLoading,
+    onSuccess: (executeResult) => Promise.resolve(onSuccess?.(executeResult)),
+  });
 
-// /**
-//  * graz query hook for dispatching a "smart" query to a CosmWasm smart
-//  * contract.
-//  *
-//  * @param address - The address of the contract to query
-//  * @param queryMsg - The query message to send to the contract
-//  * @returns A query result with the result returned by the smart contract.
-//  */
-// export const useQuerySmart = <TData, TError>(
-//   address?: string,
-//   queryMsg?: Record<string, unknown>,
-// ): UseQueryResult<TData, TError> => {
-//   const queryKey = ["USE_QUERY_SMART", address, queryMsg] as const;
-//   const query: UseQueryResult<TData, TError> = useQuery(
-//     queryKey,
-//     ({ queryKey: [, _address] }) => {
-//       if (!address || !queryMsg) throw new Error("address or queryMsg undefined");
-//       return getQuerySmart(address, queryMsg);
-//     },
-//     {
-//       enabled: Boolean(address) && Boolean(queryMsg),
-//     },
-//   );
+  return {
+    error: mutation.error,
+    isLoading: mutation.isLoading,
+    isSuccess: mutation.isSuccess,
+    executeContract: mutation.mutate,
+    executeContractAsync: mutation.mutateAsync,
+    status: mutation.status,
+  };
+};
 
-//   return query;
-// };
+/**
+ * graz query hook for dispatching a "smart" query to a CosmWasm smart
+ * contract.
+ *
+ * @param address - The address of the contract to query
+ * @param queryMsg - The query message to send to the contract
+ * @param chainId - The chainId to query on
+ *
+ * @returns A query result with the result returned by the smart contract.
+ */
+export const useQuerySmart = <TData, TError>({
+  address,
+  queryMsg,
+  chainId,
+}: {
+  address?: string;
+  queryMsg?: Record<string, unknown>;
+  chainId: string;
+}): UseQueryResult<TData, TError> => {
+  const { data: client } = useConnectClient({
+    client: "cosmWasm",
+    chainId,
+  });
+  const query: UseQueryResult<TData, TError> = useQuery(
+    ["USE_QUERY_SMART", { address, queryMsg, chainId }],
+    () => {
+      if (!address || !queryMsg) throw new Error("address or queryMsg undefined");
+      if (!client) throw new Error("Client is not available");
+      return getQuerySmart({ address, queryMsg, client });
+    },
+    {
+      enabled: Boolean(address) && Boolean(queryMsg),
+    },
+  );
 
-// /**
-//  * graz query hook for dispatching a "raw" query to a CosmWasm smart contract.
-//  *
-//  * @param address - The address of the contract to query
-//  * @param key - The key to lookup in the contract storage
-//  * @returns A query result with raw byte array stored at the key queried.
-//  */
-// export const useQueryRaw = <TError>(address?: string, key?: string): UseQueryResult<Uint8Array | null, TError> => {
-//   const queryKey = ["USE_QUERY_RAW", key, address] as const;
-//   const query: UseQueryResult<Uint8Array | null, TError> = useQuery(
-//     queryKey,
-//     ({ queryKey: [, _address] }) => {
-//       if (!address || !key) throw new Error("address or key undefined");
-//       return getQueryRaw(address, key);
-//     },
-//     {
-//       enabled: Boolean(address) && Boolean(key),
-//     },
-//   );
+  return query;
+};
 
-//   return query;
-// };
+/**
+ * graz query hook for dispatching a "raw" query to a CosmWasm smart contract.
+ *
+ * @param address - The address of the contract to query
+ * @param key - The key to lookup in the contract storage
+ * @param chainId - The chainId to query on
+ *
+ * @returns A query result with raw byte array stored at the key queried.
+ */
+export const useQueryRaw = <TError>({
+  address,
+  key,
+  chainId,
+}: {
+  address?: string;
+  key?: string;
+  chainId: string;
+}): UseQueryResult<Uint8Array | null, TError> => {
+  const { data: client } = useConnectClient({
+    client: "cosmWasm",
+    chainId,
+  });
+  const queryKey = ["USE_QUERY_RAW", key, address] as const;
+  const query: UseQueryResult<Uint8Array | null, TError> = useQuery(
+    queryKey,
+    ({ queryKey: [, _address] }) => {
+      if (!address || !key) throw new Error("address or key undefined");
+      if (!client) throw new Error("Client is not available");
+      return getQueryRaw({ address, keyStr: key, client });
+    },
+    {
+      enabled: Boolean(address) && Boolean(key),
+    },
+  );
+
+  return query;
+};

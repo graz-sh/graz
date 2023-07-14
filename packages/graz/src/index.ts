@@ -16,3 +16,4 @@ export * from "./provider/index";
 export * from "./types/core";
 export * from "./types/keplr";
 export * from "./types/wallet";
+export * from "./utils/conversion";
