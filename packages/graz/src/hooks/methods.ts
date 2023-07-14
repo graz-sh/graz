@@ -65,7 +65,7 @@ export const useBalance = <T extends "stargate" | "cosmWasm">(args: {
 
   const query = useQuery(
     [
-      "USE_BALANCES",
+      "USE_BALANCE",
       {
         client,
         ...args,
@@ -100,6 +100,8 @@ export const useBalance = <T extends "stargate" | "cosmWasm">(args: {
  * @param bech32Address - Optional bech32 address, if not provided will return undefined
  * @param chainId - Optional chainId to retrieve the balances from given address and chainId, if not provided will return all balances currencies from all chains provided from GrazProvider
  * @param client - Optional client, if not provided will use the default client
+ *
+ * @returns if chainId is string it will return an object, otherwise it will return a record of objects
  *
  * @example
  * ```ts
@@ -139,7 +141,7 @@ export const useAllBalances = <U extends ChainIdArgs>(
 
   const query = useQuery(
     [
-      "USE_BALANCES",
+      "USE_ALL_BALANCES",
       {
         singleClient,
         multiClient,
@@ -192,6 +194,8 @@ export const useAllBalances = <U extends ChainIdArgs>(
  * @param client - Optional client, if not provided will use the default client
  * @param chainId - Optional chainId to retrieve the balances from given address and chainId, if not provided will return all balances currencies from all chains provided from GrazProvider
  *
+ * @returns if chainId is string it will return an object, otherwise it will return a record of objects
+ *
  * @example
  * ```ts
  * import { useChainBalances } from "graz";
@@ -232,7 +236,7 @@ export const useChainBalances = <T extends "cosmWasm" | "stargate", U extends Ch
 
   const query = useQuery(
     [
-      "USE_BALANCES",
+      "USE_CHAIN_BALANCES",
       {
         singleClient,
         multiClient,
@@ -302,6 +306,8 @@ export const useChainBalances = <T extends "cosmWasm" | "stargate", U extends Ch
  * @param bech32Address - Optional bech32 account address, if not provided will return undefined
  * @param chainId - Optional chainId to retrieve the balances from given address and chainId, if not provided will return all balances currencies from all chains provided from GrazProvider
  *
+ * @returns if chainId is string it will return an object, otherwise it will return a record of objects
+ *
  * @example
  * ```ts
  * import { useBalanceStaked } from "graz";
@@ -338,7 +344,7 @@ export const useBalanceStaked = <U extends ChainIdArgs>(
 
   const query = useQuery(
     [
-      "USE_BALANCE_STAKED",
+      "useBalanceStaked",
       {
         singleClient,
         multiClient,

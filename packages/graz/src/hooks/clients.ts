@@ -9,17 +9,25 @@ import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { ChainIdArgs, HookResultDataWithChainId } from "../types/data";
 
 /**
- * graz query hook to retrieve a CosmWasmClient, StargateClient and Tendermint34Client. If there's no given arguments it will be using the current connected client
+ * graz query hook to retrieve a CosmWasmClient or StargateClient or Tendermint34Client.
+ *
+ * @param client - if provided, it will use the given client instead of the default client
+ * @param chainId - if provided, it will only return the data of the given chainId
+ * @param onlyConnectedChains - if true, it will only return the client of the current connected chains
+ * @param enabled - if false, it will not fetch the data
+ *
+ * @returns if chainId is string it will return an object, otherwise it will return a record of objects
  *
  * @example
  * ```ts
  * import { useClient } from "graz";
  *
- * // use connected client's cosmwasm client
- * const { data, isFetching, refetch, ... } = useClient();
+ * // single chain
+ * const { data, isLoading, ... } = useClient({ client: "stargate" chainId: "cosmoshub-4" });
  *
- * // initialize new custom client from given arguments
- * useClient({ rpc: "https://rpc.cosmoshub.strange.love", });
+ * // all chains from GrazProvider example
+ * const { data, isLoading, ... } = useClient({ client: "stargate" });
+ *
  * ```
  */
 export const useConnectClient = <T extends Clients, U extends ChainIdArgs>(
@@ -42,7 +50,7 @@ export const useConnectClient = <T extends Clients, U extends ChainIdArgs>(
 
   const query = useQuery(
     [
-      "USE_CLIENTS",
+      "USE_CONNECT_CLIENT",
       {
         client: _client,
         chainId: args?.chainId,
@@ -84,21 +92,24 @@ export const useConnectClient = <T extends Clients, U extends ChainIdArgs>(
 };
 
 /**
- * graz query hook to retrieve a SigningCosmWasmClient. If there's no given args it will be using the current connected signer
+ * graz query hook to retrieve a SigningCosmWasmClient or SigningStargateClient.
+ *
+ * @param client - if provided, it will use the given client instead of the default client
+ * @param chainId - if provided, it will only return the data of the given chainId
+ * @param options - signing client options of given client
+ *
+ * @returns if chainId is string it will return an object, otherwise it will return a record of objects
  *
  * @example
  * ```ts
  * import { useSigningClient } from "graz";
  *
- * // get connected client's cosmwasm client
- * const { data, isFetching, refetch, ... } = useSigningClient();
+ * // single chain
+ * const { data, isLoading, ... } = useSigningClient({ client: "stargate" chainId: "cosmoshub-4" });
  *
- * // initialize new custom client with given args
- * useSigningClient({
- *   rpc: "https://rpc.cosmoshub.strange.love",
- *   offlineSigner: customOfflineSigner,
- *   ...
- * });
+ * // all chains from GrazProvider example
+ * const { data, isLoading, ... } = useSigningClient({ client: "stargate" });
+ *
  * ```
  */
 export const useConnectSigningClient = <T extends SigningClients, U extends ChainIdArgs>(
@@ -117,7 +128,7 @@ export const useConnectSigningClient = <T extends SigningClients, U extends Chai
   const sessionChains = sessionChainIds?.map((i) => _chains!.find((x) => x.chainId === i)!);
 
   const queryKey = [
-    "USE_SIGNING_CLIENTS",
+    "USE_CONNECT_SIGNING_CLIENT",
     { client: _client, chainId: args?.chainId, options: args?.options },
   ] as const;
   const query = useQuery(

@@ -18,8 +18,11 @@ export interface UseAccountArgs {
 }
 
 /**
- * graz query hook to retrieve account data with optional arguments to invoke
- * given function on connect/disconnect.
+ * graz query hook to retrieve account data
+ *
+ * @param chainId - if provided, it will only return the data of the given chainId
+ * @param onConnect - callback function when the account is connected
+ * @param onDisconnect - callback function when the account is disconnected
  *
  * @example
  * ```tsx
@@ -81,6 +84,10 @@ export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, ConnectResult>;
  * graz mutation hook to execute wallet connection with optional arguments to
  * invoke given functions on error, loading, or success event.
  *
+ * @param onError - callback function when the connection is failed
+ * @param onLoading - callback function when the connection is loading
+ * @param onSuccess - callback function when the connection is successful
+ *
  * @example
  * ```ts
  * import { useConnect, mainnetChains } from "graz";
@@ -134,6 +141,10 @@ export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArg
  * graz mutation hook to execute wallet disconnection with optional arguments to
  * invoke given functions on error, loading, or success event.
  *
+ * @param onError - callback function when the disconnection is failed
+ * @param onLoading - callback function when the disconnection is loading
+ * @param onSuccess - callback function when the disconnection is successful
+ *
  * @example
  * ```ts
  * import { useDisconnect } from "graz";
@@ -148,8 +159,11 @@ export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArg
  *   onSuccess: () => { ... },
  * });
  *
- * // pass `true` on disconnect to clear recent connected chain
- * disconnect(true);
+ * //disconnect all chains
+ * disconnect();
+ *
+ * //disconnect specific chains
+ * disconnect({ chainid: ["cosmoshub-4", "juno-1"] });
  * ```
  *
  * @see {@link disconnect}
@@ -178,53 +192,39 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
 /**
  * graz hook to retrieve offline signer objects (default, amino enabled, and auto).
  *
- * Note: signer objects is initialized after connecting an account.
+ * @param chainId - chain id arguments
+ *
+ * @returns if chainId is string it will return an object, otherwise it will return a record of objects
  *
  * @example
  * ```ts
  * import { useOfflineSigners } from "graz";
- * const { signer, signerAmino, signerAuto } = useOfflineSigners();
+ *
+ * // single chain
+ * const { offlineSigner, offlineSignerAmino, offlineSignerAuto } = useOfflineSigners({ chainId: "cosmoshub-4" });
+ *
+ * // multi chain
+ * const offlineSigners = useOfflineSigners();
+ * offlineSigners["cosmoshub-4"].offlineSignerAuto;
+ *
  * ```
  */
 export const useOfflineSigners = <T extends ChainIdArgs>(args?: T) => {
   const accounts = useAccount();
-
-  const { data } = useQuery(
-    ["OFFLINE_SIGNERS", { accounts }],
-    async () => {
-      if (!accounts) return undefined;
-      const connectedChainIds = Object.values(accounts)
-        .map((i) => i?.chainId)
-        .filter(Boolean) as string[];
-      const res: Record<string, OfflineSigners> = {};
-      await Promise.all(
-        connectedChainIds.map(async (_chainId) => {
-          const signers = await getOfflineSigners({
-            chainId: _chainId,
-          });
-          res[_chainId] = signers;
-        }),
-      );
-      return res;
-    },
-    {
-      enabled: Boolean(accounts),
-    },
-  );
 
   const query = useQuery(
     [
       "USE_OFFLINE_SIGNERS",
       {
         args,
-        offlineSigners: data,
+        accounts,
       },
     ],
     async () => {
-      if (!data) return undefined;
-      const connectedChainIds = Object.keys(data)
+      if (!accounts) return undefined;
+      const connectedChainIds = Object.keys(accounts)
         .map(([chainId]) => chainId)
-        .filter((i) => i) as string[];
+        .filter(Boolean) as string[];
 
       if (args?.chainId) {
         const offlineSigners = await getOfflineSigners({
@@ -244,7 +244,7 @@ export const useOfflineSigners = <T extends ChainIdArgs>(args?: T) => {
       );
       return res;
     },
-    { enabled: Boolean(data), refetchOnMount: false, refetchOnWindowFocus: false },
+    { enabled: Boolean(accounts), refetchOnMount: false, refetchOnWindowFocus: false },
   );
   return query as UseQueryResult<HookResultDataWithChainId<OfflineSigners, T> | undefined>;
 };

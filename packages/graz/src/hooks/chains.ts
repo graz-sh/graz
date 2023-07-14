@@ -57,8 +57,6 @@ export const useActiveChainValidators = <T extends QueryClient & StakingExtensio
  *   connect(recentChain);
  * }
  * ```
- *
- * @see {@link useActiveChain}
  */
 export const useRecentChain = () => {
   const recentChains = useGrazInternalStore((x) => x.recentChains);
@@ -151,6 +149,17 @@ export const useSuggestChainAndConnect = ({ onError, onLoading, onSuccess }: Use
     suggestAndConnectAsync: mutation.mutateAsync,
   };
 };
+
+/**
+ * graz hook to retrieve chain data and usefull functions with given chainId
+ * @param chainId - Chain ID string
+ *
+ * @example
+ * ```ts
+ * import { useChain } from "graz";
+ * const { data: chain } = useChain("cosmoshub-4");
+ * ```
+ */
 
 export const useChain = ({ chainId }: { chainId: string }) => {
   const chains = useGrazInternalStore((x) => x.chains);
