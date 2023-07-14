@@ -151,3 +151,26 @@ export const useSuggestChainAndConnect = ({ onError, onLoading, onSuccess }: Use
     suggestAndConnectAsync: mutation.mutateAsync,
   };
 };
+
+export const useChain = ({ chainId }: { chainId: string }) => {
+  const chains = useGrazInternalStore((x) => x.chains);
+  const chain = chains?.find((x) => x.chainId === chainId);
+  if (!chain) return;
+
+  const currencies = chain.currencies;
+
+  const convertMinimalDenomToDenom = (searchMinimalDenom: string, value: string) => {
+    const currency = chain.currencies.find((x) => x.coinMinimalDenom === searchMinimalDenom);
+    if (!currency) return;
+    return {
+      denom: currency.coinDenom,
+      value: Number(value) * Math.pow(10, currency.coinDecimals),
+    };
+  };
+
+  return {
+    convertMinimalDenomToDenom,
+    currencies,
+    data: chain,
+  };
+};
