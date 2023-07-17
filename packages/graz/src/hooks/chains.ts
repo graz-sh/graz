@@ -172,7 +172,7 @@ export const useChain = ({ chainId }: { chainId: string }) => {
     if (!currency) return;
     return {
       denom: currency.coinDenom,
-      value: Number(value) * Math.pow(10, currency.coinDecimals),
+      value: String(Number(value) / Math.pow(10, currency.coinDecimals)),
     };
   };
 
