@@ -44,7 +44,7 @@ export const useConnectClient = <T extends Clients, U extends ChainIdArgs>(
   const _client = (args?.client ?? useGrazInternalStore.getState().defaultClient) as T;
   const _chains = useGrazInternalStore.getState().chains;
   const sessionChainIds = useGrazSessionStore.getState().sessions?.map((i) => i.chainId);
-  const singleChain = _chains?.find((i) => i.chainId === args?.chainId);
+  const singleChain = typeof args?.chainId === "string" && _chains?.find((i) => i.chainId === args.chainId);
   const sessionChains = sessionChainIds?.map((i) => _chains!.find((x) => x.chainId === i)!);
   const chains = args?.onlyConnectedChains ? sessionChains : _chains;
 
@@ -69,14 +69,16 @@ export const useConnectClient = <T extends Clients, U extends ChainIdArgs>(
       const res: Record<string, ConnectClient<T>> = {};
       if (!chains) return undefined;
       await Promise.all(
-        chains.map(async (chain) => {
-          const client = await connectClient({
-            client: _client,
-            rpc: chain.rpc,
-            rpcHeaders: chain.rpcHeaders,
-          });
-          res[chain.chainId] = client;
-        }),
+        chains
+          .filter((x) => (args?.chainId ? args.chainId.includes(x.chainId) : true))
+          .map(async (chain) => {
+            const client = await connectClient({
+              client: _client,
+              rpc: chain.rpc,
+              rpcHeaders: chain.rpcHeaders,
+            });
+            res[chain.chainId] = client;
+          }),
       );
 
       return res;
@@ -124,7 +126,7 @@ export const useConnectSigningClient = <T extends SigningClients, U extends Chai
 
   const _chains = useGrazInternalStore.getState().chains;
   const sessionChainIds = useGrazSessionStore.getState().sessions?.map((i) => i.chainId);
-  const singleChain = _chains?.find((i) => i.chainId === args?.chainId);
+  const singleChain = typeof args?.chainId === "string" && _chains?.find((i) => i.chainId === args.chainId);
   const sessionChains = sessionChainIds?.map((i) => _chains!.find((x) => x.chainId === i)!);
 
   const queryKey = [
@@ -142,7 +144,7 @@ export const useConnectSigningClient = <T extends SigningClients, U extends Chai
           ? GasPrice.fromString(`${singleChain.gas.price}${singleChain.gas.denom}`)
           : undefined;
         const options = (
-          _client === "cosmWasm" ? { gasPrice, ...(args?.options || {}) } : args?.options
+          _client === "cosmWasm" ? { gasPrice, ...(args.options || {}) } : args.options
         ) as ConnectSigningClientArgs<T>["options"];
         const client = await connectSigningClient({
           client: _client,
@@ -156,29 +158,31 @@ export const useConnectSigningClient = <T extends SigningClients, U extends Chai
       const res: Record<string, ConnectClient<T>> = {};
       if (!sessionChains) return undefined;
       await Promise.all(
-        sessionChains.map(async (chain) => {
-          const { offlineSignerAuto } = await getOfflineSigners({ chainId: chain.chainId });
-          const gasPrice = chain.gas ? GasPrice.fromString(`${chain.gas.price}${chain.gas.denom}`) : undefined;
+        sessionChains
+          .filter((x) => (args?.chainId ? args.chainId.includes(x.chainId) : true))
+          .map(async (chain) => {
+            const { offlineSignerAuto } = await getOfflineSigners({ chainId: chain.chainId });
+            const gasPrice = chain.gas ? GasPrice.fromString(`${chain.gas.price}${chain.gas.denom}`) : undefined;
 
-          const options = (
-            _client === "cosmWasm"
-              ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                { gasPrice, ...(args?.options?.[chain.chainId] || {}) }
-              : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                args?.options?.[chain.chainId]
-          ) as ConnectSigningClientArgs<T>["options"];
+            const options = (
+              _client === "cosmWasm"
+                ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-expect-error
+                  { gasPrice, ...(args?.options?.[chain.chainId] || {}) }
+                : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-expect-error
+                  args?.options?.[chain.chainId]
+            ) as ConnectSigningClientArgs<T>["options"];
 
-          const client = await connectSigningClient({
-            client: _client,
-            rpc: chain.rpc,
-            rpcHeaders: chain.rpcHeaders,
-            offlineSignerAuto,
-            options,
-          });
-          res[chain.chainId] = client;
-        }),
+            const client = await connectSigningClient({
+              client: _client,
+              rpc: chain.rpc,
+              rpcHeaders: chain.rpcHeaders,
+              offlineSignerAuto,
+              options,
+            });
+            res[chain.chainId] = client;
+          }),
       );
 
       return res;

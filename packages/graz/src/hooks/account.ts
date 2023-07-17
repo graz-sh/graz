@@ -75,14 +75,16 @@ export const useAccount = <T extends ChainIdArgs>(args?: UseAccountArgs & T) => 
 
   const res = useMemo(() => {
     if (!sessions) return undefined;
-    if (args?.chainId) {
+    if (typeof args?.chainId === "string" && args.chainId) {
       const singleChainRes = sessions.find((i) => i.chainId === args.chainId);
       return singleChainRes;
     }
     const multiChainRes: Record<string, GrazAccountSession> = {};
-    sessions.forEach((i) => {
-      multiChainRes[i.chainId] = i;
-    });
+    sessions
+      .filter((x) => (args?.chainId ? args.chainId.includes(x.chainId) : true))
+      .forEach((i) => {
+        multiChainRes[i.chainId] = i;
+      });
     return multiChainRes;
   }, [args?.chainId, sessions]);
 
@@ -228,7 +230,7 @@ export const useOfflineSigners = <T extends ChainIdArgs>(args?: T) => {
         .map(([chainId]) => chainId)
         .filter(Boolean) as string[];
 
-      if (args?.chainId) {
+      if (typeof args?.chainId === "string" && args.chainId) {
         const offlineSigners = await getOfflineSigners({
           chainId: args.chainId,
         });
@@ -237,12 +239,14 @@ export const useOfflineSigners = <T extends ChainIdArgs>(args?: T) => {
       const res: Record<string, OfflineSigners> = {};
 
       await Promise.all(
-        connectedChainIds.map(async (_chainId) => {
-          const signers = await getOfflineSigners({
-            chainId: _chainId,
-          });
-          res[_chainId] = signers;
-        }),
+        connectedChainIds
+          .filter((x) => (args?.chainId ? args.chainId.includes(x) : true))
+          .map(async (_chainId) => {
+            const signers = await getOfflineSigners({
+              chainId: _chainId,
+            });
+            res[_chainId] = signers;
+          }),
       );
       return res;
     },

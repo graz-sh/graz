@@ -35,3 +35,8 @@ export const suggestChainAndConnect = async (args: SuggestChainAndConnectArgs): 
   });
   return result;
 };
+
+export const getChain = ({ chainId }: { chainId: string }) => {
+  const chain = useGrazInternalStore.getState().chains?.find((x) => x.chainId === chainId);
+  return chain;
+};

@@ -45,20 +45,20 @@ export const useActiveChainValidators = <T extends QueryClient & StakingExtensio
 };
 
 /**
- * graz hook to retrieve last connected chain info
+ * graz hook to retrieve last connected chain ids
  *
  * @example
  * ```ts
  * import { useRecentChain, connect, mainnetChains } from "graz";
  * const { data: recentChain, clear } = useRecentChain();
  * try {
- *   connect(mainnetChains.cosmos);
+ *   connect({chainId: [mainnetChains.cosmos]});
  * } catch {
- *   connect(recentChain);
+ *   connect({chainId: recentChain});
  * }
  * ```
  */
-export const useRecentChain = () => {
+export const useRecentChains = () => {
   const recentChains = useGrazInternalStore((x) => x.recentChains);
   return { data: recentChains, clear: clearRecentChain };
 };
@@ -160,7 +160,6 @@ export const useSuggestChainAndConnect = ({ onError, onLoading, onSuccess }: Use
  * const { data: chain } = useChain("cosmoshub-4");
  * ```
  */
-
 export const useChain = ({ chainId }: { chainId: string }) => {
   const chains = useGrazInternalStore((x) => x.chains);
   const chain = chains?.find((x) => x.chainId === chainId);

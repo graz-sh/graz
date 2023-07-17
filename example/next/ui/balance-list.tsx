@@ -29,10 +29,11 @@ export const BalanceList: FC = () => {
   });
 
   const tes = useAllBalances({
+    chainId: ["cosmoshub-4", "juno-1"],
     bech32Address: account?.account?.bech32Address,
   });
 
-  console.log("all balance", tes);
+  console.log("all balance", tes.data);
   const tas = async () => {
     if (!account?.account?.bech32Address) return;
     const gg = await data?.getAllBalances(account.account.bech32Address);

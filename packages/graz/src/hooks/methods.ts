@@ -130,13 +130,14 @@ export const useAllBalances = <U extends ChainIdArgs>(
 
   const { data: singleClient } = useConnectClient({
     client: "stargate",
-    chainId: args.chainId!,
-    enabled: Boolean(args.chainId) && Boolean(args.bech32Address),
+    chainId: args.chainId as string,
+    enabled: Boolean(args.chainId) && typeof args.chainId === "string" && Boolean(args.bech32Address),
   });
 
   const { data: multiClient } = useConnectClient({
     client: "stargate",
-    enabled: !args.chainId && Boolean(args.bech32Address),
+    chainId: args.chainId as string[] | undefined,
+    enabled: (!args.chainId || (Boolean(args.chainId) && Array.isArray(args.chainId))) && Boolean(args.bech32Address),
   });
 
   const query = useQuery(
@@ -150,7 +151,7 @@ export const useAllBalances = <U extends ChainIdArgs>(
       },
     ],
     async () => {
-      if (args.chainId && singleClient) {
+      if (args.chainId && typeof args.chainId === "string" && singleClient) {
         const singleChain = _chains?.find((i) => i.chainId === args.chainId);
         const res = await getAllBalance({
           client: singleClient,
@@ -158,19 +159,21 @@ export const useAllBalances = <U extends ChainIdArgs>(
         });
         return res;
       }
-      if (!args.chainId && multiClient) {
+      if ((!args.chainId || (Boolean(args.chainId) && Array.isArray(args.chainId))) && multiClient) {
         const multiChain = Object.entries(multiClient);
         const res: Record<string, Coin[]> = {};
         await Promise.all(
-          multiChain.map(async ([chainId, client]) => {
-            const chain = _chains?.find((i) => i.chainId === chainId);
-            if (!chain) return;
-            const _res = await getAllBalance({
-              client,
-              bech32Address: toBech32(chain.bech32Config.bech32PrefixAccAddr, fromBech32(args.bech32Address!).data),
-            });
-            res[chainId] = _res;
-          }),
+          multiChain
+            .filter((x) => (args.chainId ? args.chainId.includes(x[0]) : true))
+            .map(async ([chainId, client]) => {
+              const chain = _chains?.find((i) => i.chainId === chainId);
+              if (!chain) return;
+              const _res = await getAllBalance({
+                client,
+                bech32Address: toBech32(chain.bech32Config.bech32PrefixAccAddr, fromBech32(args.bech32Address!).data),
+              });
+              res[chainId] = _res;
+            }),
         );
         return res;
       }
@@ -225,13 +228,14 @@ export const useChainBalances = <T extends "cosmWasm" | "stargate", U extends Ch
 
   const { data: singleClient } = useConnectClient({
     client: _client,
-    chainId: args.chainId!,
-    enabled: Boolean(args.chainId) && Boolean(args.bech32Address),
+    chainId: args.chainId as string,
+    enabled: Boolean(args.chainId) && typeof args.chainId === "string" && Boolean(args.bech32Address),
   });
 
   const { data: multiClient } = useConnectClient({
     client: _client,
-    enabled: !args.chainId && Boolean(args.bech32Address),
+    chainId: args.chainId as string[] | undefined,
+    enabled: (!args.chainId || (Boolean(args.chainId) && Array.isArray(args.chainId))) && Boolean(args.bech32Address),
   });
 
   const query = useQuery(
@@ -245,7 +249,7 @@ export const useChainBalances = <T extends "cosmWasm" | "stargate", U extends Ch
       },
     ],
     async () => {
-      if (args.chainId && singleClient) {
+      if (typeof args.chainId === "string" && args.chainId && singleClient) {
         const singleChain = _chains?.find((i) => i.chainId === args.chainId);
         const res = await Promise.all(
           singleChain!.currencies.map((currency) =>
@@ -261,29 +265,31 @@ export const useChainBalances = <T extends "cosmWasm" | "stargate", U extends Ch
         );
         return res;
       }
-      if (!args.chainId && multiClient) {
+      if ((!args.chainId || (Boolean(args.chainId) && Array.isArray(args.chainId))) && multiClient) {
         const multiChain = Object.entries(multiClient);
         const res: Record<string, Coin[]> = {};
         await Promise.all(
-          multiChain.map(async ([chainId, client]) => {
-            const chain = _chains?.find((i) => i.chainId === chainId);
-            if (!chain) return;
-            const _res = await Promise.all(
-              chain.currencies
-                .filter((i) => !i.coinMinimalDenom.startsWith("cw20:"))
-                .map((currency) =>
-                  getBalance({
-                    client: client as unknown as ConnectClient<T>,
-                    bech32Address: toBech32(
-                      chain.bech32Config.bech32PrefixAccAddr,
-                      fromBech32(args.bech32Address!).data,
-                    ),
-                    searchDenom: currency.coinMinimalDenom,
-                  }),
-                ),
-            );
-            res[chainId] = _res;
-          }),
+          multiChain
+            .filter((x) => (args.chainId ? args.chainId.includes(x[0]) : true))
+            .map(async ([chainId, client]) => {
+              const chain = _chains?.find((i) => i.chainId === chainId);
+              if (!chain) return;
+              const _res = await Promise.all(
+                chain.currencies
+                  .filter((i) => !i.coinMinimalDenom.startsWith("cw20:"))
+                  .map((currency) =>
+                    getBalance({
+                      client: client as unknown as ConnectClient<T>,
+                      bech32Address: toBech32(
+                        chain.bech32Config.bech32PrefixAccAddr,
+                        fromBech32(args.bech32Address!).data,
+                      ),
+                      searchDenom: currency.coinMinimalDenom,
+                    }),
+                  ),
+              );
+              res[chainId] = _res;
+            }),
         );
         return res;
       }
@@ -333,13 +339,14 @@ export const useBalanceStaked = <U extends ChainIdArgs>(
 
   const { data: singleClient } = useConnectClient({
     client: "stargate",
-    chainId: args.chainId!,
-    enabled: Boolean(args.chainId) && Boolean(args.bech32Address),
+    chainId: args.chainId as string,
+    enabled: Boolean(args.chainId) && typeof args.chainId === "string" && Boolean(args.bech32Address),
   });
 
   const { data: multiClient } = useConnectClient({
     client: "stargate",
-    enabled: !args.chainId && Boolean(args.bech32Address),
+    chainId: args.chainId as string[] | undefined,
+    enabled: (!args.chainId || (Boolean(args.chainId) && Array.isArray(args.chainId))) && Boolean(args.bech32Address),
   });
 
   const query = useQuery(
@@ -353,7 +360,7 @@ export const useBalanceStaked = <U extends ChainIdArgs>(
       },
     ],
     async () => {
-      if (args.chainId && singleClient) {
+      if (args.chainId && typeof args.chainId === "string" && singleClient) {
         const singleChain = _chains?.find((i) => i.chainId === args.chainId);
         if (!singleChain) throw new Error(`${args.chainId} Chain not found`);
         const res = await getBalanceStaked({
@@ -362,19 +369,21 @@ export const useBalanceStaked = <U extends ChainIdArgs>(
         });
         return res;
       }
-      if (!args.chainId && multiClient) {
+      if ((!args.chainId || (Boolean(args.chainId) && Array.isArray(args.chainId))) && multiClient) {
         const multiChain = Object.entries(multiClient);
         const res: Record<string, Coin | null> = {};
         await Promise.all(
-          multiChain.map(async ([chainId, client]) => {
-            const chain = _chains?.find((i) => i.chainId === chainId);
-            if (!chain) return;
-            const _res = await getBalanceStaked({
-              client,
-              bech32Address: toBech32(chain.bech32Config.bech32PrefixAccAddr, fromBech32(args.bech32Address!).data),
-            });
-            res[chainId] = _res;
-          }),
+          multiChain
+            .filter((x) => (args.chainId ? args.chainId.includes(x[0]) : true))
+            .map(async ([chainId, client]) => {
+              const chain = _chains?.find((i) => i.chainId === chainId);
+              if (!chain) return;
+              const _res = await getBalanceStaked({
+                client,
+                bech32Address: toBech32(chain.bech32Config.bech32PrefixAccAddr, fromBech32(args.bech32Address!).data),
+              });
+              res[chainId] = _res;
+            }),
         );
         return res;
       }
