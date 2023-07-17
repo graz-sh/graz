@@ -1,4 +1,4 @@
-import { Button, HStack, ListItem, Stack, Text } from "@chakra-ui/react";
+import { Button, HStack, Stack, Text } from "@chakra-ui/react";
 import { useBalanceStaked } from "graz";
 import { truncate, useAccount, useAllBalances, useConnectClient } from "graz";
 import { type FC, useEffect } from "react";
@@ -71,7 +71,7 @@ export const BalanceList: FC = () => {
           </Text>
         ))}
 
-        {!balances && <ListItem ml={4}>no available balances</ListItem>}
+        {!balances && <Text ml={4}>no available balances</Text>}
       </Stack>
     </>
   );
