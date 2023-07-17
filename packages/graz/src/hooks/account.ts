@@ -28,8 +28,19 @@ export interface UseAccountArgs {
  * ```tsx
  * import { useAccount } from "graz";
  *
- * // basic example
- * const { data, isConnecting, isConnected, ... } = useAccount();
+ * // single chain
+ * const account = useAccount({
+ *  chainId: "cosmoshub-4",
+ * })
+ *
+ * return <div>{account?.account.bech32Address}</div>
+ *
+ * // multi chain
+ * const accounts = useAccount();
+ *
+ * Object.entries(accounts).map(([chainId, account]) => {
+ *  return <div key={chainId}>{account?.account.bech32Address}</div>
+ * })
  *
  * // with event arguments
  * useAccount({
@@ -102,17 +113,8 @@ export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, ConnectResult>;
  *   onSuccess: (account) => { ... },
  * });
  *
- * // use graz provided chain information
- * connect(mainnetChains.cosmos);
- *
- * // use custom chain information
  * connect({
- *  chain:{
- *    rpc: "https://rpc.juno.strange.love",
- *    rest: "https://api.juno.strange.love",
- *    chainId: "juno-1",
- *    ...
- *   }
+ *  chainId: ["cosmoshub-4"],
  * });
  * ```
  *
