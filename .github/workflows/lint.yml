@@ -1,4 +1,4 @@
-name: Lint
+name: lint check
 
 on:
   push:
@@ -15,10 +15,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
         with:
-          version: latest
+          version: 8
       - uses: actions/setup-node@v3
         with:
-          cache: "pnpm"
+          cache: pnpm
           node-version-file: ".nvmrc"
-      - run: pnpm install
-      - run: pnpm lint
+      - run: |
+          pnpm install
+          pnpm lint
