@@ -1,5 +1,5 @@
 {
-  "name": "@strangelove-ventures/graz",
+  "name": "@graz-sh/graz",
   "version": "0.0.0",
   "workspaces": [
     "docs",

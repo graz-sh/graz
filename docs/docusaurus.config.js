@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "graz",
   tagline: "React hooks for cosmos",
-  url: "https://graz.strange.love",
+  url: "https://graz.sh",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -16,7 +16,7 @@ const config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: "strangelove-ventures", // Usually your GitHub org/user name.
+  organizationName: "graz-sh", // Usually your GitHub org/user name.
   projectName: "graz", // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
@@ -34,7 +34,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/strangelove-ventures/graz/tree/dev/docs/",
+          editUrl: "https://github.com/graz-sh/graz/tree/dev/docs/",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -66,7 +66,7 @@ const config = {
             position: "left",
           },
           {
-            href: "https://github.com/strangelove-ventures/graz",
+            href: "https://github.com/graz-sh/graz",
             label: "GitHub",
             position: "right",
           },
@@ -93,12 +93,12 @@ const config = {
               },
               {
                 label: "GitHub",
-                href: "https://github.com/strangelove-ventures/graz",
+                href: "https://github.com/graz-sh/graz",
               },
             ],
           },
         ],
-        copyright: `MIT License, Copyright © ${new Date().getFullYear()} Strangelove Ventures`,
+        copyright: `MIT License, Copyright © ${new Date().getFullYear()} Graz`,
       },
       image: "img/social.png",
       prism: {

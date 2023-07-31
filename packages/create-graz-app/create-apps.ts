@@ -23,7 +23,7 @@ export const createApp = async ({
   packageManager: PackageManager;
 }): Promise<void> => {
   const repo: RepoInfo = {
-    username: "strangelove-ventures",
+    username: "graz-sh",
     branch: "dev",
     name: "graz",
     filePath: "templates/default",

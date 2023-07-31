@@ -3,9 +3,9 @@
   "description": "Bootstrap your cosmos app with one command",
   "version": "0.0.1",
   "author": "Nur Fikri <kiki@strange.love>",
-  "repository": "https://github.com/strangelove-ventures/graz.git",
-  "homepage": "https://github.com/strangelove-ventures/graz",
-  "bugs": "https://github.com/strangelove-ventures/graz/issues",
+  "repository": "https://github.com/graz-sh/graz.git",
+  "homepage": "https://github.com/graz-sh/graz",
+  "bugs": "https://github.com/graz-sh/graz/issues",
   "bin": {
     "create-graz-app": "./dist/index.js"
   },

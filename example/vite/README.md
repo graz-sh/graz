@@ -1,6 +1,6 @@
 # graz-vite-example
 
-Example Vite + React + TypeScript project demonstrating how to use [graz](https://github.com/strangelove-ventures/graz) ⚡️
+Example Vite + React + TypeScript project demonstrating how to use [graz](https://github.com/graz-sh/graz) ⚡️
 
 ## Notes
 
@@ -9,4 +9,4 @@ Example Vite + React + TypeScript project demonstrating how to use [graz](https:
 
 ## References
 
-- <https://github.com/strangelove-ventures/graz>
+- <https://github.com/graz-sh/graz>

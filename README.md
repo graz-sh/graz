@@ -2,7 +2,7 @@
 
 [![npm/v](https://badgen.net/npm/v/graz)](https://www.npmjs.com/package/graz)
 [![npm/dt](https://badgen.net/npm/dt/graz)](https://www.npmjs.com/package/graz)
-[![stars](https://badgen.net/github/stars/strangelove-ventures/graz)](https://github.com/strangelove-ventures/graz)
+[![stars](https://badgen.net/github/stars/graz-sh/graz)](https://github.com/graz-sh/graz)
 
 `graz` is a collection of React hooks containing everything you need to start working with the [Cosmos ecosystem](https://cosmos.network/).
 
@@ -102,7 +102,7 @@ pnpm add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr
 
 ## API
 
-You can read more about available hooks and exports on [Documentation Site](https://graz.strange.love/) or via [paka.dev](https://paka.dev/npm/graz).
+You can read more about available hooks and exports on [Documentation Site](https://graz.sh/) or via [paka.dev](https://paka.dev/npm/graz).
 
 ## Maintainers
 
@@ -111,4 +111,4 @@ You can read more about available hooks and exports on [Documentation Site](http
 
 ## License
 
-[MIT License, Copyright (c) 2023 Strangelove Ventures](./LICENSE)
+[MIT License, Copyright (c) 2023 Graz](./LICENSE)

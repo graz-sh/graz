@@ -32,7 +32,7 @@ Generate options:
   -T, --testnet         Generate given testnet chain paths seperated by commas (e.g. "atlantic,bitcannadev,cheqdtestnet")
   --authz               Generate only authz compatible chains
 
-https://github.com/strangelove-ventures/graz
+https://github.com/graz-sh/graz
 `;
 
 const args = arg({

@@ -20,8 +20,8 @@ const HomepageHeader: FC = () => {
           <a href="https://www.npmjs.com/package/graz" rel="noopener" target="_blank">
             <img alt="downloads badge" src="https://badgen.net/npm/dt/graz" />
           </a>
-          <a href="https://github.com/strangelove-ventures/graz" rel="noopener" target="_blank">
-            <img alt="stars badge" src="https://badgen.net/github/stars/strangelove-ventures/graz" />
+          <a href="https://github.com/graz-sh/graz" rel="noopener" target="_blank">
+            <img alt="stars badge" src="https://badgen.net/github/stars/graz-sh/graz" />
           </a>
         </div>
 

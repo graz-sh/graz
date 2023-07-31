@@ -2,7 +2,7 @@
 
 Thanks for showing interest to contribute to `graz` <3
 
-The following is a set of guidelines for contributing to graz, which are hosted in the [Strangelove Ventures Organization](https://github.com/strangelove-ventures) on GitHub. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
+The following is a set of guidelines for contributing to graz, which are hosted in the [Graz Organization](https://github.com/graz-sh) on GitHub. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
 ## Code of Conduct
 
@@ -31,7 +31,7 @@ It would be better you know these things:
 
 The following steps will get you up and running to contribute to `graz`:
 
-1. Fork the repo (click the <kbd>Fork</kbd> button at the top right of [this page](https://github.com/strangelove-ventures/graz))
+1. Fork the repo (click the <kbd>Fork</kbd> button at the top right of [this page](https://github.com/graz-sh/graz))
 
 2. Clone your fork locally
 

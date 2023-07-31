@@ -3,9 +3,9 @@
   "description": "React hooks for Cosmos",
   "version": "0.0.44",
   "author": "Griko Nibras <griko@strange.love>",
-  "repository": "https://github.com/strangelove-ventures/graz.git",
-  "homepage": "https://github.com/strangelove-ventures/graz",
-  "bugs": "https://github.com/strangelove-ventures/graz/issues",
+  "repository": "https://github.com/graz-sh/graz.git",
+  "homepage": "https://github.com/graz-sh/graz",
+  "bugs": "https://github.com/graz-sh/graz/issues",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -62,7 +62,7 @@
     "keplr-wallet",
     "keplr",
     "react-cosmos-hooks",
-    "strangelove-ventures",
+    "graz-sh",
     "use-keplr"
   ],
   "license": "MIT"

@@ -74,14 +74,14 @@ function Wallet() {
 
 ## Examples
 
-- Next.js + Chakra UI: https://graz-example.vercel ([source code](https://github.com/strangelove-ventures/graz/tree/dev/example/next))
-- Vite: https://graz-vite-example.vercel.app ([source code](https://github.com/strangelove-ventures/graz/tree/dev/example/vite/))
+- Next.js + Chakra UI: https://graz-example.vercel ([source code](https://github.com/graz-sh/graz/tree/dev/example/next))
+- Vite: https://graz-vite-example.vercel.app ([source code](https://github.com/graz-sh/graz/tree/dev/example/vite/))
 
 ## Third-party dependencies
 
 `graz` uses various dependencies such as [`@cosmjs/cosmwasm-stargate`](https://www.npmjs.com/package/@cosmjs/cosmwasm-stargate) and [`@keplr-wallet/types`](https://www.npmjs.com/package/@keplr-wallet/types).
 
-Rather than importing those packages directly, you can import from [`graz/dist/cosmjs`](https://github.com/strangelove-ventures/graz/tree/dev/packages/graz/src/cosmjs.ts) and [`graz/dist/keplr`](https://github.com/strangelove-ventures/graz/tree/dev/packages/graz/src/keplr.ts) which re-exports all respective dependencies:
+Rather than importing those packages directly, you can import from [`graz/dist/cosmjs`](https://github.com/graz-sh/graz/tree/dev/packages/graz/src/cosmjs.ts) and [`graz/dist/keplr`](https://github.com/graz-sh/graz/tree/dev/packages/graz/src/keplr.ts) which re-exports all respective dependencies:
 
 ```diff
 - import type { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
@@ -102,4 +102,4 @@ yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr
 
 ## License
 
-[MIT License, Copyright (c) 2023 Strangelove Ventures](./license)
+[MIT License, Copyright (c) 2023 Graz](./license)

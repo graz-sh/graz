@@ -2,9 +2,9 @@
   "name": "graz-adapter-vectis",
   "description": "Graz adapter for Vectis Wallet",
   "version": "0.0.2",
-  "repository": "https://github.com/strangelove-ventures/graz.git",
-  "homepage": "https://github.com/strangelove-ventures/graz",
-  "bugs": "https://github.com/strangelove-ventures/graz/issues",
+  "repository": "https://github.com/graz-sh/graz.git",
+  "homepage": "https://github.com/graz-sh/graz",
+  "bugs": "https://github.com/graz-sh/graz/issues",
   "files": [
     "dist/*.d.ts",
     "dist/*.js",
