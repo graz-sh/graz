@@ -14,8 +14,14 @@ export const getRecentChains = (): string[] | null => {
   return useGrazInternalStore.getState().recentChains;
 };
 
-export const suggestChain = async (chainInfo: ChainInfo): Promise<ChainInfo> => {
-  const wallet = getWallet();
+export const suggestChain = async ({
+  chainInfo,
+  walletType,
+}: {
+  chainInfo: ChainInfo;
+  walletType?: WalletType;
+}): Promise<ChainInfo> => {
+  const wallet = getWallet(walletType);
   await wallet.experimentalSuggestChain(chainInfo);
   return chainInfo;
 };
@@ -27,11 +33,12 @@ export interface SuggestChainAndConnectArgs {
 }
 
 export const suggestChainAndConnect = async (args: SuggestChainAndConnectArgs): Promise<ConnectResult> => {
-  await suggestChain(args.chainInfo);
+  const defaultWalletType = useGrazInternalStore.getState().walletType;
+  await suggestChain({ chainInfo: args.chainInfo, walletType: args.walletType ?? defaultWalletType });
   const result = await connect({
     chainId: [args.chainInfo.chainId],
     autoReconnect: args.autoReconnect,
-    walletType: args.walletType,
+    walletType: args.walletType ?? defaultWalletType,
   });
   return result;
 };
