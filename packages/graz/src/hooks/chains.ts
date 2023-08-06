@@ -10,6 +10,7 @@ import type { SuggestChainAndConnectArgs } from "../actions/chains";
 import { clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import { useGrazInternalStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
+import type { WalletType } from "../types/wallet";
 import { useCheckWallet } from "./wallet";
 
 /**
@@ -63,7 +64,10 @@ export const useRecentChains = () => {
   return { data: recentChains, clear: clearRecentChain };
 };
 
-export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
+export type UseSuggestChainArgs = MutationEventArgs<{
+  chainInfo: ChainInfo;
+  walletType?: WalletType;
+}>;
 
 /**
  * graz mutation hook to suggest chain to a Wallet
@@ -84,9 +88,9 @@ export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
 export const useSuggestChain = ({ onError, onLoading, onSuccess }: UseSuggestChainArgs = {}) => {
   const queryKey = ["USE_SUGGEST_CHAIN", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, suggestChain, {
-    onError: (err, chainInfo) => Promise.resolve(onError?.(err, chainInfo)),
+    onError: (err, args) => Promise.resolve(onError?.(err, args)),
     onMutate: onLoading,
-    onSuccess: (chainInfo) => Promise.resolve(onSuccess?.(chainInfo)),
+    onSuccess: (args) => Promise.resolve(onSuccess?.(args)),
   });
 
   return {
