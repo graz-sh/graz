@@ -1,4 +1,4 @@
-![graz](./banner.jpg)
+![graz](./banner.png)
 
 [![npm/v](https://badgen.net/npm/v/graz)](https://www.npmjs.com/package/graz)
 [![npm/dt](https://badgen.net/npm/dt/graz)](https://www.npmjs.com/package/graz)
