@@ -46,7 +46,9 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
           const { account, activeChain } = useGrazSessionStore.getState();
           const { walletType } = useGrazInternalStore.getState();
           onConnect?.({
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             account: account!,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             chain: activeChain!,
             walletType,
             isReconnect: prevStat === "reconnecting",

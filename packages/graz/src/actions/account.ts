@@ -71,6 +71,7 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     });
     typeof window !== "undefined" && window.sessionStorage.setItem(RECONNECT_SESSION_KEY, "Active");
     const { account } = useGrazSessionStore.getState();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return { account: account!, walletType: currentWalletType, chain };
   } catch (error) {
     console.error("connect ", error);
