@@ -1,30 +1,34 @@
-# useQueryRaw
+# useClients
 
-Query hook for dispatching a "raw" query to a CosmWasm smart contract.
-Note: it will initiate if `address` and `key` are there
+Hook to retrieve a TendermintClient.
 
 #### Usage
 
-```ts
-import { useQuerySmart } from "graz";
+```tsx
+import { useTendermintClient } from "graz";
 
-interface TData {
-  // ...
+function App() {
+  const { data: client, isFetching, refetch, ... } = useTendermintClient("tm34");
+
+  async function getAccountFromClient() {
+    return await client.getAccount("address")
+  }
 }
-const { data, isLoading } = useQueryRaw<TData>(address, key);
-console.log(data);
 ```
 
 #### Params
 
-- address?: `string` - The address of the contract to query
-- key?: `string` - The key to lookup in the contract storage
+```tsx
+{
+  type: "tm34" | "tm37";
+}
+```
 
 #### Return Value
 
 ```tsx
 {
-  data: Uint8Array | null;
+  data: TendermintClient
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -43,7 +47,7 @@ console.log(data);
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Uint8Array | null, unknown>>;
+  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<TendermintClient | null, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

@@ -6,12 +6,14 @@ Note: if `senderAddress` undefined, it will use current connected account addres
 #### Usage
 
 ```tsx
-import { useSendIbcTokens } from "graz";
+import { useSendIbcTokens, useStargateSigningClient } from "graz";
 
   // basic example
+ const { data: signingClient } = useStargateSigningClient()
  const { sendIbcTokens } = useSendIbcTokens();
 
   sendTokens({
+    signingClient,
     recipientAddress: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430";
     // ...
   })
@@ -22,6 +24,7 @@ import { useSendIbcTokens } from "graz";
 - `SendIbcTokensArgs`
   ```ts
   {
+    signingClient?: SigningStargateClient;
     senderAddress?: string;
     recipientAddress: string;
     transferAmount: Coin;
