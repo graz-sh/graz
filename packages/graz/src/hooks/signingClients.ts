@@ -33,7 +33,7 @@ export const useStargateSigningClient = (args: { opts?: SigningStargateClientOpt
   });
 };
 
-export const useCosmwasmSigningClient = (args: { opts?: SigningCosmWasmClientOptions }) => {
+export const useCosmWasmSigningClient = (args: { opts?: SigningCosmWasmClientOptions }) => {
   const chain = useGrazSessionStore((x) => x.activeChain);
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(() => ["USE_COSMWASM_SIGNING_CLIENT", chain, wallet] as const, [chain, wallet]);
@@ -84,7 +84,7 @@ export const useStargateTmSigningClient = (args: { type: "tm34" | "tm37"; opts?:
   });
 };
 
-export const useCosmwasmTmSigningClient = (args: { type: "tm34" | "tm37"; opts?: SigningCosmWasmClientOptions }) => {
+export const useCosmWasmTmSigningClient = (args: { type: "tm34" | "tm37"; opts?: SigningCosmWasmClientOptions }) => {
   const chain = useGrazSessionStore((x) => x.activeChain);
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(

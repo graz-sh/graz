@@ -39,7 +39,7 @@ export const useStargateClient = () => {
   });
 };
 
-export const useCosmwasmClient = () => {
+export const useCosmWasmClient = () => {
   const chain = useGrazSessionStore((x) => x.activeChain);
   const queryKey = useMemo(() => ["USE_COSMWASM_CLIENT", chain] as const, [chain]);
 

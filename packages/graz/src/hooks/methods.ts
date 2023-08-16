@@ -21,7 +21,7 @@ import {
 } from "../actions/methods";
 import type { MutationEventArgs } from "../types/hooks";
 import { useAccount } from "./account";
-import { useCosmwasmClient } from "./clients";
+import { useCosmWasmClient } from "./clients";
 
 /**
  * graz mutation hook to send tokens. Note: if `senderAddress` undefined, it will use current connected account address.
@@ -273,7 +273,7 @@ export const useQuerySmart = <TData, TError>(
   address?: string,
   queryMsg?: Record<string, unknown>,
 ): UseQueryResult<TData, TError> => {
-  const { data: client } = useCosmwasmClient();
+  const { data: client } = useCosmWasmClient();
   const query: UseQueryResult<TData, TError> = useQuery(
     ["USE_QUERY_SMART", address, queryMsg, client],
     ({ queryKey: [, _address] }) => {
@@ -296,7 +296,7 @@ export const useQuerySmart = <TData, TError>(
  * @returns A query result with raw byte array stored at the key queried.
  */
 export const useQueryRaw = <TError>(address?: string, key?: string): UseQueryResult<Uint8Array | null, TError> => {
-  const { data: client } = useCosmwasmClient();
+  const { data: client } = useCosmWasmClient();
   const queryKey = ["USE_QUERY_RAW", key, address, client] as const;
   const query: UseQueryResult<Uint8Array | null, TError> = useQuery(
     queryKey,
