@@ -1,6 +1,5 @@
 export * from "./actions/account";
 export * from "./actions/chains";
-export * from "./actions/clients";
 export * from "./actions/configure";
 export * from "./actions/methods";
 export * from "./actions/wallet";
@@ -9,8 +8,8 @@ export * from "./chains";
 export * from "./hooks/account";
 export * from "./hooks/chains";
 export * from "./hooks/clients";
-export * from "./hooks/clients/tendermint";
 export * from "./hooks/methods";
+export * from "./hooks/signingClients";
 export * from "./hooks/wallet";
 export * from "./provider";
 export * from "./provider/events";

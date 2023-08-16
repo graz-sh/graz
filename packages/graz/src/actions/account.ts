@@ -1,13 +1,12 @@
 import type { SigningCosmWasmClientOptions } from "@cosmjs/cosmwasm-stargate";
-import { GasPrice } from "@cosmjs/stargate";
-import type { Key } from "@keplr-wallet/types";
+import type { OfflineDirectSigner } from "@cosmjs/proto-signing";
+import type { Key, OfflineAminoSigner } from "@keplr-wallet/types";
 
 import type { GrazChain } from "../chains";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Maybe } from "../types/core";
 import type { WalletType } from "../types/wallet";
-import { createClients, createSigningClients } from "./clients";
 import { checkWallet, getWallet } from "./wallet";
 
 export type ConnectArgs = Maybe<{
@@ -60,19 +59,6 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
       useGrazSessionStore.setState({ account });
     }
 
-    const offlineSigner = wallet.getOfflineSigner(chain.chainId);
-    const offlineSignerAmino = wallet.getOfflineSignerOnlyAmino(chain.chainId);
-    const offlineSignerAuto = await wallet.getOfflineSignerAuto(chain.chainId);
-    const gasPrice = chain.gas ? GasPrice.fromString(`${chain.gas.price}${chain.gas.denom}`) : undefined;
-    const [clients, signingClients] = await Promise.all([
-      createClients(chain),
-      createSigningClients({
-        ...chain,
-        offlineSignerAuto,
-        cosmWasmSignerOptions: { gasPrice, ...(args?.signerOpts || {}) },
-      }),
-    ] as const);
-
     useGrazInternalStore.setState({
       recentChain: chain,
       walletType: currentWalletType,
@@ -81,11 +67,6 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     });
     useGrazSessionStore.setState({
       activeChain: chain,
-      clients,
-      offlineSigner,
-      offlineSignerAmino,
-      offlineSignerAuto,
-      signingClients,
       status: "connected",
     });
     typeof window !== "undefined" && window.sessionStorage.setItem(RECONNECT_SESSION_KEY, "Active");
@@ -132,4 +113,33 @@ export const reconnect = async (args?: ReconnectArgs) => {
     args?.onError?.(error);
     void disconnect();
   }
+};
+
+export interface OfflineSigners {
+  offlineSigner: OfflineAminoSigner & OfflineDirectSigner;
+  offlineSignerAmino: OfflineAminoSigner;
+  offlineSignerAuto: OfflineAminoSigner | OfflineDirectSigner;
+}
+
+export const getOfflineSigners = async (args?: {
+  walletType?: WalletType;
+  chainId: string;
+}): Promise<OfflineSigners> => {
+  if (!args?.chainId) throw new Error("chainId is required");
+
+  const { walletType } = useGrazInternalStore.getState();
+
+  const currentWalletType = args.walletType || walletType;
+  const isWalletAvailable = checkWallet(currentWalletType);
+  if (!isWalletAvailable) {
+    throw new Error(`${currentWalletType} is not available`);
+  }
+
+  const wallet = getWallet(currentWalletType);
+
+  const offlineSigner = wallet.getOfflineSigner(args.chainId);
+  const offlineSignerAmino = wallet.getOfflineSignerOnlyAmino(args.chainId);
+  const offlineSignerAuto = await wallet.getOfflineSignerAuto(args.chainId);
+
+  return { offlineSigner, offlineSignerAmino, offlineSignerAuto };
 };
