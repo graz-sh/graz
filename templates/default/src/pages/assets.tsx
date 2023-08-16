@@ -1,4 +1,4 @@
-import { Center, Spinner, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Center, Spinner, Stack, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
 import { useAccount, useBalances, useBalanceStaked } from "graz";
 import { numberWithCommas } from "src/utils/numberWithCommas";
 
@@ -23,7 +23,11 @@ const Assets = () => {
               {balances.data?.map((balance) => {
                 return (
                   <Tr key={balance.denom}>
-                    <Td>{balance.denom}</Td>
+                    <Td>
+                      <Text w="260px" overflowX="auto">
+                        {balance.denom}
+                      </Text>
+                    </Td>
                     <Td fontFamily="mono" isNumeric>
                       {/* eslint-disable-next-line no-nested-ternary */}
                       {balanceStaked.data?.denom === balance.denom ? (

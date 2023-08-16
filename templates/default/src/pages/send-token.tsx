@@ -1,4 +1,5 @@
 import { Box, Button, FormControl, FormLabel, Heading, Input, Select, Stack, useToast } from "@chakra-ui/react";
+import { useStargateSigningClient } from "graz";
 import { useAccount, useActiveChain, useSendTokens } from "graz";
 import type { FormEvent } from "react";
 import { useState } from "react";
@@ -7,6 +8,7 @@ const SendToken = () => {
   const { data: accountData, isConnected } = useAccount();
   const activeChain = useActiveChain();
   const toast = useToast();
+  const { data: signingClient } = useStargateSigningClient();
 
   const { sendTokensAsync, isLoading } = useSendTokens({
     onError: (_, data) => {
@@ -36,6 +38,7 @@ const SendToken = () => {
     const sendToken = async () => {
       try {
         const result = await sendTokensAsync({
+          signingClient,
           recipientAddress: formData.recipientAddress,
           amount: [
             {
