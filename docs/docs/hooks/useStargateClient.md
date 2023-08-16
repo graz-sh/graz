@@ -1,4 +1,4 @@
-# useClients
+# useStargateClient
 
 Hook to retrieve a StargateClient.
 

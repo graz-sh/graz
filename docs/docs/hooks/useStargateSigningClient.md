@@ -1,4 +1,4 @@
-# useClients
+# useStargateSigningClient
 
 Hook to retrieve a SigningStargateClient.
 

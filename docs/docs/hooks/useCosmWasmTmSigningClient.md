@@ -1,14 +1,14 @@
-# useTendermintClient
+# useCosmWasmTmSigningClient
 
-Hook to retrieve a TendermintClient.
+Hook to retrieve a SigningCosmWasmClient with tendermint client.
 
 #### Usage
 
 ```tsx
-import { useTendermintClient } from "graz";
+import { useCosmWasmTmSigningClient } from "graz";
 
 function App() {
-  const { data: client, isFetching, refetch, ... } = useTendermintClient("tm34");
+  const { data: signingClient, isFetching, refetch, ... } = useCosmWasmTmSigningClient({ type: "tm34" });
 
   async function getAccountFromClient() {
     return await client.getAccount("address")
@@ -19,8 +19,9 @@ function App() {
 #### Params
 
 ```tsx
-{
+args?: {
   type: "tm34" | "tm37";
+  opts?: SigningCosmWasmClientOptions;
 }
 ```
 
@@ -28,7 +29,7 @@ function App() {
 
 ```tsx
 {
-  data: TendermintClient
+  data: SigningStargateClient
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -47,7 +48,7 @@ function App() {
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<TendermintClient | null, unknown>>;
+  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<SigningCosmWasmClient | null, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

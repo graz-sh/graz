@@ -1,4 +1,4 @@
-# useClients
+# useStargateTmSigningClient
 
 Hook to retrieve a SigningStargateClient with tendermint client.
 

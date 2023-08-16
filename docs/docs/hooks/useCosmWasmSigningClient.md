@@ -1,4 +1,4 @@
-# useClients
+# useCosmWasmSigningClient
 
 Hook to retrieve a SigningCosmWasmClient.
 

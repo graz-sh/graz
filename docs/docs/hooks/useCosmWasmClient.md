@@ -1,6 +1,6 @@
 # useClients
 
-Hook to retrieve a CosmWasmClient.
+Hook to retrieve a useCosmWasmClient.
 
 #### Usage
 
@@ -8,7 +8,7 @@ Hook to retrieve a CosmWasmClient.
 import { useCosmWasmClient } from "graz";
 
 function App() {
-  const { data: client, isFetching, refetch, ... } = useStargateClient();
+  const { data: client, isFetching, refetch, ... } = useCosmWasmClient();
 
   async function getAccountFromClient() {
     return await client.getAccount("address")
