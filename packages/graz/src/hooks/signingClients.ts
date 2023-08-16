@@ -23,14 +23,14 @@ import { useTendermintClient } from "./clients";
  *
  * ```
  */
-export const useStargateSigningClient = (args: { opts?: SigningStargateClientOptions }) => {
+export const useStargateSigningClient = (args?: { opts?: SigningStargateClientOptions }) => {
   const chain = useGrazSessionStore((x) => x.activeChain);
   const wallet = useGrazInternalStore((x) => x.walletType);
-  const queryKey = useMemo(() => ["USE_STARGATE_SIGNING_CLIENT", chain, wallet] as const, [chain, wallet]);
+  const queryKey = useMemo(() => ["USE_STARGATE_SIGNING_CLIENT", chain, wallet, args] as const, [args, chain, wallet]);
 
   return useQuery({
     queryKey,
-    queryFn: async ({ queryKey: [, _chain, _wallet] }) => {
+    queryFn: async ({ queryKey: [, _chain, _wallet, _args] }) => {
       if (!_chain) throw new Error("No chain found");
       const isWalletAvailable = checkWallet(_wallet);
       if (!isWalletAvailable) {
@@ -38,7 +38,7 @@ export const useStargateSigningClient = (args: { opts?: SigningStargateClientOpt
       }
       const offlineSigner = getWallet(_wallet).getOfflineSigner(_chain.chainId);
       const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
-      const signingClient = await SigningStargateClient.connectWithSigner(endpoint, offlineSigner, args.opts);
+      const signingClient = await SigningStargateClient.connectWithSigner(endpoint, offlineSigner, _args?.opts);
       return signingClient;
     },
     enabled: Boolean(chain) && Boolean(wallet),
@@ -59,14 +59,14 @@ export const useStargateSigningClient = (args: { opts?: SigningStargateClientOpt
  *
  * ```
  */
-export const useCosmWasmSigningClient = (args: { opts?: SigningCosmWasmClientOptions }) => {
+export const useCosmWasmSigningClient = (args?: { opts?: SigningCosmWasmClientOptions }) => {
   const chain = useGrazSessionStore((x) => x.activeChain);
   const wallet = useGrazInternalStore((x) => x.walletType);
-  const queryKey = useMemo(() => ["USE_COSMWASM_SIGNING_CLIENT", chain, wallet] as const, [chain, wallet]);
+  const queryKey = useMemo(() => ["USE_COSMWASM_SIGNING_CLIENT", chain, wallet, args] as const, [args, chain, wallet]);
 
   return useQuery({
     queryKey,
-    queryFn: async ({ queryKey: [, _chain, _wallet] }) => {
+    queryFn: async ({ queryKey: [, _chain, _wallet, _args] }) => {
       if (!_chain) throw new Error("No chain found");
       const isWalletAvailable = checkWallet(_wallet);
       if (!isWalletAvailable) {
@@ -74,7 +74,7 @@ export const useCosmWasmSigningClient = (args: { opts?: SigningCosmWasmClientOpt
       }
       const offlineSigner = getWallet(_wallet).getOfflineSigner(_chain.chainId);
       const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
-      const signingClient = await SigningCosmWasmClient.connectWithSigner(endpoint, offlineSigner, args.opts);
+      const signingClient = await SigningCosmWasmClient.connectWithSigner(endpoint, offlineSigner, _args?.opts);
       return signingClient;
     },
     enabled: Boolean(chain) && Boolean(wallet),
