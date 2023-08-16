@@ -260,7 +260,7 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
  * @example
  * ```ts
  * import { useOfflineSigners } from "graz";
- * const { signer, signerAmino, signerAuto } = useOfflineSigners();
+ * const { offlineSigner, offlineSignerAmino, offlineSignerAuto } = useOfflineSigners();
  * ```
  */
 export const useOfflineSigners = () => {

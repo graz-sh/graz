@@ -9,17 +9,16 @@ import { useMemo } from "react";
 import { useGrazSessionStore } from "../store";
 
 /**
- * graz query hook to retrieve a CosmWasmClient, StargateClient and Tendermint34Client. If there's no given arguments it will be using the current connected client
+ * graz query hook to retrieve a StargateClient.
  *
  * @example
  * ```ts
- * import { useClient } from "graz";
+ * import { useStargateClient } from "graz";
  *
- * // use connected client's cosmwasm client
- * const { data, isFetching, refetch, ... } = useClient();
+ * const { data:client, isFetching, refetch, ... } = useStargateClient();
  *
- * // initialize new custom client from given arguments
- * useClient({ rpc: "https://rpc.cosmoshub.strange.love", });
+ * client.getAccount("address")
+ *
  * ```
  */
 export const useStargateClient = () => {
@@ -39,6 +38,19 @@ export const useStargateClient = () => {
   });
 };
 
+/**
+ * graz query hook to retrieve a CosmWasmClient.
+ *
+ * @example
+ * ```ts
+ * import { useCosmWasmClient } from "graz";
+ *
+ * const { data:client, isFetching, refetch, ... } = useCosmWasmClient();
+ *
+ * client.getAccount("address")
+ *
+ * ```
+ */
 export const useCosmWasmClient = () => {
   const chain = useGrazSessionStore((x) => x.activeChain);
   const queryKey = useMemo(() => ["USE_COSMWASM_CLIENT", chain] as const, [chain]);
@@ -56,6 +68,19 @@ export const useCosmWasmClient = () => {
   });
 };
 
+/**
+ * graz query hook to retrieve a TendermintClient.
+ *
+ * @example
+ * ```ts
+ * import { useCosmWasmClient } from "graz";
+ *
+ * const { data:client, isFetching, refetch, ... } = useTendermintClient("tm37");
+ *
+ * client.getAccount("address")
+ *
+ * ```
+ */
 export const useTendermintClient = <T extends "tm34" | "tm37">(
   type: T,
 ): UseQueryResult<T extends "tm34" ? Tendermint34Client : Tendermint37Client> => {
