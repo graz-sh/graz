@@ -28,11 +28,12 @@ import { useCosmWasmClient } from "./clients";
  *
  * @example
  * ```ts
- * import { useSendTokens } from "graz";
+ * import { useSendTokens, useStargateSigningClient } from "graz";
  *
  * // basic example
- * const { sendTokens } = useSendTokens();
  * const { data: signingClient } = useStargateSigningClient()
+ * const { sendTokens } = useSendTokens();
+ *
  * sendTokens({
  *    signingClient,
  *    recipientAddress: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430";
@@ -76,11 +77,11 @@ export const useSendTokens = ({
  *
  * @example
  * ```ts
- * import { useSendIbcTokens } from "graz";
+ * import { useSendIbcTokens, useStargateSigningClient } from "graz";
  *
  * // basic example
- * const { sendIbcTokens } = useSendIbcTokens();
  * const { data: signingClient } = useStargateSigningClient()
+ * const { sendIbcTokens } = useSendIbcTokens();
  *
  * sendIbcTokens({
  *    signingClient,
@@ -127,7 +128,7 @@ export type UseInstantiateContractArgs<Message extends Record<string, unknown>> 
  *
  * @example
  * ```ts
- * import { useInstantiateContract } from "graz"
+ * import { useInstantiateContract, useCosmwasmSigningClient } from "graz"
  *
  * const { data: signingClient } = useCosmwasmSigningClient()
  * const { instantiateContract: instantiateMyContract } = useInstantiateContract({
@@ -194,7 +195,7 @@ export type UseExecuteContractArgs<Message extends Record<string, unknown>> = {
  *
  * @example
  * ```ts
- * import { useExecuteContract } from "graz"
+ * import { useExecuteContract, useCosmwasmSigningClient } from "graz"
  *
  * interface GreetMessage {
  *   name: string;
@@ -278,7 +279,7 @@ export const useQuerySmart = <TData, TError>(
     ["USE_QUERY_SMART", address, queryMsg, client],
     ({ queryKey: [, _address] }) => {
       if (!address || !queryMsg) throw new Error("address or queryMsg undefined");
-      return getQuerySmart(address, queryMsg);
+      return getQuerySmart(address, queryMsg, client);
     },
     {
       enabled: Boolean(address) && Boolean(queryMsg) && Boolean(client),
