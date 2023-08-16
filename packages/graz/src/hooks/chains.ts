@@ -65,8 +65,10 @@ export const useActiveChainValidators = <T extends QueryClient & StakingExtensio
   const queryKey = ["USE_ACTIVE_CHAIN_VALIDATORS", queryClient, status] as const;
   const query = useQuery(
     queryKey,
-    ({ queryKey: [, _queryClient, _status] }) => {
-      return _queryClient!.staking.validators(_status);
+    async ({ queryKey: [, _queryClient, _status] }) => {
+      if (!_queryClient) throw new Error("Query client is not defined");
+      const res = await _queryClient.staking.validators(_status);
+      return res;
     },
     {
       enabled: typeof queryClient !== "undefined",
