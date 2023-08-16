@@ -9,8 +9,6 @@ import type { ConnectResult } from "./account";
 import { connect } from "./account";
 import { getWallet } from "./wallet";
 
-export * from "./clients/tendermint";
-
 export const clearRecentChain = (): void => {
   useGrazInternalStore.setState({ recentChain: null });
 };

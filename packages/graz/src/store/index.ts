@@ -1,7 +1,4 @@
-import type { CosmWasmClient, SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import type { Coin, OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-signing";
-import type { SigningStargateClient, StargateClient } from "@cosmjs/stargate";
-import type { Tendermint34Client } from "@cosmjs/tendermint-rpc";
+import type { Coin } from "@cosmjs/proto-signing";
 import type { Key } from "@keplr-wallet/types";
 import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import type { Web3ModalConfig } from "@web3modal/standalone";
@@ -33,18 +30,6 @@ export interface GrazSessionStore {
   account: Key | null;
   activeChain: GrazChain | null;
   balances: Coin[] | null;
-  clients: {
-    cosmWasm: CosmWasmClient;
-    stargate: StargateClient;
-    tendermint: Tendermint34Client;
-  } | null;
-  offlineSigner: (OfflineSigner & OfflineDirectSigner) | null;
-  offlineSignerAmino: OfflineSigner | null;
-  offlineSignerAuto: (OfflineSigner | OfflineDirectSigner) | null;
-  signingClients: {
-    cosmWasm: SigningCosmWasmClient;
-    stargate: SigningStargateClient;
-  } | null;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
   wcSignClient?: ISignClient | null;
 }
@@ -72,11 +57,6 @@ export const grazSessionDefaultValues: GrazSessionStore = {
   account: null,
   activeChain: null,
   balances: null,
-  clients: null,
-  offlineSigner: null,
-  offlineSignerAmino: null,
-  offlineSignerAuto: null,
-  signingClients: null,
   status: "disconnected",
   wcSignClient: null,
 };

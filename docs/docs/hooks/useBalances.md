@@ -1,6 +1,6 @@
 # useBalances
 
-Hook to retrieve list of balances from current account or given address
+Hook to retrieve all balances from current account or given address
 
 #### Usage
 

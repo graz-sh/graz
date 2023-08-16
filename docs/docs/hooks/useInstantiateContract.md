@@ -6,21 +6,40 @@ Note: `senderAddress` will be filled with current connected account.
 #### Usage
 
 ```tsx
-import { useInstantiateContract } from "graz";
+import { useInstantiateContract, useCosmwasmSigningClient } from "graz";
 
 // basic example
-const { instantiateContract } = useInstantiateContract({
+interface TData {
+  // ...
+}
+const { data: signingClient } = useCosmwasmSigningClient();
+const { instantiateContract } = useInstantiateContract<TData>({
   codeId: 4,
 });
-
 const instantiateMessage = { foo: "bar" };
 instantiateContract({
+  signingClient,
   msg: {
     foo: "bar",
   },
   label: "test",
 });
 ```
+
+#### Types
+
+- `InstantiateContractMutationArgs`
+  ```ts
+  {
+    signingClient?: SigningCosmWasmClient;
+    msg: Message;
+    label: string;
+    fee: StdFee | "auto" | number;
+    options?: InstantiateOptions;
+    senderAddress: string;
+    codeId: number;
+  }
+  ```
 
 #### Params
 

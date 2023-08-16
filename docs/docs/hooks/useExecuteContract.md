@@ -6,12 +6,18 @@ Note: `senderAddress` will be filled with current connected account.
 #### Usage
 
 ```ts
-import { useExecuteContract } from "graz";
+import { useExecuteContract, useCosmwasmSigningClient } from "graz";
+
+interface TData {
+  // ...
+}
 
 const contractAddress = "cosmosfoobarbaz";
-const { executeContract } = useExecuteContract<ExecuteMessage>({ contractAddress });
+const { data: signingClient } = useCosmwasmSigningClient();
+const { executeContract } = useExecuteContract<TData>({ contractAddress });
 
 executeContract({
+  signingClient,
   msg: {
     foo: "bar",
   },
@@ -23,6 +29,7 @@ executeContract({
 - `ExecuteContractMutationArgs`
   ```ts
   {
+    signingClient?: SigningCosmWasmClient;
     msg: Record<string, unknown>;
     fee?: StdFee | "auto" | number; // will be default to "auto"
   }

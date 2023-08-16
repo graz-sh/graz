@@ -1,86 +1,102 @@
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import type { HttpEndpoint } from "@cosmjs/stargate";
+import { StargateClient } from "@cosmjs/stargate";
+import { Tendermint34Client, Tendermint37Client } from "@cosmjs/tendermint-rpc";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 
-import type { CreateClientArgs, CreateSigningClientArgs } from "../actions/clients";
-import { createSigningClients } from "../actions/clients";
-import { createClients } from "../actions/clients";
-import type { GrazSessionStore } from "../store";
 import { useGrazSessionStore } from "../store";
 
 /**
- * graz query hook to retrieve a CosmWasmClient, StargateClient and Tendermint34Client. If there's no given arguments it will be using the current connected client
+ * graz query hook to retrieve a StargateClient.
  *
  * @example
  * ```ts
- * import { useClient } from "graz";
+ * import { useStargateClient } from "graz";
  *
- * // use connected client's cosmwasm client
- * const { data, isFetching, refetch, ... } = useClient();
+ * const { data:client, isFetching, refetch, ... } = useStargateClient();
  *
- * // initialize new custom client from given arguments
- * useClient({ rpc: "https://rpc.cosmoshub.strange.love", });
+ * client.getAccount("address")
+ *
  * ```
  */
-export const useClients = (args?: CreateClientArgs): UseQueryResult<GrazSessionStore["clients"]> => {
-  const currentClient = useGrazSessionStore((x) => x.clients);
+export const useStargateClient = () => {
+  const chain = useGrazSessionStore((x) => x.activeChain);
+  const queryKey = useMemo(() => ["USE_STARGATE_CLIENT", chain] as const, [chain]);
 
-  const queryKey = ["USE_CLIENTS", args, currentClient] as const;
-  const query = useQuery(
+  return useQuery({
     queryKey,
-    ({ queryKey: [, _args, _current] }) => {
-      return _args?.rpc ? createClients(_args) : _current;
+    queryFn: async ({ queryKey: [, _chain] }) => {
+      if (!_chain) throw new Error("No chain found");
+      const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
+      const client = await StargateClient.connect(endpoint);
+      return client;
     },
-    {
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      onSuccess: (clients) => {
-        useGrazSessionStore.setState({ clients });
-      },
-      initialData: currentClient,
-    },
-  );
-
-  return query;
+    enabled: Boolean(chain),
+    refetchOnWindowFocus: false,
+  });
 };
 
 /**
- * graz query hook to retrieve a SigningCosmWasmClient. If there's no given args it will be using the current connected signer
+ * graz query hook to retrieve a CosmWasmClient.
  *
  * @example
  * ```ts
- * import { useSigningClient } from "graz";
+ * import { useCosmWasmClient } from "graz";
  *
- * // get connected client's cosmwasm client
- * const { data, isFetching, refetch, ... } = useSigningClient();
+ * const { data:client, isFetching, refetch, ... } = useCosmWasmClient();
  *
- * // initialize new custom client with given args
- * useSigningClient({
- *   rpc: "https://rpc.cosmoshub.strange.love",
- *   offlineSigner: customOfflineSigner,
- *   ...
- * });
+ * client.getAccount("address")
+ *
  * ```
  */
-export const useSigningClients = (
-  args?: CreateSigningClientArgs,
-): UseQueryResult<GrazSessionStore["signingClients"]> => {
-  const currentSigningClient = useGrazSessionStore((x) => x.signingClients);
+export const useCosmWasmClient = () => {
+  const chain = useGrazSessionStore((x) => x.activeChain);
+  const queryKey = useMemo(() => ["USE_COSMWASM_CLIENT", chain] as const, [chain]);
 
-  const queryKey = ["USE_SIGNING_CLIENTS", args, currentSigningClient] as const;
-  const query = useQuery(
+  return useQuery({
     queryKey,
-    ({ queryKey: [, _args, _current] }) => {
-      return _args?.rpc ? createSigningClients(_args) : _current;
+    queryFn: async ({ queryKey: [, _chain] }) => {
+      if (!_chain) throw new Error("No chain found");
+      const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
+      const client = await CosmWasmClient.connect(endpoint);
+      return client;
     },
-    {
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      onSuccess: (signingClients) => {
-        useGrazSessionStore.setState({ signingClients });
-      },
-      initialData: currentSigningClient,
-    },
-  );
+    enabled: Boolean(chain),
+    refetchOnWindowFocus: false,
+  });
+};
 
-  return query;
+/**
+ * graz query hook to retrieve a TendermintClient.
+ *
+ * @example
+ * ```ts
+ * import { useCosmWasmClient } from "graz";
+ *
+ * const { data:client, isFetching, refetch, ... } = useTendermintClient("tm37");
+ *
+ * client.getAccount("address")
+ *
+ * ```
+ */
+export const useTendermintClient = <T extends "tm34" | "tm37">(
+  type: T,
+): UseQueryResult<T extends "tm34" ? Tendermint34Client : Tendermint37Client> => {
+  const chain = useGrazSessionStore((x) => x.activeChain);
+  const queryKey = useMemo(() => ["USE_TENDERMINT_CLIENT", type, chain] as const, [type, chain]);
+
+  return useQuery({
+    queryKey,
+    queryFn: async ({ queryKey: [, _type, _chain] }) => {
+      if (!_chain) throw new Error("No chain found");
+      const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
+      const TendermintClient = _type === "tm37" ? Tendermint37Client : Tendermint34Client;
+      const client = await TendermintClient.connect(endpoint);
+      return client;
+    },
+    enabled: Boolean(chain),
+    refetchOnWindowFocus: false,
+  });
 };

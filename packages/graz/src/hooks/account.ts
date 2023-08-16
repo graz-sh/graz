@@ -1,14 +1,14 @@
 import type { Coin } from "@cosmjs/proto-signing";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { shallow } from "zustand/shallow";
+import { useEffect, useMemo } from "react";
 
 import type { ConnectArgs, ConnectResult } from "../actions/account";
-import { connect, disconnect, reconnect } from "../actions/account";
-import { getBalances, getBalanceStaked } from "../actions/methods";
+import { connect, disconnect, getOfflineSigners, reconnect } from "../actions/account";
+import { checkWallet } from "../actions/wallet";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
+import { useStargateClient } from "./clients";
 import { useCheckWallet } from "./wallet";
 
 export interface UseAccountArgs {
@@ -89,15 +89,34 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
  */
 export const useBalances = (bech32Address?: string): UseQueryResult<Coin[]> => {
   const { data: account } = useAccount();
+  const { data: client } = useStargateClient();
+  const { activeChain } = useGrazSessionStore.getState();
   const address = bech32Address || account?.bech32Address;
 
-  const queryKey = ["USE_BALANCES", address] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalances(_address!), {
-    enabled: Boolean(address),
-    refetchOnMount: false,
-    refetchOnReconnect: true,
-    refetchOnWindowFocus: false,
-  });
+  const queryKey = useMemo(
+    () => ["USE_ALL_BALANCES", client, activeChain, address] as const,
+    [activeChain, address, client],
+  );
+
+  const query = useQuery(
+    queryKey,
+    async ({ queryKey: [, _client, _activeChain, _address] }) => {
+      if (!_activeChain || !_client) {
+        throw new Error("No connected account detected");
+      }
+      if (!_address) {
+        throw new Error("address is not defined");
+      }
+      const balances = await _client.getAllBalances(_address);
+      return balances as Coin[];
+    },
+    {
+      enabled: Boolean(address) && Boolean(activeChain) && Boolean(client),
+      refetchOnMount: false,
+      refetchOnReconnect: true,
+      refetchOnWindowFocus: false,
+    },
+  );
 
   return query;
 };
@@ -241,26 +260,32 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
  * @example
  * ```ts
  * import { useOfflineSigners } from "graz";
- * const { signer, signerAmino, signerAuto } = useOfflineSigners();
+ * const { offlineSigner, offlineSignerAmino, offlineSignerAuto } = useOfflineSigners();
  * ```
  */
-export const useOfflineSigners = () =>
-  useGrazSessionStore(
-    (x) => ({
-      signer: x.offlineSigner,
-      signerAmino: x.offlineSignerAmino,
-      signerAuto: x.offlineSignerAuto,
-    }),
-    shallow,
-  );
+export const useOfflineSigners = () => {
+  const chain = useGrazSessionStore((x) => x.activeChain);
+  const wallet = useGrazInternalStore((x) => x.walletType);
+  const queryKey = useMemo(() => ["USE_OFFLINE_SIGNERS", chain, wallet] as const, [chain, wallet]);
 
-/**
- * graz hook to retrieve offline signer objects (default, amino enabled, and auto).
- *
- * @deprecated prefer using {@link useOfflineSigners}
- * @see {@link useOfflineSigners}
- */
-export const useSigners = () => useOfflineSigners();
+  return useQuery({
+    queryKey,
+    queryFn: async ({ queryKey: [, _chain, _wallet] }) => {
+      if (!_chain) throw new Error("No chain found");
+      const isWalletAvailable = checkWallet(_wallet);
+      if (!isWalletAvailable) {
+        throw new Error(`${_wallet} is not available`);
+      }
+      const offlineSigners = await getOfflineSigners({
+        chainId: _chain.chainId,
+        walletType: _wallet,
+      });
+      return offlineSigners;
+    },
+    enabled: Boolean(chain) && Boolean(wallet),
+    refetchOnWindowFocus: false,
+  });
+};
 
 /**
  * graz query hook to retrieve list of staked balances from current account or given address.
@@ -280,12 +305,34 @@ export const useSigners = () => useOfflineSigners();
  */
 export const useBalanceStaked = (bech32Address?: string): UseQueryResult<Coin | null> => {
   const { data: account } = useAccount();
+  const { data: client } = useStargateClient();
+  const { activeChain } = useGrazSessionStore.getState();
   const address = bech32Address || account?.bech32Address;
 
-  const queryKey = ["USE_BALANCE_STAKED", address] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _address] }) => getBalanceStaked(address!), {
-    enabled: Boolean(address),
-  });
+  const queryKey = useMemo(
+    () => ["USE_BALANCE_STAKED", client, activeChain, address] as const,
+    [activeChain, address, client],
+  );
+
+  const query = useQuery(
+    queryKey,
+    async ({ queryKey: [, _client, _activeChain, _address] }) => {
+      if (!_activeChain || !_client) {
+        throw new Error("No connected account detected");
+      }
+      if (!_address) {
+        throw new Error("address is not defined");
+      }
+      const balance = await _client.getBalanceStaked(_address);
+      return balance;
+    },
+    {
+      enabled: Boolean(address) && Boolean(activeChain) && Boolean(client),
+      refetchOnMount: false,
+      refetchOnReconnect: true,
+      refetchOnWindowFocus: false,
+    },
+  );
 
   return query;
 };
