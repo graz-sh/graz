@@ -22,6 +22,7 @@ function App() {
 args?: {
   type: "tm34" | "tm37";
   opts?: SigningCosmWasmClientOptions;
+  offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
 }
 ```
 

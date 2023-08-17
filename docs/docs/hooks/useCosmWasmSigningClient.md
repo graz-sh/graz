@@ -19,7 +19,10 @@ function App() {
 #### Params
 
 ```tsx
-args?: { opts?: SigningCosmWasmClientOptions }
+args?: {
+  opts?: SigningCosmWasmClientOptions;
+  offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
+}
 ```
 
 #### Return Value

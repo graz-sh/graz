@@ -21,7 +21,8 @@ function App() {
 ```tsx
 args?: {
   type: "tm34" | "tm37";
-  opts?: SigningStargateClientOptions;
+  opts?: SigningCosmWasmClientOptions;
+  offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
 }
 ```
 
