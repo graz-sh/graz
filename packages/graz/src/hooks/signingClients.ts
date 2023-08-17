@@ -23,7 +23,10 @@ import { useTendermintClient } from "./clients";
  *
  * ```
  */
-export const useStargateSigningClient = (args?: { opts?: SigningStargateClientOptions }) => {
+export const useStargateSigningClient = (args?: {
+  opts?: SigningStargateClientOptions;
+  offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
+}) => {
   const chain = useGrazSessionStore((x) => x.activeChain);
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(() => ["USE_STARGATE_SIGNING_CLIENT", chain, wallet, args] as const, [args, chain, wallet]);
@@ -36,7 +39,18 @@ export const useStargateSigningClient = (args?: { opts?: SigningStargateClientOp
       if (!isWalletAvailable) {
         throw new Error(`${_wallet} is not available`);
       }
-      const offlineSigner = getWallet(_wallet).getOfflineSigner(_chain.chainId);
+      const offlineSigner = await (async () => {
+        switch (args?.offlineSigner) {
+          case "offlineSigner":
+            return getWallet(_wallet).getOfflineSigner(_chain.chainId);
+          case "offlineSignerAuto":
+            return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
+          case "offlineSignerOnlyAmino":
+            return getWallet(_wallet).getOfflineSignerOnlyAmino(_chain.chainId);
+          default:
+            return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
+        }
+      })();
       const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
       const signingClient = await SigningStargateClient.connectWithSigner(endpoint, offlineSigner, _args?.opts);
       return signingClient;
@@ -59,7 +73,10 @@ export const useStargateSigningClient = (args?: { opts?: SigningStargateClientOp
  *
  * ```
  */
-export const useCosmWasmSigningClient = (args?: { opts?: SigningCosmWasmClientOptions }) => {
+export const useCosmWasmSigningClient = (args?: {
+  opts?: SigningCosmWasmClientOptions;
+  offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
+}) => {
   const chain = useGrazSessionStore((x) => x.activeChain);
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(() => ["USE_COSMWASM_SIGNING_CLIENT", chain, wallet, args] as const, [args, chain, wallet]);
@@ -72,7 +89,18 @@ export const useCosmWasmSigningClient = (args?: { opts?: SigningCosmWasmClientOp
       if (!isWalletAvailable) {
         throw new Error(`${_wallet} is not available`);
       }
-      const offlineSigner = getWallet(_wallet).getOfflineSigner(_chain.chainId);
+      const offlineSigner = await (async () => {
+        switch (args?.offlineSigner) {
+          case "offlineSigner":
+            return getWallet(_wallet).getOfflineSigner(_chain.chainId);
+          case "offlineSignerAuto":
+            return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
+          case "offlineSignerOnlyAmino":
+            return getWallet(_wallet).getOfflineSignerOnlyAmino(_chain.chainId);
+          default:
+            return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
+        }
+      })();
       const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
       const signingClient = await SigningCosmWasmClient.connectWithSigner(endpoint, offlineSigner, _args?.opts);
       return signingClient;
@@ -95,7 +123,11 @@ export const useCosmWasmSigningClient = (args?: { opts?: SigningCosmWasmClientOp
  *
  * ```
  */
-export const useStargateTmSigningClient = (args: { type: "tm34" | "tm37"; opts?: SigningStargateClientOptions }) => {
+export const useStargateTmSigningClient = (args: {
+  type: "tm34" | "tm37";
+  opts?: SigningStargateClientOptions;
+  offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
+}) => {
   const chain = useGrazSessionStore((x) => x.activeChain);
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(
@@ -107,14 +139,25 @@ export const useStargateTmSigningClient = (args: { type: "tm34" | "tm37"; opts?:
 
   return useQuery({
     queryKey,
-    queryFn: ({ queryKey: [, _chain, _wallet, _args] }) => {
+    queryFn: async ({ queryKey: [, _chain, _wallet, _args] }) => {
       if (!_chain) throw new Error("No chain found");
       const isWalletAvailable = checkWallet(_wallet);
       if (!isWalletAvailable) {
         throw new Error(`${_wallet} is not available`);
       }
       if (!tmClient) throw new Error("No tendermint client found");
-      const offlineSigner = getWallet(_wallet).getOfflineSigner(_chain.chainId);
+      const offlineSigner = await (async () => {
+        switch (args.offlineSigner) {
+          case "offlineSigner":
+            return getWallet(_wallet).getOfflineSigner(_chain.chainId);
+          case "offlineSignerAuto":
+            return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
+          case "offlineSignerOnlyAmino":
+            return getWallet(_wallet).getOfflineSignerOnlyAmino(_chain.chainId);
+          default:
+            return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
+        }
+      })();
       const client = SigningStargateClient.createWithSigner(tmClient, offlineSigner, _args.opts);
       return client;
     },
@@ -136,7 +179,11 @@ export const useStargateTmSigningClient = (args: { type: "tm34" | "tm37"; opts?:
  *
  * ```
  */
-export const useCosmWasmTmSigningClient = (args: { type: "tm34" | "tm37"; opts?: SigningCosmWasmClientOptions }) => {
+export const useCosmWasmTmSigningClient = (args: {
+  type: "tm34" | "tm37";
+  opts?: SigningCosmWasmClientOptions;
+  offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
+}) => {
   const chain = useGrazSessionStore((x) => x.activeChain);
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(
@@ -148,14 +195,26 @@ export const useCosmWasmTmSigningClient = (args: { type: "tm34" | "tm37"; opts?:
 
   return useQuery({
     queryKey,
-    queryFn: ({ queryKey: [, _chain, _wallet, _args] }) => {
+    queryFn: async ({ queryKey: [, _chain, _wallet, _args] }) => {
       if (!_chain) throw new Error("No chain found");
       const isWalletAvailable = checkWallet(_wallet);
       if (!isWalletAvailable) {
         throw new Error(`${_wallet} is not available`);
       }
       if (!tmClient) throw new Error("No tendermint client found");
-      const offlineSigner = getWallet(_wallet).getOfflineSigner(_chain.chainId);
+      const offlineSigner = await (async () => {
+        switch (args.offlineSigner) {
+          case "offlineSigner":
+            return getWallet(_wallet).getOfflineSigner(_chain.chainId);
+          case "offlineSignerAuto":
+            return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
+          case "offlineSignerOnlyAmino":
+            return getWallet(_wallet).getOfflineSignerOnlyAmino(_chain.chainId);
+          default:
+            return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
+        }
+      })();
+
       const client = SigningCosmWasmClient.createWithSigner(tmClient, offlineSigner, _args.opts);
       return client;
     },
