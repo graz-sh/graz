@@ -39,3 +39,6 @@ export type Wallet = Pick<
   subscription?: (reconnect: () => void) => void;
   init?: () => Promise<unknown>;
 };
+
+export type SignDirectParams = Parameters<Wallet["signDirect"]>;
+export type SignAminoParams = Parameters<Wallet["signAmino"]>;

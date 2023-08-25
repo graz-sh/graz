@@ -2,7 +2,11 @@ import type { FC } from "react";
 import { useEffect } from "react";
 
 import { reconnect } from "../actions/account";
-import { getCosmostation, getKeplr, getLeap, getVectis, getWalletConnect } from "../actions/wallet";
+import { getCosmostation } from "../actions/wallet/cosmostation";
+import { getKeplr } from "../actions/wallet/keplr";
+import { getLeap } from "../actions/wallet/leap";
+import { getVectis } from "../actions/wallet/vectis";
+import { getWalletConnect } from "../actions/wallet/wallet-connect";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import { WalletType } from "../types/wallet";
