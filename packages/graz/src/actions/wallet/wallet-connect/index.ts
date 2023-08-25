@@ -255,10 +255,9 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
         });
       };
 
-      const controller = new AbortController();
-      const signal = controller.signal;
-
       try {
+        const controller = new AbortController();
+        const signal = controller.signal;
         web3Modal.subscribeModal((state) => {
           if (!state.open) {
             controller.abort();
