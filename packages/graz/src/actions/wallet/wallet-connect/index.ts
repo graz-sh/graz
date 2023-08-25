@@ -243,14 +243,28 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       } else {
         redirectToApp(uri);
       }
+
+      const approving = async (signal: AbortSignal) => {
+        if (signal.aborted) return Promise.reject(new Error("User closed wallet connect"));
+
+        return new Promise((resolve, reject) => {
+          approval().then(resolve).catch(reject);
+          signal.addEventListener("abort", () => {
+            reject(new Error("User closed wallet connect"));
+          });
+        });
+      };
+
+      const controller = new AbortController();
+      const signal = controller.signal;
+
       try {
-        await promiseWithTimeout(
-          (async () => {
-            await approval();
-          })(),
-          40000,
-          new Error("Modal approval timeout"),
-        );
+        web3Modal.subscribeModal((state) => {
+          if (!state.open) {
+            controller.abort();
+          }
+        });
+        await approving(signal);
       } catch (error) {
         web3Modal.closeModal();
         if (!(error as Error).message.toLowerCase().includes("no matching key")) return Promise.reject(error);
@@ -268,7 +282,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
             account: wcAccount,
           });
         })(),
-        10000,
+        15000,
         new Error("Connection timeout"),
       );
     } catch (error) {
