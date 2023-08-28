@@ -4,6 +4,13 @@ sidebar_position: 15
 
 # Changelog
 
+## Version 0.0.48
+
+- Added Wallet integration Metamask Snap for Leap Cosmos 🐺🐸
+- Fix: refetch `useBalance`
+- Feat: `useBalance` if no address passed will use current connected account
+- Feat: `useCosmWasmSigningClient` and `useCosmwasmTmSigningClient` now prefilled with gas price from chain state
+
 ## Version 0.0.45
 
 - Reworked connect: connect not creating offline signers, clients and signing clients
@@ -38,7 +45,7 @@ sidebar_position: 15
   - `useTendermintClient`
   - `useStargateSigningClient`
   - `useStargateTmSigningClient`
-  - `useCosmwasmSigningClient`
+  - `useCosmWasmSigningClient`
   - `useCosmwasmTmSigningClient`
 
 - Removed Hooks:

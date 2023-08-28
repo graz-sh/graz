@@ -1,5 +1,6 @@
 type KeplrWindow = import("@keplr-wallet/types").Window;
 type VectisWindow = import("@vectis/extension-client").VectisWindow;
+type EthereumWindow = import("@metamask/providers").MetaMaskInpageProvider;
 
 declare interface Window extends KeplrWindow {
   leap: KeplrWindow["keplr"];
@@ -13,4 +14,5 @@ declare interface Window extends KeplrWindow {
     };
   };
   vectis: VectisWindow["vectis"];
+  ethereum?: EthereumWindow;
 }

@@ -46,5 +46,6 @@ enum WalletType {
   WC_KEPLR_MOBILE = "wc_keplr_mobile",
   WC_LEAP_MOBILE = "wc_leap_mobile",
   WC_COSMOSTATION_MOBILE = "wc_cosmostation_mobile",
+  METAMASK_SNAP_LEAP = "metamask_snap_leap",
 }
 ```

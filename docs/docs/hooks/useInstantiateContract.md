@@ -6,13 +6,13 @@ Note: `senderAddress` will be filled with current connected account.
 #### Usage
 
 ```tsx
-import { useInstantiateContract, useCosmwasmSigningClient } from "graz";
+import { useInstantiateContract, useCosmWasmSigningClient } from "graz";
 
 // basic example
 interface TData {
   // ...
 }
-const { data: signingClient } = useCosmwasmSigningClient();
+const { data: signingClient } = useCosmWasmSigningClient();
 const { instantiateContract } = useInstantiateContract<TData>({
   codeId: 4,
 });

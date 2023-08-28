@@ -21,7 +21,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
             {isConnecting || isReconnecting ? <Text>Connecting...</Text> : null}
             {!isConnected && !(isConnecting || isReconnecting) ? (
               <Box>
-                <Heading>Welcome to Create Graz App</Heading>
+                <Heading>Welcome to Graz Example</Heading>
                 <Text>Connect your wallet to interact within the app.</Text>
               </Box>
             ) : (
