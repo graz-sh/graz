@@ -36,12 +36,11 @@
     "@cosmjs/stargate": "^0.31.0",
     "@cosmjs/tendermint-rpc": "^0.31.0",
     "@keplr-wallet/cosmos": "^0.12.20",
-    "@keplr-wallet/types": "^0.12.20",
+    "@metamask/providers": "^11.1.1",
     "@tanstack/react-query": "^4.29.14",
     "@tanstack/react-query-devtools": "^4.29.14",
     "@vectis/extension-client": "^0.7.1",
     "@walletconnect/sign-client": "^2.8.1",
-    "@walletconnect/types": "^2.8.1",
     "@walletconnect/utils": "^2.8.1",
     "@web3modal/standalone": "^2.4.3",
     "arg": "^5.0.2",
@@ -49,8 +48,10 @@
     "zustand": "^4.3.8"
   },
   "devDependencies": {
+    "@keplr-wallet/types": "^0.12.20",
     "@types/node": "^20.3.1",
     "@types/react": "^18.2.12",
+    "@walletconnect/types": "^2.8.1",
     "react": "^18.2.0",
     "typescript": "^5.1.3"
   },

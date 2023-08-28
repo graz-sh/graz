@@ -5,6 +5,7 @@ import { WALLET_TYPES, WalletType } from "../../types/wallet";
 import { getCosmostation } from "./cosmostation";
 import { getKeplr } from "./keplr";
 import { getLeap } from "./leap";
+import { getMetamaskSnapLeap } from "./metamask-snap/leap";
 import { getVectis } from "./vectis";
 import { getWalletConnect } from "./wallet-connect";
 import { getWCCosmostation } from "./wallet-connect/cosmostation";
@@ -71,6 +72,9 @@ export const getWallet = (type: WalletType = useGrazInternalStore.getState().wal
     }
     case WalletType.WC_COSMOSTATION_MOBILE: {
       return getWCCosmostation();
+    }
+    case WalletType.METAMASK_SNAP_LEAP: {
+      return getMetamaskSnapLeap();
     }
     default: {
       throw new Error("Unknown wallet type");
