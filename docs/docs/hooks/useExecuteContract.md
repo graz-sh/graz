@@ -6,14 +6,14 @@ Note: `senderAddress` will be filled with current connected account.
 #### Usage
 
 ```ts
-import { useExecuteContract, useCosmwasmSigningClient } from "graz";
+import { useExecuteContract, useCosmWasmSigningClient } from "graz";
 
 interface TData {
   // ...
 }
 
 const contractAddress = "cosmosfoobarbaz";
-const { data: signingClient } = useCosmwasmSigningClient();
+const { data: signingClient } = useCosmWasmSigningClient();
 const { executeContract } = useExecuteContract<TData>({ contractAddress });
 
 executeContract({

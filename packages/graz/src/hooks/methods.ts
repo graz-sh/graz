@@ -195,7 +195,7 @@ export type UseExecuteContractArgs<Message extends Record<string, unknown>> = {
  *
  * @example
  * ```ts
- * import { useExecuteContract, useCosmwasmSigningClient } from "graz"
+ * import { useExecuteContract, useCosmWasmSigningClient } from "graz"
  *
  * interface GreetMessage {
  *   name: string;
@@ -207,7 +207,7 @@ export type UseExecuteContractArgs<Message extends Record<string, unknown>> = {
  *
  * const contractAddress = "cosmosfoobarbaz";
  *
- * const { data: signingClient } = useCosmwasmSigningClient()
+ * const { data: signingClient } = useCosmWasmSigningClient()
  * const { executeContract } = useExecuteContract<ExecuteMessage>({ contractAddress });
  *
  * executeContract({
