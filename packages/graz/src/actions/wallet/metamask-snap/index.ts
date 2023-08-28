@@ -7,17 +7,12 @@ import type {
   Key,
   StdSignDoc,
 } from "@keplr-wallet/types";
-import type { MetaMaskInpageProvider } from "@metamask/providers";
 // eslint-disable-next-line import/no-named-as-default
 import Long from "long";
 
 import { useGrazInternalStore } from "../../../store";
 import type { SignAminoParams, SignDirectParams, Wallet } from "../../../types/wallet";
 import type { GetSnapsResponse, Snap } from "./types";
-
-interface EthereumWindow {
-  ethereum?: MetaMaskInpageProvider;
-}
 
 export interface GetMetamaskSnap {
   id: string;
@@ -42,7 +37,7 @@ export interface GetMetamaskSnap {
  *
  */
 export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
-  const ethereum = (window as EthereumWindow).ethereum;
+  const ethereum = window.ethereum;
 
   if (ethereum && params) {
     const getSnaps = async (): Promise<GetSnapsResponse> => {
