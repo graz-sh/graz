@@ -1,7 +1,7 @@
 import type { SigningCosmWasmClientOptions } from "@cosmjs/cosmwasm-stargate";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import type { SigningStargateClientOptions } from "@cosmjs/stargate";
-import { SigningStargateClient } from "@cosmjs/stargate";
+import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
 import type { HttpEndpoint } from "@cosmjs/tendermint-rpc";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
@@ -102,7 +102,11 @@ export const useCosmWasmSigningClient = (args?: {
         }
       })();
       const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
-      const signingClient = await SigningCosmWasmClient.connectWithSigner(endpoint, offlineSigner, _args?.opts);
+      const gasPrice = _chain.gas ? GasPrice.fromString(`${_chain.gas.price}${_chain.gas.denom}`) : undefined;
+      const signingClient = await SigningCosmWasmClient.connectWithSigner(endpoint, offlineSigner, {
+        gasPrice,
+        ...(_args?.opts || {}),
+      });
       return signingClient;
     },
     enabled: Boolean(chain) && Boolean(wallet),
@@ -214,8 +218,11 @@ export const useCosmWasmTmSigningClient = (args: {
             return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
         }
       })();
-
-      const client = SigningCosmWasmClient.createWithSigner(tmClient, offlineSigner, _args.opts);
+      const gasPrice = _chain.gas ? GasPrice.fromString(`${_chain.gas.price}${_chain.gas.denom}`) : undefined;
+      const client = SigningCosmWasmClient.createWithSigner(tmClient, offlineSigner, {
+        gasPrice,
+        ...(_args?.opts || {}),
+      });
       return client;
     },
     enabled: Boolean(chain) && Boolean(wallet) && Boolean(tmClient),
