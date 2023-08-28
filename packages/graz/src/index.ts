@@ -6,6 +6,7 @@ export * from "./actions/wallet";
 export * from "./actions/wallet/cosmostation";
 export * from "./actions/wallet/keplr";
 export * from "./actions/wallet/leap";
+export * from "./actions/wallet/metamask-snap/leap";
 export * from "./actions/wallet/vectis";
 export * from "./actions/wallet/wallet-connect";
 export * from "./actions/wallet/wallet-connect/cosmostation";
