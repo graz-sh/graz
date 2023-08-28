@@ -141,7 +141,9 @@ export const useBalances = (bech32Address?: string): UseQueryResult<Coin[]> => {
  * ```
  */
 export const useBalance = (denom: string, bech32Address?: string): UseQueryResult<Coin | undefined> => {
-  const { data: balances } = useBalances(bech32Address);
+  const { data: account } = useAccount();
+  const address = bech32Address || account?.bech32Address;
+  const { data: balances, refetch: _refetch } = useBalances(address);
 
   const queryKey = ["USE_BALANCE", balances, denom, bech32Address] as const;
   const query = useQuery(
@@ -154,7 +156,13 @@ export const useBalance = (denom: string, bech32Address?: string): UseQueryResul
     },
   );
 
-  return query;
+  return {
+    ...query,
+    refetch: async () => {
+      await _refetch();
+      return query.refetch();
+    },
+  };
 };
 
 export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, ConnectResult>;
