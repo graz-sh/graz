@@ -13,7 +13,7 @@ import Long from "long";
 
 import { useGrazInternalStore } from "../../../store";
 import type { SignAminoParams, SignDirectParams, Wallet } from "../../../types/wallet";
-import type { GetSnapsResponse } from "./types";
+import type { GetSnapsResponse, Snap } from "./types";
 
 interface EthereumWindow {
   ethereum?: MetaMaskInpageProvider;
@@ -45,17 +45,20 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
   const ethereum = (window as EthereumWindow).ethereum;
 
   if (ethereum && params) {
-    // const subscription: (reconnect: () => void) => void = (reconnect) => {
-    //   ethereum.on("accountsChanged", (accounts: string[]) => {
-    //     if (useGrazSessionStore.getState().account?.bech32Address) {
-    //     }
-    //     console.log("accountsChanged", accounts);
-    //   });
-    // };
     const getSnaps = async (): Promise<GetSnapsResponse> => {
-      return (await ethereum.request({
+      const res = (await ethereum.request({
         method: "wallet_getSnaps",
       })) as unknown as GetSnapsResponse;
+      return res;
+    };
+
+    const getSnap = async (version?: string): Promise<Snap | undefined> => {
+      try {
+        const snaps = await getSnaps();
+        return Object.values(snaps).find((snap) => snap.id === params.id && (!version || snap.version === version));
+      } catch (e) {
+        return undefined;
+      }
     };
 
     const connectSnap = async () => {
@@ -72,15 +75,13 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
         method: "web3_clientVersion",
       });
       const isFlaskDetected = (clientVersion as string[])?.includes("flask");
-      if (!isFlaskDetected) throw new Error("Metamask is not detected");
+      if (!isFlaskDetected) throw new Error("Metamask Flask is not detected");
       return true;
     };
 
     const enable = async (chainId: string | string[]) => {
-      const installedSnap = await getSnaps();
-      if (!installedSnap) {
-        await connectSnap();
-      }
+      const installedSnap = await getSnap();
+      if (!installedSnap) await connectSnap();
     };
 
     const requestSignDirect = async (
