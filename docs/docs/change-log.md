@@ -4,6 +4,12 @@ sidebar_position: 15
 
 # Changelog
 
+## Version 0.0.49
+
+- Fix client side error
+- Fix wallet not found error
+- Add experimentalSuggestChain to metamask snap
+
 ## Version 0.0.48
 
 - Added Wallet integration Metamask Snap for Leap Cosmos 🐺🐸
