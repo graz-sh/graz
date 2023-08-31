@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useEffect } from "react";
 
 import { reconnect } from "../actions/account";
+import { checkWallet } from "../actions/wallet";
 import { getCosmostation } from "../actions/wallet/cosmostation";
 import { getKeplr } from "../actions/wallet/keplr";
 import { getLeap } from "../actions/wallet/leap";
@@ -21,10 +22,12 @@ export const useGrazEvents = () => {
     typeof window !== "undefined" && window.sessionStorage.getItem(RECONNECT_SESSION_KEY) === "Active";
   const { _reconnect, _onReconnectFailed, _reconnectConnector } = useGrazInternalStore();
   const { activeChain, wcSignClient } = useGrazSessionStore();
+  const isReconnectConnectorReady = checkWallet(_reconnectConnector || undefined);
 
   useEffect(() => {
     // will reconnect on refresh
     if (_reconnectConnector) {
+      if (!isReconnectConnectorReady) return;
       if (isSessionActive && Boolean(activeChain)) {
         void reconnect({
           onError: _onReconnectFailed,
@@ -38,10 +41,11 @@ export const useGrazEvents = () => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isReconnectConnectorReady]);
 
   useEffect(() => {
     if (_reconnectConnector) {
+      if (!isReconnectConnectorReady) return;
       if (_reconnectConnector === WalletType.COSMOSTATION) {
         getCosmostation().subscription?.(() => {
           void reconnect({
@@ -74,7 +78,7 @@ export const useGrazEvents = () => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [_reconnectConnector, wcSignClient]);
+  }, [_reconnectConnector, wcSignClient, isReconnectConnectorReady]);
 
   return null;
 };
