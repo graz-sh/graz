@@ -4,6 +4,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "export:docs": "next build && next export --outdir ../../docs/build/examples/next",
     "lint": "eslint --fix \"**/*.{ts,tsx}\"",
     "start": "next start"
   },
