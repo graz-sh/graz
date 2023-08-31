@@ -61,8 +61,8 @@ const config = {
             label: "Docs",
           },
           {
-            href: "https://graz-example.vercel.app/",
-            label: "Example",
+            href: "/docs/examples",
+            label: "Examples",
             position: "left",
           },
           {
