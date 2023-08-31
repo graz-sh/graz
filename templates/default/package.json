@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "export:docs": "next build && next export --outdir ../../docs/build/examples/starter",
     "dev": "next dev -p 8080",
     "build": "next build",
     "start": "next start",
