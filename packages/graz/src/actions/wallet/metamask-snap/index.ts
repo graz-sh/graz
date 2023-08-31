@@ -218,7 +218,18 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
     };
 
     const experimentalSuggestChain = async (..._args: Parameters<Keplr["experimentalSuggestChain"]>) => {
-      await Promise.reject(new Error("Metamask does not support experimentalSuggestChain"));
+      await ethereum.request({
+        method: "wallet_invokeSnap",
+        params: {
+          snapId: params.id,
+          request: {
+            method: "suggestChain",
+            params: {
+              chainInfo: _args[0],
+            },
+          },
+        },
+      });
     };
 
     return {

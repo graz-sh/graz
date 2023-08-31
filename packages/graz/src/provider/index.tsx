@@ -42,8 +42,8 @@ export const GrazProvider: FC<GrazProviderProps> = ({ children, grazOptions, deb
   return (
     <QueryClientProvider key="graz-provider" client={queryClient} {...props}>
       <ClientOnly>
-        <GrazEvents />
         {children}
+        <GrazEvents />
       </ClientOnly>
       {debug ? <ReactQueryDevtools initialIsOpen={false} position="bottom-right" /> : null}
     </QueryClientProvider>
