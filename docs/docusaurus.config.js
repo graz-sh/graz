@@ -88,8 +88,16 @@ const config = {
             title: "More",
             items: [
               {
-                label: "Example",
-                href: "https://graz-example.vercel.app/",
+                label: "Next.js Example",
+                href: "https://graz.sh/examples/next",
+              },
+              {
+                label: "Vite Example",
+                href: "https://graz.sh/examples/vite",
+              },
+              {
+                label: "Starter Example",
+                href: "https://graz.sh/examples/starter",
               },
               {
                 label: "GitHub",
