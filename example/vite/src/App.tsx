@@ -22,7 +22,7 @@ export default function App() {
   return (
     <div className="App">
       <div>
-        <img src="/vite.svg" className="logo" alt="Vite logo" />
+        <img src="vite.svg" className="logo" alt="Vite logo" />
         <img src={reactLogo} className="logo react" alt="React logo" />
       </div>
       <h1>Vite + React + Graz</h1>
