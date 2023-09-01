@@ -6,7 +6,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: Boolean(process.env.VERCEL),
   },
-  basePath: process.env.EXPORT_DOCS ? "/examples/next" : "/",
+  basePath: process.env.EXPORT_DOCS ? "/examples/next" : undefined,
   headers: async () => [],
   reactStrictMode: false,
   redirects: async () => [],

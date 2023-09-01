@@ -8,9 +8,9 @@
     "templates/*"
   ],
   "scripts": {
-    "build": "turbo run build --filter=!@project/example-vite",
+    "build": "turbo run build --filter=!@project/example-next --filter=!@project/default --filter=!@project/example-vite",
     "clean": "turbo run clean",
-    "dev": "turbo run dev --filter=!@project/docs --filter=!@project/example-vite",
+    "dev": "turbo run dev --filter=!@project/docs --filter=!create-graz-app --filter=!create-graz-app --filter=!\"graz-adapter-*\" --filter=!@project/example-vite",
     "docs": "pnpm --dir docs",
     "example:next": "pnpm --dir example/next",
     "example:vite": "pnpm --dir example/vite",
