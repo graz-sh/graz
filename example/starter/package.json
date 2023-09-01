@@ -1,5 +1,5 @@
 {
-  "name": "@project/default",
+  "name": "@project/starter",
   "version": "0.1.0",
   "private": true,
   "scripts": {

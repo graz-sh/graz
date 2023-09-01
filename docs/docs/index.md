@@ -76,7 +76,7 @@ function Wallet() {
 
 - Next.js + Chakra UI: https://graz.sh/examples/next ([source code](https://github.com/graz-sh/graz/tree/dev/example/next))
 - Vite: https://graz.sh/examples/vite ([source code](https://github.com/graz-sh/graz/tree/dev/example/vite/))
-- Next.js Starter: https://graz.sh/examples/starter ([source code](https://github.com/graz-sh/graz/tree/dev/templates/default/))
+- Next.js Starter: https://graz.sh/examples/starter ([source code](https://github.com/graz-sh/graz/tree/dev/example/default/))
 
 ## Third-party dependencies
 

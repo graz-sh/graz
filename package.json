@@ -4,11 +4,10 @@
   "workspaces": [
     "docs",
     "example/*",
-    "packages/*",
-    "templates/*"
+    "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build --filter=!@project/example-next --filter=!@project/default --filter=!@project/example-vite",
+    "build": "turbo run build --filter=!@project/example-next --filter=!@project/starter --filter=!@project/example-vite",
     "clean": "turbo run clean",
     "dev": "turbo run dev --filter=!@project/docs --filter=!create-graz-app --filter=!create-graz-app --filter=!\"graz-adapter-*\" --filter=!@project/example-vite",
     "docs": "pnpm --dir docs",
@@ -20,7 +19,6 @@
     "prepare": "husky uninstall",
     "release": "turbo run build --filter=graz && pnpm publish --filter graz",
     "release-adapter": "turbo run build --filter=\"graz-adapter-*\" && pnpm publish --filter=\"graz-adapter-*\"",
-    "templates": "pnpm --dir templates/default",
     "test": "turbo run test"
   },
   "devDependencies": {

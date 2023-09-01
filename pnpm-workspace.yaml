@@ -2,4 +2,3 @@ packages:
   - "docs/"
   - "example/*"
   - "packages/*"
-  - "templates/*"

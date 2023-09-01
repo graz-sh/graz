@@ -26,7 +26,7 @@ export const createApp = async ({
     username: "graz-sh",
     branch: "dev",
     name: "graz",
-    filePath: "templates/default",
+    filePath: "example/starter",
   };
 
   const root = path.resolve(appPath);
