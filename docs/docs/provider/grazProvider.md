@@ -27,7 +27,6 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
 `grazOptions`(Optional)
 
 - defaultChain?: `GrazChain`;
-- defaultSigningClient?: `GrazStore["defaultSigningClient"]`;
 - defaultWallet?: `WalletType`;
 - onNotFound?: () => void;
 - autoReconnect?: boolean; -> Defaults to `true`, will try to reconnect when initial start(session empty)

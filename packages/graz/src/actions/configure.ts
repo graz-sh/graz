@@ -5,7 +5,6 @@ import type { WalletType } from "../types/wallet";
 
 export interface ConfigureGrazArgs {
   defaultChain?: GrazChain;
-  defaultSigningClient?: GrazInternalStore["defaultSigningClient"];
   defaultWallet?: WalletType;
   onNotFound?: () => void;
   onReconnectFailed?: () => void;
@@ -19,7 +18,6 @@ export interface ConfigureGrazArgs {
 export const configureGraz = (args: ConfigureGrazArgs = {}): ConfigureGrazArgs => {
   useGrazInternalStore.setState((prev) => ({
     defaultChain: args.defaultChain || prev.defaultChain,
-    defaultSigningClient: args.defaultSigningClient || prev.defaultSigningClient,
     walletConnect: args.walletConnect || prev.walletConnect,
     walletType: args.defaultWallet || prev.walletType,
     _notFoundFn: args.onNotFound || prev._notFoundFn,

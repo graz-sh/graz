@@ -16,7 +16,6 @@ export interface WalletConnectStore {
 }
 export interface GrazInternalStore {
   defaultChain: GrazChain | null;
-  defaultSigningClient: "cosmWasm" | "stargate";
   recentChain: GrazChain | null;
   walletType: WalletType;
   walletConnect: WalletConnectStore | null;
@@ -41,7 +40,6 @@ export type GrazInternalPersistedStore = Pick<GrazInternalStore, "recentChain" |
 export const grazInternalDefaultValues: GrazInternalStore = {
   recentChain: null,
   defaultChain: null,
-  defaultSigningClient: "stargate",
   walletType: WalletType.KEPLR,
   walletConnect: {
     options: null,
