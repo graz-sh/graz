@@ -303,6 +303,9 @@ importers:
       cosmos-directory-client:
         specifier: 0.0.6
         version: 0.0.6
+      p-map:
+        specifier: ^6.0.0
+        version: 6.0.0
       zustand:
         specifier: ^4.3.8
         version: 4.3.8(react@18.2.0)
@@ -13088,7 +13091,6 @@ packages:
   /p-map@6.0.0:
     resolution: {integrity: sha512-T8BatKGY+k5rU+Q/GTYgrEf2r4xRMevAN5mtXc2aPc4rS1j3s+vWTaO2Wag94neXuCAUAs8cxBL9EeB5EA6diw==}
     engines: {node: '>=16'}
-    dev: true
 
   /p-retry@4.6.2:
     resolution: {integrity: sha512-312Id396EbJdvRONlngUx0NydfrIQ5lsYu0znKVUzVvArzEIt08V1qhtyESbGVd1FGX7UKtiFp5uwKZdM8wIuQ==}

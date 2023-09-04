@@ -13,6 +13,11 @@ export interface ConfigureGrazArgs {
    * default to true
    */
   autoReconnect?: boolean;
+  /**
+   * Graz will use this number to determine how many concurrent requests to make when using `multiChain` args in hooks.
+   * Defaults to 3.
+   */
+  multiChainConcurrency?: number;
 }
 
 export const configureGraz = (args: ConfigureGrazArgs): ConfigureGrazArgs => {
@@ -20,6 +25,7 @@ export const configureGraz = (args: ConfigureGrazArgs): ConfigureGrazArgs => {
     walletConnect: args.walletConnect || prev.walletConnect,
     walletType: args.defaultWallet || prev.walletType,
     chains: args.chains || prev.chains,
+    multiChainConcurrency: args.multiChainConcurrency || prev.multiChainConcurrency,
     _notFoundFn: args.onNotFound || prev._notFoundFn,
     _onReconnectFailed: args.onReconnectFailed || prev._onReconnectFailed,
     _reconnect: args.autoReconnect === undefined ? true : args.autoReconnect || prev._reconnect,
