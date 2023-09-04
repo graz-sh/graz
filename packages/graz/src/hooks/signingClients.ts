@@ -3,13 +3,37 @@ import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import type { SigningStargateClientOptions } from "@cosmjs/stargate";
 import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
 import type { HttpEndpoint } from "@cosmjs/tendermint-rpc";
+import type { UseQueryResult } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import { checkWallet, getWallet } from "../actions/wallet";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
+import { type ChainId, createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi-chain";
 import { useTendermintClient } from "./clients";
 
+type SiginingClientSinglechainArgs<T> = {
+  multiChain: false;
+  opts?: Record<string, T>;
+};
+
+type SiginingClientMultichainArgs<T> = {
+  multiChain: true;
+  opts?: Record<string, T>;
+};
+
+type Args<T> = SiginingClientSinglechainArgs<T> | SiginingClientMultichainArgs<T>;
+
+type BaseSigningClientArgs = {
+  chainId?: ChainId;
+  offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
+};
+export function useStargateSigningClient(
+  args?: BaseSigningClientArgs & SiginingClientSinglechainArgs<SigningStargateClientOptions>,
+): UseQueryResult<SigningStargateClient>;
+export function useStargateSigningClient(
+  args?: BaseSigningClientArgs & SiginingClientMultichainArgs<SigningStargateClientOptions>,
+): UseQueryResult<Record<string, SigningStargateClient>>;
 /**
  * graz query hook to retrieve a SigningStargateClient.
  *
@@ -23,42 +47,55 @@ import { useTendermintClient } from "./clients";
  *
  * ```
  */
-export const useStargateSigningClient = (args?: {
-  opts?: SigningStargateClientOptions;
-  offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
-}) => {
-  const chain = useGrazSessionStore((x) => x.activeChainIds);
+// eslint-disable-next-line prefer-arrow-functions/prefer-arrow-functions
+export function useStargateSigningClient(
+  args?: BaseSigningClientArgs & Args<SigningStargateClientOptions>,
+): UseQueryResult<SigningStargateClient | Record<string, SigningStargateClient>> {
+  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const wallet = useGrazInternalStore((x) => x.walletType);
-  const queryKey = useMemo(() => ["USE_STARGATE_SIGNING_CLIENT", chain, wallet, args] as const, [args, chain, wallet]);
+  const queryKey = useMemo(
+    () => ["USE_STARGATE_SIGNING_CLIENT", chains, wallet, args?.opts, args?.multiChain] as const,
+    [args, chains, wallet],
+  );
 
   return useQuery({
     queryKey,
-    queryFn: async ({ queryKey: [, _chain, _wallet, _args] }) => {
-      if (!_chain) throw new Error("No chain found");
-      const isWalletAvailable = checkWallet(_wallet);
-      if (!isWalletAvailable) {
-        throw new Error(`${_wallet} is not available`);
-      }
-      const offlineSigner = await (async () => {
-        switch (args?.offlineSigner) {
-          case "offlineSigner":
-            return getWallet(_wallet).getOfflineSigner(_chain.chainId);
-          case "offlineSignerAuto":
-            return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
-          case "offlineSignerOnlyAmino":
-            return getWallet(_wallet).getOfflineSignerOnlyAmino(_chain.chainId);
-          default:
-            return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
+    queryFn: async ({ queryKey: [, _chains, _wallet, _opts, _multiChain] }) => {
+      if (!_chains) throw new Error("No chains found");
+      const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
+        const isWalletAvailable = checkWallet(_wallet);
+        if (!isWalletAvailable) {
+          throw new Error(`${_wallet} is not available`);
         }
-      })();
-      const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
-      const signingClient = await SigningStargateClient.connectWithSigner(endpoint, offlineSigner, _args?.opts);
-      return signingClient;
+        const offlineSigner = await (async () => {
+          switch (args?.offlineSigner) {
+            case "offlineSigner":
+              return getWallet(_wallet).getOfflineSigner(_chain.chainId);
+            case "offlineSignerAuto":
+              return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
+            case "offlineSignerOnlyAmino":
+              return getWallet(_wallet).getOfflineSignerOnlyAmino(_chain.chainId);
+            default:
+              return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
+          }
+        })();
+        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
+        if (args?.multiChain === true) {
+          args?.opts;
+        }
+        const signingClient = await SigningStargateClient.connectWithSigner(
+          endpoint,
+          offlineSigner,
+          args?.multiChain ? args?.opts?.[_chain.chainId] : args?.opts,
+        );
+        return signingClient;
+      });
+      return res;
     },
-    enabled: Boolean(chain) && Boolean(wallet),
+    enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet),
     refetchOnWindowFocus: false,
   });
-};
+}
 
 /**
  * graz query hook to retrieve a SigningCosmWasmClient.

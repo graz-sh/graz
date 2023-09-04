@@ -2,11 +2,12 @@ import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import type { HttpEndpoint } from "@cosmjs/stargate";
 import { StargateClient } from "@cosmjs/stargate";
 import { Tendermint34Client, Tendermint37Client } from "@cosmjs/tendermint-rpc";
-import type { UseQueryResult } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import { useGrazSessionStore } from "../store";
+import type { UseMultiChainQueryResult } from "../types/hooks";
+import type { ChainId } from "../utils/multi-chain";
+import { createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi-chain";
 
 /**
  * graz query hook to retrieve a StargateClient.
@@ -21,19 +22,28 @@ import { useGrazSessionStore } from "../store";
  *
  * ```
  */
-export const useStargateClient = () => {
-  const chain = useGrazSessionStore((x) => x.activeChainIds);
-  const queryKey = useMemo(() => ["USE_STARGATE_CLIENT", chain] as const, [chain]);
+export const useStargateClient = <TMulti extends boolean>({
+  chainId,
+  multiChain,
+}: {
+  chainId?: ChainId;
+  multiChain?: TMulti;
+}): UseMultiChainQueryResult<TMulti, StargateClient> => {
+  const chains = useChainsFromArgs({ chainId, multiChain });
+  const queryKey = useMemo(() => ["USE_STARGATE_CLIENT", chains] as const, [chains]);
 
   return useQuery({
     queryKey,
-    queryFn: async ({ queryKey: [, _chain] }) => {
-      if (!_chain) throw new Error("No chain found");
-      const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
-      const client = await StargateClient.connect(endpoint);
-      return client;
+    queryFn: async ({ queryKey: [, _chains] }) => {
+      if (!_chains || _chains.length < 1) throw new Error("No chains found");
+      const res = await createMultiChainAsyncFunction(Boolean(multiChain), _chains, async (_chain) => {
+        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
+        const client = await StargateClient.connect(endpoint);
+        return client;
+      });
+      return res;
     },
-    enabled: Boolean(chain),
+    enabled: Boolean(chains) && chains.length > 0,
     refetchOnWindowFocus: false,
   });
 };
@@ -51,19 +61,28 @@ export const useStargateClient = () => {
  *
  * ```
  */
-export const useCosmWasmClient = () => {
-  const chain = useGrazSessionStore((x) => x.activeChainIds);
-  const queryKey = useMemo(() => ["USE_COSMWASM_CLIENT", chain] as const, [chain]);
+export const useCosmWasmClient = <TMulti extends boolean>({
+  chainId,
+  multiChain,
+}: {
+  chainId?: ChainId;
+  multiChain?: TMulti;
+}): UseMultiChainQueryResult<TMulti, CosmWasmClient> => {
+  const chains = useChainsFromArgs({ chainId, multiChain });
+  const queryKey = useMemo(() => ["USE_COSMWASM_CLIENT", chains] as const, [chains]);
 
   return useQuery({
     queryKey,
-    queryFn: async ({ queryKey: [, _chain] }) => {
-      if (!_chain) throw new Error("No chain found");
-      const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
-      const client = await CosmWasmClient.connect(endpoint);
-      return client;
+    queryFn: async ({ queryKey: [, _chains] }) => {
+      if (!_chains) throw new Error("No chains found");
+      const res = await createMultiChainAsyncFunction(Boolean(multiChain), _chains, async (_chain) => {
+        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
+        const client = await CosmWasmClient.connect(endpoint);
+        return client;
+      });
+      return res;
     },
-    enabled: Boolean(chain),
+    enabled: Boolean(chains) && chains.length > 0,
     refetchOnWindowFocus: false,
   });
 };
@@ -81,22 +100,31 @@ export const useCosmWasmClient = () => {
  *
  * ```
  */
-export const useTendermintClient = <T extends "tm34" | "tm37">(
-  type: T,
-): UseQueryResult<T extends "tm34" ? Tendermint34Client : Tendermint37Client> => {
-  const chain = useGrazSessionStore((x) => x.activeChainIds);
-  const queryKey = useMemo(() => ["USE_TENDERMINT_CLIENT", type, chain] as const, [type, chain]);
+export const useTendermintClient = <T extends "tm34" | "tm37", TMulti extends boolean>({
+  type,
+  chainId,
+  multiChain,
+}: {
+  type: T;
+  chainId?: ChainId;
+  multiChain?: TMulti;
+}): UseMultiChainQueryResult<TMulti, T extends "tm34" ? Tendermint34Client : Tendermint37Client> => {
+  const chains = useChainsFromArgs({ chainId, multiChain });
+  const queryKey = useMemo(() => ["USE_TENDERMINT_CLIENT", type, chains] as const, [type, chains]);
 
   return useQuery({
     queryKey,
-    queryFn: async ({ queryKey: [, _type, _chain] }) => {
-      if (!_chain) throw new Error("No chain found");
-      const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
-      const TendermintClient = _type === "tm37" ? Tendermint37Client : Tendermint34Client;
-      const client = await TendermintClient.connect(endpoint);
-      return client;
+    queryFn: async ({ queryKey: [, _type, _chains] }) => {
+      if (!_chains) throw new Error("No chains found");
+      const res = await createMultiChainAsyncFunction(Boolean(multiChain), _chains, async (_chain) => {
+        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
+        const TendermintClient = _type === "tm37" ? Tendermint37Client : Tendermint34Client;
+        const client = await TendermintClient.connect(endpoint);
+        return client;
+      });
+      return res;
     },
-    enabled: Boolean(chain),
+    enabled: Boolean(chains) && chains.length > 0,
     refetchOnWindowFocus: false,
   });
 };
