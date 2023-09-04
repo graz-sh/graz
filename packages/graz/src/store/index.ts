@@ -1,4 +1,3 @@
-import type { Coin } from "@cosmjs/proto-signing";
 import type { Key } from "@keplr-wallet/types";
 import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import type { Web3ModalConfig } from "@web3modal/standalone";
@@ -28,7 +27,6 @@ export interface GrazInternalStore {
 export interface GrazSessionStore {
   account: Key | null;
   activeChain: GrazChain | null;
-  balances: Coin[] | null;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
   wcSignClient?: ISignClient | null;
 }
@@ -54,7 +52,6 @@ export const grazInternalDefaultValues: GrazInternalStore = {
 export const grazSessionDefaultValues: GrazSessionStore = {
   account: null,
   activeChain: null,
-  balances: null,
   status: "disconnected",
   wcSignClient: null,
 };
