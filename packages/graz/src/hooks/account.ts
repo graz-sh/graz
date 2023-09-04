@@ -73,23 +73,19 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
   };
 };
 
-/**
- * graz query hook to retrieve list of balances from current account or given address.
- *
- * @param bech32Address - Optional bech32 account address, defaults to connected account address
- *
- * @example
- * ```ts
- * import { useBalances } from "graz";
- *
- * // basic example
- * const { data, isFetching, refetch, ... } = useBalances();
- *
- * // with custom bech32 address
- * useBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
- * ```
- */
-export const useBalances = (bech32Address?: string): UseQueryResult<Coin[]> => {
+type UseMultiChainQueryResult<TMulti extends boolean, TData> = UseQueryResult<
+  TMulti extends true ? Record<string, TData> : TData
+>;
+
+export const useBalances = <TMulti extends boolean>({
+  bech32Address,
+  chainId,
+  multiChain,
+}: {
+  bech32Address?: string;
+  chainId?: string | string[];
+  multiChain?: TMulti;
+}): UseMultiChainQueryResult<TMulti, Coin[]> => {
   const { data: account } = useAccount();
   const { data: client } = useStargateClient();
   const { activeChainIds: activeChain } = useGrazSessionStore.getState();
@@ -122,6 +118,7 @@ export const useBalances = (bech32Address?: string): UseQueryResult<Coin[]> => {
 
   return query;
 };
+const res = useBalances({ multiChain: true });
 
 /**
  * graz query hook to retrieve specific asset balance from current account or given address.
