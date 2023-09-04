@@ -16,6 +16,11 @@ export interface WalletConnectStore {
 export interface GrazInternalStore {
   recentChainIds: string[] | null;
   chains: GrazChain[] | null;
+  /**
+   * Graz will use this number to determine how many concurrent requests to make when using `multiChain` args in hooks.
+   * Defaults to 3.
+   */
+  multiChainConcurrency: number;
   walletType: WalletType;
   walletConnect: WalletConnectStore | null;
   _notFoundFn: () => void;
@@ -41,6 +46,7 @@ export type GrazInternalPersistedStore = Pick<
 export const grazInternalDefaultValues: GrazInternalStore = {
   recentChainIds: null,
   chains: null,
+  multiChainConcurrency: 3,
   walletType: WalletType.KEPLR,
   walletConnect: {
     options: null,
