@@ -253,8 +253,8 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
   });
 
   return {
-    disconnect: (forget?: boolean) => mutation.mutate(forget),
-    disconnectAsync: (forget?: boolean) => mutation.mutateAsync(forget),
+    disconnect: mutation.mutate,
+    disconnectAsync: mutation.mutateAsync,
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
