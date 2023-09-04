@@ -1,4 +1,3 @@
-import type { SigningCosmWasmClientOptions } from "@cosmjs/cosmwasm-stargate";
 import type { OfflineDirectSigner } from "@cosmjs/proto-signing";
 import type { Key, OfflineAminoSigner } from "@keplr-wallet/types";
 
@@ -11,7 +10,6 @@ import { checkWallet, getWallet } from "./wallet";
 
 export type ConnectArgs = Maybe<{
   chain?: GrazChain;
-  signerOpts?: SigningCosmWasmClientOptions;
   walletType?: WalletType;
   autoReconnect?: boolean;
 }>;
