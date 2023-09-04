@@ -1,7 +1,7 @@
-import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
+import type { ChainInfo } from "@keplr-wallet/types";
 
 import type { GrazChain } from "../chains";
-import { useGrazInternalStore, useGrazSessionStore } from "../store";
+import { useGrazInternalStore } from "../store";
 import type { Dictionary } from "../types/core";
 import type { WalletType } from "../types/wallet";
 import type { ConnectResult } from "./account";
@@ -9,16 +9,16 @@ import { connect } from "./account";
 import { getWallet } from "./wallet";
 
 export const clearRecentChain = (): void => {
-  useGrazInternalStore.setState({ recentChain: null });
+  useGrazInternalStore.setState({ recentChainIds: null });
 };
 
-export const getActiveChainCurrency = (denom: string): AppCurrency | undefined => {
-  const { activeChain } = useGrazSessionStore.getState();
-  return activeChain?.currencies.find((x) => x.coinMinimalDenom === denom);
+export const getRecentChainIds = (): string[] | null => {
+  return useGrazInternalStore.getState().recentChainIds;
 };
 
-export const getRecentChain = (): GrazChain | null => {
-  return useGrazInternalStore.getState().recentChain;
+export const getRecentChains = (): GrazChain[] | null => {
+  const { recentChainIds: recentChains, chains } = useGrazInternalStore.getState();
+  return recentChains?.map((chainId) => chains!.find((x) => x.chainId === chainId)!) ?? null;
 };
 
 export interface SuggestChainArgs {
@@ -44,30 +44,13 @@ export interface SuggestChainAndConnectArgs {
   autoReconnect?: boolean;
 }
 
-export const suggestChainAndConnect = async ({
-  chainInfo,
-  rpcHeaders,
-  gas,
-  path,
-  ...rest
-}: SuggestChainAndConnectArgs): Promise<ConnectResult> => {
-  const { walletType } = useGrazInternalStore.getState();
-  const wallet = rest.walletType || walletType;
-  const chain = await suggestChain({
-    chainInfo,
-    walletType: wallet,
-  });
+export const suggestChainAndConnect = async (args: SuggestChainAndConnectArgs): Promise<ConnectResult> => {
+  const defaultWalletType = useGrazInternalStore.getState().walletType;
+  await suggestChain({ chainInfo: args.chainInfo, walletType: args.walletType ?? defaultWalletType });
   const result = await connect({
-    chain: {
-      chainId: chainInfo.chainId,
-      currencies: chainInfo.currencies,
-      rest: chainInfo.rest,
-      rpc: chainInfo.rpc,
-      rpcHeaders,
-      gas,
-      path,
-    },
-    ...rest,
+    chainId: args.chainInfo.chainId,
+    walletType: args.walletType,
+    autoReconnect: args.autoReconnect,
   });
-  return { ...result, chain };
+  return result;
 };
