@@ -22,7 +22,7 @@ import { useGrazSessionStore } from "../store";
  * ```
  */
 export const useStargateClient = () => {
-  const chain = useGrazSessionStore((x) => x.activeChain);
+  const chain = useGrazSessionStore((x) => x.activeChainIds);
   const queryKey = useMemo(() => ["USE_STARGATE_CLIENT", chain] as const, [chain]);
 
   return useQuery({
@@ -52,7 +52,7 @@ export const useStargateClient = () => {
  * ```
  */
 export const useCosmWasmClient = () => {
-  const chain = useGrazSessionStore((x) => x.activeChain);
+  const chain = useGrazSessionStore((x) => x.activeChainIds);
   const queryKey = useMemo(() => ["USE_COSMWASM_CLIENT", chain] as const, [chain]);
 
   return useQuery({
@@ -84,7 +84,7 @@ export const useCosmWasmClient = () => {
 export const useTendermintClient = <T extends "tm34" | "tm37">(
   type: T,
 ): UseQueryResult<T extends "tm34" ? Tendermint34Client : Tendermint37Client> => {
-  const chain = useGrazSessionStore((x) => x.activeChain);
+  const chain = useGrazSessionStore((x) => x.activeChainIds);
   const queryKey = useMemo(() => ["USE_TENDERMINT_CLIENT", type, chain] as const, [type, chain]);
 
   return useQuery({

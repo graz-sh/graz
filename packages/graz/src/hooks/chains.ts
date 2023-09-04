@@ -23,7 +23,7 @@ import { useCheckWallet } from "./wallet";
  * ```
  */
 export const useActiveChain = (): GrazChain | null => {
-  return useGrazSessionStore((x) => x.activeChain);
+  return useGrazSessionStore((x) => x.activeChainIds);
 };
 
 /**
@@ -94,7 +94,7 @@ export const useActiveChainValidators = <T extends QueryClient & StakingExtensio
  * @see {@link useActiveChain}
  */
 export const useRecentChain = () => {
-  const recentChain = useGrazInternalStore((x) => x.recentChain);
+  const recentChain = useGrazInternalStore((x) => x.recentChainIds);
   return { data: recentChain, clear: clearRecentChain };
 };
 

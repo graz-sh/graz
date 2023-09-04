@@ -4,8 +4,8 @@ import { useGrazInternalStore } from "../store";
 import type { WalletType } from "../types/wallet";
 
 export interface ConfigureGrazArgs {
-  defaultChain?: GrazChain;
   defaultWallet?: WalletType;
+  chains: GrazChain[];
   onNotFound?: () => void;
   onReconnectFailed?: () => void;
   walletConnect?: GrazInternalStore["walletConnect"];
@@ -15,11 +15,11 @@ export interface ConfigureGrazArgs {
   autoReconnect?: boolean;
 }
 
-export const configureGraz = (args: ConfigureGrazArgs = {}): ConfigureGrazArgs => {
+export const configureGraz = (args: ConfigureGrazArgs): ConfigureGrazArgs => {
   useGrazInternalStore.setState((prev) => ({
-    defaultChain: args.defaultChain || prev.defaultChain,
     walletConnect: args.walletConnect || prev.walletConnect,
     walletType: args.defaultWallet || prev.walletType,
+    chains: args.chains || prev.chains,
     _notFoundFn: args.onNotFound || prev._notFoundFn,
     _onReconnectFailed: args.onReconnectFailed || prev._onReconnectFailed,
     _reconnect: args.autoReconnect === undefined ? true : args.autoReconnect || prev._reconnect,
