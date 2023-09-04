@@ -83,7 +83,7 @@ export const getVectis = (): Wallet => {
     };
 
     return {
-      enable: (chainId: string) => vectis.enable(chainId),
+      enable: (chainId: string | string[]) => vectis.enable(chainId),
       getOfflineSigner: (chainId: string) => vectis.getOfflineSigner(chainId),
       getOfflineSignerAuto: (chainId: string) => vectis.getOfflineSignerAuto(chainId),
       getKey,

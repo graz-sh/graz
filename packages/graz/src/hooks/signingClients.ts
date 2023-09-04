@@ -27,7 +27,7 @@ export const useStargateSigningClient = (args?: {
   opts?: SigningStargateClientOptions;
   offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
 }) => {
-  const chain = useGrazSessionStore((x) => x.activeChain);
+  const chain = useGrazSessionStore((x) => x.activeChainIds);
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(() => ["USE_STARGATE_SIGNING_CLIENT", chain, wallet, args] as const, [args, chain, wallet]);
 
@@ -77,7 +77,7 @@ export const useCosmWasmSigningClient = (args?: {
   opts?: SigningCosmWasmClientOptions;
   offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
 }) => {
-  const chain = useGrazSessionStore((x) => x.activeChain);
+  const chain = useGrazSessionStore((x) => x.activeChainIds);
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(() => ["USE_COSMWASM_SIGNING_CLIENT", chain, wallet, args] as const, [args, chain, wallet]);
 
@@ -132,7 +132,7 @@ export const useStargateTmSigningClient = (args: {
   opts?: SigningStargateClientOptions;
   offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
 }) => {
-  const chain = useGrazSessionStore((x) => x.activeChain);
+  const chain = useGrazSessionStore((x) => x.activeChainIds);
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(
     () => ["USE_STARGATE_TM_SIGNING_CLIENT", chain, wallet, args] as const,
@@ -188,7 +188,7 @@ export const useCosmWasmTmSigningClient = (args: {
   opts?: SigningCosmWasmClientOptions;
   offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
 }) => {
-  const chain = useGrazSessionStore((x) => x.activeChain);
+  const chain = useGrazSessionStore((x) => x.activeChainIds);
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(
     () => ["USE_COSMWASM_TM_SIGNING_CLIENT", chain, wallet, args] as const,

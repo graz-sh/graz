@@ -1,3 +1,4 @@
+import { fromBech32, toBech32 } from "@cosmjs/encoding";
 import type { OfflineDirectSigner } from "@cosmjs/proto-signing";
 import type { Key, OfflineAminoSigner } from "@keplr-wallet/types";
 
@@ -9,20 +10,20 @@ import type { WalletType } from "../types/wallet";
 import { checkWallet, getWallet } from "./wallet";
 
 export type ConnectArgs = Maybe<{
-  chain?: GrazChain;
+  chainId: string | string[];
   walletType?: WalletType;
   autoReconnect?: boolean;
 }>;
 
 export interface ConnectResult {
-  account: Key;
+  accounts: Record<string, Key>;
   walletType: WalletType;
-  chain: GrazChain;
+  chains: GrazChain[];
 }
 
 export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   try {
-    const { defaultChain, recentChain, walletType } = useGrazInternalStore.getState();
+    const { recentChainIds: recentChains, chains, walletType } = useGrazInternalStore.getState();
 
     const currentWalletType = args?.walletType || walletType;
 
@@ -33,50 +34,71 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
 
     const wallet = getWallet(currentWalletType);
 
-    const chain = args?.chain || recentChain || defaultChain;
-    if (!chain) {
-      throw new Error("No last known connected chain, connect action requires chain info");
+    const chainIds = typeof args?.chainId === "string" ? [args.chainId] : args?.chainId || recentChains;
+    if (!chainIds) {
+      throw new Error("No last known connected chain, connect action requires chain ids");
     }
+    const providerChainIds = chains?.map((x) => x.chainId);
+
+    chainIds.forEach((chainId) => {
+      if (!providerChainIds?.includes(chainId)) {
+        throw new Error(`Chain ${chainId} is not provided`);
+      }
+    });
 
     useGrazSessionStore.setState((x) => {
       const isReconnecting =
         useGrazInternalStore.getState()._reconnect ||
         Boolean(useGrazInternalStore.getState()._reconnectConnector) ||
-        Boolean(chain);
-      const isSwitchingChain = x.activeChain && x.activeChain.chainId !== chain.chainId;
+        Boolean(chainIds);
+
+      const isSwitchingChain = x.activeChainIds && chainIds.filter((y) => !x.activeChainIds?.includes(y)).length > 0;
       if (isSwitchingChain) return { status: "connecting" };
       if (isReconnecting) return { status: "reconnecting" };
       return { status: "connecting" };
     });
 
-    const { account: _account, activeChain } = useGrazSessionStore.getState();
+    const { accounts: _account, activeChainIds: activeChains } = useGrazSessionStore.getState();
     await wallet.init?.();
-    if (!_account || activeChain?.chainId !== chain.chainId) {
-      await wallet.enable(chain.chainId);
-      const account = await wallet.getKey(chain.chainId);
-      useGrazSessionStore.setState({ account });
-    }
+    await wallet.enable(chainIds);
+    const key = await wallet.getKey(chainIds[0]!);
+    const resultAcccounts: Record<string, Key> = {};
+    chainIds.forEach((chainId) => {
+      resultAcccounts[chainId] = {
+        ...key,
+        bech32Address: toBech32(
+          chains!.find((x) => x.chainId === chainId)!.bech32Config.bech32PrefixAccAddr,
+          fromBech32(key.bech32Address).data,
+        ),
+      };
+    });
+
+    useGrazInternalStore.setState((prev) => ({
+      recentChainIds: [...(prev.recentChainIds || []), ...chainIds],
+    }));
+    useGrazSessionStore.setState((prev) => ({
+      activeChainIds: [...(prev.activeChainIds || []), ...chainIds],
+      accounts: { ...(prev.accounts || {}), ...resultAcccounts },
+    }));
 
     useGrazInternalStore.setState({
-      recentChain: chain,
       walletType: currentWalletType,
       _reconnect: Boolean(args?.autoReconnect),
       _reconnectConnector: currentWalletType,
     });
     useGrazSessionStore.setState({
-      activeChain: chain,
       status: "connected",
     });
     typeof window !== "undefined" && window.sessionStorage.setItem(RECONNECT_SESSION_KEY, "Active");
-    const { account } = useGrazSessionStore.getState();
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return { account: account!, walletType: currentWalletType, chain };
+
+    const connectedChains = chainIds.map((x) => chains!.find((y) => y.chainId === x)!);
+    return { accounts: resultAcccounts, walletType: currentWalletType, chains: connectedChains };
   } catch (error) {
     console.error("connect ", error);
-    if (useGrazSessionStore.getState().account === null) {
+    if (useGrazSessionStore.getState().accounts === null) {
       useGrazSessionStore.setState({ status: "disconnected" });
     }
-    if (useGrazSessionStore.getState().account && useGrazSessionStore.getState().activeChain) {
+    if (useGrazSessionStore.getState().accounts && useGrazSessionStore.getState().activeChainIds) {
       useGrazSessionStore.setState({ status: "connected" });
     }
     throw error;
@@ -89,7 +111,7 @@ export const disconnect = async (clearRecentChain = false): Promise<void> => {
   useGrazInternalStore.setState((x) => ({
     _reconnect: false,
     _reconnectConnector: null,
-    recentChain: clearRecentChain ? null : x.recentChain,
+    recentChainIds: clearRecentChain ? null : x.recentChainIds,
   }));
   return Promise.resolve();
 };
@@ -97,12 +119,12 @@ export const disconnect = async (clearRecentChain = false): Promise<void> => {
 export type ReconnectArgs = Maybe<{ onError?: (error: unknown) => void }>;
 
 export const reconnect = async (args?: ReconnectArgs) => {
-  const { recentChain, _reconnectConnector, _reconnect } = useGrazInternalStore.getState();
+  const { recentChainIds: recentChains, _reconnectConnector, _reconnect } = useGrazInternalStore.getState();
   try {
     const isWalletReady = checkWallet(_reconnectConnector || undefined);
-    if (recentChain && isWalletReady && _reconnectConnector) {
+    if (recentChains && isWalletReady && _reconnectConnector) {
       const key = await connect({
-        chain: recentChain,
+        chainId: recentChains,
         walletType: _reconnectConnector,
         autoReconnect: _reconnect,
       });

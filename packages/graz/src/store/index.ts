@@ -14,8 +14,8 @@ export interface WalletConnectStore {
   web3Modal?: Pick<Web3ModalConfig, "themeVariables" | "themeMode" | "privacyPolicyUrl" | "termsOfServiceUrl"> | null;
 }
 export interface GrazInternalStore {
-  defaultChain: GrazChain | null;
-  recentChain: GrazChain | null;
+  recentChainIds: string[] | null;
+  chains: GrazChain[] | null;
   walletType: WalletType;
   walletConnect: WalletConnectStore | null;
   _notFoundFn: () => void;
@@ -25,19 +25,22 @@ export interface GrazInternalStore {
 }
 
 export interface GrazSessionStore {
-  account: Key | null;
-  activeChain: GrazChain | null;
+  accounts: Record<string, Key> | null;
+  activeChainIds: string[] | null;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
   wcSignClient?: ISignClient | null;
 }
 
-export type GrazSessionPersistedStore = Pick<GrazSessionStore, "account" | "activeChain">;
+export type GrazSessionPersistedStore = Pick<GrazSessionStore, "accounts" | "activeChainIds">;
 
-export type GrazInternalPersistedStore = Pick<GrazInternalStore, "recentChain" | "_reconnect" | "_reconnectConnector">;
+export type GrazInternalPersistedStore = Pick<
+  GrazInternalStore,
+  "recentChainIds" | "_reconnect" | "_reconnectConnector"
+>;
 
 export const grazInternalDefaultValues: GrazInternalStore = {
-  recentChain: null,
-  defaultChain: null,
+  recentChainIds: null,
+  chains: null,
   walletType: WalletType.KEPLR,
   walletConnect: {
     options: null,
@@ -50,18 +53,18 @@ export const grazInternalDefaultValues: GrazInternalStore = {
 };
 
 export const grazSessionDefaultValues: GrazSessionStore = {
-  account: null,
-  activeChain: null,
+  accounts: null,
+  activeChainIds: null,
   status: "disconnected",
   wcSignClient: null,
 };
 
 const sessionOptions: PersistOptions<GrazSessionStore, GrazSessionPersistedStore> = {
   name: "graz-session",
-  version: 1,
+  version: 2,
   partialize: (x) => ({
-    account: x.account,
-    activeChain: x.activeChain,
+    accounts: x.accounts,
+    activeChainIds: x.activeChainIds,
   }),
   storage: createJSONStorage(() => sessionStorage),
 };
@@ -69,11 +72,11 @@ const sessionOptions: PersistOptions<GrazSessionStore, GrazSessionPersistedStore
 const persistOptions: PersistOptions<GrazInternalStore, GrazInternalPersistedStore> = {
   name: "graz-internal",
   partialize: (x) => ({
-    recentChain: x.recentChain,
+    recentChainIds: x.recentChainIds,
     _reconnect: x._reconnect,
     _reconnectConnector: x._reconnectConnector,
   }),
-  version: 1,
+  version: 2,
 };
 
 export const useGrazSessionStore = create(

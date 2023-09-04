@@ -35,7 +35,7 @@ export interface UseAccountArgs {
  * ```
  */
 export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => {
-  const _account = useGrazSessionStore((x) => x.account);
+  const _account = useGrazSessionStore((x) => x.accounts);
   const status = useGrazSessionStore((x) => x.status);
 
   useEffect(() => {
@@ -43,13 +43,13 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
       (x) => x.status,
       (stat, prevStat) => {
         if (stat === "connected") {
-          const { account, activeChain } = useGrazSessionStore.getState();
+          const { accounts: account, activeChainIds: activeChain } = useGrazSessionStore.getState();
           const { walletType } = useGrazInternalStore.getState();
           onConnect?.({
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             account: account!,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            chain: activeChain!,
+
+            chain: activeChain,
             walletType,
             isReconnect: prevStat === "reconnecting",
           });
@@ -92,7 +92,7 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
 export const useBalances = (bech32Address?: string): UseQueryResult<Coin[]> => {
   const { data: account } = useAccount();
   const { data: client } = useStargateClient();
-  const { activeChain } = useGrazSessionStore.getState();
+  const { activeChainIds: activeChain } = useGrazSessionStore.getState();
   const address = bech32Address || account?.bech32Address;
 
   const queryKey = useMemo(
@@ -274,7 +274,7 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
  * ```
  */
 export const useOfflineSigners = () => {
-  const chain = useGrazSessionStore((x) => x.activeChain);
+  const chain = useGrazSessionStore((x) => x.activeChainIds);
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(() => ["USE_OFFLINE_SIGNERS", chain, wallet] as const, [chain, wallet]);
 
@@ -316,7 +316,7 @@ export const useOfflineSigners = () => {
 export const useBalanceStaked = (bech32Address?: string): UseQueryResult<Coin | null> => {
   const { data: account } = useAccount();
   const { data: client } = useStargateClient();
-  const { activeChain } = useGrazSessionStore.getState();
+  const { activeChainIds: activeChain } = useGrazSessionStore.getState();
   const address = bech32Address || account?.bech32Address;
 
   const queryKey = useMemo(

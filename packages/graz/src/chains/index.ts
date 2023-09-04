@@ -1,4 +1,4 @@
-import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
+import type { AppCurrency, Bech32Config, ChainInfo } from "@keplr-wallet/types";
 
 import type { Dictionary } from "../types/core";
 import type { ChainInfoWithPath } from "../types/keplr";
@@ -22,6 +22,7 @@ export interface GrazChain {
     price: string;
     denom: string;
   };
+  bech32Config: Bech32Config;
 }
 
 /**
