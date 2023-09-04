@@ -105,14 +105,31 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   }
 };
 
-export const disconnect = async (clearRecentChain = false): Promise<void> => {
+export const disconnect = async (args?: { chainId?: string | string[] }): Promise<void> => {
   typeof window !== "undefined" && window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
-  useGrazSessionStore.setState(grazSessionDefaultValues);
-  useGrazInternalStore.setState((x) => ({
-    _reconnect: false,
-    _reconnectConnector: null,
-    recentChainIds: clearRecentChain ? null : x.recentChainIds,
-  }));
+  const chainId = typeof args?.chainId === "string" ? [args.chainId] : args?.chainId;
+  if (chainId) {
+    const _accounts = useGrazSessionStore.getState().accounts;
+    chainId.forEach((x) => {
+      delete _accounts?.[x];
+    });
+
+    useGrazSessionStore.setState((x) => ({
+      activeChainIds: x.activeChainIds?.filter((item) => !chainId?.includes(item)),
+      accounts: _accounts,
+    }));
+    useGrazInternalStore.setState((x) => ({
+      recentChainIds: x.recentChainIds?.filter((item) => !chainId?.includes(item)),
+    }));
+  } else {
+    useGrazSessionStore.setState(grazSessionDefaultValues);
+    useGrazInternalStore.setState({
+      _reconnect: false,
+      _reconnectConnector: null,
+      recentChainIds: null,
+    });
+  }
+
   return Promise.resolve();
 };
 
