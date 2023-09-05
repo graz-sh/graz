@@ -158,7 +158,7 @@ export function useCosmWasmSigningClient(
       });
       return res;
     },
-    enabled: Boolean(chains) && Boolean(wallet),
+    enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet),
     refetchOnWindowFocus: false,
   });
 }
@@ -242,7 +242,7 @@ export function useStargateTmSigningClient(
       });
       return res;
     },
-    enabled: Boolean(chains) && Boolean(wallet) && Boolean(tmClient),
+    enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet) && Boolean(tmClient),
     refetchOnWindowFocus: false,
   });
 }
@@ -326,7 +326,7 @@ export function useCosmWasmTmSigningClient(
       });
       return res;
     },
-    enabled: Boolean(chains) && Boolean(wallet) && Boolean(tmClient),
+    enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet) && Boolean(tmClient),
     refetchOnWindowFocus: false,
   });
 }
