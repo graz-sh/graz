@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import type { QueryConfig, UseMultiChainQueryResult } from "../types/hooks";
-import type { ChainId } from "../utils/multi-chain";
+import type { MultiChainHookArgs } from "../utils/multi-chain";
 import { createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi-chain";
 
 /**
@@ -23,10 +23,7 @@ import { createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi
  * ```
  */
 export const useStargateClient = <TMulti extends boolean>(
-  args?: {
-    chainId?: ChainId;
-    multiChain?: TMulti;
-  } & QueryConfig,
+  args?: MultiChainHookArgs<TMulti> & QueryConfig,
 ): UseMultiChainQueryResult<TMulti, StargateClient> => {
   const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const queryKey = useMemo(() => ["USE_STARGATE_CLIENT", chains] as const, [chains]);
@@ -61,10 +58,7 @@ export const useStargateClient = <TMulti extends boolean>(
  * ```
  */
 export const useCosmWasmClient = <TMulti extends boolean>(
-  args: {
-    chainId?: ChainId;
-    multiChain?: TMulti;
-  } & QueryConfig,
+  args: MultiChainHookArgs<TMulti> & QueryConfig,
 ): UseMultiChainQueryResult<TMulti, CosmWasmClient> => {
   const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const queryKey = useMemo(() => ["USE_COSMWASM_CLIENT", chains] as const, [chains]);
@@ -105,9 +99,8 @@ export const useTendermintClient = <T extends "tm34" | "tm37", TMulti extends bo
   enabled,
 }: {
   type: T;
-  chainId?: ChainId;
-  multiChain?: TMulti;
-} & QueryConfig): UseMultiChainQueryResult<TMulti, T extends "tm34" ? Tendermint34Client : Tendermint37Client> => {
+} & MultiChainHookArgs<TMulti> &
+  QueryConfig): UseMultiChainQueryResult<TMulti, T extends "tm34" ? Tendermint34Client : Tendermint37Client> => {
   const chains = useChainsFromArgs({ chainId, multiChain });
   const queryKey = useMemo(() => ["USE_TENDERMINT_CLIENT", type, chains] as const, [type, chains]);
 
