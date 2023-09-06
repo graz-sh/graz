@@ -8,9 +8,10 @@ import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } f
 import type { Maybe } from "../types/core";
 import type { WalletType } from "../types/wallet";
 import { checkWallet, getWallet, isWalletConnect } from "./wallet";
+import type { ChainId } from "../utils/multi-chain";
 
 export type ConnectArgs = Maybe<{
-  chainId: string | string[];
+  chainId: ChainId;
   walletType?: WalletType;
   autoReconnect?: boolean;
 }>;

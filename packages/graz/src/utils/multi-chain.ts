@@ -5,9 +5,9 @@ import { useGrazInternalStore } from "../store";
 
 export type ChainId = string | string[];
 
-export interface MultiChainHookArgs<T> {
+export interface MultiChainHookArgs {
   chainId?: ChainId;
-  multiChain?: T;
+  multiChain?: boolean;
 }
 
 export const useChainsFromArgs = ({ chainId, multiChain }: { chainId?: ChainId; multiChain?: boolean }) => {
@@ -37,5 +37,14 @@ export const createMultiChainAsyncFunction = async <T>(
     return Object.fromEntries(res.map((x, i) => [chains[i]!.chainId, x]));
   }
   const res = await fn(chains[0]!);
+  return res;
+};
+
+export const createMultiChainFunction = <T>(multiChain: boolean, chains: GrazChain[], fn: (chain: GrazChain) => T) => {
+  if (multiChain) {
+    const res = chains.map(fn);
+    return Object.fromEntries(res.map((x, i) => [chains[i]!.chainId, x]));
+  }
+  const res = fn(chains[0]!);
   return res;
 };
