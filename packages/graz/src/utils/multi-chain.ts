@@ -5,6 +5,11 @@ import { useGrazInternalStore } from "../store";
 
 export type ChainId = string | string[];
 
+export interface MultiChainHookArgs<T> {
+  chainId?: ChainId;
+  multiChain?: T;
+}
+
 export const useChainsFromArgs = ({ chainId, multiChain }: { chainId?: ChainId; multiChain?: boolean }) => {
   const chains = useGrazInternalStore((x) => x.chains);
   if (!chains) throw new Error("No chains found in GrazProvider");
