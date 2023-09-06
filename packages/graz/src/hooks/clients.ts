@@ -22,8 +22,8 @@ import { createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi
  *
  * ```
  */
-export const useStargateClient = <TMulti extends boolean>(
-  args?: MultiChainHookArgs<TMulti> & QueryConfig,
+export const useStargateClient = <TMulti extends MultiChainHookArgs>(
+  args?: TMulti & QueryConfig,
 ): UseMultiChainQueryResult<TMulti, StargateClient> => {
   const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const queryKey = useMemo(() => ["USE_STARGATE_CLIENT", chains] as const, [chains]);
@@ -57,8 +57,8 @@ export const useStargateClient = <TMulti extends boolean>(
  *
  * ```
  */
-export const useCosmWasmClient = <TMulti extends boolean>(
-  args: MultiChainHookArgs<TMulti> & QueryConfig,
+export const useCosmWasmClient = <TMulti extends MultiChainHookArgs>(
+  args?: TMulti & QueryConfig,
 ): UseMultiChainQueryResult<TMulti, CosmWasmClient> => {
   const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const queryKey = useMemo(() => ["USE_COSMWASM_CLIENT", chains] as const, [chains]);
@@ -92,14 +92,14 @@ export const useCosmWasmClient = <TMulti extends boolean>(
  *
  * ```
  */
-export const useTendermintClient = <T extends "tm34" | "tm37", TMulti extends boolean>({
+export const useTendermintClient = <T extends "tm34" | "tm37", TMulti extends MultiChainHookArgs>({
   type,
   chainId,
   multiChain,
   enabled,
 }: {
   type: T;
-} & MultiChainHookArgs<TMulti> &
+} & TMulti &
   QueryConfig): UseMultiChainQueryResult<TMulti, T extends "tm34" ? Tendermint34Client : Tendermint37Client> => {
   const chains = useChainsFromArgs({ chainId, multiChain });
   const queryKey = useMemo(() => ["USE_TENDERMINT_CLIENT", type, chains] as const, [type, chains]);
