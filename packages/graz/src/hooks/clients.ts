@@ -5,7 +5,7 @@ import { Tendermint34Client, Tendermint37Client } from "@cosmjs/tendermint-rpc";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import type { UseMultiChainQueryResult } from "../types/hooks";
+import type { QueryConfig, UseMultiChainQueryResult } from "../types/hooks";
 import type { ChainId } from "../utils/multi-chain";
 import { createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi-chain";
 
@@ -22,28 +22,27 @@ import { createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi
  *
  * ```
  */
-export const useStargateClient = <TMulti extends boolean>({
-  chainId,
-  multiChain,
-}: {
-  chainId?: ChainId;
-  multiChain?: TMulti;
-}): UseMultiChainQueryResult<TMulti, StargateClient> => {
-  const chains = useChainsFromArgs({ chainId, multiChain });
+export const useStargateClient = <TMulti extends boolean>(
+  args?: {
+    chainId?: ChainId;
+    multiChain?: TMulti;
+  } & QueryConfig,
+): UseMultiChainQueryResult<TMulti, StargateClient> => {
+  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const queryKey = useMemo(() => ["USE_STARGATE_CLIENT", chains] as const, [chains]);
 
   return useQuery({
     queryKey,
     queryFn: async ({ queryKey: [, _chains] }) => {
       if (!_chains || _chains.length < 1) throw new Error("No chains found");
-      const res = await createMultiChainAsyncFunction(Boolean(multiChain), _chains, async (_chain) => {
+      const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
         const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
         const client = await StargateClient.connect(endpoint);
         return client;
       });
       return res;
     },
-    enabled: Boolean(chains) && chains.length > 0,
+    enabled: Boolean(chains) && chains.length > 0 && args?.enabled !== undefined ? Boolean(args?.enabled) : true,
     refetchOnWindowFocus: false,
   });
 };
@@ -61,28 +60,27 @@ export const useStargateClient = <TMulti extends boolean>({
  *
  * ```
  */
-export const useCosmWasmClient = <TMulti extends boolean>({
-  chainId,
-  multiChain,
-}: {
-  chainId?: ChainId;
-  multiChain?: TMulti;
-}): UseMultiChainQueryResult<TMulti, CosmWasmClient> => {
-  const chains = useChainsFromArgs({ chainId, multiChain });
+export const useCosmWasmClient = <TMulti extends boolean>(
+  args: {
+    chainId?: ChainId;
+    multiChain?: TMulti;
+  } & QueryConfig,
+): UseMultiChainQueryResult<TMulti, CosmWasmClient> => {
+  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const queryKey = useMemo(() => ["USE_COSMWASM_CLIENT", chains] as const, [chains]);
 
   return useQuery({
     queryKey,
     queryFn: async ({ queryKey: [, _chains] }) => {
       if (!_chains) throw new Error("No chains found");
-      const res = await createMultiChainAsyncFunction(Boolean(multiChain), _chains, async (_chain) => {
+      const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
         const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
         const client = await CosmWasmClient.connect(endpoint);
         return client;
       });
       return res;
     },
-    enabled: Boolean(chains) && chains.length > 0,
+    enabled: Boolean(chains) && chains.length > 0 && args?.enabled !== undefined ? Boolean(args?.enabled) : true,
     refetchOnWindowFocus: false,
   });
 };
@@ -104,11 +102,12 @@ export const useTendermintClient = <T extends "tm34" | "tm37", TMulti extends bo
   type,
   chainId,
   multiChain,
+  enabled,
 }: {
   type: T;
   chainId?: ChainId;
   multiChain?: TMulti;
-}): UseMultiChainQueryResult<TMulti, T extends "tm34" ? Tendermint34Client : Tendermint37Client> => {
+} & QueryConfig): UseMultiChainQueryResult<TMulti, T extends "tm34" ? Tendermint34Client : Tendermint37Client> => {
   const chains = useChainsFromArgs({ chainId, multiChain });
   const queryKey = useMemo(() => ["USE_TENDERMINT_CLIENT", type, chains] as const, [type, chains]);
 
@@ -124,7 +123,7 @@ export const useTendermintClient = <T extends "tm34" | "tm37", TMulti extends bo
       });
       return res;
     },
-    enabled: Boolean(chains) && chains.length > 0,
+    enabled: Boolean(chains) && chains.length > 0 && enabled !== undefined ? Boolean(enabled) : true,
     refetchOnWindowFocus: false,
   });
 };
