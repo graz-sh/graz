@@ -9,3 +9,7 @@ export interface MutationEventArgs<TInitial = unknown, TSuccess = TInitial> {
 export type UseMultiChainQueryResult<TMulti extends boolean, TData> = UseQueryResult<
   TMulti extends true ? Record<string, TData> : TData
 >;
+
+export interface QueryConfig {
+  enabled?: boolean;
+}
