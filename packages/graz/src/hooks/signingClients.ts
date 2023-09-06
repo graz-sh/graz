@@ -289,7 +289,15 @@ export function useCosmWasmTmSigningClient(
   const { data: tmClient } = useTendermintClient({
     type: args.type,
     chainId: args.chainId,
-    multiChain: args.multiChain,
+    multiChain: false,
+    enabled: !args.multiChain,
+  });
+
+  const { data: tmClients } = useTendermintClient({
+    type: args.type,
+    chainId: args.chainId,
+    multiChain: true,
+    enabled: Boolean(args.multiChain),
   });
 
   return useQuery({
@@ -301,7 +309,6 @@ export function useCosmWasmTmSigningClient(
         if (!isWalletAvailable) {
           throw new Error(`${_wallet} is not available`);
         }
-        if (!tmClient) throw new Error("No tendermint client found");
         const offlineSigner = await (async () => {
           switch (args.offlineSigner) {
             case "offlineSigner":
@@ -315,9 +322,8 @@ export function useCosmWasmTmSigningClient(
           }
         })();
         const gasPrice = _chain.gas ? GasPrice.fromString(`${_chain.gas.price}${_chain.gas.denom}`) : undefined;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        const tendermintClient = (args?.multiChain ? tmClient[_chain.chainId] : tmClient) as TendermintClient;
+        const tendermintClient = args?.multiChain ? tmClients?.[_chain.chainId] : tmClient;
+        if (!tendermintClient) throw new Error("No tendermint client found");
         const client = await SigningCosmWasmClient.createWithSigner(tendermintClient, offlineSigner, {
           gasPrice,
           ...(args?.multiChain ? args?.opts?.[_chain.chainId] : args?.opts || {}),
@@ -326,7 +332,7 @@ export function useCosmWasmTmSigningClient(
       });
       return res;
     },
-    enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet) && Boolean(tmClient),
+    enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet) && (Boolean(tmClient) || Boolean(tmClients)),
     refetchOnWindowFocus: false,
   });
 }
