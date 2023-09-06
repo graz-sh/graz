@@ -288,7 +288,7 @@ export function useCosmWasmTmSigningClient(
 
   const { data: tmClient } = useTendermintClient({
     type: args.type,
-    chainId: args.chainId,
+    chainId: args?.chainId,
     multiChain: false,
     enabled: !args.multiChain,
   });

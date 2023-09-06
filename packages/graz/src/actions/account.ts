@@ -7,10 +7,11 @@ import { RECONNECT_SESSION_KEY } from "../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Maybe } from "../types/core";
 import type { WalletType } from "../types/wallet";
+import type { ChainId } from "../utils/multi-chain";
 import { checkWallet, getWallet } from "./wallet";
 
 export type ConnectArgs = Maybe<{
-  chainId: string | string[];
+  chainId: ChainId;
   walletType?: WalletType;
   autoReconnect?: boolean;
 }>;
