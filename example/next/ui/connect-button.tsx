@@ -18,11 +18,11 @@ export const ConnectButton: FC = () => {
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   const { isConnected, isConnecting, isReconnecting, reconnect } = useAccount({
-    onConnect: ({ account, walletType, chain }) => {
+    onConnect: ({ accounts, walletType, chains }) => {
       toast({
         status: "success",
-        title: `Wallet connected! using ${walletType} to ${chain.chainId}`,
-        description: `Connected as ${account.name}`,
+        title: `Wallet connected! using ${walletType} to ${chains?.map((item) => item.chainId)}`,
+        description: `Connected as ${accounts[0]?.name}`,
       });
     },
     onDisconnect: () => {
@@ -33,16 +33,14 @@ export const ConnectButton: FC = () => {
     },
   });
 
-  const { connect } = useConnect({
-    onSuccess: () => console.log("wallet connected"),
-  });
+  const { connect } = useConnect();
 
   const { disconnect } = useDisconnect({
     onSuccess: () => console.log("wallet disconnected"),
   });
 
   const handleConnect = (wallet: WalletType) => {
-    connect({ walletType: wallet });
+    connect({ walletType: wallet, chainId: "cosmoshub-4" });
     onClose();
   };
   const wallets = getAvailableWallets();

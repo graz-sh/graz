@@ -1,15 +1,15 @@
 import { Button, Text } from "@chakra-ui/react";
-import { useRecentChain } from "graz";
+import { useRecentChainIds } from "graz";
 import type { FC } from "react";
 
 export const RecentChain: FC = () => {
-  const { data: recentChain, clear } = useRecentChain();
+  const { data: recentChains, clear } = useRecentChainIds();
 
-  if (!recentChain) return null;
+  if (!recentChains) return null;
 
   return (
     <Text>
-      Recent chain: <b>{recentChain.chainId}</b> (
+      Recent chain: <b>{recentChains.join("; ")}</b> (
       <Button colorScheme="blue" onClick={clear} variant="link">
         clear
       </Button>
