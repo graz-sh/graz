@@ -1,6 +1,5 @@
 import type { ChainInfo } from "@keplr-wallet/types";
 
-import type { GrazChain } from "../chains";
 import { useGrazInternalStore } from "../store";
 import type { Dictionary } from "../types/core";
 import type { WalletType } from "../types/wallet";
@@ -16,7 +15,7 @@ export const getRecentChainIds = (): string[] | null => {
   return useGrazInternalStore.getState().recentChainIds;
 };
 
-export const getRecentChains = (): GrazChain[] | null => {
+export const getRecentChains = (): ChainInfo[] | null => {
   const { recentChainIds: recentChains, chains } = useGrazInternalStore.getState();
   return recentChains?.map((chainId) => chains!.find((x) => x.chainId === chainId)!) ?? null;
 };

@@ -1,4 +1,5 @@
-import type { GrazChain } from "../chains";
+import type { ChainInfo } from "@keplr-wallet/types";
+
 import { useGrazInternalStore } from "../store";
 
 export type ChainId = string | string[];
@@ -26,8 +27,8 @@ export const useChainsFromArgs = ({ chainId, multiChain }: { chainId?: ChainId; 
 
 export const createMultiChainAsyncFunction = async <T>(
   multiChain: boolean,
-  chains: GrazChain[],
-  fn: (chain: GrazChain) => Promise<T>,
+  chains: ChainInfo[],
+  fn: (chain: ChainInfo) => Promise<T>,
 ) => {
   const concurrency = useGrazInternalStore.getState().multiChainFetchConcurrency;
   if (multiChain) {
@@ -39,7 +40,7 @@ export const createMultiChainAsyncFunction = async <T>(
   return res;
 };
 
-export const createMultiChainFunction = <T>(multiChain: boolean, chains: GrazChain[], fn: (chain: GrazChain) => T) => {
+export const createMultiChainFunction = <T>(multiChain: boolean, chains: ChainInfo[], fn: (chain: ChainInfo) => T) => {
   if (multiChain) {
     const res = chains.map(fn);
     return Object.fromEntries(res.map((x, i) => [chains[i]!.chainId, x]));

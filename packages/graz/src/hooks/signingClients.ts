@@ -83,7 +83,8 @@ export function useStargateSigningClient(
               return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
           }
         })();
-        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
+        const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
+        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
         if (args?.multiChain === true) {
           args?.opts;
         }
@@ -154,8 +155,11 @@ export function useCosmWasmSigningClient(
               return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
           }
         })();
-        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
-        const gasPrice = _chain.gas ? GasPrice.fromString(`${_chain.gas.price}${_chain.gas.denom}`) : undefined;
+        const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
+        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
+        const gasPrice = chainConfig?.gas
+          ? GasPrice.fromString(`${chainConfig.gas.price}${chainConfig.gas.denom}`)
+          : undefined;
         const signingClient = await SigningCosmWasmClient.connectWithSigner(endpoint, offlineSigner, {
           gasPrice,
           ...(args?.multiChain ? args?.opts?.[_chain.chainId] : args?.opts || {}),
@@ -335,7 +339,10 @@ export function useCosmWasmTmSigningClient(
               return getWallet(_wallet).getOfflineSignerAuto(_chain.chainId);
           }
         })();
-        const gasPrice = _chain.gas ? GasPrice.fromString(`${_chain.gas.price}${_chain.gas.denom}`) : undefined;
+        const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
+        const gasPrice = chainConfig?.gas
+          ? GasPrice.fromString(`${chainConfig.gas.price}${chainConfig.gas.denom}`)
+          : undefined;
         const tendermintClient = args?.multiChain ? tmClients?.[_chain.chainId] : tmClient;
         if (!tendermintClient) throw new Error("No tendermint client found");
         const client = await SigningCosmWasmClient.createWithSigner(tendermintClient, offlineSigner, {
