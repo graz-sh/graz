@@ -17,6 +17,7 @@ export default defineConfig(({ watch }) => [
       banner: '/// <reference types="../types/global" />',
     },
     entry: ["src/index.ts"],
+    external: [/^@cosmjs\/.*/],
     format: ["cjs", "esm"],
     minify: !watch,
   },

@@ -42,7 +42,13 @@
     "@cosmjs/proto-signing": "*",
     "@cosmjs/stargate": "*",
     "@cosmjs/tendermint-rpc": "*",
+    "long": "*",
     "react": ">=17"
+  },
+  "peerDependenciesMeta": {
+    "long": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@keplr-wallet/types": "^0.12.20",
