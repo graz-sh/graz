@@ -8,8 +8,10 @@ export interface MutationEventArgs<TInitial = unknown, TSuccess = TInitial> {
   onSuccess?: (data: TSuccess) => unknown;
 }
 
+type ChainId = string;
+
 export type UseMultiChainQueryResult<TMulti extends MultiChainHookArgs, TData> = UseQueryResult<
-  TMulti["multiChain"] extends true ? Record<string, TData> : TData
+  TMulti["multiChain"] extends true ? Record<ChainId, TData> : TData
 >;
 
 export interface QueryConfig {
