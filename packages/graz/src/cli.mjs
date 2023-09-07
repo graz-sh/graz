@@ -3,7 +3,6 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
-import { Bech32Address } from "@keplr-wallet/cosmos";
 import arg from "arg";
 import { createClient, createTestnetClient } from "cosmos-directory-client";
 import pMap from "p-map";
@@ -120,7 +119,6 @@ const generate = async () => {
 const chainsDir = (...args) => path.resolve(__dirname, "..", "chains", ...args);
 
 /**
- * @param {Record<string, import("@keplr-wallet/types").ChainInfo>} record
  * @param {Record<string, boolean>} opts
  */
 const makeChainMap = (record, { testnet = false } = {}) =>
@@ -129,7 +127,6 @@ const makeChainMap = (record, { testnet = false } = {}) =>
     .join("\n");
 
 /**
- * @param {Record<string, import("@keplr-wallet/types").ChainInfo>} record
  * @param {Record<string, boolean>} opts
  */
 const makeDefs = (record, { mjs = false, testnet = false } = {}) =>
@@ -142,13 +139,27 @@ const makeDefs = (record, { mjs = false, testnet = false } = {}) =>
     .join("");
 
 /**
- * @param {Record<string, import("@keplr-wallet/types").ChainInfo>} record
  * @param {Record<string, boolean>} opts
  */
 const makeExports = (record, { testnet = false } = {}) =>
   Object.keys(record)
     .map((k) => `  ${chainNaming(k)},`)
     .join("\n");
+
+const prefixToBech32Config = (
+  prefix = "",
+  validatorPrefix = "val",
+  consensusPrefix = "cons",
+  publicPrefix = "pub",
+  operatorPrefix = "oper",
+) => ({
+  bech32PrefixAccAddr: prefix,
+  bech32PrefixAccPub: prefix + publicPrefix,
+  bech32PrefixValAddr: prefix + validatorPrefix + operatorPrefix,
+  bech32PrefixValPub: prefix + validatorPrefix + operatorPrefix + publicPrefix,
+  bech32PrefixConsAddr: prefix + validatorPrefix + consensusPrefix,
+  bech32PrefixConsPub: prefix + validatorPrefix + consensusPrefix + publicPrefix,
+});
 
 /**
  * @param {import("cosmos-directory-client").DirectoryClient} client
@@ -161,7 +172,6 @@ const makeRecord = async (client, { filter = "" } = {}) => {
 
   const chains = await pMap(paths, async (c) => client.fetchChain(c.path).then((x) => x.chain), { concurrency: 4 });
 
-  /** @type {Record<string, import("@keplr-wallet/types").ChainInfo>} */
   const record = {};
 
   chains.forEach((chain) => {
@@ -180,7 +190,6 @@ const makeRecord = async (client, { filter = "" } = {}) => {
       }
       const mainAsset = chain.assets[0];
 
-      /** @type{import("@keplr-wallet/types").Currency} */
       const nativeCurrency = {
         coinDenom: mainAsset.denom_units[mainAsset.denom_units.length - 1].denom,
         coinMinimalDenom: mainAsset.denom_units[0].denom,
@@ -198,7 +207,7 @@ const makeRecord = async (client, { filter = "" } = {}) => {
         })),
         rest: apis.rest[0].address || "",
         rpc: apis.rpc[0].address || "",
-        bech32Config: Bech32Address.defaultBech32Config(chain.bech32_prefix),
+        bech32Config: prefixToBech32Config(chain.bech32_prefix),
         chainName: chain.chain_name,
         feeCurrencies: [nativeCurrency],
         stakeCurrency: nativeCurrency,
