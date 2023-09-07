@@ -9,13 +9,9 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "bin": {
-    "graz": "./cli.mjs"
-  },
+  "bin": "./dist/cli.js",
   "files": [
     "chains/*.stub",
-    "cli.js",
-    "compiled/**",
     "dist/*.d.ts",
     "dist/*.js",
     "dist/*.mjs"
@@ -24,7 +20,7 @@
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist/*",
-    "cli": "node cli.mjs",
+    "cli": "node dist/cli.js",
     "dev": "tsup --watch",
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
     "prepublishOnly": "pnpm build"
