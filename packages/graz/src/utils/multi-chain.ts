@@ -1,5 +1,3 @@
-import pMap from "p-map";
-
 import type { GrazChain } from "../chains";
 import { useGrazInternalStore } from "../store";
 
@@ -33,7 +31,8 @@ export const createMultiChainAsyncFunction = async <T>(
 ) => {
   const concurrency = useGrazInternalStore.getState().multiChainFetchConcurrency;
   if (multiChain) {
-    const res = await pMap(chains, fn, { concurrency });
+    // const res = await pMap(chains, fn, { concurrency });
+    const res = await Promise.all(chains.map(fn));
     return Object.fromEntries(res.map((x, i) => [chains[i]!.chainId, x]));
   }
   const res = await fn(chains[0]!);
