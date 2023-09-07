@@ -1,4 +1,6 @@
+import { fromBech32, toBech32 } from "@cosmjs/encoding";
 import type { Coin } from "@cosmjs/proto-signing";
+import type { Key } from "@keplr-wallet/types";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
@@ -7,13 +9,25 @@ import type { ConnectArgs, ConnectResult } from "../actions/account";
 import { connect, disconnect, getOfflineSigners, reconnect } from "../actions/account";
 import { checkWallet } from "../actions/wallet";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
-import type { MutationEventArgs } from "../types/hooks";
+import type { MutationEventArgs, UseMultiChainQueryResult } from "../types/hooks";
+import type { MultiChainHookArgs } from "../utils/multi-chain";
+import { createMultiChainAsyncFunction, createMultiChainFunction, useChainsFromArgs } from "../utils/multi-chain";
 import { useStargateClient } from "./clients";
 import { useCheckWallet } from "./wallet";
 
 export interface UseAccountArgs {
   onConnect?: (args: ConnectResult & { isReconnect: boolean }) => void;
   onDisconnect?: () => void;
+}
+export interface UseAccountResult<TMulti extends MultiChainHookArgs> {
+  data?: TMulti["multiChain"] extends true ? Record<string, Key | undefined> : Key | undefined;
+  isConnected: boolean;
+  isConnecting: boolean;
+  isDisconnected: boolean;
+  isReconnecting: boolean;
+  isLoading: boolean;
+  reconnect: () => void;
+  status: string;
 }
 
 /**
@@ -34,7 +48,10 @@ export interface UseAccountArgs {
  * });
  * ```
  */
-export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => {
+export const useAccount = <TMulti extends MultiChainHookArgs>(
+  args?: UseAccountArgs & TMulti,
+): UseAccountResult<TMulti> => {
+  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const _account = useGrazSessionStore((x) => x.accounts);
   const status = useGrazSessionStore((x) => x.status);
 
@@ -43,27 +60,34 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
       (x) => x.status,
       (stat, prevStat) => {
         if (stat === "connected") {
-          const { accounts: account, activeChainIds: activeChain } = useGrazSessionStore.getState();
+          const { accounts, activeChainIds } = useGrazSessionStore.getState();
           const { walletType } = useGrazInternalStore.getState();
-          onConnect?.({
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            account: account!,
-
-            chain: activeChain,
+          if (!accounts || !activeChainIds || !chains) {
+            return args?.onDisconnect?.();
+          }
+          args?.onConnect?.({
+            accounts,
+            chains: activeChainIds.map((id) => chains.find((x) => x.chainId === id)!),
             walletType,
             isReconnect: prevStat === "reconnecting",
           });
         }
         if (stat === "disconnected") {
-          onDisconnect?.();
+          args?.onDisconnect?.();
         }
       },
     );
-  }, [onConnect, onDisconnect]);
+  }, [args, chains]);
+
+  const resAccount = _account
+    ? createMultiChainFunction(Boolean(args?.multiChain), chains, (chain) => {
+        return _account?.[chain.chainId];
+      })
+    : undefined;
 
   return {
-    data: _account,
-    isConnected: Boolean(_account),
+    data: resAccount as UseAccountResult<TMulti>["data"],
+    isConnected: Boolean(_account?.[0]),
     isConnecting: status === "connecting",
     isDisconnected: status === "disconnected",
     isReconnecting: status === "reconnecting",
@@ -89,38 +113,46 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
  * useBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export const useBalances = (bech32Address?: string): UseQueryResult<Coin[]> => {
+export const useBalances = <TMulti extends MultiChainHookArgs>(
+  args?: { bech32Address?: string } & TMulti,
+): UseMultiChainQueryResult<TMulti, Coin[]> => {
+  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const { data: account } = useAccount();
-  const { data: client } = useStargateClient();
-  const { activeChainIds: activeChain } = useGrazSessionStore.getState();
-  const address = bech32Address || account?.bech32Address;
 
-  const queryKey = useMemo(
-    () => ["USE_ALL_BALANCES", client, activeChain, address] as const,
-    [activeChain, address, client],
-  );
+  const { data: clients } = useStargateClient({
+    chainId: chains.map((x) => x.chainId),
+    multiChain: true,
+  });
 
-  const query = useQuery(
+  const address = args?.bech32Address || account?.bech32Address;
+
+  const queryKey = useMemo(() => ["USE_ALL_BALANCES", clients, chains, address] as const, [address, chains, clients]);
+
+  return useQuery(
     queryKey,
-    async ({ queryKey: [, _client, _activeChain, _address] }) => {
-      if (!_activeChain || !_client) {
-        throw new Error("No connected account detected");
-      }
+    async ({ queryKey: [, _clients, _chains, _address] }) => {
       if (!_address) {
         throw new Error("address is not defined");
       }
-      const balances = await _client.getAllBalances(_address);
-      return balances as Coin[];
+      const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
+        const stargateClient = _clients?.[_chain.chainId];
+        if (!stargateClient) {
+          throw new Error("Client is not ready");
+        }
+        const balances = await stargateClient.getAllBalances(
+          toBech32(_chain.bech32Config.bech32PrefixAccAddr, fromBech32(_address).data),
+        );
+        return balances as Coin[];
+      });
+      return res;
     },
     {
-      enabled: Boolean(address) && Boolean(activeChain) && Boolean(client),
+      enabled: Boolean(address) && Boolean(chains) && chains.length > 0 && Boolean(clients),
       refetchOnMount: false,
       refetchOnReconnect: true,
       refetchOnWindowFocus: false,
     },
   );
-
-  return query;
 };
 
 /**
