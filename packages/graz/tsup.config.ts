@@ -15,7 +15,6 @@ export default defineConfig(({ watch }) => [
   {
     ...defaultOptions,
     entry: ["src/*.ts"],
-    external: [/^@cosmjs\/.*/, /^@keplr-wallet\/.*/],
     format: ["cjs", "esm"],
     minify: !watch,
   },
