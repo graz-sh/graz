@@ -8,7 +8,6 @@ import type { QueryValidatorsResponse } from "cosmjs-types/cosmos/staking/v1beta
 import type { ConnectResult } from "../actions/account";
 import type { SuggestChainAndConnectArgs } from "../actions/chains";
 import { clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
-import type { GrazChain } from "../chains";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
@@ -36,14 +35,14 @@ export const useActiveChainIds = (): string[] | null => {
  * const { rpc, rest, chainId, currencies } = activeChains[0];
  * ```
  */
-export const useActiveChains = (): GrazChain[] | undefined => {
+export const useActiveChains = (): ChainInfo[] | undefined => {
   return useGrazSessionStore((x) => x.activeChainIds)
     ?.map((chainId) => {
       const chain = useGrazInternalStore.getState().chains?.find((x) => x.chainId === chainId);
       if (!chain) return;
       return chain;
     })
-    .filter(Boolean) as GrazChain[] | undefined;
+    .filter(Boolean) as ChainInfo[] | undefined;
 };
 
 /**
@@ -144,7 +143,7 @@ export const useRecentChains = () => {
       if (!chain) return;
       return chain;
     })
-    .filter(Boolean) as GrazChain[] | undefined;
+    .filter(Boolean) as ChainInfo[] | undefined;
   return { data, clear: clearRecentChain };
 };
 
