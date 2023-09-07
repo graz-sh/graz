@@ -21,9 +21,8 @@
     "graz": ">=0.0.37"
   },
   "devDependencies": {
-    "@types/node": "^20.3.1",
     "graz": "*",
-    "typescript": "^5.1.3"
+    "typescript": "^5.2.2"
   },
   "keywords": [
     "graz",
@@ -35,6 +34,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@vectis/extension-client": "^0.7.0"
+    "@vectis/extension-client": "^0.7.2"
   }
 }
