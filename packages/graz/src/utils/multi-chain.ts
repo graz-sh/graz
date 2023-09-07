@@ -31,7 +31,7 @@ export const createMultiChainAsyncFunction = async <T>(
   chains: GrazChain[],
   fn: (chain: GrazChain) => Promise<T>,
 ) => {
-  const concurrency = useGrazInternalStore.getState().multiChainConcurrency;
+  const concurrency = useGrazInternalStore.getState().multiChainFetchConcurrency;
   if (multiChain) {
     const res = await pMap(chains, fn, { concurrency });
     return Object.fromEntries(res.map((x, i) => [chains[i]!.chainId, x]));
