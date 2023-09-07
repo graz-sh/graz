@@ -1,6 +1,5 @@
 import type { QueryClientProviderProps } from "@tanstack/react-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { FC } from "react";
 
 import type { ConfigureGrazArgs } from "../actions/configure";
@@ -45,7 +44,6 @@ export const GrazProvider: FC<GrazProviderProps> = ({ children, grazOptions, deb
         {children}
         <GrazEvents />
       </ClientOnly>
-      {debug ? <ReactQueryDevtools initialIsOpen={false} position="bottom-right" /> : null}
     </QueryClientProvider>
   );
 };
