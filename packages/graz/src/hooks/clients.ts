@@ -16,9 +16,13 @@ import { createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi
  * ```ts
  * import { useStargateClient } from "graz";
  *
+ * // single chain
  * const { data:client, isFetching, refetch, ... } = useStargateClient();
+ * await client.getAccount("address")
  *
- * client.getAccount("address")
+ * // multi chain
+ * const { data:clients, isFetching, refetch, ... } = useStargateClient({multiChain: true, chainId: ["cosmoshub-4", "sommelier-3"]});
+ * await clients["cosmoshub-4"].getAccount("address")
  *
  * ```
  */
@@ -51,9 +55,13 @@ export const useStargateClient = <TMulti extends MultiChainHookArgs>(
  * ```ts
  * import { useCosmWasmClient } from "graz";
  *
+ * //single chain
  * const { data:client, isFetching, refetch, ... } = useCosmWasmClient();
+ * await client.getAccount("address")
  *
- * client.getAccount("address")
+ * // multi chain
+ * const { data:clients, isFetching, refetch, ... } = useCosmWasmClient({multiChain: true, chainId: ["cosmoshub-4", "sommelier-3"]});
+ * await clients["cosmoshub-4"].getAccount("address")
  *
  * ```
  */
@@ -84,12 +92,15 @@ export const useCosmWasmClient = <TMulti extends MultiChainHookArgs>(
  *
  * @example
  * ```ts
- * import { useCosmWasmClient } from "graz";
+ * import { useTendermintClient } from "graz";
  *
- * const { data:client, isFetching, refetch, ... } = useTendermintClient("tm37");
+ * //single chain
+ * const { data:client, isFetching, refetch, ... } = useTendermintClient({type: "tm37"});
+ * await client.getAccount("address")
  *
- * client.getAccount("address")
- *
+ * // multi chain
+ * const { data:clients, isFetching, refetch, ... } = useTendermintClient({type: "tm34", multiChain: true, chainId: ["cosmoshub-4", "sommelier-3"]});
+ * await clients["cosmoshub-4"].getAccount("address")
  * ```
  */
 export const useTendermintClient = <T extends "tm34" | "tm37", TMulti extends MultiChainHookArgs>({
