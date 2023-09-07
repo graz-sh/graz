@@ -23,7 +23,9 @@
   },
   "files": [
     "chains/*.stub",
-    "dist/*"
+    "dist/*",
+    "types/*",
+    "env.d.ts"
   ],
   "sideEffects": false,
   "scripts": {

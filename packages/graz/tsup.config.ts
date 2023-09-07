@@ -4,7 +4,6 @@ import { defineConfig } from "tsup";
 const defaultOptions: Options = {
   cjsInterop: true,
   clean: true,
-  dts: true,
   format: ["cjs", "esm"],
   shims: true,
   splitting: true,
@@ -14,6 +13,9 @@ const defaultOptions: Options = {
 export default defineConfig(({ watch }) => [
   {
     ...defaultOptions,
+    dts: {
+      banner: '/// <reference types="../types/global" />',
+    },
     entry: ["src/index.ts"],
     format: ["cjs", "esm"],
     minify: !watch,
