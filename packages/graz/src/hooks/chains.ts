@@ -14,18 +14,28 @@ import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
 
 /**
- * graz hook to retrieve connected account's active chain
+ * graz hook to retrieve connected account's active chainIds
  *
  * @example
  * ```ts
- * import { useActiveChain } from "graz";
- * const { rpc, rest, chainId, currencies } = useActiveChain();
+ * import { useActiveChainIds } from "graz";
+ * const activeChainIds = useActiveChainIds();
  * ```
  */
 export const useActiveChainIds = (): string[] | null => {
   return useGrazSessionStore((x) => x.activeChainIds);
 };
 
+/**
+ * graz hook to retrieve connected account's active chains
+ *
+ * @example
+ * ```ts
+ * import { useActiveChains } from "graz";
+ * const activeChains = useActiveChains();
+ * const { rpc, rest, chainId, currencies } = activeChains[0];
+ * ```
+ */
 export const useActiveChains = (): GrazChain[] | undefined => {
   return useGrazSessionStore((x) => x.activeChainIds)
     ?.map((chainId) => {
@@ -37,23 +47,23 @@ export const useActiveChains = (): GrazChain[] | undefined => {
 };
 
 /**
- * graz hook to retrieve specific connected account's currency
+ * graz hook to retrieve specific connected chains currency
  *
  * @param denom - Currency denom to search
  *
  * @example
  * ```ts
  * import { useActiveChainCurrency } from "graz";
- * const { data: currency, ... } = useActiveChainCurrency("juno");
+ * const { data: currency, ... } = useActiveChainCurrency({denom: "juno"});
  * ```
  */
-export const useActiveChainCurrencies = (denom: string): UseQueryResult<AppCurrency[] | undefined> => {
+export const useActiveChainCurrency = ({ denom }: { denom: string }): UseQueryResult<AppCurrency | undefined> => {
   const chains = useActiveChains();
   const queryKey = ["USE_ACTIVE_CHAIN_CURRENCY", denom] as const;
   const query = useQuery(
     queryKey,
     ({ queryKey: [, _denom] }) =>
-      chains?.find((c) => c.currencies.find((x) => x.coinMinimalDenom === _denom))?.currencies,
+      chains?.find((c) => c.currencies.find((x) => x.coinMinimalDenom === _denom))?.currencies.find((x) => x),
   );
   return query;
 };
@@ -94,26 +104,39 @@ export const useQueryClientValidators = <T extends QueryClient & StakingExtensio
 };
 
 /**
- * graz hook to retrieve last connected chain info
+ * graz hook to retrieve last connected chainIds
  *
  * @example
  * ```ts
- * import { useRecentChain, connect, mainnetChains } from "graz";
- * const { data: recentChain, clear } = useRecentChain();
+ * import { useRecentChainIds, connect, mainnetChains } from "graz";
+ * const { data: recentChainIds, clear } = useRecentChainIds();
  * try {
  *   connect(mainnetChains.cosmos);
  * } catch {
- *   connect(recentChain);
+ *   connect(recentChainIds);
  * }
  * ```
  *
- * @see {@link useActiveChain}
+ * @see {@link useActiveChainIds}
  */
 export const useRecentChainIds = () => {
   const recentChain = useGrazInternalStore((x) => x.recentChainIds);
   return { data: recentChain, clear: clearRecentChain };
 };
 
+/**
+ * graz hook to retrieve last connected chains
+ *
+ * @example
+ * ```ts
+ * import { useRecentChains, connect, mainnetChains } from "graz";
+ *
+ * const recentChains = useRecentChains();
+ * const { rpc, rest, chainId, currencies } = activeChains[0];
+ * ```
+ *
+ * @see {@link useActiveChains}
+ */
 export const useRecentChains = () => {
   const data = useGrazInternalStore((x) => x.recentChainIds)
     ?.map((chainId) => {
