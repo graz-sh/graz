@@ -53,7 +53,8 @@ export interface UseAccountResult<TMulti extends MultiChainHookArgs> {
 export const useAccount = <TMulti extends MultiChainHookArgs>(
   args?: UseAccountArgs & TMulti,
 ): UseAccountResult<TMulti> => {
-  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
+  const activeChainIds = useGrazSessionStore((x) => x.activeChainIds);
+  const activeChains = useChainsFromArgs({ chainId: activeChainIds ?? undefined, multiChain: args?.multiChain });
   const _account = useGrazSessionStore((x) => x.accounts);
   const status = useGrazSessionStore((x) => x.status);
 
@@ -62,14 +63,15 @@ export const useAccount = <TMulti extends MultiChainHookArgs>(
       (x) => x.status,
       (stat, prevStat) => {
         if (stat === "connected") {
-          const { accounts, activeChainIds } = useGrazSessionStore.getState();
+          const { accounts, activeChainIds: _activeChainIds } = useGrazSessionStore.getState();
+          const { chains } = useGrazInternalStore.getState();
           const { walletType } = useGrazInternalStore.getState();
-          if (!accounts || !activeChainIds || !chains) {
+          if (!accounts || !_activeChainIds || !chains) {
             return args?.onDisconnect?.();
           }
           args?.onConnect?.({
             accounts,
-            chains: activeChainIds.map((id) => chains.find((x) => x.chainId === id)!),
+            chains: _activeChainIds.map((id) => chains.find((x) => x.chainId === id)!),
             walletType,
             isReconnect: prevStat === "reconnecting",
           });
@@ -79,15 +81,18 @@ export const useAccount = <TMulti extends MultiChainHookArgs>(
         }
       },
     );
-  }, [args, chains]);
-  const resAccount = _account
-    ? createMultiChainFunction(Boolean(args?.multiChain), chains, (chain) => {
-        return _account?.[chain.chainId];
-      })
-    : undefined;
+  }, [args]);
+
+  const account = useMemo(() => {
+    return _account
+      ? createMultiChainFunction(Boolean(args?.multiChain), activeChains, (chain) => {
+          return _account?.[chain.chainId];
+        })
+      : undefined;
+  }, [_account, activeChains, args?.multiChain]);
 
   return {
-    data: resAccount as UseAccountResult<TMulti>["data"],
+    data: account as UseAccountResult<TMulti>["data"],
     isConnected: status === "connected",
     isConnecting: status === "connecting",
     isDisconnected: status === "disconnected",
