@@ -1,8 +1,7 @@
 import { fromBech32, toBech32 } from "@cosmjs/encoding";
 import type { OfflineDirectSigner } from "@cosmjs/proto-signing";
-import type { Key, OfflineAminoSigner } from "@keplr-wallet/types";
+import type { ChainInfo, Key, OfflineAminoSigner } from "@keplr-wallet/types";
 
-import type { GrazChain } from "../chains";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Maybe } from "../types/core";
@@ -19,7 +18,7 @@ export type ConnectArgs = Maybe<{
 export interface ConnectResult {
   accounts: Record<string, Key>;
   walletType: WalletType;
-  chains: GrazChain[];
+  chains: ChainInfo[];
 }
 
 export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {

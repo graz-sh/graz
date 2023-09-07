@@ -5,6 +5,7 @@ import { Tendermint34Client, Tendermint37Client } from "@cosmjs/tendermint-rpc";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
+import { useGrazInternalStore } from "../store";
 import type { QueryConfig, UseMultiChainQueryResult } from "../types/hooks";
 import type { MultiChainHookArgs } from "../utils/multi-chain";
 import { createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi-chain";
@@ -37,7 +38,8 @@ export const useStargateClient = <TMulti extends MultiChainHookArgs>(
     queryFn: async ({ queryKey: [, _chains] }) => {
       if (!_chains || _chains.length < 1) throw new Error("No chains found");
       const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
-        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
+        const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
+        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
         const client = await StargateClient.connect(endpoint);
         return client;
       });
@@ -76,7 +78,8 @@ export const useCosmWasmClient = <TMulti extends MultiChainHookArgs>(
     queryFn: async ({ queryKey: [, _chains] }) => {
       if (!_chains) throw new Error("No chains found");
       const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
-        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
+        const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
+        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
         const client = await CosmWasmClient.connect(endpoint);
         return client;
       });
@@ -120,7 +123,8 @@ export const useTendermintClient = <T extends "tm34" | "tm37", TMulti extends Mu
     queryFn: async ({ queryKey: [, _type, _chains] }) => {
       if (!_chains) throw new Error("No chains found");
       const res = await createMultiChainAsyncFunction(Boolean(multiChain), _chains, async (_chain) => {
-        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(_chain.rpcHeaders || {}) } };
+        const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
+        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
         const TendermintClient = _type === "tm37" ? Tendermint37Client : Tendermint34Client;
         const client = await TendermintClient.connect(endpoint);
         return client;
