@@ -6,8 +6,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import type { QueryValidatorsResponse } from "cosmjs-types/cosmos/staking/v1beta1/query";
 
 import type { ConnectResult } from "../actions/account";
-import type { SuggestChainAndConnectArgs, SuggestChainArgs } from "../actions/chains";
-import { clearRecentChain, getActiveChainCurrency, suggestChain, suggestChainAndConnect } from "../actions/chains";
+import type { SuggestChainAndConnectArgs } from "../actions/chains";
+import { clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import type { GrazChain } from "../chains";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
@@ -22,8 +22,18 @@ import { useCheckWallet } from "./wallet";
  * const { rpc, rest, chainId, currencies } = useActiveChain();
  * ```
  */
-export const useActiveChain = (): GrazChain | null => {
+export const useActiveChainIds = (): string[] | null => {
   return useGrazSessionStore((x) => x.activeChainIds);
+};
+
+export const useActiveChains = (): GrazChain[] | undefined => {
+  return useGrazSessionStore((x) => x.activeChainIds)
+    ?.map((chainId) => {
+      const chain = useGrazInternalStore.getState().chains?.find((x) => x.chainId === chainId);
+      if (!chain) return;
+      return chain;
+    })
+    .filter(Boolean) as GrazChain[] | undefined;
 };
 
 /**
@@ -37,9 +47,14 @@ export const useActiveChain = (): GrazChain | null => {
  * const { data: currency, ... } = useActiveChainCurrency("juno");
  * ```
  */
-export const useActiveChainCurrency = (denom: string): UseQueryResult<AppCurrency | undefined> => {
+export const useActiveChainCurrencies = (denom: string): UseQueryResult<AppCurrency[] | undefined> => {
+  const chains = useActiveChains();
   const queryKey = ["USE_ACTIVE_CHAIN_CURRENCY", denom] as const;
-  const query = useQuery(queryKey, ({ queryKey: [, _denom] }) => getActiveChainCurrency(_denom));
+  const query = useQuery(
+    queryKey,
+    ({ queryKey: [, _denom] }) =>
+      chains?.find((c) => c.currencies.find((x) => x.coinMinimalDenom === _denom))?.currencies,
+  );
   return query;
 };
 
@@ -58,11 +73,12 @@ export const useActiveChainCurrency = (denom: string): UseQueryResult<AppCurrenc
  * const { data: response, ... } = useActiveChainValidators(queryClient);
  * ```
  */
-export const useActiveChainValidators = <T extends QueryClient & StakingExtension>(
-  queryClient: T | undefined,
-  status: BondStatusString = "BOND_STATUS_BONDED",
-): UseQueryResult<QueryValidatorsResponse> => {
-  const queryKey = ["USE_ACTIVE_CHAIN_VALIDATORS", queryClient, status] as const;
+export const useQueryClientValidators = <T extends QueryClient & StakingExtension>(args: {
+  queryClient: T | undefined;
+  status?: BondStatusString;
+}): UseQueryResult<QueryValidatorsResponse> => {
+  const status = args.status ?? "BOND_STATUS_BONDED";
+  const queryKey = ["USE_ACTIVE_CHAIN_VALIDATORS", args.queryClient, status] as const;
   const query = useQuery(
     queryKey,
     async ({ queryKey: [, _queryClient, _status] }) => {
@@ -71,7 +87,7 @@ export const useActiveChainValidators = <T extends QueryClient & StakingExtensio
       return res;
     },
     {
-      enabled: typeof queryClient !== "undefined",
+      enabled: typeof args.queryClient !== "undefined",
     },
   );
   return query;
@@ -93,12 +109,23 @@ export const useActiveChainValidators = <T extends QueryClient & StakingExtensio
  *
  * @see {@link useActiveChain}
  */
-export const useRecentChain = () => {
+export const useRecentChainIds = () => {
   const recentChain = useGrazInternalStore((x) => x.recentChainIds);
   return { data: recentChain, clear: clearRecentChain };
 };
 
-export type UseSuggestChainArgs = MutationEventArgs<SuggestChainArgs, ChainInfo>;
+export const useRecentChains = () => {
+  const data = useGrazInternalStore((x) => x.recentChainIds)
+    ?.map((chainId) => {
+      const chain = useGrazInternalStore.getState().chains?.find((x) => x.chainId === chainId);
+      if (!chain) return;
+      return chain;
+    })
+    .filter(Boolean) as GrazChain[] | undefined;
+  return { data, clear: clearRecentChain };
+};
+
+export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
 
 /**
  * graz mutation hook to suggest chain to a Wallet
@@ -119,8 +146,8 @@ export type UseSuggestChainArgs = MutationEventArgs<SuggestChainArgs, ChainInfo>
 export const useSuggestChain = ({ onError, onLoading, onSuccess }: UseSuggestChainArgs = {}) => {
   const queryKey = ["USE_SUGGEST_CHAIN", onError, onLoading, onSuccess];
   const mutation = useMutation(queryKey, suggestChain, {
-    onError: (err, chainInfo) => Promise.resolve(onError?.(err, chainInfo)),
-    onMutate: onLoading,
+    onError: (err, args) => Promise.resolve(onError?.(err, args.chainInfo)),
+    onMutate: (data) => onLoading?.(data.chainInfo),
     onSuccess: (chainInfo) => Promise.resolve(onSuccess?.(chainInfo)),
   });
 
