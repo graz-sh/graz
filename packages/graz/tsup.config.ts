@@ -14,7 +14,7 @@ const defaultOptions: Options = {
 export default defineConfig(({ watch }) => [
   {
     ...defaultOptions,
-    entry: ["src/*.ts"],
+    entry: ["src/index.ts"],
     format: ["cjs", "esm"],
     minify: !watch,
   },
