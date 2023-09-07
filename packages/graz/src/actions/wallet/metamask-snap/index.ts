@@ -12,6 +12,7 @@ import Long from "long";
 
 import { useGrazInternalStore } from "../../../store";
 import type { SignAminoParams, SignDirectParams, Wallet } from "../../../types/wallet";
+import type { ChainId } from "../../../utils/multi-chain";
 import type { GetSnapsResponse, Snap } from "./types";
 
 export interface GetMetamaskSnap {
@@ -81,7 +82,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       return true;
     };
 
-    const enable = async (chainId: string | string[]) => {
+    const enable = async (chainId: ChainId) => {
       const installedSnap = await getSnap();
       if (!installedSnap) await requestSnaps();
     };

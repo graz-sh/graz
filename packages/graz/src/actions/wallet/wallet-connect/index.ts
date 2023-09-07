@@ -1,6 +1,5 @@
 import type { AminoSignResponse } from "@cosmjs/amino";
 import { fromBech32, toBech32 } from "@cosmjs/encoding";
-import { fromBech32 } from "@cosmjs/encoding";
 import type { AccountData, Algo, DirectSignResponse } from "@cosmjs/proto-signing";
 import type { Keplr, Key } from "@keplr-wallet/types";
 import { SignClient } from "@walletconnect/sign-client";
