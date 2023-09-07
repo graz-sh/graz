@@ -43,7 +43,7 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
 
     chainIds.forEach((chainId) => {
       if (!providerChainIds?.includes(chainId)) {
-        throw new Error(`Chain ${chainId} is not provided`);
+        throw new Error(`Chain ${chainId} is not provided in GrazProvider`);
       }
     });
 
@@ -75,10 +75,14 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     });
 
     useGrazInternalStore.setState((prev) => ({
-      recentChainIds: [...(prev.recentChainIds || []), ...chainIds],
+      recentChainIds: [...(prev.recentChainIds || []), ...chainIds].filter((thing, i, arr) => {
+        return arr.indexOf(thing) === i;
+      }),
     }));
     useGrazSessionStore.setState((prev) => ({
-      activeChainIds: [...(prev.activeChainIds || []), ...chainIds],
+      activeChainIds: [...(prev.activeChainIds || []), ...chainIds].filter((thing, i, arr) => {
+        return arr.indexOf(thing) === i;
+      }),
       accounts: { ...(prev.accounts || {}), ...resultAcccounts },
     }));
 
@@ -106,7 +110,7 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   }
 };
 
-export const disconnect = async (args?: { chainId?: string | string[] }): Promise<void> => {
+export const disconnect = (args?: { chainId?: ChainId }) => {
   typeof window !== "undefined" && window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
   const chainId = typeof args?.chainId === "string" ? [args.chainId] : args?.chainId;
   if (chainId) {

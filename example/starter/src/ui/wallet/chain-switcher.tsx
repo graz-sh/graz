@@ -3,7 +3,7 @@ import {
   mainnetChainsArray,
   testnetChains,
   useAccount,
-  useActiveChain,
+  useActiveChainIds,
   useConnect,
   useSuggestChainAndConnect,
 } from "graz";
@@ -11,36 +11,38 @@ import {
 export const ChainSwitcher = () => {
   const toast = useToast();
 
-  const activeChain = useActiveChain();
+  const activeChainIds = useActiveChainIds();
   const { isConnecting, isReconnecting } = useAccount({
-    onConnect: ({ account, isReconnect }) => {
+    onConnect: ({ chains, isReconnect }) => {
       if (!isReconnect) {
         toast({
           status: "success",
           title: "Switched chain!",
-          description: `Connected as ${account.name}`,
+          description: `Connected as ${Object.values(chains)
+            .map((c) => c.chainId)
+            .join("; ")}`,
         });
       }
     },
   });
 
   const { connect } = useConnect({
-    onSuccess: () => console.log("switched chain"),
+    onSuccess: () => console.log("Connnected"),
   });
 
   const { suggestAndConnect } = useSuggestChainAndConnect({
-    onSuccess: () => console.log("switched chain"),
+    onSuccess: () => console.log("Connnected"),
   });
 
   return (
     <FormControl>
-      <FormLabel my={4}>Switch Chain</FormLabel>
+      <FormLabel my={4}>Connect other chains</FormLabel>
       <ButtonGroup flexWrap="wrap" gap={2} isDisabled={isConnecting || isReconnecting} size="sm" spacing={0}>
         {mainnetChainsArray.map((chain) => (
           <Button
             key={chain.chainId}
-            colorScheme={activeChain?.chainId === chain.chainId ? "green" : "gray"}
-            onClick={() => connect({ chain })}
+            colorScheme={activeChainIds?.includes(chain.chainId) ? "green" : "gray"}
+            onClick={() => connect({ chainId: chain.chainId })}
           >
             {chain.chainId}
           </Button>
@@ -49,7 +51,7 @@ export const ChainSwitcher = () => {
       <FormLabel my={4}>Suggest and connect chain</FormLabel>
       <ButtonGroup isDisabled={isConnecting || isReconnecting} size="sm">
         <Button
-          colorScheme={activeChain?.chainId === testnetChains.osmosis.chainId ? "green" : "gray"}
+          colorScheme={activeChainIds?.includes(testnetChains.osmosis.chainId) ? "green" : "gray"}
           onClick={() =>
             suggestAndConnect({
               chainInfo: testnetChains.osmosis,
