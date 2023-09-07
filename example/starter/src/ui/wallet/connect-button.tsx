@@ -7,13 +7,15 @@ export const WalletConnectButton = () => {
   const toast = useToast();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isConnected, isConnecting } = useAccount({
-    onConnect: ({ account, isReconnect }) => {
+  const { isConnected, isConnecting, status } = useAccount({
+    onConnect: ({ chains, isReconnect }) => {
       if (!isReconnect) {
         toast({
           status: "success",
-          title: "Wallet connected!",
-          description: `Connected as ${account.name}`,
+          title: "Switched chain!",
+          description: `Connected as ${Object.values(chains)
+            .map((c) => c.chainId)
+            .join("; ")}`,
         });
       }
     },
@@ -24,6 +26,7 @@ export const WalletConnectButton = () => {
       });
     },
   });
+  console.log(status, isConnected);
 
   const { connect } = useConnect();
 
@@ -31,7 +34,7 @@ export const WalletConnectButton = () => {
 
   const handleConnect = (wallet: WalletType) => {
     onClose();
-    return connect({ chain: mainnetChains.cosmoshub, walletType: wallet });
+    return connect({ chainId: mainnetChains.cosmoshub.chainId, walletType: wallet });
   };
 
   const wallets = getAvailableWallets();

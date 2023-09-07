@@ -80,7 +80,6 @@ export const useAccount = <TMulti extends MultiChainHookArgs>(
       },
     );
   }, [args, chains]);
-
   const resAccount = _account
     ? createMultiChainFunction(Boolean(args?.multiChain), chains, (chain) => {
         return _account?.[chain.chainId];
@@ -89,7 +88,7 @@ export const useAccount = <TMulti extends MultiChainHookArgs>(
 
   return {
     data: resAccount as UseAccountResult<TMulti>["data"],
-    isConnected: Boolean(_account?.[0]),
+    isConnected: status === "connected",
     isConnecting: status === "connecting",
     isDisconnected: status === "disconnected",
     isReconnecting: status === "reconnecting",
@@ -305,8 +304,8 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
   });
 
   return {
-    disconnect: mutation.mutate,
-    disconnectAsync: mutation.mutateAsync,
+    disconnect: (args?: { chainId?: string }) => mutation.mutate(args),
+    disconnectAsync: (args?: { chainId?: string }) => mutation.mutateAsync(args),
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
