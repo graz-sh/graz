@@ -41,9 +41,13 @@ export function useStargateSigningClient(
  * ```ts
  * import { useStargateSigningClient } from "graz";
  *
+ * // single chain
  * const { data:signingClient, isFetching, refetch, ... } = useStargateSigningClient();
+ * await signingClient.getAccount("address")
  *
- * signingClient.getAccount("address")
+ * // multi chain
+ * const { data:signingClients, isFetching, refetch, ... } = useStargateSigningClient({multiChain: true, chainId: ["cosmoshub-4", "sommelier-3"]});
+ * await signingClients["cosmoshub-4"].getAccount("address")
  *
  * ```
  */
@@ -109,11 +113,13 @@ export function useCosmWasmSigningClient(
  * @example
  * ```ts
  * import { useCosmWasmSigningClient } from "graz";
- *
+ * // single chain
  * const { data:signingClient, isFetching, refetch, ... } = useCosmWasmSigningClient();
+ * await signingClient.getAccount("address")
  *
- * signingClient.getAccount("address")
- *
+ * // multi chain
+ * const { data:signingClients, isFetching, refetch, ... } = useCosmWasmSigningClient({multiChain: true, chainId: ["cosmoshub-4", "sommelier-3"]});
+ * await signingClients["cosmoshub-4"].getAccount("address")
  * ```
  */
 // eslint-disable-next-line prefer-arrow-functions/prefer-arrow-functions
@@ -182,9 +188,13 @@ export function useStargateTmSigningClient(
  * ```ts
  * import { useStargateTmSigningClient } from "graz";
  *
+ * // single chain
  * const { data:signingClient, isFetching, refetch, ... } = useStargateTmSigningClient("tm34");
+ * await signingClient.getAccount("address")
  *
- * signingClient.getAccount("address")
+ * // multi chain
+ * const { data:signingClients, isFetching, refetch, ... } = useStargateTmSigningClient({type: "tm34", multiChain: true, chainId: ["cosmoshub-4", "sommelier-3"]});
+ * await signingClients["cosmoshub-4"].getAccount("address")
  *
  * ```
  */
@@ -266,9 +276,13 @@ export function useCosmWasmTmSigningClient(
  * ```ts
  * import { useCosmWasmTmSigningClient } from "graz";
  *
+ * // single chain
  * const { data:signingClient, isFetching, refetch, ... } = useCosmWasmTmSigningClient("tm34");
+ * await signingClient.getAccount("address")
  *
- * signingClient.getAccount("address")
+ * // multi chain
+ * const { data:signingClients, isFetching, refetch, ... } = useCosmWasmTmSigningClient({type: "tm34", multiChain: true, chainId: ["cosmoshub-4", "sommelier-3"]});
+ * await signingClients["cosmoshub-4"].getAccount("address")
  *
  * ```
  */

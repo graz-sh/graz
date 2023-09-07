@@ -4,7 +4,7 @@ import type { Key } from "@keplr-wallet/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 
-import type { ConnectArgs, ConnectResult, OfflineSigners } from "../actions/account";
+import type { ConnectArgs, ConnectResult, OfflineSigners, ReconnectArgs } from "../actions/account";
 import { connect, disconnect, getOfflineSigners, reconnect } from "../actions/account";
 import { checkWallet } from "../actions/wallet";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
@@ -25,7 +25,7 @@ export interface UseAccountResult<TMulti extends MultiChainHookArgs> {
   isDisconnected: boolean;
   isReconnecting: boolean;
   isLoading: boolean;
-  reconnect: () => void;
+  reconnect: (args?: ReconnectArgs) => Promise<ConnectResult | undefined>;
   status: string;
 }
 
@@ -38,7 +38,10 @@ export interface UseAccountResult<TMulti extends MultiChainHookArgs> {
  * import { useAccount } from "graz";
  *
  * // basic example
- * const { data, isConnecting, isConnected, ... } = useAccount();
+ * const { data:account, isConnecting, isConnected, ... } = useAccount();
+ *
+ * // multichain example
+ * const { data:accounts, isConnecting, isConnected, ... } = useAccount({chainId: ["cosmoshub-4", "sommelier-3"] multiChain: true});
  *
  * // with event arguments
  * useAccount({
@@ -108,6 +111,10 @@ export const useAccount = <TMulti extends MultiChainHookArgs>(
  * // basic example
  * const { data, isFetching, refetch, ... } = useBalances();
  *
+ * // multichain example
+ * const { data:balances, isFetching, refetch, ... } = useBalances({chainId: ["cosmoshub-4", "sommelier-3"] multiChain: true});
+ * const cosmoshubBalances = balances["cosmoshub-4"]
+ *
  * // with custom bech32 address
  * useBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
@@ -165,7 +172,7 @@ export const useBalances = <TMulti extends MultiChainHookArgs>(
  * import { useBalance } from "graz";
  *
  * // basic example
- * const { data, isFetching, refetch, ... } = useBalance("atom");
+ * const { data, isFetching, refetch, ... } = useBalance({denom: "atom"});
  *
  * // with custom bech32 address
  * useBalance("atom", "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
@@ -314,8 +321,15 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
  *
  * @example
  * ```ts
+ *
+ * // basic example
  * import { useOfflineSigners } from "graz";
  * const { offlineSigner, offlineSignerAmino, offlineSignerAuto } = useOfflineSigners();
+ *
+ * // multichain example
+ * const offlineSigners = useOfflineSigners({chainId: ["cosmoshub-4", "sommelier-3"] multiChain: true});
+ * const cosmoshubOfflineSigners = offlineSigners["cosmoshub-4"]
+ *
  * ```
  */
 export const useOfflineSigners = <TMulti extends MultiChainHookArgs>(
@@ -359,8 +373,12 @@ export const useOfflineSigners = <TMulti extends MultiChainHookArgs>(
  * // basic example
  * const { data, isFetching, refetch, ... } = useBalanceStaked();
  *
+ * // multichain example
+ * const { data:balanceStaked, isFetching, refetch, ... } = useBalanceStaked({chainId: ["cosmoshub-4", "sommelier-3"] multiChain: true});
+ * const cosmoshubBalanceStaked = balances["cosmoshub-4"]
+ *
  * // with custom bech32 address
- * useBalanceStaked("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
+ * useBalanceStaked({ bech32Address: "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu"});
  * ```
  */
 export const useBalanceStaked = <TMulti extends MultiChainHookArgs>(
@@ -384,7 +402,9 @@ export const useBalanceStaked = <TMulti extends MultiChainHookArgs>(
       }
       const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
         if (!_client) throw new Error("Client is not ready");
-        const balance = await _client[_chain.chainId]?.getBalanceStaked(_address);
+        const balance = await _client[_chain.chainId]?.getBalanceStaked(
+          toBech32(_chain.bech32Config.bech32PrefixAccAddr, fromBech32(_address).data),
+        );
         return balance;
       });
       return res;
