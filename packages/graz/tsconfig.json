@@ -1,6 +1,7 @@
 {
   "extends": "@graz-sh/style-guide/tsconfig/next.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
     "incremental": false,
     "target": "es6"
   },
