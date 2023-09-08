@@ -346,7 +346,7 @@ export const useOfflineSigners = <TMulti extends MultiChainHookArgs>(
   return useQuery({
     queryKey,
     queryFn: async ({ queryKey: [, _chains, _wallet] }) => {
-      if (!_chains) throw new Error("No chain found");
+      if (_chains.length < 1) throw new Error("No chain found");
       const isWalletAvailable = checkWallet(_wallet);
       if (!isWalletAvailable) {
         throw new Error(`${_wallet} is not available`);
