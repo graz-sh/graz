@@ -1,5 +1,5 @@
 import { Button, Stack, Tooltip, useDisclosure, useToast } from "@chakra-ui/react";
-import { getAvailableWallets, mainnetChains, useAccount, useConnect, useDisconnect, WalletType } from "graz";
+import { getAvailableWallets, useAccount, useConnect, useDisconnect, WalletType } from "graz";
 
 import { Modal } from "../core/modal";
 
@@ -34,7 +34,7 @@ export const WalletConnectButton = () => {
 
   const handleConnect = (wallet: WalletType) => {
     onClose();
-    return connect({ chainId: mainnetChains.cosmoshub.chainId, walletType: wallet });
+    return connect({ chainId: "", walletType: wallet });
   };
 
   const wallets = getAvailableWallets();
@@ -42,19 +42,19 @@ export const WalletConnectButton = () => {
   return (
     <>
       {!isConnected ? (
-        <Button onClick={onOpen} isLoading={isConnecting}>
+        <Button isLoading={isConnecting} onClick={onOpen}>
           Connect Wallet
         </Button>
       ) : (
         <Tooltip label="Disconnect" placement="bottom">
-          <Button variant="outline" onClick={() => disconnect()} isLoading={isConnecting}>
+          <Button isLoading={isConnecting} onClick={() => disconnect()} variant="outline">
             Connected
           </Button>
         </Tooltip>
       )}
 
       {!isConnected && (
-        <Modal isOpen={isOpen} onClose={onClose} modalHeader="Select a wallet">
+        <Modal isOpen={isOpen} modalHeader="Select a wallet" onClose={onClose}>
           <Stack spacing={3}>
             {wallets.keplr ? <Button onClick={() => handleConnect(WalletType.KEPLR)}>Keplr</Button> : null}
             {wallets.leap ? <Button onClick={() => handleConnect(WalletType.LEAP)}>Leap</Button> : null}
