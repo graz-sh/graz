@@ -13,6 +13,7 @@
     "docs": "pnpm --dir docs",
     "example:next": "pnpm --dir example/next",
     "example:vite": "pnpm --dir example/vite",
+    "example:starter": "pnpm --dir example/starter",
     "graz": "pnpm --dir packages/graz",
     "create-graz-app": "pnpm --dir packages/create-graz-app",
     "lint": "turbo run lint",
