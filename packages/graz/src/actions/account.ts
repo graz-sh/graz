@@ -124,11 +124,11 @@ export const disconnect = (args?: { chainId?: ChainId }) => {
     });
 
     useGrazSessionStore.setState((x) => ({
-      activeChainIds: x.activeChainIds?.filter((item) => !chainId?.includes(item)),
+      activeChainIds: x.activeChainIds?.filter((item) => !chainId.includes(item)),
       accounts: _accounts,
     }));
     useGrazInternalStore.setState((x) => ({
-      recentChainIds: x.recentChainIds?.filter((item) => !chainId?.includes(item)),
+      recentChainIds: x.recentChainIds?.filter((item) => !chainId.includes(item)),
     }));
   } else {
     useGrazSessionStore.setState(grazSessionDefaultValues);

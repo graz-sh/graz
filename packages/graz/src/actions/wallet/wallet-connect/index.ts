@@ -325,7 +325,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
         new Error("Connection timeout"),
       );
     } catch (error) {
-      void wcDisconnect(lastSession?.topic);
+      void wcDisconnect(lastSession.topic);
       if (!(error as Error).message.toLowerCase().includes("no matching key")) throw error;
     }
   };

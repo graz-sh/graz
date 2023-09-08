@@ -71,7 +71,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
         method: "web3_clientVersion",
       });
 
-      const isMetamask = (clientVersion as string)?.includes("MetaMask");
+      const isMetamask = (clientVersion as string).includes("MetaMask");
       if (!isMetamask) throw new Error("Metamask is not installed");
       const version = (clientVersion as string).split("MetaMask/v")[1]?.split(".")[0];
       const isSupportMMSnap = Number(version) >= 11;
