@@ -26,7 +26,7 @@ export const configureGraz = (args: ConfigureGrazArgs): ConfigureGrazArgs => {
   useGrazInternalStore.setState((prev) => ({
     walletConnect: args.walletConnect || prev.walletConnect,
     walletType: args.defaultWallet || prev.walletType,
-    chains: args.chains || prev.chains,
+    chains: args.chains,
     chainsConfig: args.chainsConfig || prev.chainsConfig,
     multiChainFetchConcurrency: args.multiChainFetchConcurrency || prev.multiChainFetchConcurrency,
     _notFoundFn: args.onNotFound || prev._notFoundFn,
