@@ -12,8 +12,7 @@ const queryClient = new QueryClient({
 });
 
 export type GrazProviderProps = Partial<QueryClientProviderProps> & {
-  grazOptions?: ConfigureGrazArgs;
-  debug?: boolean;
+  grazOptions: ConfigureGrazArgs;
 };
 
 /**
@@ -34,10 +33,9 @@ export type GrazProviderProps = Partial<QueryClientProviderProps> & {
  *
  * @see https://tanstack.com/query
  */
-export const GrazProvider: FC<GrazProviderProps> = ({ children, grazOptions, debug, ...props }) => {
-  if (grazOptions) {
-    configureGraz(grazOptions);
-  }
+export const GrazProvider: FC<GrazProviderProps> = ({ children, grazOptions, ...props }) => {
+  configureGraz(grazOptions);
+
   return (
     <QueryClientProvider key="graz-provider" client={queryClient} {...props}>
       <ClientOnly>
