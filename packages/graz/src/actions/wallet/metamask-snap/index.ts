@@ -70,7 +70,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       const clientVersion = await ethereum.request({
         method: "web3_clientVersion",
       });
-      const isFlaskDetected = (clientVersion as string[])?.includes("flask");
+      const isFlaskDetected = (clientVersion as string[]).includes("flask");
       if (!isFlaskDetected) throw new Error("Metamask Flask is not detected");
       return true;
     };

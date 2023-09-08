@@ -86,7 +86,7 @@ export const useQueryClientValidators = <T extends QueryClient & StakingExtensio
   queryClient: T | undefined;
   status?: BondStatusString;
 }): UseQueryResult<QueryValidatorsResponse> => {
-  const status = args?.status ?? "BOND_STATUS_BONDED";
+  const status = args.status ?? "BOND_STATUS_BONDED";
   const queryKey = ["USE_ACTIVE_CHAIN_VALIDATORS", args.queryClient, status] as const;
   const query = useQuery(
     queryKey,
