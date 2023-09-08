@@ -1,7 +1,7 @@
 import { HStack } from "@chakra-ui/react";
 
+import { ToggleTheme } from "../core/toggle-theme";
 import { WalletConnectButton } from "../wallet/connect-button";
-import { ToggleTheme } from "./toggle-theme";
 
 export const NavbarRightSection = () => {
   return (
