@@ -65,7 +65,7 @@ export function useStargateSigningClient(
   return useQuery({
     queryKey,
     queryFn: async ({ queryKey: [, _chains, _wallet] }) => {
-      if (!_chains) throw new Error("No chains found");
+      if (_chains.length < 1) throw new Error("No chains found");
       const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
         const isWalletAvailable = checkWallet(_wallet);
         if (!isWalletAvailable) {
@@ -137,7 +137,7 @@ export function useCosmWasmSigningClient(
   return useQuery({
     queryKey,
     queryFn: async ({ queryKey: [, _chains, _wallet] }) => {
-      if (!_chains) throw new Error("No chains found");
+      if (_chains.length < 1) throw new Error("No chains found");
       const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
         const isWalletAvailable = checkWallet(_wallet);
         if (!isWalletAvailable) {
@@ -225,7 +225,7 @@ export function useStargateTmSigningClient(
   return useQuery({
     queryKey,
     queryFn: async ({ queryKey: [, _chains, _wallet] }) => {
-      if (!_chains) throw new Error("No chains found");
+      if (_chains.length < 1) throw new Error("No chains found");
       const res = await createMultiChainAsyncFunction(Boolean(args.multiChain), _chains, async (_chain) => {
         const isWalletAvailable = checkWallet(_wallet);
         if (!isWalletAvailable) {
@@ -321,7 +321,7 @@ export function useCosmWasmTmSigningClient(
   return useQuery({
     queryKey,
     queryFn: async ({ queryKey: [, _chains, _wallet] }) => {
-      if (!_chains) throw new Error("No chains found");
+      if (_chains.length < 1) throw new Error("No chains found");
       const res = await createMultiChainAsyncFunction(Boolean(args.multiChain), _chains, async (_chain) => {
         const isWalletAvailable = checkWallet(_wallet);
         if (!isWalletAvailable) {
