@@ -19,6 +19,14 @@
       },
       "module": "./dist/index.mjs",
       "default": "./dist/index.js"
+    },
+    "./chains": {
+      "types": "./chains/index.ts",
+      "import": {
+        "default": "./chains/index.mjs"
+      },
+      "module": "./chains/index.mjs",
+      "default": "./chains/index.js"
     }
   },
   "files": [
