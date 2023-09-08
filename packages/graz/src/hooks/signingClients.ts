@@ -9,6 +9,7 @@ import { useMemo } from "react";
 
 import { checkWallet, getWallet } from "../actions/wallet";
 import { useGrazInternalStore } from "../store";
+import type { QueryConfig } from "../types/hooks";
 import { type ChainId, createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi-chain";
 import { useTendermintClient } from "./clients";
 
@@ -24,7 +25,7 @@ interface SiginingClientMultichainArgs<T> {
 
 type Args<T> = SiginingClientSinglechainArgs<T> | SiginingClientMultichainArgs<T>;
 
-interface BaseSigningClientArgs {
+interface BaseSigningClientArgs extends QueryConfig {
   chainId?: ChainId;
   offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
 }
@@ -97,7 +98,11 @@ export function useStargateSigningClient(
       });
       return res;
     },
-    enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet),
+    enabled:
+      Boolean(chains) &&
+      chains.length > 0 &&
+      Boolean(wallet) &&
+      (args?.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
   });
 }
@@ -168,7 +173,11 @@ export function useCosmWasmSigningClient(
       });
       return res;
     },
-    enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet),
+    enabled:
+      Boolean(chains) &&
+      chains.length > 0 &&
+      Boolean(wallet) &&
+      (args?.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
   });
 }
@@ -256,7 +265,12 @@ export function useStargateTmSigningClient(
       });
       return res;
     },
-    enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet) && Boolean(tmClient),
+    enabled:
+      Boolean(chains) &&
+      chains.length > 0 &&
+      Boolean(wallet) &&
+      Boolean(tmClient) &&
+      (args.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
   });
 }
@@ -353,7 +367,12 @@ export function useCosmWasmTmSigningClient(
       });
       return res;
     },
-    enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet) && (Boolean(tmClient) || Boolean(tmClients)),
+    enabled:
+      Boolean(chains) &&
+      chains.length > 0 &&
+      Boolean(wallet) &&
+      (Boolean(tmClient) || Boolean(tmClients)) &&
+      (args.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
   });
 }
