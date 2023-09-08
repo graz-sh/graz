@@ -21,7 +21,7 @@ export const ConnectButton: FC = () => {
     onConnect: ({ accounts, walletType, chains }) => {
       toast({
         status: "success",
-        title: `Wallet connected! using ${walletType} to ${chains?.map((item) => item.chainId)}`,
+        title: `Wallet connected! using ${walletType} to ${chains.map((item) => item.chainId)}`,
         description: `Connected as ${accounts[0]?.name}`,
       });
     },
@@ -53,11 +53,11 @@ export const ConnectButton: FC = () => {
         {isConnected ? <IconButton aria-label="refresh" icon={<>🔄</>} onClick={() => void reconnect()} /> : null}
       </ButtonGroup>
 
-      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+      <Modal isCentered isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Select a wallet</ModalHeader>
-          <Stack spacing={3} p={4}>
+          <Stack p={4} spacing={3}>
             {wallets.keplr ? <Button onClick={() => handleConnect(WalletType.KEPLR)}>Keplr</Button> : null}
             {wallets.leap ? <Button onClick={() => handleConnect(WalletType.LEAP)}>Leap</Button> : null}
             {wallets.cosmostation ? (

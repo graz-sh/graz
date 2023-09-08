@@ -1,6 +1,5 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { testnetChainsArray } from "graz";
-import { GrazProvider, mainnetChainsArray } from "graz";
+import { GrazProvider } from "graz";
 import type { AppProps } from "next/app";
 import { Layout } from "src/ui/layout";
 
@@ -10,7 +9,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
     <GrazProvider
       grazOptions={{
-        chains: [...mainnetChainsArray, ...testnetChainsArray],
+        chains: [],
         walletConnect: {
           options: {
             projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
