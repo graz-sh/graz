@@ -8,7 +8,7 @@ export const RecentChain = () => {
 
   return (
     <Text>
-      Recent chain: <b>{recentChainIds?.join("; ")}</b> (
+      Recent chain: <b>{recentChainIds.join("; ")}</b> (
       <Button colorScheme="blue" onClick={clear} variant="link">
         clear
       </Button>
