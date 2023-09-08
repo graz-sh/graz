@@ -1,5 +1,6 @@
 import { Button, Stack, Tooltip, useDisclosure, useToast } from "@chakra-ui/react";
 import { getAvailableWallets, useAccount, useConnect, useDisconnect, WalletType } from "graz";
+import { cosmoshub } from "graz/chains";
 
 import { Modal } from "../core/modal";
 
@@ -34,7 +35,7 @@ export const WalletConnectButton = () => {
 
   const handleConnect = (wallet: WalletType) => {
     onClose();
-    return connect({ chainId: "", walletType: wallet });
+    return connect({ chainId: cosmoshub.chainId, walletType: wallet });
   };
 
   const wallets = getAvailableWallets();
