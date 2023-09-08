@@ -36,7 +36,7 @@ export const useStargateClient = <TMulti extends MultiChainHookArgs>(
   return useQuery({
     queryKey,
     queryFn: async ({ queryKey: [, _chains] }) => {
-      if (!_chains || _chains.length < 1) throw new Error("No chains found");
+      if (_chains.length < 1) throw new Error("No chains found");
       const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
         const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
         const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
@@ -76,7 +76,7 @@ export const useCosmWasmClient = <TMulti extends MultiChainHookArgs>(
   return useQuery({
     queryKey,
     queryFn: async ({ queryKey: [, _chains] }) => {
-      if (!_chains) throw new Error("No chains found");
+      if (_chains.length < 1) throw new Error("No chains found");
       const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
         const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
         const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
@@ -121,7 +121,7 @@ export const useTendermintClient = <T extends "tm34" | "tm37", TMulti extends Mu
   return useQuery({
     queryKey,
     queryFn: async ({ queryKey: [, _type, _chains] }) => {
-      if (!_chains) throw new Error("No chains found");
+      if (_chains.length < 1) throw new Error("No chains found");
       const res = await createMultiChainAsyncFunction(Boolean(multiChain), _chains, async (_chain) => {
         const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
         const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
