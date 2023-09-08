@@ -13,6 +13,7 @@ export * from "./actions/wallet/wallet-connect/cosmostation";
 export * from "./actions/wallet/wallet-connect/keplr";
 export * from "./actions/wallet/wallet-connect/leap";
 export * from "./adapter";
+export * from "./chains";
 export * from "./hooks/account";
 export * from "./hooks/chains";
 export * from "./hooks/clients";
