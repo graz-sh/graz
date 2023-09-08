@@ -41,7 +41,7 @@ export interface UseAccountResult<TMulti extends MultiChainHookArgs> {
  * const { data:account, isConnecting, isConnected, ... } = useAccount();
  *
  * // multichain example
- * const { data:accounts, isConnecting, isConnected, ... } = useAccount({chainId: ["cosmoshub-4", "sommelier-3"] multiChain: true});
+ * const { data: accounts, isConnecting, isConnected, ... } = useAccount({chainId: ["cosmoshub-4", "sommelier-3"] multiChain: true});
  *
  * // with event arguments
  * useAccount({
@@ -86,7 +86,7 @@ export const useAccount = <TMulti extends MultiChainHookArgs>(
   const account = useMemo(() => {
     return _account
       ? createMultiChainFunction(Boolean(args?.multiChain), activeChains, (chain) => {
-          return _account?.[chain.chainId];
+          return _account[chain.chainId];
         })
       : undefined;
   }, [_account, activeChains, args?.multiChain]);
@@ -188,7 +188,7 @@ export const useBalance = <TMulti extends MultiChainHookArgs>(
     bech32Address?: string;
   } & TMulti,
 ): UseMultiChainQueryResult<TMulti, Coin | undefined> => {
-  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
+  const chains = useChainsFromArgs({ chainId: args.chainId, multiChain: args.multiChain });
   const { data: account } = useAccount();
 
   const { data: balances, refetch: _refetch } = useBalances({
@@ -196,13 +196,13 @@ export const useBalance = <TMulti extends MultiChainHookArgs>(
     multiChain: true,
   });
 
-  const address = args?.bech32Address || account?.bech32Address;
+  const address = args.bech32Address || account?.bech32Address;
 
   const queryKey = ["USE_BALANCE", balances, args.denom, chains, address] as const;
   const query = useQuery(
     queryKey,
     ({ queryKey: [, _balances, _denom] }) => {
-      const res = createMultiChainFunction(Boolean(args?.multiChain), chains, (chain) => {
+      const res = createMultiChainFunction(Boolean(args.multiChain), chains, (chain) => {
         return _balances?.[chain.chainId]?.find((x) => x.denom === _denom);
       });
       return res;

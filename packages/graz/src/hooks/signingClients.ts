@@ -12,22 +12,22 @@ import { useGrazInternalStore } from "../store";
 import { type ChainId, createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi-chain";
 import { useTendermintClient } from "./clients";
 
-type SiginingClientSinglechainArgs<T> = {
+interface SiginingClientSinglechainArgs<T> {
   multiChain?: false;
   opts?: Record<string, T>;
-};
+}
 
-type SiginingClientMultichainArgs<T> = {
+interface SiginingClientMultichainArgs<T> {
   multiChain?: true;
   opts?: Record<string, T>;
-};
+}
 
 type Args<T> = SiginingClientSinglechainArgs<T> | SiginingClientMultichainArgs<T>;
 
-type BaseSigningClientArgs = {
+interface BaseSigningClientArgs {
   chainId?: ChainId;
   offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
-};
+}
 export function useStargateSigningClient(
   args?: BaseSigningClientArgs & SiginingClientSinglechainArgs<SigningStargateClientOptions>,
 ): UseQueryResult<SigningStargateClient>;
@@ -86,12 +86,12 @@ export function useStargateSigningClient(
         const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
         const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
         if (args?.multiChain === true) {
-          args?.opts;
+          args.opts;
         }
         const signingClient = await SigningStargateClient.connectWithSigner(
           endpoint,
           offlineSigner,
-          args?.multiChain ? args?.opts?.[_chain.chainId] : args?.opts,
+          args?.multiChain ? args.opts?.[_chain.chainId] : args?.opts,
         );
         return signingClient;
       });
@@ -162,7 +162,7 @@ export function useCosmWasmSigningClient(
           : undefined;
         const signingClient = await SigningCosmWasmClient.connectWithSigner(endpoint, offlineSigner, {
           gasPrice,
-          ...(args?.multiChain ? args?.opts?.[_chain.chainId] : args?.opts || {}),
+          ...(args?.multiChain ? args.opts?.[_chain.chainId] : args?.opts || {}),
         });
         return signingClient;
       });
@@ -209,7 +209,7 @@ export function useStargateTmSigningClient(
   } & BaseSigningClientArgs &
     Args<SigningStargateClientOptions>,
 ): UseQueryResult<SigningStargateClient | Record<string, SigningStargateClient>> {
-  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
+  const chains = useChainsFromArgs({ chainId: args.chainId, multiChain: args.multiChain });
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(
     () => ["USE_STARGATE_TM_SIGNING_CLIENT", chains, wallet, args] as const,
@@ -226,7 +226,7 @@ export function useStargateTmSigningClient(
     queryKey,
     queryFn: async ({ queryKey: [, _chains, _wallet] }) => {
       if (!_chains) throw new Error("No chains found");
-      const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
+      const res = await createMultiChainAsyncFunction(Boolean(args.multiChain), _chains, async (_chain) => {
         const isWalletAvailable = checkWallet(_wallet);
         if (!isWalletAvailable) {
           throw new Error(`${_wallet} is not available`);
@@ -246,11 +246,11 @@ export function useStargateTmSigningClient(
         })();
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        const tendermintClient = (args?.multiChain ? tmClient[_chain.chainId] : tmClient) as TendermintClient;
+        const tendermintClient = (args.multiChain ? tmClient[_chain.chainId] : tmClient) as TendermintClient;
         const client = await SigningStargateClient.createWithSigner(
           tendermintClient,
           offlineSigner,
-          args?.multiChain ? args?.opts?.[_chain.chainId] : args?.opts,
+          args.multiChain ? args.opts?.[_chain.chainId] : args.opts,
         );
         return client;
       });
@@ -297,7 +297,7 @@ export function useCosmWasmTmSigningClient(
   } & BaseSigningClientArgs &
     Args<SigningCosmWasmClientOptions>,
 ): UseQueryResult<SigningCosmWasmClient | Record<string, SigningCosmWasmClient>> {
-  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
+  const chains = useChainsFromArgs({ chainId: args.chainId, multiChain: args.multiChain });
   const wallet = useGrazInternalStore((x) => x.walletType);
   const queryKey = useMemo(
     () => ["USE_COSMWASM_TM_SIGNING_CLIENT", chains, wallet, args] as const,
@@ -306,7 +306,7 @@ export function useCosmWasmTmSigningClient(
 
   const { data: tmClient } = useTendermintClient({
     type: args.type,
-    chainId: args?.chainId,
+    chainId: args.chainId,
     multiChain: false,
     enabled: !args.multiChain,
   });
@@ -322,7 +322,7 @@ export function useCosmWasmTmSigningClient(
     queryKey,
     queryFn: async ({ queryKey: [, _chains, _wallet] }) => {
       if (!_chains) throw new Error("No chains found");
-      const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
+      const res = await createMultiChainAsyncFunction(Boolean(args.multiChain), _chains, async (_chain) => {
         const isWalletAvailable = checkWallet(_wallet);
         if (!isWalletAvailable) {
           throw new Error(`${_wallet} is not available`);
@@ -343,11 +343,11 @@ export function useCosmWasmTmSigningClient(
         const gasPrice = chainConfig?.gas
           ? GasPrice.fromString(`${chainConfig.gas.price}${chainConfig.gas.denom}`)
           : undefined;
-        const tendermintClient = args?.multiChain ? tmClients?.[_chain.chainId] : tmClient;
+        const tendermintClient = args.multiChain ? tmClients?.[_chain.chainId] : tmClient;
         if (!tendermintClient) throw new Error("No tendermint client found");
         const client = await SigningCosmWasmClient.createWithSigner(tendermintClient, offlineSigner, {
           gasPrice,
-          ...(args?.multiChain ? args?.opts?.[_chain.chainId] : args?.opts || {}),
+          ...(args.multiChain ? args.opts?.[_chain.chainId] : args.opts || {}),
         });
         return client;
       });
