@@ -310,8 +310,8 @@ importers:
         specifier: '*'
         version: 5.2.3
       wadesta:
-        specifier: ^0.0.3
-        version: 0.0.3(long@5.2.3)
+        specifier: ^0.0.5
+        version: 0.0.5(long@5.2.3)
       zustand:
         specifier: ^4.4.1
         version: 4.4.1(@types/react@18.2.21)(react@18.2.0)
@@ -14730,8 +14730,8 @@ packages:
     resolution: {integrity: sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==}
     dev: true
 
-  /wadesta@0.0.3(long@5.2.3):
-    resolution: {integrity: sha512-qnUx/SF6caey5XJwEoxl5K3RgmetNH3F59R2nj+q2FpVRxdSA0l22PWIXUTiZpGhDsagFb0g61jzixIMOV1P6g==}
+  /wadesta@0.0.5(long@5.2.3):
+    resolution: {integrity: sha512-nhwUb/dDUqwI8I4f8N5/5V78aZx5YRoC0+mnu14KKG+1B/HevCa0PcRhM1tLZz4R5ZQ2J900FPlSSIcjSa2GaA==}
     hasBin: true
     peerDependencies:
       long: '*'
