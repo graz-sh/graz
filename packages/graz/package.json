@@ -70,7 +70,7 @@
     "@web3modal/standalone": "^2.4.3",
     "cac": "^6.7.14",
     "cosmos-directory-client": "0.0.6",
-    "wadesta": "^0.0.3",
+    "wadesta": "^0.0.5",
     "zustand": "^4.4.1"
   },
   "devDependencies": {
