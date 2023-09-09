@@ -21,12 +21,23 @@
       "default": "./dist/index.js"
     },
     "./chains": {
-      "types": "./chains/index.ts",
-      "import": {
-        "default": "./chains/index.mjs"
-      },
-      "module": "./chains/index.mjs",
+      "types": "./chains/index.d.ts",
       "default": "./chains/index.js"
+    },
+    "./chains/chunk-*.js": {
+      "default": "./chains/chunk-*.js"
+    },
+    "./chains/*": {
+      "default": "./chains/*/index.js"
+    },
+    "./chains/*/assetlist": {
+      "default": "./chains/*/assetlist.js"
+    },
+    "./chains/*/chain-info": {
+      "default": "./chains/*/chain-info.js"
+    },
+    "./chains/*/chain": {
+      "default": "./chains/*/chain.js"
     }
   },
   "files": [
