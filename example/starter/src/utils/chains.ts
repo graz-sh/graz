@@ -1,3 +1,3 @@
-import { cosmoshub, osmosis, osmosistestnet, sommelier, stargaze } from "graz/chains";
+import { getChainInfoArray } from "graz/chains";
 
-export const mainnetChains = [cosmoshub, sommelier, osmosis, stargaze, osmosistestnet];
+export const mainnetChains = getChainInfoArray(["cosmoshub", "sommelier", "stargaze", "osmosis", "axelar"])
