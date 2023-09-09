@@ -11,7 +11,7 @@
     "postinstall": "graz generate"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.8.0",
+    "@chakra-ui/react": "^2.8.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "bignumber.js": "^9.1.2",
@@ -23,10 +23,10 @@
   },
   "devDependencies": {
     "@graz-sh/style-guide": "^4.0.1",
-    "@types/node": "^18.17.14",
+    "@types/node": "^18.17.15",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
-    "eslint": "^8.48.0",
+    "eslint": "^8.49.0",
     "prettier": "^3.0.3",
     "typescript": "^5.2.2"
   },
