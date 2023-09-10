@@ -2,7 +2,7 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { GrazProvider } from "graz";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
-import { mainnetChains } from "utils/chains";
+import { chains } from "utils/graz";
 
 const theme = extendTheme();
 
@@ -11,7 +11,7 @@ const CustomApp: NextPage<AppProps> = ({ Component, pageProps }) => {
     <ChakraProvider resetCSS theme={theme}>
       <GrazProvider
         grazOptions={{
-          chains: mainnetChains,
+          chains,
           onReconnectFailed: () => {
             console.log("reconnect failed");
           },

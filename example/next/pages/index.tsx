@@ -5,18 +5,18 @@ import { BalanceList } from "ui/balance-list";
 import { ChainSwitcher } from "ui/chain-switcher";
 import { ConnectButton } from "ui/connect-button";
 import { ConnectStatus } from "ui/connect-status";
-import { RecentChain } from "ui/recent-chain";
 import { ToggleTheme } from "ui/toggle-theme";
 
 const HomePage: NextPage = () => {
-  const { data: accountData, isConnecting, isReconnecting } = useAccount();
+  const { data: accountData } = useAccount({
+    chainId: "cosmoshub-4",
+  });
   return (
     <Center minH="100vh">
       <Stack bgColor="whiteAlpha.100" boxShadow="md" maxW="md" p={4} rounded="md" spacing={4} w="full">
         <HStack>
           <ConnectStatus />
         </HStack>
-        {!accountData && (isConnecting || isReconnecting) ? <RecentChain /> : null}
         {accountData ? (
           <>
             <Text>

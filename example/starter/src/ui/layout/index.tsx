@@ -1,4 +1,4 @@
-import { Box, Button, Center, Heading, HStack, keyframes, Link, Stack, Text, useToast } from "@chakra-ui/react";
+import { Box, Button, Center, Heading, HStack, keyframes, Link, Stack, Text, useToast, VStack } from "@chakra-ui/react";
 import { useAccount, useDisconnect } from "graz";
 import Head from "next/head";
 import NextLink from "next/link";
@@ -33,7 +33,11 @@ export const Layout = ({ children }: { children: ReactNode }) => {
         <meta content="minimum-scale=1, initial-scale=1, width=device-width" name="viewport" />
       </Head>
 
-      <Stack alignItems="center" my={20} spacing={16}>
+      <Stack alignItems="center" mb={4} mt={20} spacing={16}>
+        <VStack spacing={1}>
+          <Heading size="lg">Graz Playground</Heading>
+          <Text fontWeight="semibold">Everything you need to start working with the Cosmos ecosystem.</Text>
+        </VStack>
         <Stack
           bgColor="whiteAlpha.100"
           borderRadius={12}
@@ -50,16 +54,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
           }}
           w="container.md"
         >
-          <HStack alignItems="start" justifyContent="space-between">
-            <Stack spacing={1}>
-              <Heading size="lg">Graz Playground</Heading>
-              <Text fontWeight="semibold">Everything you need to start working with the Cosmos ecosystem.</Text>
-            </Stack>
-            <ToggleTheme />
-          </HStack>
-          {children}
-
-          <HStack justifyContent="end">
+          <HStack justifyContent="space-between">
             {isConnected ? (
               <Button colorScheme="red" onClick={() => disconnect()} size="sm" variant="outline">
                 Disconnect all
@@ -67,9 +62,12 @@ export const Layout = ({ children }: { children: ReactNode }) => {
             ) : (
               <ConnectAllChainsWallet />
             )}
+
+            <ToggleTheme />
           </HStack>
+          {children}
         </Stack>
-        <Center bottom={0}>
+        <Center>
           <HStack divider={<Text>•</Text>} gap={4} wrap="wrap">
             <Link as={NextLink} href="https://graz.sh" isExternal>
               Documentation
