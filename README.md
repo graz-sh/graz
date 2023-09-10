@@ -9,8 +9,8 @@
 ## Features
 
 - 🪝 20+ hooks for interfacing with wallets, clients, signers, etc. (connecting, view balances, send tokens, etc.)
-- 💳 Multiple wallet supports (Keplr, Leap, Cosmostation, WalletConnect )
-- ⚙️ Generate mainnet & testnet `ChainInfo` from chain registry
+- 💳 Multiple wallet supports (Keplr, Leap, Cosmostation, Vectis, Metamask Snap, WalletConnect)
+- ⚙️ Generate mainnet & testnet `ChainInfo` from cosmos directory
 - 📚 Built-in caching, request deduplication, and all the good stuff from [`@tanstack/react-query`](https://tanstack.com/query) and [`zustand`](https://github.com/pmndrs/zustand)
 - 🔄 Auto refresh on wallet and network change
 - 👏 Fully typed and tree-shakeable
@@ -79,9 +79,9 @@ function Wallet() {
 
 ## Examples
 
+- Next.js + Multi chain: https://graz.sh/examples/starter ([source code](https://github.com/graz-sh/graz/tree/dev/example/starter/))
 - Next.js + Chakra UI: https://graz.sh/examples/next ([source code](./example/next/))
 - Vite: https://graz.sh/examples/vite ([source code](./example/vite/))
-- Next.js Starter: https://graz.sh/examples/starter ([source code](https://github.com/graz-sh/graz/tree/dev/example/starter/))
 
 ## Third-party dependencies
 
