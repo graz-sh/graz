@@ -2,9 +2,22 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { GrazProvider } from "graz";
 import type { AppProps } from "next/app";
 import { Layout } from "src/ui/layout";
-import { mainnetChains } from "src/utils/chains";
+import { mainnetChains } from "src/utils/graz";
 
-const theme = extendTheme();
+const theme = extendTheme({
+  semanticTokens: {
+    colors: {
+      baseBackground: {
+        default: "blackAlpha.100",
+        _dark: "whiteAlpha.100",
+      },
+      baseHoverBackground: {
+        default: "blackAlpha.200",
+        _dark: "whiteAlpha.200",
+      },
+    },
+  },
+});
 
 // export const osmosis = defineChainInfo({
 //   chainId: "osmosis-1",
