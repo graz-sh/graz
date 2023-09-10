@@ -122,14 +122,23 @@ export const disconnect = (args?: { chainId?: ChainId }) => {
     chainId.forEach((x) => {
       delete _accounts?.[x];
     });
-
-    useGrazSessionStore.setState((x) => ({
-      activeChainIds: x.activeChainIds?.filter((item) => !chainId.includes(item)),
-      accounts: _accounts,
-    }));
-    useGrazInternalStore.setState((x) => ({
-      recentChainIds: x.recentChainIds?.filter((item) => !chainId.includes(item)),
-    }));
+    const isEmpty = Object.values(_accounts ? _accounts : {}).length === 0;
+    if (isEmpty) {
+      useGrazSessionStore.setState(grazSessionDefaultValues);
+      useGrazInternalStore.setState({
+        _reconnect: false,
+        _reconnectConnector: null,
+        recentChainIds: null,
+      });
+    } else {
+      useGrazSessionStore.setState((x) => ({
+        activeChainIds: x.activeChainIds?.filter((item) => !chainId.includes(item)),
+        accounts: _accounts,
+      }));
+      useGrazInternalStore.setState((x) => ({
+        recentChainIds: x.recentChainIds?.filter((item) => !chainId.includes(item)),
+      }));
+    }
   } else {
     useGrazSessionStore.setState(grazSessionDefaultValues);
     useGrazInternalStore.setState({
