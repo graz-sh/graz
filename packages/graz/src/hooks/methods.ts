@@ -270,19 +270,19 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
  * @param queryMsg - The query message to send to the contract
  * @returns A query result with the result returned by the smart contract.
  */
-export const useQuerySmart = <TData, TError>(
-  address?: string,
-  queryMsg?: Record<string, unknown>,
-): UseQueryResult<TData, TError> => {
+export const useQuerySmart = <TData, TError>(args?: {
+  address?: string;
+  queryMsg?: Record<string, unknown>;
+}): UseQueryResult<TData, TError> => {
   const { data: client } = useCosmWasmClient();
   const query: UseQueryResult<TData, TError> = useQuery(
-    ["USE_QUERY_SMART", address, queryMsg, client],
+    ["USE_QUERY_SMART", args?.address, args?.queryMsg, client],
     ({ queryKey: [, _address] }) => {
-      if (!address || !queryMsg) throw new Error("address or queryMsg undefined");
-      return getQuerySmart(address, queryMsg, client);
+      if (!args?.address || !args.queryMsg) throw new Error("address or queryMsg undefined");
+      return getQuerySmart(args.address, args.queryMsg, client);
     },
     {
-      enabled: Boolean(address) && Boolean(queryMsg) && Boolean(client),
+      enabled: Boolean(args?.address) && Boolean(args?.queryMsg) && Boolean(client),
     },
   );
 
@@ -296,17 +296,20 @@ export const useQuerySmart = <TData, TError>(
  * @param key - The key to lookup in the contract storage
  * @returns A query result with raw byte array stored at the key queried.
  */
-export const useQueryRaw = <TError>(address?: string, key?: string): UseQueryResult<Uint8Array | null, TError> => {
+export const useQueryRaw = <TError>(args?: {
+  address?: string;
+  key?: string;
+}): UseQueryResult<Uint8Array | null, TError> => {
   const { data: client } = useCosmWasmClient();
-  const queryKey = ["USE_QUERY_RAW", key, address, client] as const;
+  const queryKey = ["USE_QUERY_RAW", args?.key, args?.address, client] as const;
   const query: UseQueryResult<Uint8Array | null, TError> = useQuery(
     queryKey,
     ({ queryKey: [, _address] }) => {
-      if (!address || !key) throw new Error("address or key undefined");
-      return getQueryRaw(address, key, client);
+      if (!args?.address || !args.key) throw new Error("address or key undefined");
+      return getQueryRaw(args.address, args.key, client);
     },
     {
-      enabled: Boolean(address) && Boolean(key) && Boolean(client),
+      enabled: Boolean(args?.address) && Boolean(args?.key) && Boolean(client),
     },
   );
 
