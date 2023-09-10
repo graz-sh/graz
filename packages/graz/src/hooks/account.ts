@@ -11,7 +11,7 @@ import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { MutationEventArgs, QueryConfig, UseMultiChainQueryResult } from "../types/hooks";
 import type { WalletType } from "../types/wallet";
 import { isEmpty } from "../utils/isEmpty";
-import type { MultiChainHookArgs } from "../utils/multi-chain";
+import type { ChainId, MultiChainHookArgs } from "../utils/multi-chain";
 import { createMultiChainAsyncFunction, createMultiChainFunction, useChainsFromArgs } from "../utils/multi-chain";
 import { useStargateClient } from "./clients";
 import { useCheckWallet } from "./wallet";
@@ -202,33 +202,28 @@ export const useBalance = <TMulti extends MultiChainHookArgs>(
   args: {
     denom: string;
     bech32Address?: string;
-  } & TMulti &
-    QueryConfig,
+  } & { chainId: ChainId } & QueryConfig,
 ): UseMultiChainQueryResult<TMulti, Coin | undefined> => {
-  const chains = useChainsFromArgs({ chainId: args.chainId, multiChain: args.multiChain });
+  const chains = useChainsFromArgs({ chainId: args.chainId });
   const { data: account } = useAccount({
     chainId: args.chainId,
   });
   const address = args.bech32Address || account?.bech32Address;
   const { data: balances, refetch: _refetch } = useBalances({
     chainId: chains.map((x) => x.chainId),
-    multiChain: true,
     bech32Address: address,
     enabled: Boolean(address) && (args.enabled === undefined ? true : args.enabled),
   });
 
-  const queryKey = ["USE_BALANCE", balances, args.denom, chains, address, args.chainId] as const;
+  const queryKey = ["USE_BALANCE", args.denom, balances, chains, address, args.chainId] as const;
 
   const query = useQuery(
     queryKey,
-    ({ queryKey: [, _balances, _denom] }) => {
-      const res = createMultiChainFunction(Boolean(args.multiChain), chains, (chain) => {
-        return _balances?.[chain.chainId]?.find((x) => x.denom === _denom);
-      });
-      return res;
+    ({ queryKey: [, _denom, _balances] }) => {
+      return _balances?.find((x) => x.denom === _denom);
     },
     {
-      enabled: !isEmpty(balances) && (args.enabled === undefined ? true : args.enabled),
+      enabled: Boolean(balances) && Boolean(balances?.length) && (args.enabled === undefined ? true : args.enabled),
     },
   );
 
