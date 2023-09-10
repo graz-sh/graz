@@ -50,11 +50,9 @@ The following steps will get you up and running to contribute to `graz`:
 
 ```sh
 ├── packages/             # local packages
-│   ├── eslint-config/    # project eslint configuration
-│   ├── prettier-config/  # project prettier configuration
 │   └── graz/             # graz
 ├── docs/                 # documentation website
-└── example/              # example website (nextjs + chakra ui)
+└── example/*             # example website (nextjs + chakra ui)
 ```
 
 ### graz

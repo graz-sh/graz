@@ -6,7 +6,7 @@ The following is a set of guidelines for contributing to graz, which are hosted 
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [`graz` Code of Conduct](./code-of-conduct.md). By participating, you are expected to uphold this code.
+This project and everyone participating in it is governed by the [`graz` Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
 ## Brief of graz
 
@@ -50,11 +50,9 @@ The following steps will get you up and running to contribute to `graz`:
 
 ```sh
 ├── packages/             # local packages
-│   ├── eslint-config/    # project eslint configuration
-│   ├── prettier-config/  # project prettier configuration
 │   └── graz/             # graz
 ├── docs/                 # documentation website
-└── example/              # example website (nextjs + chakra ui)
+└── example/*             # example website (nextjs + chakra ui)
 ```
 
 ### graz
@@ -103,4 +101,4 @@ If you are interested in the detailed specification you can visit https://www.co
 
 ## License
 
-By contributing your code to the graz GitHub repository, you agree to license your contribution under the [MIT license](./license.md).
+By contributing your code to the graz GitHub repository, you agree to license your contribution under the [MIT license](./LICENSE).
