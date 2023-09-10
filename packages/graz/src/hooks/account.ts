@@ -9,6 +9,7 @@ import { connect, disconnect, getOfflineSigners, reconnect } from "../actions/ac
 import { checkWallet } from "../actions/wallet";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { MutationEventArgs, UseMultiChainQueryResult } from "../types/hooks";
+import type { WalletType } from "../types/wallet";
 import type { MultiChainHookArgs } from "../utils/multi-chain";
 import { createMultiChainAsyncFunction, createMultiChainFunction, useChainsFromArgs } from "../utils/multi-chain";
 import { useStargateClient } from "./clients";
@@ -27,6 +28,7 @@ export interface UseAccountResult<TMulti extends MultiChainHookArgs> {
   isLoading: boolean;
   reconnect: (args?: ReconnectArgs) => Promise<ConnectResult | undefined>;
   status: string;
+  walletType?: WalletType;
 }
 
 /**
@@ -53,8 +55,12 @@ export interface UseAccountResult<TMulti extends MultiChainHookArgs> {
 export const useAccount = <TMulti extends MultiChainHookArgs>(
   args?: UseAccountArgs & TMulti,
 ): UseAccountResult<TMulti> => {
+  const walletType = useGrazInternalStore((x) => x.walletType);
   const activeChainIds = useGrazSessionStore((x) => x.activeChainIds);
-  const activeChains = useChainsFromArgs({ chainId: activeChainIds ?? undefined, multiChain: args?.multiChain });
+  const activeChains = useChainsFromArgs({
+    chainId: args?.chainId ? args.chainId : activeChainIds || undefined,
+    multiChain: args?.multiChain,
+  });
   const _account = useGrazSessionStore((x) => x.accounts);
   const status = useGrazSessionStore((x) => x.status);
 
@@ -65,14 +71,14 @@ export const useAccount = <TMulti extends MultiChainHookArgs>(
         if (stat === "connected") {
           const { accounts, activeChainIds: _activeChainIds } = useGrazSessionStore.getState();
           const { chains } = useGrazInternalStore.getState();
-          const { walletType } = useGrazInternalStore.getState();
+          const { walletType: _walletType } = useGrazInternalStore.getState();
           if (!accounts || !_activeChainIds || !chains) {
             return args?.onDisconnect?.();
           }
           args?.onConnect?.({
             accounts,
             chains: _activeChainIds.map((id) => chains.find((x) => x.chainId === id)!),
-            walletType,
+            walletType: _walletType,
             isReconnect: prevStat === "reconnecting",
           });
         }
@@ -98,6 +104,7 @@ export const useAccount = <TMulti extends MultiChainHookArgs>(
     isDisconnected: status === "disconnected",
     isReconnecting: status === "reconnecting",
     isLoading: status === "connecting" || status === "reconnecting",
+    walletType: status === "connected" ? walletType : undefined,
     reconnect,
     status,
   };
