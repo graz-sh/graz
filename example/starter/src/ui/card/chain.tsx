@@ -5,6 +5,7 @@ import { useAccount, useBalance, useBalanceStaked, useDisconnect } from "graz";
 
 import { AllBalancesModal } from "../modal/all-balances";
 import { ConnectWalletModal } from "../modal/connect-wallet";
+import { SendTokenModal } from "../modal/send-token-modal";
 
 export const Card = ({ chain }: { chain: ChainInfo }) => {
   const toast = useToast();
@@ -95,9 +96,7 @@ export const Card = ({ chain }: { chain: ChainInfo }) => {
       </HStack>
       {account ? (
         <HStack alignItems="end" justifyContent="space-between">
-          <Button colorScheme="blue" size="sm" variant="solid">
-            Send Tokens
-          </Button>
+          <SendTokenModal chain={chain} />
           <Stack alignItems="end">
             <HStack>
               <AllBalancesModal chain={chain} />

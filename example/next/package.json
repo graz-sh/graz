@@ -6,7 +6,8 @@
     "dev": "next dev",
     "export:docs": "next build && next export --outdir ../../docs/build/examples/next",
     "lint": "eslint --fix \"**/*.{ts,tsx}\"",
-    "start": "next start"
+    "start": "next start",
+    "postinstall": "graz generate"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.1",

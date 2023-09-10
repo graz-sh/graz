@@ -18,11 +18,11 @@ export const ConnectButton: FC = () => {
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   const { isConnected, isConnecting, isReconnecting, reconnect } = useAccount({
-    onConnect: ({ accounts, walletType, chains }) => {
+    chainId: "cosmoshub-4",
+    onConnect: ({ walletType, chains }) => {
       toast({
         status: "success",
         title: `Wallet connected! using ${walletType} to ${chains.map((item) => item.chainId)}`,
-        description: `Connected as ${accounts[0]?.name}`,
       });
     },
     onDisconnect: () => {
