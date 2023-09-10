@@ -10,6 +10,7 @@ import { useMemo } from "react";
 import { checkWallet, getWallet } from "../actions/wallet";
 import { useGrazInternalStore } from "../store";
 import type { QueryConfig } from "../types/hooks";
+import { isEmpty } from "../utils/isEmpty";
 import { type ChainId, createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi-chain";
 import { useTendermintClient } from "./clients";
 
@@ -371,7 +372,7 @@ export function useCosmWasmTmSigningClient(
       Boolean(chains) &&
       chains.length > 0 &&
       Boolean(wallet) &&
-      (Boolean(tmClient) || Boolean(tmClients)) &&
+      (Boolean(tmClient) || Boolean(!isEmpty(tmClients))) &&
       (args.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
   });

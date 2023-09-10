@@ -45,7 +45,7 @@ export const useStargateClient = <TMulti extends MultiChainHookArgs>(
       });
       return res;
     },
-    enabled: Boolean(chains) && chains.length > 0 && args?.enabled !== undefined ? Boolean(args.enabled) : true,
+    enabled: Boolean(chains) && chains.length > 0 && (args?.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
   });
 };
@@ -85,7 +85,7 @@ export const useCosmWasmClient = <TMulti extends MultiChainHookArgs>(
       });
       return res;
     },
-    enabled: Boolean(chains) && chains.length > 0 && args?.enabled !== undefined ? Boolean(args.enabled) : true,
+    enabled: Boolean(chains) && chains.length > 0 && (args?.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
   });
 };
@@ -131,7 +131,7 @@ export const useTendermintClient = <T extends "tm34" | "tm37", TMulti extends Mu
       });
       return res;
     },
-    enabled: Boolean(chains) && chains.length > 0 && enabled !== undefined ? Boolean(enabled) : true,
+    enabled: Boolean(chains) && chains.length > 0 && (enabled !== undefined ? Boolean(enabled) : true),
     refetchOnWindowFocus: false,
   });
 };
