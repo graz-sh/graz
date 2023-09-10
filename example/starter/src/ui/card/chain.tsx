@@ -1,12 +1,41 @@
-import { HStack, Skeleton, Spinner, Stack, Text } from "@chakra-ui/react";
+import { CopyIcon } from "@chakra-ui/icons";
+import { Button, HStack, IconButton, Image, Spinner, Stack, Text, Tooltip, useToast } from "@chakra-ui/react";
+import type { ChainInfo } from "@graz-sh/types";
+import { useAccount, useBalance, useBalanceStaked, useDisconnect } from "graz";
 
-export const Card = () => {
+import { AllBalancesModal } from "../modal/all-balances";
+import { ConnectWalletModal } from "../modal/connect-wallet";
+
+export const Card = ({ chain }: { chain: ChainInfo }) => {
+  const toast = useToast();
+  const { data: account, isConnecting } = useAccount({
+    chainId: chain.chainId,
+  });
+  const { data: balance } = useBalance({
+    chainId: chain.chainId,
+    bech32Address: account?.bech32Address,
+    denom: chain.stakeCurrency.coinMinimalDenom,
+  });
+  const { data: stakedBalance } = useBalanceStaked({
+    chainId: chain.chainId,
+    bech32Address: account?.bech32Address,
+  });
+  const { disconnect } = useDisconnect({
+    onSuccess: () => {
+      toast({
+        description: `Successfully disconnected from ${chain.chainName}`,
+        duration: 3000,
+        isClosable: true,
+        status: "success",
+      });
+    },
+  });
   return (
     <Stack
       _hover={{
-        bgColor: "blackAlpha.400",
+        bgColor: "baseHoverBackground",
       }}
-      bgColor="blackAlpha.300"
+      bgColor="baseBackground"
       borderRadius={12}
       px={4}
       py={4}
@@ -14,27 +43,87 @@ export const Card = () => {
     >
       <HStack justifyContent="space-between">
         <HStack>
-          <Text fontWeight="bold">cosmoshub-4</Text>
-          <Spinner size="sm" />
+          <Image alt={chain.chainName} boxSize="32px" src={chain.stakeCurrency.coinImageUrl} />
+          <Text fontWeight="bold">{chain.chainName}</Text>
+          {isConnecting ? <Spinner size="sm" /> : null}
+          {account ? (
+            <Button
+              colorScheme="red"
+              onClick={() => {
+                disconnect({
+                  chainId: chain.chainId,
+                });
+              }}
+              size="xs"
+              variant="outline"
+            >
+              Disconnect
+            </Button>
+          ) : null}
         </HStack>
-        <Text bgColor="blackAlpha.300" borderRadius={8} fontFamily="mono" fontSize="sm" p={1} px={2}>
-          address
-        </Text>
-      </HStack>
-      <HStack alignItems="end" justifyContent="space-between">
-        <Stack>
-          <Skeleton endColor="whiteAlpha.500" isLoaded startColor="whiteAlpha.200">
+        {account ? (
+          <Tooltip
+            backgroundColor="green.100"
+            color="black"
+            fontFamily="mono"
+            fontSize="2xs"
+            label={account.bech32Address}
+            placement="top"
+          >
             <HStack>
-              <Text fontFamily="mono" fontWeight="bold">
-                10
+              <Text bgColor="blackAlpha.300" borderRadius={8} fontFamily="mono" fontSize="sm" p={1} px={2}>
+                {account.bech32Address.slice(0, 6)}...{account.bech32Address.slice(-6)}
               </Text>
-              <Text fontFamily="mono" fontWeight="semibold">
-                atom
+              <IconButton
+                aria-label="copy address"
+                icon={<CopyIcon />}
+                onClick={() => {
+                  void window.navigator.clipboard.writeText(account.bech32Address);
+                  toast({
+                    description: "Copied address to clipboard",
+                    duration: 3000,
+                    isClosable: true,
+                  });
+                }}
+                size="xs"
+              />
+            </HStack>
+          </Tooltip>
+        ) : (
+          <ConnectWalletModal chain={chain} />
+        )}
+      </HStack>
+      {account ? (
+        <HStack alignItems="end" justifyContent="space-between">
+          <Button colorScheme="blue" size="sm" variant="solid">
+            Send Tokens
+          </Button>
+          <Stack alignItems="end">
+            <HStack>
+              <AllBalancesModal chain={chain} />
+              <Text fontFamily="mono" fontWeight="bold">
+                {balance
+                  ? Number(Number(balance.amount) / Math.pow(10, chain.stakeCurrency.coinDecimals)).toFixed(6)
+                  : "--"}
+              </Text>
+              <Text fontFamily="mono" fontWeight="semibold" textTransform="uppercase">
+                {chain.stakeCurrency.coinDenom}
               </Text>
             </HStack>
-          </Skeleton>
-        </Stack>
-      </HStack>
+            <HStack>
+              <Text fontFamily="mono" fontWeight="bold">
+                Staked{" "}
+                {stakedBalance
+                  ? Number(Number(stakedBalance.amount) / Math.pow(10, chain.stakeCurrency.coinDecimals)).toFixed(6)
+                  : "--"}
+              </Text>
+              <Text fontFamily="mono" fontWeight="semibold" textTransform="uppercase">
+                {chain.stakeCurrency.coinDenom}
+              </Text>
+            </HStack>
+          </Stack>
+        </HStack>
+      ) : null}
     </Stack>
   );
 };

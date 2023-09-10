@@ -1,7 +1,7 @@
 import { Button, ButtonGroup, FormControl, FormLabel, useToast } from "@chakra-ui/react";
 import { useAccount, useActiveChainIds, useConnect, useSuggestChainAndConnect } from "graz";
 import { testnetChains } from "graz/chains";
-import { mainnetChains } from "src/utils/chains";
+import { mainnetChains } from "src/utils/graz";
 
 export const ChainSwitcher = () => {
   const toast = useToast();
