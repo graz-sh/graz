@@ -8,8 +8,9 @@ import type { ConnectArgs, ConnectResult, OfflineSigners, ReconnectArgs } from "
 import { connect, disconnect, getOfflineSigners, reconnect } from "../actions/account";
 import { checkWallet } from "../actions/wallet";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
-import type { MutationEventArgs, UseMultiChainQueryResult } from "../types/hooks";
+import type { MutationEventArgs, QueryConfig, UseMultiChainQueryResult } from "../types/hooks";
 import type { WalletType } from "../types/wallet";
+import { isEmpty } from "../utils/isEmpty";
 import type { MultiChainHookArgs } from "../utils/multi-chain";
 import { createMultiChainAsyncFunction, createMultiChainFunction, useChainsFromArgs } from "../utils/multi-chain";
 import { useStargateClient } from "./clients";
@@ -131,19 +132,22 @@ export const useAccount = <TMulti extends MultiChainHookArgs>(
  * ```
  */
 export const useBalances = <TMulti extends MultiChainHookArgs>(
-  args?: { bech32Address?: string } & TMulti,
+  args?: { bech32Address?: string } & TMulti & QueryConfig,
 ): UseMultiChainQueryResult<TMulti, Coin[]> => {
   const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const { data: account } = useAccount();
 
+  const address = args?.bech32Address || account?.bech32Address;
   const { data: clients } = useStargateClient({
     chainId: chains.map((x) => x.chainId),
     multiChain: true,
+    enabled: (args?.enabled === undefined ? true : args.enabled) && Boolean(address),
   });
 
-  const address = args?.bech32Address || account?.bech32Address;
-
-  const queryKey = useMemo(() => ["USE_ALL_BALANCES", clients, chains, address] as const, [address, chains, clients]);
+  const queryKey = useMemo(
+    () => ["USE_ALL_BALANCES", clients, chains, address, args?.chainId] as const,
+    [address, args?.chainId, chains, clients],
+  );
 
   return useQuery(
     queryKey,
@@ -154,7 +158,7 @@ export const useBalances = <TMulti extends MultiChainHookArgs>(
       const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
         const stargateClient = _clients?.[_chain.chainId];
         if (!stargateClient) {
-          throw new Error("Client is not ready");
+          throw new Error(`Client is not ready ${_chain.chainId}`);
         }
         const balances = await stargateClient.getAllBalances(
           toBech32(_chain.bech32Config.bech32PrefixAccAddr, fromBech32(_address).data),
@@ -164,7 +168,12 @@ export const useBalances = <TMulti extends MultiChainHookArgs>(
       return res;
     },
     {
-      enabled: Boolean(address) && Boolean(chains) && chains.length > 0 && Boolean(clients),
+      enabled:
+        Boolean(address) &&
+        Boolean(chains) &&
+        chains.length > 0 &&
+        !isEmpty(clients) &&
+        (args?.enabled === undefined ? true : args.enabled),
       refetchOnMount: false,
       refetchOnReconnect: true,
       refetchOnWindowFocus: false,
@@ -193,19 +202,23 @@ export const useBalance = <TMulti extends MultiChainHookArgs>(
   args: {
     denom: string;
     bech32Address?: string;
-  } & TMulti,
+  } & TMulti &
+    QueryConfig,
 ): UseMultiChainQueryResult<TMulti, Coin | undefined> => {
   const chains = useChainsFromArgs({ chainId: args.chainId, multiChain: args.multiChain });
-  const { data: account } = useAccount();
-
+  const { data: account } = useAccount({
+    chainId: args.chainId,
+  });
+  const address = args.bech32Address || account?.bech32Address;
   const { data: balances, refetch: _refetch } = useBalances({
     chainId: chains.map((x) => x.chainId),
     multiChain: true,
+    bech32Address: address,
+    enabled: Boolean(address) && (args.enabled === undefined ? true : args.enabled),
   });
 
-  const address = args.bech32Address || account?.bech32Address;
+  const queryKey = ["USE_BALANCE", balances, args.denom, chains, address, args.chainId] as const;
 
-  const queryKey = ["USE_BALANCE", balances, args.denom, chains, address] as const;
   const query = useQuery(
     queryKey,
     ({ queryKey: [, _balances, _denom] }) => {
@@ -215,7 +228,7 @@ export const useBalance = <TMulti extends MultiChainHookArgs>(
       return res;
     },
     {
-      enabled: Boolean(balances),
+      enabled: !isEmpty(balances) && (args.enabled === undefined ? true : args.enabled),
     },
   );
 
