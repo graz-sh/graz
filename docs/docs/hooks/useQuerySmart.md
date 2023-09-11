@@ -12,20 +12,24 @@ interface TData {
   // ...
 }
 
-const { data, isLoading } = useQuerySmart<TData>(address, queryMsg);
+const { data, isLoading } = useQuerySmart<TData>({ address, queryMsg });
 console.log(data);
 ```
 
-#### Params
+#### Hook Params
 
-- address?: `string` - The address of the contract to query
-- queryMsg?: `string` - The key to lookup in the contract storage
+```ts
+<TData>{
+  address?: string // The address of the contract to query
+  queryMsg?: string // The key to lookup in the contract storage
+}
+```
 
 #### Return Value
 
 ```tsx
 {
-  data: unknown;
+  data: TData | unknown;
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;

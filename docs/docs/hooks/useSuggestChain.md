@@ -111,13 +111,22 @@ function App() {
 }
 ```
 
-#### Params
+#### Hook Params
 
-Object params
+```ts
+  onError?: (error: unknown, data: ChainInfo) => void
+  onMutate?: (data: chainInfo) => void
+  onSuccess?: (data: chainInfo) => void
+```
 
-- onError?: `(error: unknown, data: ChainInfo) => void`
-- onMutate?: `(data: chainInfo) => void`
-- onSuccess?: `(data: chainInfo) => void`
+#### Types
+
+```ts
+interface SuggestChainArgs {
+  chainInfo: ChainInfo;
+  walletType?: WalletType;
+}
+```
 
 #### Return Value
 

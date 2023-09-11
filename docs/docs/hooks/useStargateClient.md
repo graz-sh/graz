@@ -4,6 +4,8 @@ Hook to retrieve a StargateClient.
 
 #### Usage
 
+##### Single Chain
+
 ```tsx
 import { useStargateClient } from "graz";
 
@@ -16,11 +18,37 @@ function App() {
 }
 ```
 
+##### Multi Chain
+
+```tsx
+import { useStargateClient } from "graz";
+
+function App() {
+  const { data: client, isFetching, refetch, ... } = useStargateClient({
+    chainId: ["cosmoshub-4", "sommelier-1"],
+    multiChain: true
+  });
+
+  async function getAccountFromClient() {
+    return await client["cosmoshub-4"].getAccount("address")
+  }
+}
+```
+
+#### Hook Params
+
+```tsx
+<TMultiChain extends boolean>{
+  chainId?: string | string[];
+  multiChain?: TMultiChain; // boolean
+}
+```
+
 #### Return Value
 
 ```tsx
 {
-  data: StargateClient
+  data?: TMultiChain extends true ? Record<string, StargateClient> : StargateClient;
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -39,7 +67,7 @@ function App() {
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<StargateClient | null, unknown>>;
+  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<TMultiChain extends true ? Record<string, StargateClient> : StargateClient;, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

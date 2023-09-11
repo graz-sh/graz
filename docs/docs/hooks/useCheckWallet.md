@@ -5,10 +5,10 @@ Hook to check whether given {@link WalletType} or default configured wallet is s
 #### Usage
 
 ```tsx
-import { useCheckWallet } from "graz";
+import { useCheckWallet, WalletType } from "graz";
 
-const { data: isSupported } = useCheckWallet();
-const { data: isKeplrSupported } = useCheckWallet("keplr");
+const { data: isSupported } = useCheckWallet(WalletType.KEPLR);
+const { data: isKeplrSupported } = useCheckWallet(WalletType.KEPLR);
 ```
 
 #### Enum
@@ -18,6 +18,13 @@ const { data: isKeplrSupported } = useCheckWallet("keplr");
   {
     KEPLR = "keplr",
     LEAP = "leap",
+    VECTIS = "vectis",
+    COSMOSTATION = "cosmostation",
+    WALLETCONNECT = "walletconnect",
+    WC_KEPLR_MOBILE = "wc_keplr_mobile",
+    WC_LEAP_MOBILE = "wc_leap_mobile",
+    WC_COSMOSTATION_MOBILE = "wc_cosmostation_mobile",
+    METAMASK_SNAP_LEAP = "metamask_snap_leap",
   }
   ```
 
@@ -28,12 +35,20 @@ const { data: isKeplrSupported } = useCheckWallet("keplr");
   {
     WalletType.KEPLR,
     WalletType.LEAP,
+    WalletTyoe.VECTIS,
+    WalletTyoe.WALLETCONNECT,
+    WalletTyoe.WC_KEPLR_MOBILE,
+    WalletTyoe.WC_LEAP_MOBILE,
+    WalletTyoe.WC_COSMOSTATION_MOBILE,
+    WalletTyoe.METAMASK_SNAP_LEAP,
   }
   ```
 
-#### Params
+#### Hook Params
 
-- type?: `WalletType` = you can check specific supported wallet
+```ts
+type?: WalletType // you can check specific supported wallet
+```
 
 ##### Usage
 
@@ -43,7 +58,7 @@ const { data: isKeplrSupported } = useCheckWallet("keplr");
 
 ```tsx
 {
-  data: boolean;
+  data?: boolean;
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
