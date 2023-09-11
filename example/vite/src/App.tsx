@@ -1,20 +1,18 @@
 import "./App.css";
 
-import { configureGraz, mainnetChains, useAccount, useActiveChain, useConnect, useDisconnect } from "graz";
+import { useAccount, useActiveChainIds, useConnect, useDisconnect } from "graz";
 
 import reactLogo from "./assets/react.svg";
 
-configureGraz({
-  defaultChain: mainnetChains.juno,
-});
-
+// eslint-disable-next-line prefer-arrow-functions/prefer-arrow-functions, react/function-component-definition
 export default function App() {
   const { data: account, isConnected, isConnecting, isDisconnected, isReconnecting } = useAccount();
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
 
-  const activeChain = useActiveChain();
+  const activeChainIds = useActiveChainIds();
 
+  // eslint-disable-next-line prefer-arrow-functions/prefer-arrow-functions
   function handleButton() {
     (isConnected ? disconnect : connect)();
   }
@@ -22,29 +20,70 @@ export default function App() {
   return (
     <div className="App">
       <div>
-        <img src="vite.svg" className="logo" alt="Vite logo" />
-        <img src={reactLogo} className="logo react" alt="React logo" />
+        <img alt="Vite logo" className="logo" src="vite.svg" />
+        <img alt="React logo" className="logo react" src={reactLogo} />
       </div>
       <h1>Vite + React + Graz</h1>
       <div className="card">
-        {isDisconnected && <p>Connect wallet using the button below.</p>}
-        {activeChain && (
+        {isDisconnected ? <p>Connect wallet using the button below.</p> : null}
+        {activeChainIds ? (
           <p>
-            Current chain: <code>{activeChain.chainId}</code>
+            Current chain: <code>{activeChainIds.join("; ")}</code>
           </p>
-        )}
-        {account && (
+        ) : null}
+        {account ? (
           <p>
             Wallet address: <code>{account.bech32Address}</code>
           </p>
-        )}
+        ) : null}
         <br />
-        <button disabled={isConnecting || isReconnecting} onClick={handleButton}>
-          {(isConnecting || isReconnecting) && "Connecting..."}
-          {isConnected && "Disconnect Wallet"}
-          {isDisconnected && "Connect Wallet"}
+        <button disabled={isConnecting || isReconnecting} onClick={handleButton} type="button">
+          {isConnecting || isReconnecting ? "Connecting..." : null}
+          {isConnected ? "Disconnect Wallet" : null}
+          {isDisconnected ? "Connect Wallet" : null}
         </button>
       </div>
     </div>
   );
 }
+
+export const Graz = () => {
+  const { data: account, isConnected, isConnecting, isDisconnected, isReconnecting } = useAccount();
+  const { connect } = useConnect();
+  const { disconnect } = useDisconnect();
+
+  const activeChainIds = useActiveChainIds();
+
+  const handleButton = () => {
+    (isConnected ? disconnect : connect)();
+  };
+
+  return (
+    <div className="App">
+      <div>
+        <img alt="Vite logo" className="logo" src="vite.svg" />
+        <img alt="React logo" className="logo react" src={reactLogo} />
+      </div>
+      <h1>Vite + React + Graz</h1>
+      <div className="card">
+        {isDisconnected ? <p>Connect wallet using the button below.</p> : null}
+        {activeChainIds ? (
+          <p>
+            Current chain: <code>{activeChainIds.join("; ")}</code>
+          </p>
+        ) : null}
+        {account ? (
+          <p>
+            Wallet address: <code>{account.bech32Address}</code>
+          </p>
+        ) : null}
+        <br />
+        <button disabled={isConnecting || isReconnecting} onClick={handleButton}>
+          {isConnecting || isReconnecting ? "Connecting..." : null}
+          {isConnected ? "Disconnect Wallet" : null}
+          {isDisconnected ? "Connect Wallet" : null}
+        </button>
+      </div>
+    </div>
+  );
+};
