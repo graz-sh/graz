@@ -16,8 +16,10 @@ const HomepageFeatures: FC = () => {
                 🪝 20+ hooks for interfacing with wallets, clients, signers, etc. (connecting, view balances, send
                 tokens, etc.)
               </li>
-              <li>💳 Multiple wallet supports</li>
-              <li>⚙️ Generate mainnet & testnet `ChainInfo`</li>
+              <li>💳 Multiple wallet supports (Keplr, Leap, Cosmostation, Vectis, Metamask Snap, WalletConnect)</li>
+              <li>
+                ⚙️ Generate mainnet & testnet <code>ChainInfo</code>
+              </li>
               <li>
                 📚 Built-in caching, request deduplication, and all the good stuff from @tanstack/react-query and
                 zustand

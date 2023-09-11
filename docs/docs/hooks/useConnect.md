@@ -4,8 +4,10 @@ Mutation hook to execute wallet connection with optional arguments to invoke giv
 
 #### Usage
 
+#### Single Chain
+
 ```tsx
-import { useAccount, useConnect, mainnetChains } from "graz";
+import { useAccount, useConnect, WalletType } from "graz";
 
 function App() {
   const { connect } = useConnect();
@@ -13,7 +15,29 @@ function App() {
 
   return (
     <div>
-      {isConnected ? account.bech32Address : <button onClick={() => connect({ chain: mainnetChains.cosmoshub, walletType: wallet })>Connect</button>}
+      {isConnected ? account.bech32Address : <button onClick={() => connect({ chainId: "cosmoshub-4", walletType: WalletType.KEPLR })>Connect</button>}
+    </div>
+  );
+}
+```
+
+#### Multi Chain
+
+```tsx
+import { useAccount, useConnect, WalletType } from "graz";
+
+function App() {
+  const { connect } = useConnect();
+  const { isConnected, data: account } = useAccount({
+    chainId: ["cosmoshub-4", "sommelier-1"],
+    multiChain: true
+  });
+
+  return (
+    <div>
+      {isConnected ? <p>Connected</p> : <button onClick={() => connect({ chainId: ["cosmoshub-4", "sommelier-1"], walletType: WalletType.KEPLR })>Connect</button>}
+      <p>Cosmos hub address: {account?.["cosmoshub-4"].bech32Address}</p>
+      <p>Sommelier address: {account?.["sommelier-1"].bech32Address}</p>
     </div>
   );
 }
@@ -24,30 +48,21 @@ function App() {
 - `ConnectArgs`
   ```tsx
   {
-    chain?: {
-      chainId: string;
-      currencies: AppCurrency[];
-      path?: string;
-      rest: string;
-      rpc: string;
-      rpcHeaders?: Dictionary;
-      gas?: {
-        price: string;
-        denom: string;
-      }
-    }
-    signerOpts?: SigningCosmWasmClientOptions;
+    chainId: string | string[];
     walletType?: WalletType;
+    autoReconnect?: boolean;
   }
   ```
 
-#### Params
+#### Hook Params
 
-Object params
-
-- onError?: `(error: unknown, data: ConnectArgs) => void`
-- onMutate?: `(data: ConnectArgs) => void`
-- onSuccess?: `(data: ConnectResult) => void`
+````ts
+{
+  onError?: (error: unknown, data: ConnectArgs) => void;
+  onMutate?: (data: ConnectArgs) => void;
+  onSuccess?: (data: ConnectResult) => void;
+}
+```
 
 ##### `ConnectResult`
 
@@ -57,7 +72,7 @@ Object params
   walletType: WalletType;
   chain: GrazChain;
 }
-```
+````
 
 #### Return Value
 

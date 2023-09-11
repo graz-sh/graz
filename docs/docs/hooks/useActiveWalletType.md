@@ -31,5 +31,6 @@ function App() {
   isVectis: boolean;
   isLeapMobile: boolean;
   isWalletConnect: boolean;
+  isMetamaskSnapLeap: boolean;
 }
 ```

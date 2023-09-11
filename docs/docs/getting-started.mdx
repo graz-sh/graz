@@ -27,6 +27,21 @@ yarn add graz
 pnpm add graz
 ```
 
+## Install peer dependencies
+
+To avoid version missmatch we dcided to make these packages as peer dependencies
+
+```shell
+# using npm
+npm install @cosmjs/cosmwasm-stargate @cosmjs/launchpad @cosmjs/proto-signing @cosmjs/stargate @cosmjs/tendermint-rpc long
+
+# using yarn
+yarn add @cosmjs/cosmwasm-stargate @cosmjs/launchpad @cosmjs/proto-signing @cosmjs/stargate @cosmjs/tendermint-rpc long
+
+# using pnpm
+pnpm add @cosmjs/cosmwasm-stargate @cosmjs/launchpad @cosmjs/proto-signing @cosmjs/stargate @cosmjs/tendermint-rpc long
+```
+
 ## Quick start
 
 ### 1. Wrap app with `<GrazProvider />`
@@ -45,20 +60,21 @@ function App() {
 
 ### 2. Configure `grazOptions`
 
-:::info
+```tsx
+import { ChainInfo } from "@keplr-wallet/types";
+import { GrazProvider } from "graz";
 
-**Optional** You can configure your default chain, default wallet, default `SigningClient`
-
-:::
-
-```jsx
-import { GrazProvider, mainnetChains } from "graz";
+const cosmoshub: ChainInfo = {
+  chainId: "cosmoshub-4",
+  chainName: "Cosmos Hub",
+  //... rest of cosmoshub ChainInfo
+};
 
 function App() {
   return (
     <GrazProvider
       grazOptions={{
-        defaultChain: mainnetChains.cosmoshub,
+        chains: [cosmoshub],
       }}
     >
       <Wallet />

@@ -4,15 +4,15 @@ sidebar_position: 4
 
 # Examples
 
-## Next.js
-
-- Website: https://graz.sh/examples/next
-- GitHub: https://github.com/graz-sh/graz/tree/dev/example/next
-
-## Next.js Starter
+## Next.js + Multi chain
 
 - Website: https://graz.sh/examples/starter
 - GitHub: https://github.com/graz-sh/graz/tree/dev/example/starter
+
+## Next.js Simple
+
+- Website: https://graz.sh/examples/next
+- GitHub: https://github.com/graz-sh/graz/tree/dev/example/next
 
 ## Vite
 

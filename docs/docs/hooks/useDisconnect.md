@@ -8,26 +8,41 @@ Mutation hook to execute wallet disconnection with optional arguments to invoke 
 import { useAccount, useDisconnect } from "graz";
 
 function App() {
-  // pass `true` on disconnect to clear recent connected chain
   const { disconnect } = useDisconnect();
-  const { isConnected, account, status } = useAccount();
 
   return (
     <div>
-      {isConnected ? `Connected to ${account?.bech32Address}` : status}
-      {isConnected && <button onClick={() => disconnect(true)}>Disconnect</button>}
+      <button onClick={() => disconnect()}>Disconnect</button>}
     </div>
   );
 }
 ```
 
-#### Params
+##### Disconnect a specific chain
 
-Object params
+```tsx
+import { useAccount, useDisconnect } from "graz";
 
-- onError?: `(error: unknown, data: boolean) => void`
-- onMutate?: `(data: boolean) => void`
-- onSuccess?: `(data: boolean) => void`
+function App() {
+  const { disconnect } = useDisconnect();
+
+  return (
+    <div>
+       <button onClick={() => disconnect({chainId?: ["cosmoshub-4"] })}>Disconnect</button>
+    </div>
+  );
+}
+```
+
+#### Hook Params
+
+```ts
+{
+  onError?: (error: unknown, data: boolean) => void
+  onMutate?: (data: boolean) => void
+  onSuccess?: (data: boolean) => void
+}
+```
 
 #### Return Value
 

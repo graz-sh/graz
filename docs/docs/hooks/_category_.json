@@ -3,6 +3,6 @@
   "position": 5,
   "link": {
     "type": "generated-index",
-    "description": "Collection of hooks that graz provide"
+    "description": "Collection of graz hooks"
   }
 }
