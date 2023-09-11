@@ -1,7 +1,6 @@
 import type { ChainInfo } from "@keplr-wallet/types";
 
 import { useGrazInternalStore } from "../store";
-import type { Dictionary } from "../types/core";
 import type { WalletType } from "../types/wallet";
 import type { ConnectResult } from "./account";
 import { connect } from "./account";
@@ -34,12 +33,6 @@ export const suggestChain = async ({ chainInfo, walletType }: SuggestChainArgs):
 export interface SuggestChainAndConnectArgs {
   chainInfo: ChainInfo;
   walletType?: WalletType;
-  gas?: {
-    price: string;
-    denom: string;
-  };
-  rpcHeaders?: Dictionary;
-  path?: string;
   autoReconnect?: boolean;
 }
 

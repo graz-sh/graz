@@ -42,10 +42,10 @@ export interface UseAccountResult<TMulti extends MultiChainHookArgs> {
  *
  * // basic example
  * const { data:account, isConnecting, isConnected, ... } = useAccount();
- *
+ * account.bech32Address
  * // multichain example
- * const { data: accounts, isConnecting, isConnected, ... } = useAccount({chainId: ["cosmoshub-4", "sommelier-3"] multiChain: true});
- *
+ * const { data: accounts, isConnecting, isConnected, ... } = useAccount({ chainId: ["cosmoshub-4", "sommelier-3"], multiChain: true });
+ * accounts['cosmoshub-4'].bech32Address
  * // with event arguments
  * useAccount({
  *   onConnect: ({ account, isReconnect }) => { ... },
@@ -127,8 +127,6 @@ export const useAccount = <TMulti extends MultiChainHookArgs>(
  * const { data:balances, isFetching, refetch, ... } = useBalances({chainId: ["cosmoshub-4", "sommelier-3"] multiChain: true});
  * const cosmoshubBalances = balances["cosmoshub-4"]
  *
- * // with custom bech32 address
- * useBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
 export const useBalances = <TMulti extends MultiChainHookArgs>(
