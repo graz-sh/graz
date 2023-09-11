@@ -1,4 +1,4 @@
-# WALLET_TYPES
+# Connect a specific wallet
 
 `graz` support multiple wallets, we have an array that contains our supported wallets
 
@@ -12,7 +12,7 @@ export const SupportedWallet = () => {
   return (
     <div>
       {WALLET_TYPES.map((name) => (
-        <button onClick={connect({ chain: cosmoshub, walletType: name })} key={name}>
+        <button onClick={connect({ chainId: "cosmoshub-4", walletType: name })} key={name}>
           {name}
         </button>
       ))}

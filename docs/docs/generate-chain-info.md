@@ -48,5 +48,5 @@ in your package.json add it to in your install or postInstall scripts
 After you generate `ChainInfo` you can use it in you project
 
 ```ts
-import { axelar, cosmoshub, sommelier, mainnetChains, testnetChains } from "graz/chains";
+import { axelar, cosmoshub, sommelier } from "graz/chains";
 ```

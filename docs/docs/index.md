@@ -77,7 +77,7 @@ function App() {
 ```
 
 ```jsx
-import { mainnetChains, useAccount, useConnect, useDisconnect } from "graz";
+import { useAccount, useConnect, useDisconnect } from "graz";
 
 function Wallet() {
   const { connect, status } = useConnect();
