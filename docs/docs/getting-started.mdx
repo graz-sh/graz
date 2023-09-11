@@ -88,7 +88,7 @@ function App() {
 Use hooks! Every component inside the GrazProvider is now set up to use the graz hooks.
 
 ```jsx
-import { mainnetChains, useAccount, useConnect, useDisconnect } from "graz";
+import { useAccount, useConnect, useDisconnect } from "graz";
 
 function Wallet() {
   const { connect, status } = useConnect();
