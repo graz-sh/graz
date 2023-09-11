@@ -2,6 +2,8 @@
 
 Hook to retrieve account data with optional arguments to invoke given function on connect/disconnect.
 
+`useAccount` only retrieve connected/active chains if there's no `chainId` passed to the hook param.
+
 #### Usage
 
 ##### Basic
