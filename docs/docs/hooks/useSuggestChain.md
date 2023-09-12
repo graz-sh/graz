@@ -68,7 +68,7 @@ interface ChainInfo {
 
 ```tsx
 import { Bech32Address } from "@keplr-wallet/cosmos";
-import { useSuggestChain } from "graz";
+import { useSuggestChain, WalletType } from "graz";
 
 const OSMO = {
   coinDenom: "osmo",
@@ -97,7 +97,10 @@ function App() {
   const { suggest } = useSuggestChain();
 
   function handleSuggestChain() {
-    suggest(osmosisTestnet);
+    suggest({
+      chainInfo: osmosisTestnet,
+      walletType: WalletType.KEPLR,
+    });
   }
 
   return (
@@ -123,8 +126,8 @@ Object params
   error: unknown;
   isLoading: boolean;
   isSuccess: boolean;
-  suggest: (chain: ChainInfo) => void;
-  suggestAsync: (chain: ChainInfo) => Promise<ChainInfo>;
+  suggest: ({chain: ChainInfo, walletType: WalletType}) => void;
+  suggestAsync: ({chain: ChainInfo, walletType: WalletType}) => Promise<ChainInfo>;
   status: "idle" | "error" | "loading" | "success";
 }
 ```

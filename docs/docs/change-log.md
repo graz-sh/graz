@@ -15,7 +15,6 @@ sidebar_position: 15
     walletType: WalletType;
   }
   ```
--
 
 ## Version 0.0.49
 
