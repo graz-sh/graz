@@ -4,6 +4,19 @@ sidebar_position: 15
 
 # Changelog
 
+## version 0.0.50
+
+- MetaMask Snap: Remove Flask flag, you can now use MetaMask wallet for MetaMask Snap.
+- Fix `suggestChain` (`useSuggestChain`), `suggestAndConnect` (`useSuggestChainAndConnect`) for MetaMask Snap
+- Change `suggestChain` param to object param
+  ```ts
+  {
+    chainInfo: ChainInfo;
+    walletType: WalletType;
+  }
+  ```
+-
+
 ## Version 0.0.49
 
 - Fix client side error
