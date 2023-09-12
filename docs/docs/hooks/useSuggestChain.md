@@ -126,8 +126,8 @@ Object params
   error: unknown;
   isLoading: boolean;
   isSuccess: boolean;
-  suggest: ({chain: ChainInfo, walletType: WalletType}) => void;
-  suggestAsync: ({chain: ChainInfo, walletType: WalletType}) => Promise<ChainInfo>;
+  suggest: ({chainInfo: ChainInfo, walletType: WalletType}) => void;
+  suggestAsync: ({chainInfo: ChainInfo, walletType: WalletType}) => Promise<ChainInfo>;
   status: "idle" | "error" | "loading" | "success";
 }
 ```
