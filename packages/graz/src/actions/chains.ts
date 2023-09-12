@@ -1,4 +1,3 @@
-import type { SigningCosmWasmClientOptions } from "@cosmjs/cosmwasm-stargate";
 import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 
 import type { GrazChain } from "../chains";
@@ -22,15 +21,19 @@ export const getRecentChain = (): GrazChain | null => {
   return useGrazInternalStore.getState().recentChain;
 };
 
-export const suggestChain = async (chainInfo: ChainInfo): Promise<ChainInfo> => {
-  const wallet = getWallet();
+export interface SuggestChainArgs {
+  chainInfo: ChainInfo;
+  walletType: WalletType;
+}
+
+export const suggestChain = async ({ chainInfo, walletType }: SuggestChainArgs): Promise<ChainInfo> => {
+  const wallet = getWallet(walletType);
   await wallet.experimentalSuggestChain(chainInfo);
   return chainInfo;
 };
 
 export interface SuggestChainAndConnectArgs {
   chainInfo: ChainInfo;
-  signerOpts?: SigningCosmWasmClientOptions;
   walletType?: WalletType;
   gas?: {
     price: string;
@@ -48,7 +51,12 @@ export const suggestChainAndConnect = async ({
   path,
   ...rest
 }: SuggestChainAndConnectArgs): Promise<ConnectResult> => {
-  const chain = await suggestChain(chainInfo);
+  const { walletType } = useGrazInternalStore.getState();
+  const wallet = rest.walletType || walletType;
+  const chain = await suggestChain({
+    chainInfo,
+    walletType: wallet,
+  });
   const result = await connect({
     chain: {
       chainId: chainInfo.chainId,

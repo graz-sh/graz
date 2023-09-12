@@ -6,7 +6,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import type { QueryValidatorsResponse } from "cosmjs-types/cosmos/staking/v1beta1/query";
 
 import type { ConnectResult } from "../actions/account";
-import type { SuggestChainAndConnectArgs } from "../actions/chains";
+import type { SuggestChainAndConnectArgs, SuggestChainArgs } from "../actions/chains";
 import { clearRecentChain, getActiveChainCurrency, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import type { GrazChain } from "../chains";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
@@ -98,7 +98,7 @@ export const useRecentChain = () => {
   return { data: recentChain, clear: clearRecentChain };
 };
 
-export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
+export type UseSuggestChainArgs = MutationEventArgs<SuggestChainArgs, ChainInfo>;
 
 /**
  * graz mutation hook to suggest chain to a Wallet
