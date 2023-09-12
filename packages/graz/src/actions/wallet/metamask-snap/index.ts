@@ -56,7 +56,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       }
     };
 
-    const connectSnap = async () => {
+    const requestSnaps = async () => {
       await ethereum.request({
         method: "wallet_requestSnaps",
         params: {
@@ -69,14 +69,21 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       const clientVersion = await ethereum.request({
         method: "web3_clientVersion",
       });
-      const isFlaskDetected = (clientVersion as string[])?.includes("flask");
-      if (!isFlaskDetected) throw new Error("Metamask Flask is not detected");
+
+      const isMetamask = (clientVersion as string)?.includes("MetaMask");
+      if (!isMetamask) throw new Error("Metamask is not installed");
+      const version = (clientVersion as string).split("MetaMask/v")[1]?.split(".")[0];
+      const isSupportMMSnap = Number(version) >= 11;
+      if (!isSupportMMSnap) throw new Error("Metamask Snap is not supported in this version");
+
+      const installedSnap = await getSnap();
+      if (!installedSnap) await requestSnaps();
       return true;
     };
 
     const enable = async (chainId: string | string[]) => {
       const installedSnap = await getSnap();
-      if (!installedSnap) await connectSnap();
+      if (!installedSnap) await requestSnaps();
     };
 
     const requestSignDirect = async (
@@ -218,6 +225,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
     };
 
     const experimentalSuggestChain = async (..._args: Parameters<Keplr["experimentalSuggestChain"]>) => {
+      await init();
       await ethereum.request({
         method: "wallet_invokeSnap",
         params: {
@@ -233,15 +241,15 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
     };
 
     return {
+      enable,
+      experimentalSuggestChain,
       getKey,
       getOfflineSigner,
       getOfflineSignerAuto,
       getOfflineSignerOnlyAmino,
-      signDirect,
-      signAmino,
-      enable,
-      experimentalSuggestChain,
       init,
+      signAmino,
+      signDirect,
     };
   }
   useGrazInternalStore.getState()._notFoundFn();
