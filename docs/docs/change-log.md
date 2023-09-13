@@ -15,6 +15,8 @@ sidebar_position: 15
     walletType: WalletType;
   }
   ```
+- Removed `signerOpts` param in `connect` and `connectAsync` from `useConnect`
+- Removed `signerOpts` param in `suggestChainAndConnect` and `suggestChainAndConnectAsync` from `useSuggestChainAndConnect`
 
 ## Version 0.0.49
 

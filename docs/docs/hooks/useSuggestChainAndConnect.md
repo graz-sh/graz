@@ -54,7 +54,6 @@ function App() {
   ```tsx
   {
     chainInfo: ChainInfo;
-    signerOpts?: SigningCosmWasmClientOptions;
     walletType?: WalletType;
     gas?: {
       price: string;
