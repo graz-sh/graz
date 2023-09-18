@@ -100,8 +100,8 @@ function Wallet() {
 ## Examples
 
 - Next.js + Multi chain: https://graz.sh/examples/starter ([source code](https://github.com/graz-sh/graz/tree/dev/example/starter/))
-- Next.js + Chakra UI: https://graz.sh/examples/next ([source code](./example/next/))
-- Vite: https://graz.sh/examples/vite ([source code](./example/vite/))
+- Next.js + Chakra UI: https://graz.sh/examples/next ([source code](https://github.com/graz-sh/graz/tree/dev/example/next/))
+- Vite: https://graz.sh/examples/vite ([source code](https://github.com/graz-sh/graz/tree/dev/example/vite/))
 
 ## Maintainers
 
