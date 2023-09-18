@@ -7,7 +7,7 @@
     "dev": "vite",
     "export:docs": "tsc && vite build --emptyOutDir --outDir ../../docs/build/examples/vite",
     "preview": "vite preview",
-    "postinstall": "graz generate"
+    "postinstall": "graz generate -g"
   },
   "dependencies": {
     "graz": "*",

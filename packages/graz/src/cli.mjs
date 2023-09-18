@@ -1,60 +1,216 @@
 #!/usr/bin/env node
 // @ts-check
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
 
-import path from "node:path";
+import { Bech32Address } from "@keplr-wallet/cosmos";
+import arg from "arg";
+import { createClient, createTestnetClient } from "cosmos-directory-client";
+import pmap from "p-map";
 
-import { cac } from "cac";
-import { generate } from "wadesta";
-import { parseOptions, withDefaultGenerateFlags } from "wadesta/cli";
-import { GenerateEventEmitter } from "wadesta/events";
+const isNumber = (char) => /^\d+$/.test(char);
 
-import * as p from "./utils/cli/clack";
-import { promptParsedOptions } from "./utils/cli/prompt-opt";
+const chainNaming = (name) => {
+  if (isNumber(name[0])) {
+    return `_${name}`;
+  }
+  return name;
+};
 
-const cli = cac("graz")
-  .help()
-  .version(process.env.WADESTA_VERSION || "0.0.0");
+const HELP_MESSAGE = `Usage: graz [options]
 
-const cmd = withDefaultGenerateFlags(cli.command("generate", "Generate client"));
+Options:
 
-cmd.action(
-  async (options) => {
-    const parsed = parseOptions(options, {
-      outDir: path.resolve(__dirname, "../chains"),
-    });
-    const { isActuallyInteractive } = parsed;
+  -g, --generate        Generate chain definitions and export to "graz/chains"
+  -h, --help            Show this help message
 
-    isActuallyInteractive && p.intro("graz generate");
+Generate options:
+  -b, --best            Set REST and RPC endpoint to best available nodes instead or first listed ones
+  -M, --mainnet         Generate given mainnet chain paths seperated by commas (e.g. "axelar,cosmoshub,juno")
+  -T, --testnet         Generate given testnet chain paths seperated by commas (e.g. "atlantic,bitcannadev,cheqdtestnet")
+  --authz               Generate only authz compatible chains
 
-    const inputs = await promptParsedOptions(parsed);
+https://github.com/graz-sh/graz
+`;
 
-    const emitter = new GenerateEventEmitter();
-    if (isActuallyInteractive) {
-      p.withSpinner((s) => {
-        emitter.on("cloneRegistry", () => s.start("Loading registry"));
-        emitter.on("cloneRegistryEnd", () => s.stop("✅ Loaded registry"));
-      });
-      p.withSpinner((s) => {
-        emitter.on("clean", () => s.start("Cleaning output directory"));
-        emitter.on("cleanEnd", () => s.stop("✅ Cleaned output directory"));
-      });
-      p.withSpinner((s) => {
-        emitter.on("writeChains", () => s.start("Generating chain sources"));
-        emitter.on("writeChainsEnd", () => s.stop("✅ Generated chain sources"));
-      });
-      p.withSpinner((s) => {
-        emitter.on("writeRoot", () => s.start("Generating root sources"));
-        emitter.on("writeRootEnd", () => s.stop("✅ Generated root sources"));
-      });
+const args = arg({
+  "--generate": Boolean,
+  "-g": "--generate",
+
+  "--authz": Boolean,
+  "--best": Boolean,
+  "--mainnet": String,
+  "--testnet": String,
+  "-b": "--best",
+  "-M": "--mainnet",
+  "-T": "--testnet",
+
+  "--help": Boolean,
+  "-h": "--help",
+});
+
+const cli = async () => {
+  if (args["--help"]) {
+    console.log(HELP_MESSAGE);
+    return;
+  }
+
+  if (args["--generate"]) {
+    await generate();
+    return;
+  }
+
+  console.log(HELP_MESSAGE);
+};
+
+const generate = async () => {
+  console.log(`⏳\tGenerating chain list from cosmos.directory...`);
+  if (args["--authz"]) {
+    console.log(`✍️\tDetected authz flag, generating only compatible chains...`);
+  }
+  if (args["--best"]) {
+    console.log(`💁‍♂️\tDetected best flag, setting REST and RPC endpoints to best latency...`);
+  }
+  if (args["--mainnet"] || args["--testnet"]) {
+    console.log(`🐙\tDetected chain filtering flag, generating only given chain paths...`);
+  }
+
+  const [mainnetRecord, testnetRecord] = await Promise.all([
+    makeRecord(createClient(), { filter: args["--mainnet"] }),
+    makeRecord(createTestnetClient(), { filter: args["--testnet"] }),
+  ]);
+
+  const [jsStub, mjsStub] = await Promise.all([
+    fs.readFile(chainsDir("index.js.stub"), { encoding: "utf-8" }),
+    fs.readFile(chainsDir("index.mjs.stub"), { encoding: "utf-8" }),
+  ]);
+
+  const jsContent = jsStub
+    .replace("/* REPLACE_MAINNET_DEFS */", makeDefs(mainnetRecord))
+    .replace("/* REPLACE_TESTNET_DEFS */", makeDefs(testnetRecord, { testnet: true }))
+    .replace("/* REPLACE_MAINNET_CHAINS */", makeChainMap(mainnetRecord))
+    .replace("/* REPLACE_TESTNET_CHAINS */", makeChainMap(testnetRecord, { testnet: true }))
+    .replace("/* REPLACE_MAINNET_CHAINS_ARRAY */", makeExports(mainnetRecord))
+    .replace("/* REPLACE_TESTNET_CHAINS_ARRAY */", makeExports(testnetRecord, { testnet: true }))
+    .replace("/* REPLACE_MAINNET_EXPORTS */", makeExports(mainnetRecord))
+    .replace("/* REPLACE_TESTNET_EXPORTS */", makeExports(testnetRecord, { testnet: true }))
+    .replace(/"(.+)":/g, "$1:")
+    .trim();
+
+  const mjsContent = mjsStub
+    .replace("/* REPLACE_MAINNET_DEFS */", makeDefs(mainnetRecord, { mjs: true }))
+    .replace("/* REPLACE_TESTNET_DEFS */", makeDefs(testnetRecord, { mjs: true, testnet: true }))
+    .replace("/* REPLACE_MAINNET_CHAINS */", makeChainMap(mainnetRecord))
+    .replace("/* REPLACE_TESTNET_CHAINS */", makeChainMap(testnetRecord, { testnet: true }))
+    .replace("/* REPLACE_MAINNET_CHAINS_ARRAY */", makeExports(mainnetRecord))
+    .replace("/* REPLACE_TESTNET_CHAINS_ARRAY */", makeExports(testnetRecord, { testnet: true }))
+    .replace(/"(.+)":/g, "$1:")
+    .trim();
+
+  await Promise.all([
+    fs.writeFile(chainsDir("index.js"), jsContent, { encoding: "utf-8" }),
+    fs.writeFile(chainsDir("index.mjs"), mjsContent.replace('"../dist"', '"../dist/index.mjs"'), { encoding: "utf-8" }),
+    fs.writeFile(chainsDir("index.ts"), mjsContent, { encoding: "utf-8" }),
+  ]);
+
+  console.log('✨\tGenerate complete! You can import `mainnetChains` and `testnetChains` from "graz/chains".\n');
+};
+
+/** @param {string[]} args */
+const chainsDir = (...args) => path.resolve(__dirname, "../chains", ...args);
+
+/**
+ * @param {Record<string, import("@keplr-wallet/types").ChainInfo>} record
+ * @param {Record<string, boolean>} opts
+ */
+const makeChainMap = (record, { testnet = false } = {}) =>
+  Object.keys(record)
+    .map((k) => `  ${chainNaming(k)}: ${chainNaming(k)},`)
+    .join("\n");
+
+/**
+ * @param {Record<string, import("@keplr-wallet/types").ChainInfo>} record
+ * @param {Record<string, boolean>} opts
+ */
+const makeDefs = (record, { mjs = false, testnet = false } = {}) =>
+  Object.entries(record)
+    .map(([k, v]) => {
+      const jsVariable = `${chainNaming(k)}`;
+      const jsChainInfo = JSON.stringify(v, null, 2);
+      return `${mjs ? "export " : ""}const ${jsVariable} = defineChainInfo(${jsChainInfo});\n`;
+    })
+    .join("");
+
+/**
+ * @param {Record<string, import("@keplr-wallet/types").ChainInfo>} record
+ * @param {Record<string, boolean>} opts
+ */
+const makeExports = (record, { testnet = false } = {}) =>
+  Object.keys(record)
+    .map((k) => `  ${chainNaming(k)},`)
+    .join("\n");
+
+/**
+ * @param {import("cosmos-directory-client").DirectoryClient} client
+ * @param {{ filter?: string }} opts
+ */
+const makeRecord = async (client, { filter = "" } = {}) => {
+  const paths = filter
+    ? filter.split(",").map((path) => ({ path }))
+    : await client.fetchChains().then((c) => c.chains.map(({ path }) => ({ path })));
+
+  const chains = await pmap(paths, async (c) => client.fetchChain(c.path).then((x) => x.chain), { concurrency: 4 });
+
+  /** @type {Record<string, import("@keplr-wallet/types").ChainInfo>} */
+  const record = {};
+
+  chains.forEach((chain) => {
+    try {
+      if (args["--authz"] && !chain.params?.authz) {
+        return;
+      }
+
+      const apis = args["--best"] ? chain.best_apis : chain.apis;
+      if (!apis || !apis.rest?.[0] || !apis.rpc?.[0]) {
+        throw new Error(`⚠️\t${chain.name} has no REST/RPC endpoints, skipping codegen...`);
+      }
+
+      if (!chain.assets) {
+        throw new Error(`⚠️\t${chain.name} has no assets, skipping codegen...`);
+      }
+      const mainAsset = chain.assets[0];
+
+      /** @type{import("@keplr-wallet/types").Currency} */
+      const nativeCurrency = {
+        coinDenom: mainAsset.denom_units[mainAsset.denom_units.length - 1].denom,
+        coinMinimalDenom: mainAsset.denom_units[0].denom,
+        coinDecimals: mainAsset.denom_units[mainAsset.denom_units.length - 1].exponent,
+        coinGeckoId: mainAsset.coingecko_id,
+      };
+
+      record[chain.path] = {
+        chainId: chain.chain_id,
+        currencies: chain.assets.map((asset) => ({
+          coinDenom: asset.denom_units[asset.denom_units.length - 1].denom,
+          coinMinimalDenom: asset.denom_units[0].denom,
+          coinDecimals: asset.denom_units[asset.denom_units.length - 1].exponent,
+          coinGeckoId: asset.coingecko_id,
+        })),
+        rest: apis.rest[0].address || "",
+        rpc: apis.rpc[0].address || "",
+        bech32Config: Bech32Address.defaultBech32Config(chain.bech32_prefix),
+        chainName: chain.chain_name,
+        feeCurrencies: [nativeCurrency],
+        stakeCurrency: nativeCurrency,
+        bip44: {
+          coinType: chain.slip44 ?? 0,
+        },
+      };
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : String(error));
     }
+  });
+  return record;
+};
 
-    await generate(inputs, emitter);
-
-    isActuallyInteractive && p.outro(`🎉 Chain registry client generated at "graz/chains".`);
-  },
-  //
-);
-
-cli.command("").action(() => cli.outputHelp());
-
-cli.parse();
+void cli();

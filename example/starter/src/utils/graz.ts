@@ -1,13 +1,9 @@
 import { WalletType } from "graz";
-import axelar from "graz/chains/axelar";
-import cosmos from "graz/chains/cosmoshub";
-import osmosis from "graz/chains/osmosis";
-import somm from "graz/chains/sommelier";
-import stargaze from "graz/chains/stargaze";
+import { axelar, cosmoshub, osmosis, sommelier, stargaze } from "graz/chains";
 
 export const mainnetChains = [
-  { ...cosmos, rpc: "https://rpc.cosmos.directory/cosmoshub", rest: "https://rest.cosmos.directory/cosmoshub" },
-  { ...somm, rpc: "https://rpc.cosmos.directory/sommelier", rest: "https://rest.cosmos.directory/sommelier" },
+  { ...cosmoshub, rpc: "https://rpc.cosmos.directory/cosmoshub", rest: "https://rest.cosmos.directory/cosmoshub" },
+  { ...sommelier, rpc: "https://rpc.cosmos.directory/sommelier", rest: "https://rest.cosmos.directory/sommelier" },
   { ...stargaze, rpc: "https://rpc.cosmos.directory/stargaze", rest: "https://rest.cosmos.directory/stargaze" },
   { ...axelar, rpc: "https://rpc.cosmos.directory/axelar", rest: "https://rest.cosmos.directory/axelar" },
   { ...osmosis, rpc: "https://rpc.cosmos.directory/osmosis", rest: "https://rest.cosmos.directory/osmosis" },

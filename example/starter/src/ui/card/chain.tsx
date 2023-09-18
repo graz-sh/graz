@@ -1,5 +1,5 @@
 import { CopyIcon } from "@chakra-ui/icons";
-import { Button, HStack, IconButton, Image, Spinner, Stack, Text, Tooltip, useToast } from "@chakra-ui/react";
+import { Avatar, Button, HStack, IconButton, Spinner, Stack, Text, Tooltip, useToast } from "@chakra-ui/react";
 import type { ChainInfo } from "@graz-sh/types";
 import { useAccount, useBalance, useBalanceStaked, useDisconnect } from "graz";
 
@@ -44,7 +44,7 @@ export const Card = ({ chain }: { chain: ChainInfo }) => {
     >
       <HStack justifyContent="space-between">
         <HStack>
-          <Image alt={chain.chainName} boxSize="32px" src={chain.stakeCurrency.coinImageUrl} />
+          <Avatar boxSize="32px" name={chain.chainName} rounded="full" src={chain.stakeCurrency.coinImageUrl} />
           <Text fontWeight="bold">{chain.chainName}</Text>
           {isConnecting ? <Spinner size="sm" /> : null}
           {account ? (

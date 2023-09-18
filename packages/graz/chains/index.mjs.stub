@@ -1,0 +1,20 @@
+import { defineChainInfo, defineChains } from "../dist";
+
+/* REPLACE_MAINNET_DEFS */
+/* REPLACE_TESTNET_DEFS */
+
+export const mainnetChains = defineChains({
+/* REPLACE_MAINNET_CHAINS */
+});
+
+export const mainnetChainsArray = [
+/* REPLACE_MAINNET_CHAINS_ARRAY */
+];
+
+export const testnetChains = defineChains({
+/* REPLACE_TESTNET_CHAINS */
+});
+
+export const testnetChainsArray = [
+/* REPLACE_TESTNET_CHAINS_ARRAY */
+];

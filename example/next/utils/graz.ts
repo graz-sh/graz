@@ -1,7 +1,6 @@
-import cosmos from "graz/chains/cosmoshub";
-import osmosisTestnet from "graz/chains/osmosistestnet";
+import { cosmoshub, osmosistestnet } from "graz/chains";
 
 export const chains = [
-  { ...cosmos, rpc: "https://rpc.cosmos.directory/cosmoshub", rest: "https://rest.cosmos.directory/cosmoshub" },
-  osmosisTestnet,
+  { ...cosmoshub, rpc: "https://rpc.cosmos.directory/cosmoshub", rest: "https://rest.cosmos.directory/cosmoshub" },
+  osmosistestnet,
 ];
