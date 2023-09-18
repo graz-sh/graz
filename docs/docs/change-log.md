@@ -90,5 +90,5 @@ sidebar_position: 8
 
 - ✅ [WalletConnect v2 support](./wallet-connect.md)
 - ✅ Added more `WalletType` for connecting WalletConnect wallets
-- 🗑️ Deprecated constants, will be removed in next version `mainnetChains`, `mainnetChainsArray`, `testnetChains`, `testnetChainsArray`. Use [`graz generate`](./generate-chain-info.mdx)👍
+- 🗑️ Deprecated constants, will be removed in next version `mainnetChains`, `mainnetChainsArray`, `testnetChains`, `testnetChainsArray`. Use [`graz generate`](./generate-chain-info.md)👍
 - 🛠️ Splitted internal store between user session and graz internal
