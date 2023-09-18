@@ -21,27 +21,13 @@
       "default": "./dist/index.js"
     },
     "./chains": {
-      "types": "./chains/index.d.ts",
+      "types": "./chains/index.ts",
+      "module": "./chains/index.mjs",
       "default": "./chains/index.js"
-    },
-    "./chains/chunk-*.js": {
-      "default": "./chains/chunk-*.js"
-    },
-    "./chains/*": {
-      "default": "./chains/*/index.js"
-    },
-    "./chains/*/assetlist": {
-      "default": "./chains/*/assetlist.js"
-    },
-    "./chains/*/chain-info": {
-      "default": "./chains/*/chain-info.js"
-    },
-    "./chains/*/chain": {
-      "default": "./chains/*/chain.js"
     }
   },
   "files": [
-    "chains/*",
+    "chains/*.stub",
     "dist/*",
     "types/*",
     "env.d.ts"
@@ -71,6 +57,7 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.7.0",
+    "@keplr-wallet/cosmos": "^0.12.20",
     "@keplr-wallet/types": "^0.12.23",
     "@metamask/providers": "^12.0.0",
     "@tanstack/react-query": "^4.35.0",

@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, Stack, Text } from "@chakra-ui/react";
 import { useAccount, useSuggestChainAndConnect } from "graz";
-import osmosisTestnet from "graz/chains/osmosistestnet";
+import { osmosistestnet } from "graz/chains";
 import type { FC } from "react";
 
 export const ChainSwitcher: FC = () => {
@@ -9,7 +9,7 @@ export const ChainSwitcher: FC = () => {
     isReconnecting,
     data: account,
   } = useAccount({
-    chainId: osmosisTestnet.chainId,
+    chainId: osmosistestnet.chainId,
   });
 
   const { suggestAndConnect } = useSuggestChainAndConnect();
@@ -23,11 +23,11 @@ export const ChainSwitcher: FC = () => {
           colorScheme={account ? "green" : "gray"}
           onClick={() =>
             suggestAndConnect({
-              chainInfo: osmosisTestnet,
+              chainInfo: osmosistestnet,
             })
           }
         >
-          {osmosisTestnet.chainId}
+          {osmosistestnet.chainId}
         </Button>
       </ButtonGroup>
     </Stack>

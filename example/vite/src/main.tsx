@@ -1,7 +1,7 @@
 import "./index.css";
 
 import { GrazProvider } from "graz";
-import cosmoshub from "graz/chains/cosmoshub";
+import { cosmoshub } from "graz/chains";
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 

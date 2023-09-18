@@ -14,7 +14,11 @@ export default function App() {
 
   // eslint-disable-next-line prefer-arrow-functions/prefer-arrow-functions
   function handleButton() {
-    (isConnected ? disconnect : connect)();
+    isConnected
+      ? disconnect()
+      : connect({
+          chainId: "cosmoshub-4",
+        });
   }
 
   return (

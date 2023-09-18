@@ -1,0 +1,30 @@
+const { defineChainInfo, defineChains } = require("../dist");
+
+/* REPLACE_MAINNET_DEFS */
+/* REPLACE_TESTNET_DEFS */
+
+const mainnetChains = defineChains({
+/* REPLACE_MAINNET_CHAINS */
+});
+
+const mainnetChainsArray = [
+/* REPLACE_MAINNET_CHAINS_ARRAY */
+];
+
+const testnetChains = defineChains({
+/* REPLACE_TESTNET_CHAINS */
+});
+
+const testnetChainsArray = [
+/* REPLACE_TESTNET_CHAINS_ARRAY */
+];
+
+module.exports = {
+  mainnetChains,
+  mainnetChainsArray,
+  testnetChains,
+  testnetChainsArray,
+
+/* REPLACE_MAINNET_EXPORTS */
+/* REPLACE_TESTNET_EXPORTS */
+};
