@@ -4,7 +4,12 @@ sidebar_position: 15
 
 # Changelog
 
-## version 0.0.50
+## Version 0.0.51
+
+- Fix Wallet Connect multiple prompt when connect in mobile
+- Added `isWalletConnect` to check walletType is using Wallet Connect or not
+
+## Version 0.0.50
 
 - MetaMask Snap: Remove Flask flag, you can now use MetaMask wallet for MetaMask Snap.
 - Fix `suggestChain` (`useSuggestChain`), `suggestAndConnect` (`useSuggestChainAndConnect`) for MetaMask Snap
