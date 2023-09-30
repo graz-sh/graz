@@ -6,7 +6,7 @@ import { RECONNECT_SESSION_KEY } from "../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Maybe } from "../types/core";
 import type { WalletType } from "../types/wallet";
-import { checkWallet, getWallet } from "./wallet";
+import { checkWallet, getWallet, isWalletConnect } from "./wallet";
 
 export type ConnectArgs = Maybe<{
   chain?: GrazChain;
@@ -53,8 +53,10 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     await wallet.init?.();
     if (!_account || activeChain?.chainId !== chain.chainId) {
       await wallet.enable(chain.chainId);
-      const account = await wallet.getKey(chain.chainId);
-      useGrazSessionStore.setState({ account });
+      if (!isWalletConnect(currentWalletType)) {
+        const account = await wallet.getKey(chain.chainId);
+        useGrazSessionStore.setState({ account });
+      }
     }
 
     useGrazInternalStore.setState({
