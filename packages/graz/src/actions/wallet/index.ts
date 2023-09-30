@@ -85,3 +85,12 @@ export const getWallet = (type: WalletType = useGrazInternalStore.getState().wal
 export const getAvailableWallets = (): Record<WalletType, boolean> => {
   return Object.fromEntries(WALLET_TYPES.map((type) => [type, checkWallet(type)])) as Record<WalletType, boolean>;
 };
+
+export const isWalletConnect = (type: WalletType): boolean => {
+  return (
+    type === WalletType.WALLETCONNECT ||
+    type === WalletType.WC_KEPLR_MOBILE ||
+    type === WalletType.WC_LEAP_MOBILE ||
+    type === WalletType.WC_COSMOSTATION_MOBILE
+  );
+};
