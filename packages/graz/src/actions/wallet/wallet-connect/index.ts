@@ -229,9 +229,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       //   "f896cbca30cd6dc414712d3d6fcc2f8f7d35d5bd30e3b1fc5d60cf6c8926f98f",
       // ],
     });
-
     const lastSession = checkSession(chainId);
-
     if (!lastSession) {
       const { uri, approval } = await signClient.connect({
         requiredNamespaces: {
@@ -248,9 +246,6 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       } else {
         redirectToApp(uri);
       }
-
-      const { chains } = useGrazInternalStore.getState();
-
       const approving = async (signal: AbortSignal) => {
         if (signal.aborted) return Promise.reject(new Error("User closed wallet connect"));
         return new Promise((resolve, reject) => {
@@ -259,7 +254,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
               const sessionProperties = d.sessionProperties;
               if (!sessionProperties) return reject(new Error("No session properties"));
               const _acc: (Key & { chainId?: string })[] = JSON.parse(String(sessionProperties.keys));
-              if (_acc?.length) return reject(new Error("No accounts"));
+              if (_acc.length === 0) return reject(new Error("No accounts"));
               const acc = _acc[0];
               if (!acc) return reject(new Error("No accounts"));
               const resAcc: Record<string, Key> = {};

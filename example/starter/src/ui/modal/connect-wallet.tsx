@@ -47,6 +47,7 @@ const WalletModal = ({
                     borderRadius={12}
                     flex={1}
                     onClick={() => {
+                      modal.onClose();
                       onClick(key as WalletType);
                     }}
                     p={4}
