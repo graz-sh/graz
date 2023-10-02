@@ -322,8 +322,8 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
   });
 
   return {
-    disconnect: (args?: { chainId?: string }) => mutation.mutate(args),
-    disconnectAsync: (args?: { chainId?: string }) => mutation.mutateAsync(args),
+    disconnect: (args?: { chainId?: ChainId }) => mutation.mutate(args),
+    disconnectAsync: (args?: { chainId?: ChainId }) => mutation.mutateAsync(args),
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
