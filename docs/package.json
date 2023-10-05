@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "docusaurus build",
-    "build:all": "docusaurus build && pnpm -F graz build && pnpm -r run export:docs",
+    "build:all": "docusaurus build && pnpm -F graz build && pnpm -F graz cli -g && pnpm -r run export:docs",
     "clear": "docusaurus clear",
     "deploy": "docusaurus deploy",
     "docusaurus": "docusaurus",
