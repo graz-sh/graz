@@ -4,6 +4,8 @@
 [![npm/dt](https://badgen.net/npm/dt/graz)](https://www.npmjs.com/package/graz)
 [![stars](https://badgen.net/github/stars/graz-sh/graz)](https://github.com/graz-sh/graz)
 
+**`graz-interchain` adds multiple chain support for `graz`.**
+
 `graz` is a collection of React hooks containing everything you need to start working with the [Cosmos ecosystem](https://cosmos.network/).
 
 ## Features

@@ -24,8 +24,14 @@ export interface GrazInternalStore {
   _onReconnectFailed: () => void;
 }
 
+export interface Account {
+  chain: GrazChain;
+  key: Key;
+}
+
 export interface GrazSessionStore {
   account: Key | null;
+  accounts: Map<GrazChain, Account>;
   activeChain: GrazChain | null;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
   wcSignClient?: ISignClient | null;
@@ -51,6 +57,7 @@ export const grazInternalDefaultValues: GrazInternalStore = {
 
 export const grazSessionDefaultValues: GrazSessionStore = {
   account: null,
+  accounts: new Map<GrazChain, Account>(),
   activeChain: null,
   status: "disconnected",
   wcSignClient: null,
@@ -61,6 +68,7 @@ const sessionOptions: PersistOptions<GrazSessionStore, GrazSessionPersistedStore
   version: 1,
   partialize: (x) => ({
     account: x.account,
+    accounts: x.accounts,
     activeChain: x.activeChain,
   }),
   storage: createJSONStorage(() => sessionStorage),

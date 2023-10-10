@@ -2,7 +2,7 @@
   "extends": "@graz-sh/style-guide/tsconfig.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "module": "Node16"
   },

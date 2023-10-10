@@ -19,5 +19,6 @@
     { "!cwd": false, "pattern": "packages/*" }
   ],
   "npm.packageManager": "pnpm",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
 }
