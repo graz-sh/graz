@@ -33,6 +33,5 @@
     "typescript": "^5.1.3"
   },
   "prettier": "@graz-sh/style-guide/prettier",
-  "private": true,
   "license": "MIT"
 }
