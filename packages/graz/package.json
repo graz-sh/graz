@@ -1,7 +1,7 @@
 {
   "name": "@josefleventon/graz-interchain",
   "description": "React hooks for Cosmos",
-  "version": "0.0.51",
+  "version": "0.0.52",
   "authors": ["Griko Nibras <griko@strange.love>", "Josef Leventon <josef@swiftprotocol.zone>"],
   "repository": "https://github.com/josefleventon/graz-interchain.git",
   "homepage": "https://github.com/graz-sh/graz",

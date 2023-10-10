@@ -1,4 +1,4 @@
-export * from "./actions/account";
+export * from "./actions/accounts";
 export * from "./actions/chains";
 export * from "./actions/configure";
 export * from "./actions/methods";
@@ -14,7 +14,7 @@ export * from "./actions/wallet/wallet-connect/keplr";
 export * from "./actions/wallet/wallet-connect/leap";
 export * from "./adapter";
 export * from "./chains";
-export * from "./hooks/account";
+export * from "./hooks/accounts";
 export * from "./hooks/chains";
 export * from "./hooks/clients";
 export * from "./hooks/methods";
