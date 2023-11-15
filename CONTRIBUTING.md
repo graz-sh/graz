@@ -16,7 +16,7 @@ This project and everyone participating in it is governed by the [`graz` Code of
 
 ### Why this library exist?
 
-Currently there were no stable library for cosmos wallets. We were inspired by the patterns in [`wagmi`](https://wagmi.sh) in the Etherium ecosystem.
+At the time there were no stable libraries for cosmos wallets. We were inspired by the patterns in [`wagmi`](https://wagmi.sh) in the Ethereum ecosystem.
 
 ## What should I know before I get started?
 
