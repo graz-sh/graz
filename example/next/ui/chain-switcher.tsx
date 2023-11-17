@@ -1,48 +1,35 @@
-import { Button, ButtonGroup, FormControl, FormLabel, useToast } from "@chakra-ui/react";
-import { mainnetChainsArray, testnetChains, useAccount, useConnect, useSuggestChainAndConnect } from "graz";
+import { Button, ButtonGroup, Stack, Text } from "@chakra-ui/react";
+import { useAccount, useSuggestChainAndConnect } from "graz";
+import { osmosistestnet } from "graz/chains";
 import type { FC } from "react";
 
 export const ChainSwitcher: FC = () => {
-  const toast = useToast();
-
-  const { isConnecting, isReconnecting } = useAccount({
-    onConnect: ({ account, isReconnect }) => {
-      if (!isReconnect) {
-        toast({
-          status: "success",
-          title: "Switched chain!",
-          description: `Connected as ${account.name}`,
-        });
-      }
-    },
+  const {
+    isConnecting,
+    isReconnecting,
+    data: account,
+  } = useAccount({
+    chainId: osmosistestnet.chainId,
   });
-
-  const { connect } = useConnect();
 
   const { suggestAndConnect } = useSuggestChainAndConnect();
 
   return (
-    <FormControl>
-      <FormLabel>Switch Chain</FormLabel>
-      <ButtonGroup flexWrap="wrap" gap={2} isDisabled={isConnecting || isReconnecting} size="sm" spacing={0}>
-        {mainnetChainsArray.map((chain) => (
-          <Button key={chain.chainId} onClick={() => connect({ chain })}>
-            {chain.chainId}
-          </Button>
-        ))}
-      </ButtonGroup>
-      <FormLabel mt={2}>Suggest and connect chain</FormLabel>
+    <Stack spacing={4}>
+      <Text>Suggest and connect chain</Text>
+      {account ? <Text>Address: {account.bech32Address}</Text> : null}
       <ButtonGroup isDisabled={isConnecting || isReconnecting} size="sm">
         <Button
+          colorScheme={account ? "green" : "gray"}
           onClick={() =>
             suggestAndConnect({
-              chainInfo: testnetChains.osmosis,
+              chainInfo: osmosistestnet,
             })
           }
         >
-          {testnetChains.osmosis.chainId}
+          {osmosistestnet.chainId}
         </Button>
       </ButtonGroup>
-    </FormControl>
+    </Stack>
   );
 };

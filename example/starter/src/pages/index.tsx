@@ -1,24 +1,13 @@
-import { Heading, Stack, Text } from "@chakra-ui/react";
-import { useAccount } from "graz";
-
-import { ChainSwitcher } from "../ui/wallet/chain-switcher";
-import { RecentChain } from "../ui/wallet/recent-chain";
+import { Stack } from "@chakra-ui/react";
+import { Card } from "src/ui/card/chain";
+import { mainnetChains } from "src/utils/graz";
 
 const HomePage = () => {
-  const { data: accountData, isConnecting, isReconnecting } = useAccount();
-
   return (
-    <Stack w="full" gap={2}>
-      {!accountData && (isConnecting || isReconnecting) ? <RecentChain /> : null}
-      {accountData ? (
-        <>
-          <Heading size="lg">Welcome {accountData.name}</Heading>
-          <Text noOfLines={1} wordBreak="break-all">
-            Wallet address: <b>{accountData.bech32Address}</b>
-          </Text>
-          <ChainSwitcher />
-        </>
-      ) : null}
+    <Stack spacing={4}>
+      {mainnetChains.map((chain) => (
+        <Card key={chain.chainId} chain={chain} />
+      ))}
     </Stack>
   );
 };

@@ -1,19 +1,35 @@
+import { fromBech32, toBech32 } from "@cosmjs/encoding";
 import type { Coin } from "@cosmjs/proto-signing";
-import type { UseQueryResult } from "@tanstack/react-query";
+import type { Key } from "@keplr-wallet/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 
-import type { ConnectArgs, ConnectResult } from "../actions/account";
+import type { ConnectArgs, ConnectResult, OfflineSigners, ReconnectArgs } from "../actions/account";
 import { connect, disconnect, getOfflineSigners, reconnect } from "../actions/account";
 import { checkWallet } from "../actions/wallet";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
-import type { MutationEventArgs } from "../types/hooks";
+import type { MutationEventArgs, QueryConfig, UseMultiChainQueryResult } from "../types/hooks";
+import type { WalletType } from "../types/wallet";
+import { isEmpty } from "../utils/isEmpty";
+import type { ChainId, MultiChainHookArgs } from "../utils/multi-chain";
+import { createMultiChainAsyncFunction, createMultiChainFunction, useChainsFromArgs } from "../utils/multi-chain";
 import { useStargateClient } from "./clients";
 import { useCheckWallet } from "./wallet";
 
 export interface UseAccountArgs {
   onConnect?: (args: ConnectResult & { isReconnect: boolean }) => void;
   onDisconnect?: () => void;
+}
+export interface UseAccountResult<TMulti extends MultiChainHookArgs> {
+  data?: TMulti["multiChain"] extends true ? Record<string, Key | undefined> : Key | undefined;
+  isConnected: boolean;
+  isConnecting: boolean;
+  isDisconnected: boolean;
+  isReconnecting: boolean;
+  isLoading: boolean;
+  reconnect: (args?: ReconnectArgs) => Promise<ConnectResult | undefined>;
+  status: string;
+  walletType?: WalletType;
 }
 
 /**
@@ -25,8 +41,11 @@ export interface UseAccountArgs {
  * import { useAccount } from "graz";
  *
  * // basic example
- * const { data, isConnecting, isConnected, ... } = useAccount();
- *
+ * const { data:account, isConnecting, isConnected, ... } = useAccount();
+ * account.bech32Address
+ * // multichain example
+ * const { data: accounts, isConnecting, isConnected, ... } = useAccount({ chainId: ["cosmoshub-4", "sommelier-3"], multiChain: true });
+ * accounts['cosmoshub-4'].bech32Address
  * // with event arguments
  * useAccount({
  *   onConnect: ({ account, isReconnect }) => { ... },
@@ -34,8 +53,16 @@ export interface UseAccountArgs {
  * });
  * ```
  */
-export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => {
-  const _account = useGrazSessionStore((x) => x.account);
+export const useAccount = <TMulti extends MultiChainHookArgs>(
+  args?: UseAccountArgs & TMulti,
+): UseAccountResult<TMulti> => {
+  const walletType = useGrazInternalStore((x) => x.walletType);
+  const activeChainIds = useGrazSessionStore((x) => x.activeChainIds);
+  const activeChains = useChainsFromArgs({
+    chainId: args?.chainId ? args.chainId : activeChainIds || undefined,
+    multiChain: args?.multiChain,
+  });
+  const _account = useGrazSessionStore((x) => x.accounts);
   const status = useGrazSessionStore((x) => x.status);
 
   useEffect(() => {
@@ -43,31 +70,42 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
       (x) => x.status,
       (stat, prevStat) => {
         if (stat === "connected") {
-          const { account, activeChain } = useGrazSessionStore.getState();
-          const { walletType } = useGrazInternalStore.getState();
-          onConnect?.({
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            account: account!,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            chain: activeChain!,
-            walletType,
+          const { accounts, activeChainIds: _activeChainIds } = useGrazSessionStore.getState();
+          const { chains } = useGrazInternalStore.getState();
+          const { walletType: _walletType } = useGrazInternalStore.getState();
+          if (!accounts || !_activeChainIds || !chains) {
+            return args?.onDisconnect?.();
+          }
+          args?.onConnect?.({
+            accounts,
+            chains: _activeChainIds.map((id) => chains.find((x) => x.chainId === id)!),
+            walletType: _walletType,
             isReconnect: prevStat === "reconnecting",
           });
         }
         if (stat === "disconnected") {
-          onDisconnect?.();
+          args?.onDisconnect?.();
         }
       },
     );
-  }, [onConnect, onDisconnect]);
+  }, [args]);
+
+  const account = useMemo(() => {
+    return _account
+      ? createMultiChainFunction(Boolean(args?.multiChain), activeChains, (chain) => {
+          return _account[chain.chainId];
+        })
+      : undefined;
+  }, [_account, activeChains, args?.multiChain]);
 
   return {
-    data: _account,
-    isConnected: Boolean(_account),
+    data: account as UseAccountResult<TMulti>["data"],
+    isConnected: status === "connected",
     isConnecting: status === "connecting",
     isDisconnected: status === "disconnected",
     isReconnecting: status === "reconnecting",
     isLoading: status === "connecting" || status === "reconnecting",
+    walletType: status === "connected" ? walletType : undefined,
     reconnect,
     status,
   };
@@ -85,42 +123,60 @@ export const useAccount = ({ onConnect, onDisconnect }: UseAccountArgs = {}) => 
  * // basic example
  * const { data, isFetching, refetch, ... } = useBalances();
  *
- * // with custom bech32 address
- * useBalances("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
+ * // multichain example
+ * const { data:balances, isFetching, refetch, ... } = useBalances({chainId: ["cosmoshub-4", "sommelier-3"] multiChain: true});
+ * const cosmoshubBalances = balances["cosmoshub-4"]
+ *
  * ```
  */
-export const useBalances = (bech32Address?: string): UseQueryResult<Coin[]> => {
+export const useBalances = <TMulti extends MultiChainHookArgs>(
+  args?: { bech32Address?: string } & TMulti & QueryConfig,
+): UseMultiChainQueryResult<TMulti, Coin[]> => {
+  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const { data: account } = useAccount();
-  const { data: client } = useStargateClient();
-  const { activeChain } = useGrazSessionStore.getState();
-  const address = bech32Address || account?.bech32Address;
+
+  const address = args?.bech32Address || account?.bech32Address;
+  const { data: clients } = useStargateClient({
+    chainId: chains.map((x) => x.chainId),
+    multiChain: true,
+    enabled: (args?.enabled === undefined ? true : args.enabled) && Boolean(address),
+  });
 
   const queryKey = useMemo(
-    () => ["USE_ALL_BALANCES", client, activeChain, address] as const,
-    [activeChain, address, client],
+    () => ["USE_ALL_BALANCES", clients, chains, address, args?.chainId] as const,
+    [address, args?.chainId, chains, clients],
   );
 
-  const query = useQuery(
+  return useQuery(
     queryKey,
-    async ({ queryKey: [, _client, _activeChain, _address] }) => {
-      if (!_activeChain || !_client) {
-        throw new Error("No connected account detected");
-      }
+    async ({ queryKey: [, _clients, _chains, _address] }) => {
       if (!_address) {
         throw new Error("address is not defined");
       }
-      const balances = await _client.getAllBalances(_address);
-      return balances as Coin[];
+      const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
+        const stargateClient = _clients?.[_chain.chainId];
+        if (!stargateClient) {
+          throw new Error(`Client is not ready ${_chain.chainId}`);
+        }
+        const balances = await stargateClient.getAllBalances(
+          toBech32(_chain.bech32Config.bech32PrefixAccAddr, fromBech32(_address).data),
+        );
+        return balances as Coin[];
+      });
+      return res;
     },
     {
-      enabled: Boolean(address) && Boolean(activeChain) && Boolean(client),
+      enabled:
+        Boolean(address) &&
+        Boolean(chains) &&
+        chains.length > 0 &&
+        !isEmpty(clients) &&
+        (args?.enabled === undefined ? true : args.enabled),
       refetchOnMount: false,
       refetchOnReconnect: true,
       refetchOnWindowFocus: false,
     },
   );
-
-  return query;
 };
 
 /**
@@ -134,35 +190,48 @@ export const useBalances = (bech32Address?: string): UseQueryResult<Coin[]> => {
  * import { useBalance } from "graz";
  *
  * // basic example
- * const { data, isFetching, refetch, ... } = useBalance("atom");
+ * const { data, isFetching, refetch, ... } = useBalance({denom: "atom"});
  *
  * // with custom bech32 address
  * useBalance("atom", "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
  * ```
  */
-export const useBalance = (denom: string, bech32Address?: string): UseQueryResult<Coin | undefined> => {
-  const { data: account } = useAccount();
-  const address = bech32Address || account?.bech32Address;
-  const { data: balances, refetch: _refetch } = useBalances(address);
+export const useBalance = <TMulti extends MultiChainHookArgs>(
+  args: {
+    denom: string;
+    bech32Address?: string;
+  } & { chainId: ChainId } & QueryConfig,
+): UseMultiChainQueryResult<TMulti, Coin | undefined> => {
+  const chains = useChainsFromArgs({ chainId: args.chainId });
+  const { data: account } = useAccount({
+    chainId: args.chainId,
+  });
+  const address = args.bech32Address || account?.bech32Address;
+  const { data: balances, refetch: _refetch } = useBalances({
+    chainId: chains.map((x) => x.chainId),
+    bech32Address: address,
+    enabled: Boolean(address) && (args.enabled === undefined ? true : args.enabled),
+  });
 
-  const queryKey = ["USE_BALANCE", balances, denom, bech32Address] as const;
+  const queryKey = ["USE_BALANCE", args.denom, balances, chains, address, args.chainId] as const;
+
   const query = useQuery(
     queryKey,
-    ({ queryKey: [, _balances] }) => {
-      return _balances?.find((x) => x.denom === denom);
+    ({ queryKey: [, _denom, _balances] }) => {
+      return _balances?.find((x) => x.denom === _denom);
     },
     {
-      enabled: Boolean(balances),
+      enabled: Boolean(balances) && Boolean(balances?.length) && (args.enabled === undefined ? true : args.enabled),
     },
   );
 
   return {
     ...query,
-    refetch: async () => {
+    refetch: async (options) => {
       await _refetch();
-      return query.refetch();
+      return query.refetch(options);
     },
-  };
+  } as UseMultiChainQueryResult<TMulti, Coin | undefined>;
 };
 
 export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, ConnectResult>;
@@ -253,8 +322,8 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
   });
 
   return {
-    disconnect: (forget?: boolean) => mutation.mutate(forget),
-    disconnectAsync: (forget?: boolean) => mutation.mutateAsync(forget),
+    disconnect: (args?: { chainId?: ChainId }) => mutation.mutate(args),
+    disconnectAsync: (args?: { chainId?: ChainId }) => mutation.mutateAsync(args),
     error: mutation.error,
     isLoading: mutation.isLoading,
     isSuccess: mutation.isSuccess,
@@ -269,30 +338,42 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
  *
  * @example
  * ```ts
+ *
+ * // basic example
  * import { useOfflineSigners } from "graz";
  * const { offlineSigner, offlineSignerAmino, offlineSignerAuto } = useOfflineSigners();
+ *
+ * // multichain example
+ * const offlineSigners = useOfflineSigners({chainId: ["cosmoshub-4", "sommelier-3"] multiChain: true});
+ * const cosmoshubOfflineSigners = offlineSigners["cosmoshub-4"]
+ *
  * ```
  */
-export const useOfflineSigners = () => {
-  const chain = useGrazSessionStore((x) => x.activeChain);
+export const useOfflineSigners = <TMulti extends MultiChainHookArgs>(
+  args?: TMulti,
+): UseMultiChainQueryResult<TMulti, OfflineSigners> => {
+  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const wallet = useGrazInternalStore((x) => x.walletType);
-  const queryKey = useMemo(() => ["USE_OFFLINE_SIGNERS", chain, wallet] as const, [chain, wallet]);
+  const queryKey = useMemo(() => ["USE_OFFLINE_SIGNERS", chains, wallet] as const, [chains, wallet]);
 
   return useQuery({
     queryKey,
-    queryFn: async ({ queryKey: [, _chain, _wallet] }) => {
-      if (!_chain) throw new Error("No chain found");
+    queryFn: async ({ queryKey: [, _chains, _wallet] }) => {
+      if (_chains.length < 1) throw new Error("No chain found");
       const isWalletAvailable = checkWallet(_wallet);
       if (!isWalletAvailable) {
         throw new Error(`${_wallet} is not available`);
       }
-      const offlineSigners = await getOfflineSigners({
-        chainId: _chain.chainId,
-        walletType: _wallet,
+      const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
+        const offlineSigners = await getOfflineSigners({
+          chainId: _chain.chainId,
+          walletType: _wallet,
+        });
+        return offlineSigners;
       });
-      return offlineSigners;
+      return res;
     },
-    enabled: Boolean(chain) && Boolean(wallet),
+    enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet),
     refetchOnWindowFocus: false,
   });
 };
@@ -309,40 +390,47 @@ export const useOfflineSigners = () => {
  * // basic example
  * const { data, isFetching, refetch, ... } = useBalanceStaked();
  *
+ * // multichain example
+ * const { data:balanceStaked, isFetching, refetch, ... } = useBalanceStaked({chainId: ["cosmoshub-4", "sommelier-3"] multiChain: true});
+ * const cosmoshubBalanceStaked = balances["cosmoshub-4"]
+ *
  * // with custom bech32 address
- * useBalanceStaked("cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
+ * useBalanceStaked({ bech32Address: "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu"});
  * ```
  */
-export const useBalanceStaked = (bech32Address?: string): UseQueryResult<Coin | null> => {
+export const useBalanceStaked = <TMulti extends MultiChainHookArgs>(
+  args?: { bech32Address?: string } & TMulti,
+): UseMultiChainQueryResult<TMulti, Coin> => {
+  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
   const { data: account } = useAccount();
-  const { data: client } = useStargateClient();
-  const { activeChain } = useGrazSessionStore.getState();
-  const address = bech32Address || account?.bech32Address;
+  const { data: client } = useStargateClient({
+    chainId: chains.map((x) => x.chainId),
+    multiChain: true,
+  });
+  const address = args?.bech32Address || account?.bech32Address;
 
-  const queryKey = useMemo(
-    () => ["USE_BALANCE_STAKED", client, activeChain, address] as const,
-    [activeChain, address, client],
-  );
+  const queryKey = useMemo(() => ["USE_BALANCE_STAKED", client, chains, address] as const, [chains, address, client]);
 
-  const query = useQuery(
+  return useQuery(
     queryKey,
-    async ({ queryKey: [, _client, _activeChain, _address] }) => {
-      if (!_activeChain || !_client) {
-        throw new Error("No connected account detected");
-      }
+    async ({ queryKey: [, _client, _chains, _address] }) => {
       if (!_address) {
         throw new Error("address is not defined");
       }
-      const balance = await _client.getBalanceStaked(_address);
-      return balance;
+      const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
+        if (!_client) throw new Error("Client is not ready");
+        const balance = await _client[_chain.chainId]?.getBalanceStaked(
+          toBech32(_chain.bech32Config.bech32PrefixAccAddr, fromBech32(_address).data),
+        );
+        return balance;
+      });
+      return res;
     },
     {
-      enabled: Boolean(address) && Boolean(activeChain) && Boolean(client),
+      enabled: Boolean(address) && Boolean(chains) && chains.length > 0 && Boolean(client),
       refetchOnMount: false,
       refetchOnReconnect: true,
       refetchOnWindowFocus: false,
     },
   );
-
-  return query;
 };

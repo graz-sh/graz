@@ -9,8 +9,8 @@
 ## Features
 
 - 🪝 20+ hooks for interfacing with wallets, clients, signers, etc. (connecting, view balances, send tokens, etc.)
-- 💳 Multiple wallet supports (Keplr, Leap, Cosmostation, WalletConnect )
-- ⚙️ Generate mainnet & testnet `ChainInfo` from chain registry
+- 💳 Multiple wallet supports (Keplr, Leap, Cosmostation, Vectis, Metamask Snap, WalletConnect)
+- ⚙️ Generate mainnet & testnet `ChainInfo`
 - 📚 Built-in caching, request deduplication, and all the good stuff from [`@tanstack/react-query`](https://tanstack.com/query) and [`zustand`](https://github.com/pmndrs/zustand)
 - 🔄 Auto refresh on wallet and network change
 - 👏 Fully typed and tree-shakeable
@@ -35,21 +35,39 @@ yarn add graz
 pnpm add graz
 ```
 
+### Install peer dependencies
+
+To avoid version mismatch we decided to make these packages as peer dependencies:
+
+```shell
+# using npm
+npm install @cosmjs/cosmwasm-stargate @cosmjs/launchpad @cosmjs/proto-signing @cosmjs/stargate @cosmjs/tendermint-rpc long
+
+# using yarn
+yarn add @cosmjs/cosmwasm-stargate @cosmjs/launchpad @cosmjs/proto-signing @cosmjs/stargate @cosmjs/tendermint-rpc long
+
+# using pnpm
+pnpm add @cosmjs/cosmwasm-stargate @cosmjs/launchpad @cosmjs/proto-signing @cosmjs/stargate @cosmjs/tendermint-rpc long
+```
+
 ## Quick start
 
 Wrap your React app with `<GrazProvider />` and use available `graz` hooks anywhere:
 
 ```jsx
-import { GrazProvider, mainnetChains } from "graz";
+import { GrazProvider } from "graz";
+
+const cosmoshub: ChainInfo = {
+  chainId: "cosmoshub-4",
+  chainName: "Cosmos Hub",
+  //... rest of cosmoshub ChainInfo
+}
 
 function App() {
   return (
-    <GrazProvider
-      // optional
-      grazOptions={{
-        defaultChain: mainnetChains.cosmos,
-      }}
-    >
+    <GrazProvider grazOptions={{
+      chains: [cosmoshub]
+    }}>
       <Wallet />
     </GrazProvider>
   );
@@ -79,27 +97,9 @@ function Wallet() {
 
 ## Examples
 
+- Next.js + Multi chain: https://graz.sh/examples/starter ([source code](https://github.com/graz-sh/graz/tree/dev/example/starter/))
 - Next.js + Chakra UI: https://graz.sh/examples/next ([source code](./example/next/))
 - Vite: https://graz.sh/examples/vite ([source code](./example/vite/))
-- Next.js Starter: https://graz.sh/examples/starter ([source code](https://github.com/graz-sh/graz/tree/dev/example/starter/))
-
-## Third-party dependencies
-
-`graz` uses various dependencies such as [`@cosmjs/cosmwasm-stargate`](https://www.npmjs.com/package/@cosmjs/cosmwasm-stargate) and [`@keplr-wallet/types`](https://www.npmjs.com/package/@keplr-wallet/types).
-
-Rather than importing those packages directly, you can import from [`graz/dist/cosmjs`](./packages/graz/src/cosmjs.ts) and [`graz/dist/keplr`](./packages/graz/src/keplr.ts) which re-exports all respective dependencies:
-
-```diff
-- import type { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-+ import type { CosmWasmClient } from "graz/dist/cosmjs";
-```
-
-But if you prefer importing from their respective pacakges, you can install dependencies that `graz` uses for better intellisense:
-
-```sh
-# using pnpm
-pnpm add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @keplr-wallet/types
-```
 
 ## API
 

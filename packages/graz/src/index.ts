@@ -23,5 +23,4 @@ export * from "./hooks/wallet";
 export * from "./provider";
 export * from "./provider/events";
 export * from "./types/core";
-export * from "./types/keplr";
 export * from "./types/wallet";

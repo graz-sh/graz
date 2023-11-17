@@ -2,7 +2,9 @@
 
 Hook to retrieve a SigningStargateClient.
 
-#### Usage
+### Usage
+
+##### Single Chain
 
 ```tsx
 import { useStargateSigningClient } from "graz";
@@ -16,12 +18,29 @@ function App() {
 }
 ```
 
-#### Params
+##### Multi Chain
 
 ```tsx
-args?: {
-  opts?: SigningCosmWasmClientOptions;
-  offlineSigner?: "offlineSigner" | "offlineSignerAuto" | "offlineSignerOnlyAmino";
+import { useStargateClient } from "graz";
+
+function App() {
+  const { data: signingClient, isFetching, refetch, ... } = useStargateSigningClient({
+    chainId: ["cosmoshub-4", "sommelier-1"],
+    multiChain: true
+  });
+
+  async function getAccountFromClient() {
+    return await client["cosmoshub-4"].getAccount("address")
+  }
+}
+```
+
+#### Hook Params
+
+```tsx
+<TMultiChain extends boolean>{
+  chainId?: string | string[];
+  multiChain?: TMultiChain; // boolean
 }
 ```
 
@@ -29,7 +48,7 @@ args?: {
 
 ```tsx
 {
-  data: SigningStargateClient
+  data?: TMultiChain extends true ? Record<string, SigningStargateClient> : SigningStargateClient;
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -48,7 +67,7 @@ args?: {
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<SigningStargateClient | null, unknown>>;
+  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult< TMultiChain extends true ? Record<string, SigningStargateClient> : SigningStargateClient, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

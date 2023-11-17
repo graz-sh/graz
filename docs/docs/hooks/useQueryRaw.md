@@ -8,17 +8,18 @@ Note: it will initiate if `address` and `key` are there
 ```ts
 import { useQuerySmart } from "graz";
 
-interface TData {
-  // ...
-}
-const { data, isLoading } = useQueryRaw<TData>(address, key);
+const { data, isLoading } = useQueryRaw({ address, key });
 console.log(data);
 ```
 
-#### Params
+#### Hook Params
 
-- address?: `string` - The address of the contract to query
-- key?: `string` - The key to lookup in the contract storage
+```ts
+{
+  address?: string // The address of the contract to query
+  key?: string //The key to lookup in the contract storage
+}
+```
 
 #### Return Value
 

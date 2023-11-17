@@ -16,13 +16,14 @@ This project and everyone participating in it is governed by the [`graz` Code of
 
 ### Why this library exist?
 
-Currently there is no stable library for cosmos wallets. We were inspired by the patterns in [`wagmi`](https://wagmi.sh) in the Etherium ecosystem.
+At the time there were no stable libraries for cosmos wallets. We were inspired by the patterns in [`wagmi`](https://wagmi.sh) in the Ethereum ecosystem.
 
 ## What should I know before I get started?
 
 It greatly helps if you already have a basic understanding of:
 
 - [Cosmos ecosystem](https://cosmos.network/)
+- [Cosmjs](https://cosmos.github.io/cosmjs/)
 - [`react-query`](https://react-query.tanstack.com/)
 - [`zustand`](https://github.com/pmndrs/zustand)
 - [Keplr Wallet](https://docs.keplr.app)
@@ -49,11 +50,9 @@ The following steps will get you up and running to contribute to `graz`:
 
 ```sh
 ├── packages/             # local packages
-│   ├── eslint-config/    # project eslint configuration
-│   ├── prettier-config/  # project prettier configuration
 │   └── graz/             # graz
 ├── docs/                 # documentation website
-└── example/              # example website (nextjs + chakra ui)
+└── example/*             # example website (nextjs + chakra ui)
 ```
 
 ### graz
@@ -66,14 +65,17 @@ The following steps will get you up and running to contribute to `graz`:
 │   └── provider/         # application state providers
 │   └── store/            # application state stores
 │   └── types/            # shared types
-├── dist/                 # output
+├── dist/                 # output graz package
+├── chains/               # output chains
 ```
 
 ## Development
 
-- `pnpm install`: bootstrap the entire project
+- `pnpm graz install`: install `graz` project
+- `pnpm graz build`: build `graz` package
+- `pnpm install`: install all projects
 - `pnpm dev`: compiles `graz` and start the development server of the example app
-- `pnpm docs dev`: start the documentation website
+- `pnpm project:docs dev`: start the documentation website
 - `pnpm example dev`: start the example app
 
 ## Pull Request

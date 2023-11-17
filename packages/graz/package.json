@@ -1,7 +1,7 @@
 {
   "name": "graz",
   "description": "React hooks for Cosmos",
-  "version": "0.0.51",
+  "version": "0.1.0",
   "author": "Griko Nibras <griko@strange.love>",
   "repository": "https://github.com/graz-sh/graz.git",
   "homepage": "https://github.com/graz-sh/graz",
@@ -9,54 +9,75 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "bin": {
-    "graz": "./cli.mjs"
+  "bin": "./dist/cli.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "module": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    },
+    "./chains": {
+      "types": "./chains/index.ts",
+      "module": "./chains/index.mjs",
+      "default": "./chains/index.js"
+    }
   },
   "files": [
     "chains/*.stub",
-    "cli.js",
-    "compiled/**",
-    "dist/*.d.ts",
-    "dist/*.js",
-    "dist/*.mjs"
+    "dist/*",
+    "types/*",
+    "env.d.ts"
   ],
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf dist/*",
-    "cli": "node cli.mjs",
+    "cli": "node dist/cli.js",
     "dev": "tsup --watch",
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
     "prepublishOnly": "pnpm build"
   },
+  "peerDependencies": {
+    "@cosmjs/cosmwasm-stargate": "*",
+    "@cosmjs/launchpad": "*",
+    "@cosmjs/proto-signing": "*",
+    "@cosmjs/stargate": "*",
+    "@cosmjs/tendermint-rpc": "*",
+    "long": "*",
+    "react": ">=17"
+  },
+  "peerDependenciesMeta": {
+    "long": {
+      "optional": true
+    }
+  },
   "dependencies": {
-    "@cosmjs/cosmwasm-stargate": "^0.31.0",
-    "@cosmjs/launchpad": "^0.27.1",
-    "@cosmjs/proto-signing": "^0.31.0",
-    "@cosmjs/stargate": "^0.31.0",
-    "@cosmjs/tendermint-rpc": "^0.31.0",
+    "@clack/prompts": "^0.7.0",
     "@keplr-wallet/cosmos": "^0.12.20",
-    "@metamask/providers": "^11.1.1",
-    "@tanstack/react-query": "^4.29.14",
-    "@tanstack/react-query-devtools": "^4.29.14",
-    "@vectis/extension-client": "^0.7.1",
-    "@walletconnect/sign-client": "^2.8.1",
-    "@walletconnect/utils": "^2.8.1",
+    "@keplr-wallet/types": "^0.12.23",
+    "@metamask/providers": "^12.0.0",
+    "@tanstack/react-query": "^4.35.0",
+    "@vectis/extension-client": "^0.7.2",
+    "@walletconnect/sign-client": "^2.10.0",
+    "@walletconnect/types": "^2.10.0",
+    "@walletconnect/utils": "^2.10.0",
     "@web3modal/standalone": "^2.4.3",
-    "arg": "^5.0.2",
+    "cac": "^6.7.14",
     "cosmos-directory-client": "0.0.6",
-    "zustand": "^4.3.8"
+    "wadesta": "^0.0.5",
+    "zustand": "^4.4.1"
   },
   "devDependencies": {
-    "@keplr-wallet/types": "^0.12.20",
-    "@types/node": "^20.3.1",
-    "@types/react": "^18.2.12",
-    "@walletconnect/types": "^2.8.1",
+    "@types/node": "^18.17.15",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "arg": "^5.0.2",
     "react": "^18.2.0",
-    "typescript": "^5.1.3"
-  },
-  "peerDependencies": {
-    "react": ">=17"
+    "typescript": "^5.2.2"
   },
   "keywords": [
     "graz",

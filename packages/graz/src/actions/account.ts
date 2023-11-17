@@ -1,28 +1,29 @@
+import { fromBech32, toBech32 } from "@cosmjs/encoding";
 import type { OfflineDirectSigner } from "@cosmjs/proto-signing";
-import type { Key, OfflineAminoSigner } from "@keplr-wallet/types";
+import type { ChainInfo, Key, OfflineAminoSigner } from "@keplr-wallet/types";
 
-import type { GrazChain } from "../chains";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Maybe } from "../types/core";
 import type { WalletType } from "../types/wallet";
+import type { ChainId } from "../utils/multi-chain";
 import { checkWallet, getWallet, isWalletConnect } from "./wallet";
 
 export type ConnectArgs = Maybe<{
-  chain?: GrazChain;
+  chainId: ChainId;
   walletType?: WalletType;
   autoReconnect?: boolean;
 }>;
 
 export interface ConnectResult {
-  account: Key;
+  accounts: Record<string, Key>;
   walletType: WalletType;
-  chain: GrazChain;
+  chains: ChainInfo[];
 }
 
 export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   try {
-    const { defaultChain, recentChain, walletType } = useGrazInternalStore.getState();
+    const { recentChainIds: recentChains, chains, walletType } = useGrazInternalStore.getState();
 
     const currentWalletType = args?.walletType || walletType;
 
@@ -33,78 +34,132 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
 
     const wallet = getWallet(currentWalletType);
 
-    const chain = args?.chain || recentChain || defaultChain;
-    if (!chain) {
-      throw new Error("No last known connected chain, connect action requires chain info");
+    const chainIds = typeof args?.chainId === "string" ? [args.chainId] : args?.chainId || recentChains;
+    if (!chainIds) {
+      throw new Error("No last known connected chain, connect action requires chain ids");
     }
+    const providerChainIds = chains?.map((x) => x.chainId);
+
+    chainIds.forEach((chainId) => {
+      if (!providerChainIds?.includes(chainId)) {
+        throw new Error(`Chain ${chainId} is not provided in GrazProvider`);
+      }
+    });
 
     useGrazSessionStore.setState((x) => {
       const isReconnecting =
         useGrazInternalStore.getState()._reconnect ||
         Boolean(useGrazInternalStore.getState()._reconnectConnector) ||
-        Boolean(chain);
-      const isSwitchingChain = x.activeChain && x.activeChain.chainId !== chain.chainId;
+        Boolean(chainIds);
+
+      const isSwitchingChain = x.activeChainIds && chainIds.filter((y) => !x.activeChainIds?.includes(y)).length > 0;
       if (isSwitchingChain) return { status: "connecting" };
       if (isReconnecting) return { status: "reconnecting" };
       return { status: "connecting" };
     });
 
-    const { account: _account, activeChain } = useGrazSessionStore.getState();
+    const { accounts: _account } = useGrazSessionStore.getState();
     await wallet.init?.();
-    if (!_account || activeChain?.chainId !== chain.chainId) {
-      await wallet.enable(chain.chainId);
-      if (!isWalletConnect(currentWalletType)) {
-        const account = await wallet.getKey(chain.chainId);
-        useGrazSessionStore.setState({ account });
-      }
+    await wallet.enable(chainIds);
+    if (!isWalletConnect(currentWalletType)) {
+      const key = await wallet.getKey(chainIds[0]!);
+      const resultAcccounts: Record<string, Key> = {};
+      chainIds.forEach((chainId) => {
+        resultAcccounts[chainId] = {
+          ...key,
+          bech32Address: toBech32(
+            chains!.find((x) => x.chainId === chainId)!.bech32Config.bech32PrefixAccAddr,
+            fromBech32(key.bech32Address).data,
+          ),
+        };
+      });
+      useGrazSessionStore.setState((prev) => ({
+        accounts: { ...(prev.accounts || {}), ...resultAcccounts },
+      }));
     }
 
+    useGrazInternalStore.setState((prev) => ({
+      recentChainIds: [...(prev.recentChainIds || []), ...chainIds].filter((thing, i, arr) => {
+        return arr.indexOf(thing) === i;
+      }),
+    }));
+    useGrazSessionStore.setState((prev) => ({
+      activeChainIds: [...(prev.activeChainIds || []), ...chainIds].filter((thing, i, arr) => {
+        return arr.indexOf(thing) === i;
+      }),
+    }));
+
     useGrazInternalStore.setState({
-      recentChain: chain,
       walletType: currentWalletType,
       _reconnect: Boolean(args?.autoReconnect),
       _reconnectConnector: currentWalletType,
     });
     useGrazSessionStore.setState({
-      activeChain: chain,
       status: "connected",
     });
     typeof window !== "undefined" && window.sessionStorage.setItem(RECONNECT_SESSION_KEY, "Active");
-    const { account } = useGrazSessionStore.getState();
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return { account: account!, walletType: currentWalletType, chain };
+
+    const connectedChains = chainIds.map((x) => chains!.find((y) => y.chainId === x)!);
+    const _resAcc = useGrazSessionStore.getState().accounts;
+    return { accounts: _resAcc!, walletType: currentWalletType, chains: connectedChains };
   } catch (error) {
     console.error("connect ", error);
-    if (useGrazSessionStore.getState().account === null) {
+    if (useGrazSessionStore.getState().accounts === null) {
       useGrazSessionStore.setState({ status: "disconnected" });
     }
-    if (useGrazSessionStore.getState().account && useGrazSessionStore.getState().activeChain) {
+    if (useGrazSessionStore.getState().accounts && useGrazSessionStore.getState().activeChainIds) {
       useGrazSessionStore.setState({ status: "connected" });
     }
     throw error;
   }
 };
 
-export const disconnect = async (clearRecentChain = false): Promise<void> => {
+export const disconnect = (args?: { chainId?: ChainId }) => {
   typeof window !== "undefined" && window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
-  useGrazSessionStore.setState(grazSessionDefaultValues);
-  useGrazInternalStore.setState((x) => ({
-    _reconnect: false,
-    _reconnectConnector: null,
-    recentChain: clearRecentChain ? null : x.recentChain,
-  }));
+  const chainId = typeof args?.chainId === "string" ? [args.chainId] : args?.chainId;
+  if (chainId) {
+    const _accounts = useGrazSessionStore.getState().accounts;
+    chainId.forEach((x) => {
+      delete _accounts?.[x];
+    });
+    const isEmpty = Object.values(_accounts ? _accounts : {}).length === 0;
+    if (isEmpty) {
+      useGrazSessionStore.setState(grazSessionDefaultValues);
+      useGrazInternalStore.setState({
+        _reconnect: false,
+        _reconnectConnector: null,
+        recentChainIds: null,
+      });
+    } else {
+      useGrazSessionStore.setState((x) => ({
+        activeChainIds: x.activeChainIds?.filter((item) => !chainId.includes(item)),
+        accounts: _accounts,
+      }));
+      useGrazInternalStore.setState((x) => ({
+        recentChainIds: x.recentChainIds?.filter((item) => !chainId.includes(item)),
+      }));
+    }
+  } else {
+    useGrazSessionStore.setState(grazSessionDefaultValues);
+    useGrazInternalStore.setState({
+      _reconnect: false,
+      _reconnectConnector: null,
+      recentChainIds: null,
+    });
+  }
+
   return Promise.resolve();
 };
 
 export type ReconnectArgs = Maybe<{ onError?: (error: unknown) => void }>;
 
 export const reconnect = async (args?: ReconnectArgs) => {
-  const { recentChain, _reconnectConnector, _reconnect } = useGrazInternalStore.getState();
+  const { recentChainIds: recentChains, _reconnectConnector, _reconnect } = useGrazInternalStore.getState();
   try {
     const isWalletReady = checkWallet(_reconnectConnector || undefined);
-    if (recentChain && isWalletReady && _reconnectConnector) {
+    if (recentChains && isWalletReady && _reconnectConnector) {
       const key = await connect({
-        chain: recentChain,
+        chainId: recentChains,
         walletType: _reconnectConnector,
         autoReconnect: _reconnect,
       });

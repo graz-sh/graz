@@ -5,14 +5,14 @@
 ### Usage
 
 ```tsx
-import { WALLET_TYPES, useConnect, mainnetChains } from "graz";
+import { WALLET_TYPES, useConnect } from "graz";
 
 export const SupportedWallet = () => {
   const { connect } = useConnect();
   return (
     <div>
       {WALLET_TYPES.map((name) => (
-        <button onClick={connect({ chain: mainnetChains.cosmoshub, walletType: name })} key={name}>
+        <button onClick={connect({ chain: cosmoshub, walletType: name })} key={name}>
           {name}
         </button>
       ))}

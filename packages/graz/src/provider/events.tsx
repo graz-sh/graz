@@ -21,14 +21,14 @@ export const useGrazEvents = () => {
   const isSessionActive =
     typeof window !== "undefined" && window.sessionStorage.getItem(RECONNECT_SESSION_KEY) === "Active";
   const { _reconnect, _onReconnectFailed, _reconnectConnector } = useGrazInternalStore();
-  const { activeChain, wcSignClient } = useGrazSessionStore();
+  const { activeChainIds: activeChains, wcSignClient } = useGrazSessionStore();
   const isReconnectConnectorReady = checkWallet(_reconnectConnector || undefined);
 
   useEffect(() => {
     // will reconnect on refresh
     if (_reconnectConnector) {
       if (!isReconnectConnectorReady) return;
-      if (isSessionActive && Boolean(activeChain)) {
+      if (isSessionActive && Boolean(activeChains)) {
         void reconnect({
           onError: _onReconnectFailed,
         });

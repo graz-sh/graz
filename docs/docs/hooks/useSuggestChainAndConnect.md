@@ -6,7 +6,7 @@ mutation hook for [Suggesting a chain](useSuggestChain.md) and [connect](./useCo
 
 ```tsx
 import { Bech32Address } from "@keplr-wallet/cosmos";
-import { useSuggestChainAndConnect } from "graz";
+import { useSuggestChainAndConnect, WalletType } from "graz";
 
 const OSMO = {
   coinDenom: "osmo",
@@ -37,6 +37,7 @@ function App() {
   function handleSuggestAndConnect() {
     suggestAndConnect({
       chainInfo: osmosisTestnet,
+      walletType: WalletType.KEPLR,
     });
   }
 
@@ -64,20 +65,28 @@ function App() {
   }
   ```
 
-#### Params
+#### Hook Params
 
-Object params
+```ts
+{
+  onError?: (error: unknown, data: ChainInfo) => void
+  onMutate?: (data: chainInfo) => void
+  onSuccess?: (data: {
+                account: Key;
+                walletType: WalletType;
+                chain: ChainInfo;
+              }) => void}
+```
 
-- onError?: `(error: unknown, data: ChainInfo) => void`
-- onMutate?: `(data: chainInfo) => void`
-- onSuccess?:
-  ```tsx
-  (data: {
-    account: Key;
-    walletType: WalletType;
-    chain: ChainInfo;
-  }) => void
-  ```
+#### Types
+
+```ts
+interface SuggestChainAndConnectArgs {
+  chainInfo: ChainInfo;
+  walletType?: WalletType;
+  autoReconnect?: boolean;
+}
+```
 
 #### Return Value
 

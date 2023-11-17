@@ -4,11 +4,13 @@ Hook to retrieve a TendermintClient.
 
 #### Usage
 
+##### Single Chain
+
 ```tsx
 import { useTendermintClient } from "graz";
 
 function App() {
-  const { data: client, isFetching, refetch, ... } = useTendermintClient("tm34");
+  const { data: client, isFetching, refetch, ... } = useTendermintClient();
 
   async function getAccountFromClient() {
     return await client.getAccount("address")
@@ -16,11 +18,30 @@ function App() {
 }
 ```
 
-#### Params
+##### Multi Chain
 
 ```tsx
-{
+import { useTendermintClient } from "graz";
+
+function App() {
+  const { data: client, isFetching, refetch, ... } = useTendermintClient({
+    chainId: ["cosmoshub-4", "sommelier-1"],
+    multiChain: true
+  });
+
+  async function getAccountFromClient() {
+    return await client["cosmoshub-4"].getAccount("address")
+  }
+}
+```
+
+#### Hook Params
+
+```tsx
+<TMultiChain extends boolean>{
   type: "tm34" | "tm37";
+  chainId?: string | string[];
+  multiChain?: TMultiChain; // boolean
 }
 ```
 
@@ -28,7 +49,7 @@ function App() {
 
 ```tsx
 {
-  data: TendermintClient
+  data?: TMultiChain extends true ? Record<string, TendermintClient> : TendermintClient;
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -47,7 +68,7 @@ function App() {
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<TendermintClient | null, unknown>>;
+  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<TMultiChain extends true ? Record<string, TendermintClient> : TendermintClient;, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

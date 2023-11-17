@@ -18,11 +18,11 @@ export const ConnectButton: FC = () => {
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   const { isConnected, isConnecting, isReconnecting, reconnect } = useAccount({
-    onConnect: ({ account, walletType, chain }) => {
+    chainId: "cosmoshub-4",
+    onConnect: ({ walletType, chains }) => {
       toast({
         status: "success",
-        title: `Wallet connected! using ${walletType} to ${chain.chainId}`,
-        description: `Connected as ${account.name}`,
+        title: `Wallet connected! using ${walletType} to ${chains.map((item) => item.chainId)}`,
       });
     },
     onDisconnect: () => {
@@ -33,16 +33,14 @@ export const ConnectButton: FC = () => {
     },
   });
 
-  const { connect } = useConnect({
-    onSuccess: () => console.log("wallet connected"),
-  });
+  const { connect } = useConnect();
 
   const { disconnect } = useDisconnect({
     onSuccess: () => console.log("wallet disconnected"),
   });
 
   const handleConnect = (wallet: WalletType) => {
-    connect({ walletType: wallet });
+    connect({ walletType: wallet, chainId: "cosmoshub-4" });
     onClose();
   };
   const wallets = getAvailableWallets();
@@ -55,11 +53,11 @@ export const ConnectButton: FC = () => {
         {isConnected ? <IconButton aria-label="refresh" icon={<>🔄</>} onClick={() => void reconnect()} /> : null}
       </ButtonGroup>
 
-      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+      <Modal isCentered isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Select a wallet</ModalHeader>
-          <Stack spacing={3} p={4}>
+          <Stack p={4} spacing={3}>
             {wallets.keplr ? <Button onClick={() => handleConnect(WalletType.KEPLR)}>Keplr</Button> : null}
             {wallets.leap ? <Button onClick={() => handleConnect(WalletType.LEAP)}>Leap</Button> : null}
             {wallets.cosmostation ? (

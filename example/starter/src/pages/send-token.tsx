@@ -1,12 +1,12 @@
 import { Box, Button, FormControl, FormLabel, Heading, Input, Select, Stack, useToast } from "@chakra-ui/react";
 import { useStargateSigningClient } from "graz";
-import { useAccount, useActiveChain, useSendTokens } from "graz";
+import { useAccount, useActiveChains, useSendTokens } from "graz";
 import type { FormEvent } from "react";
 import { useState } from "react";
 
 const SendToken = () => {
   const { data: accountData, isConnected } = useAccount();
-  const activeChain = useActiveChain();
+  const activeChains = useActiveChains();
   const toast = useToast();
   const { data: signingClient } = useStargateSigningClient();
 
@@ -101,7 +101,7 @@ const SendToken = () => {
               }
               value={formData.coin}
             >
-              {activeChain?.currencies.map((currency) => (
+              {activeChains?.[0]?.currencies.map((currency) => (
                 <option value={currency.coinMinimalDenom} key={currency.coinMinimalDenom}>
                   {currency.coinMinimalDenom}
                 </option>

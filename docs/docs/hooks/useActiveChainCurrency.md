@@ -1,6 +1,6 @@
 # useActiveChainCurrency
 
-hook to retrieve active chain validators with given query client and optional bond status
+hook to retrieve specific connected chains currency
 
 #### Usage
 
@@ -8,13 +8,15 @@ hook to retrieve active chain validators with given query client and optional bo
 import { useActiveChainCurrency } from "graz";
 
 function App() {
-  const { data: currency } = useActiveChainCurrency("juno");
+  const { data: currency, ... } = useActiveChainCurrency({ denom: "juno" });
 }
 ```
 
-#### Params
+#### Hook Params
 
-- denom: `string` = Currency denom to search
+```ts
+denom: string; //Currency denom to search
+```
 
 #### Return Value
 

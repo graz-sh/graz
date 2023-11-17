@@ -1,6 +1,5 @@
 import type { QueryClientProviderProps } from "@tanstack/react-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { FC } from "react";
 
 import type { ConfigureGrazArgs } from "../actions/configure";
@@ -13,8 +12,7 @@ const queryClient = new QueryClient({
 });
 
 export type GrazProviderProps = Partial<QueryClientProviderProps> & {
-  grazOptions?: ConfigureGrazArgs;
-  debug?: boolean;
+  grazOptions: ConfigureGrazArgs;
 };
 
 /**
@@ -35,17 +33,15 @@ export type GrazProviderProps = Partial<QueryClientProviderProps> & {
  *
  * @see https://tanstack.com/query
  */
-export const GrazProvider: FC<GrazProviderProps> = ({ children, grazOptions, debug, ...props }) => {
-  if (grazOptions) {
-    configureGraz(grazOptions);
-  }
+export const GrazProvider: FC<GrazProviderProps> = ({ children, grazOptions, ...props }) => {
+  configureGraz(grazOptions);
+
   return (
     <QueryClientProvider key="graz-provider" client={queryClient} {...props}>
       <ClientOnly>
         {children}
         <GrazEvents />
       </ClientOnly>
-      {debug ? <ReactQueryDevtools initialIsOpen={false} position="bottom-right" /> : null}
     </QueryClientProvider>
   );
 };

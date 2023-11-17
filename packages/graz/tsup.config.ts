@@ -1,20 +1,31 @@
+import type { Options } from "tsup";
 import { defineConfig } from "tsup";
 
-import packageJson from "./package.json";
-
-export default defineConfig(({ watch }) => ({
+const defaultOptions: Options = {
+  cjsInterop: true,
   clean: true,
-  dts: true,
-  entry: ["src/*.ts"],
-  external: [
-    ...Object.keys(packageJson.dependencies),
-    ...Object.keys(packageJson.peerDependencies),
-    /^@cosmjs\/.*/,
-    /^@keplr-wallet\/.*/,
-  ],
   format: ["cjs", "esm"],
-  minify: !watch,
-  minifyIdentifiers: !watch,
-  minifySyntax: !watch,
-  minifyWhitespace: !watch,
-}));
+  shims: true,
+  splitting: true,
+  treeshake: true,
+};
+
+export default defineConfig(({ watch }) => [
+  {
+    ...defaultOptions,
+    dts: {
+      banner: '/// <reference types="../types/global" />',
+    },
+    entry: ["src/index.ts"],
+    external: [/^@cosmjs\/.*/],
+    format: ["cjs", "esm"],
+    minify: !watch,
+  },
+  {
+    ...defaultOptions,
+    dts: false,
+    entry: ["src/cli.mjs"],
+    format: ["cjs"],
+    minify: !watch,
+  },
+]);

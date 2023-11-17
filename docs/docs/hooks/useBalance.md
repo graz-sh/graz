@@ -7,36 +7,53 @@ Hook to retrieve specific asset balance from current account or given address
 ```tsx
 import { useBalance } from "graz";
 function App() {
-  const { data: atomBalance, isLoading, refetch } = useBalance("atom");
-
-  // with custom bech32 address
-  const userBalance = useBalance("atom", "cosmos1kpzxx2lxg05xxn8mfygrerhmkj0ypn8edmu2pu");
+  const {
+    data: balance,
+    isLoading,
+    refetch,
+  } = useBalance({
+    denom: "uatom",
+    bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
+  });
 
   return (
     <div>
-      Atom Balance:
+      Balance:
       {isLoading ? (
         "Fetching balances..."
       ) : (
         <span>
-          {atomBalance.amount} {atomBalance.denom}
+          {balance.amount} {balance.denom}
         </span>
       )}
+      <button
+        onClick={() => {
+          void refetch();
+        }}
+      >
+        Refresh
+      </button>
     </div>
   );
 }
 ```
 
-#### Params
+#### Hook Params
 
-- denom: `string` = Asset denom to search
-- bech32Address?: `string` = Optional bech32 account address, defaults to connected account address
+```ts
+{
+  denom: string // Asset denom to search
+  chainId: string
+  bech32Address?: string // Optional bech32 account address, defaults to connected account address
+
+}
+```
 
 #### Return Value
 
 ```tsx
 {
-  data: Coin[] | null; // from @cosmjs/proto-signing
+  data: Coin | null; // from @cosmjs/proto-signing
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -55,7 +72,7 @@ function App() {
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Coin[], unknown>>;
+  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Coin, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';
