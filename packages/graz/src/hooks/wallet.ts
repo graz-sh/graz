@@ -28,6 +28,7 @@ export const useActiveWalletType = () => {
       isVectis: x.walletType === WalletType.VECTIS,
       isWalletConnect: x.walletType === WalletType.WALLETCONNECT,
       isMetamaskSnapLeap: x.walletType === WalletType.METAMASK_SNAP_LEAP,
+      isStation: x.walletType === WalletType.STATION,
     }),
     shallow,
   );
