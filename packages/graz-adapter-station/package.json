@@ -34,7 +34,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@terra-money/station-connector": "^1.0.15",
-    "@terra-money/station-wallet": "^1.0.15"
+    "@terra-money/station-connector": "^1.0.15"
   }
 }
