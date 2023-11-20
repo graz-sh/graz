@@ -16,7 +16,7 @@ export interface WalletConnectSignDirectResponse {
 
 export interface GetWalletConnectParams {
   encoding: BufferEncoding;
-  walletType: WalletType.WC_KEPLR_MOBILE | WalletType.WC_LEAP_MOBILE;
+  walletType: WalletType.WC_KEPLR_MOBILE | WalletType.WC_LEAP_MOBILE | WalletType.WC_COSMOSTATION_MOBILE;
   appUrl: {
     mobile: {
       ios: string;
