@@ -10,7 +10,7 @@ export const getWCCosmostation = (): Wallet => {
     throw new Error("walletConnect.options.projectId is not defined");
   }
 
-  if (!isMobile()) throw new Error("WalletConnect Leap mobile is only supported in mobile");
+  if (!isMobile()) throw new Error("WalletConnect Cosmostation mobile is only supported in mobile");
 
   const params: GetWalletConnectParams = {
     encoding: "hex",
