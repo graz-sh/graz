@@ -26,6 +26,10 @@ export const listedWallets = {
     name: "Vectis",
     imgSrc: "/assets/wallet-icon-vectis.svg",
   },
+  [WalletType.STATION]: {
+    name: "Station",
+    imgSrc: "/assets/wallet-icon-station.svg",
+  },
   [WalletType.METAMASK_SNAP_LEAP]: {
     name: "Metamask Snap Leap",
     imgSrc: "/assets/wallet-icon-metamask.png",
