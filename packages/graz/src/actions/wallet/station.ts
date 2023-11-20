@@ -95,13 +95,17 @@ export const getStation = (): Wallet => {
       }
     };
 
-    const res = Object.assign(station, {
+    return {
       subscription,
       getKey,
       getOfflineSigner,
       experimentalSuggestChain,
-    });
-    return res;
+      enable: station.enable,
+      getOfflineSignerAuto: station.getOfflineSignerAuto,
+      getOfflineSignerOnlyAmino: station.getOfflineSignerOnlyAmino,
+      signDirect: station.signDirect,
+      signAmino: station.signAmino,
+    };
   }
 
   useGrazInternalStore.getState()._notFoundFn();
