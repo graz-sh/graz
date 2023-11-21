@@ -1,8 +1,9 @@
+import type { ChainInfo, DirectSignResponse, KeplrSignOptions, Key, SignDoc, StdSignDoc } from "@keplr-wallet/types";
+import type { ChainInfoResponse } from "@terra-money/station-connector/keplrConnector";
+
 import { useGrazInternalStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
 import { clearSession } from ".";
-import { ChainInfo, DirectSignResponse, Key, SignDoc } from "@keplr-wallet/types";
-import { ChainInfoResponse } from "@terra-money/station-connector/keplrConnector";
 
 /**
  * Function to return Station object (which is {@link Wallet}) and throws and error if it does not exist on `window`.
@@ -44,9 +45,9 @@ export const getStation = (): Wallet => {
     const getOfflineSigner = (chainId: string) => {
       try {
         const signerOnlyAmino = station.getOfflineSignerOnlyAmino(chainId);
-        const signDirect: (signerAddress: string, signDoc: SignDoc) => Promise<DirectSignResponse> = async (
-          signerAddress: string,
-          signDoc: SignDoc,
+        const signDirect: (signerAddress: string, signDoc: SignDoc) => Promise<DirectSignResponse> = (
+          _signerAddress: string,
+          _signDoc: SignDoc,
         ) => {
           throw new Error("signDirect not supported by Station");
         };
@@ -100,11 +101,12 @@ export const getStation = (): Wallet => {
       getKey,
       getOfflineSigner,
       experimentalSuggestChain,
-      enable: station.enable,
-      getOfflineSignerAuto: station.getOfflineSignerAuto,
-      getOfflineSignerOnlyAmino: station.getOfflineSignerOnlyAmino,
-      signDirect: station.signDirect,
-      signAmino: station.signAmino,
+      enable: (chainIds: string | string[]) => station.enable(chainIds),
+      getOfflineSignerAuto: (chainId: string) => station.getOfflineSignerAuto(chainId),
+      getOfflineSignerOnlyAmino: (chainId: string) => station.getOfflineSignerOnlyAmino(chainId),
+      signDirect: () => station.signDirect(),
+      signAmino: (chainId: string, signer: string, signDoc: StdSignDoc, _signOptions?: KeplrSignOptions) =>
+        station.signAmino(chainId, signer, signDoc),
     };
   }
 
