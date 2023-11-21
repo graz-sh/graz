@@ -20,15 +20,13 @@ export const getCosmostation = (): Wallet => {
   if (typeof window.cosmostation.providers.keplr !== "undefined") {
     const cosmostation = window.cosmostation.providers.keplr;
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      window.cosmostation.cosmos.on("accountChanged", () => {
+      const listener = () => {
         clearSession();
         reconnect();
-      });
+      };
+      window.cosmostation.cosmos.on("accountChanged", listener);
       return () => {
-        window.cosmostation.cosmos.off("accountChanged", () => {
-          clearSession();
-          reconnect();
-        });
+        window.cosmostation.cosmos.off("accountChanged", listener);
       };
     };
     const res = Object.assign(cosmostation, {

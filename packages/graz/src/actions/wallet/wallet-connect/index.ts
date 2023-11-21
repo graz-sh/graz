@@ -275,9 +275,13 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
               return resolve(d);
             })
             .catch(reject);
-          signal.addEventListener("abort", () => {
-            reject(new Error("User closed wallet connect"));
-          });
+          signal.addEventListener(
+            "abort",
+            () => {
+              reject(new Error("User closed wallet connect"));
+            },
+            { once: true },
+          );
         });
       };
 

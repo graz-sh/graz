@@ -27,15 +27,13 @@ export const getVectis = (): Wallet => {
   if (typeof window.vectis !== "undefined") {
     const vectis = window.vectis.cosmos;
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      window.addEventListener("vectis_accountChanged", () => {
+      const listener = () => {
         clearSession();
         reconnect();
-      });
+      };
+      window.addEventListener("vectis_accountChanged", listener);
       return () => {
-        window.removeEventListener("vectis_accountChanged", () => {
-          clearSession();
-          reconnect();
-        });
+        window.removeEventListener("vectis_accountChanged", listener);
       };
     };
     const getOfflineSignerOnlyAmino = (...args: Parameters<Wallet["getOfflineSignerOnlyAmino"]>) => {

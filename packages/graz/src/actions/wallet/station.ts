@@ -22,15 +22,13 @@ export const getStation = (): Wallet => {
     const station = window.station.keplr;
 
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      window.addEventListener("station_wallet_change", () => {
+      const listener = () => {
         clearSession();
         reconnect();
-      });
+      };
+      window.addEventListener("station_wallet_change", listener);
       return () => {
-        window.removeEventListener("station_wallet_change", () => {
-          clearSession();
-          reconnect();
-        });
+        window.removeEventListener("station_wallet_change", listener);
       };
     };
 
