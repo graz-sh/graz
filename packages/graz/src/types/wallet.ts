@@ -41,7 +41,7 @@ export type Wallet = Pick<
   | "signDirect"
   | "signAmino"
 > & {
-  subscription?: (reconnect: () => void) => void;
+  subscription?: (reconnect: () => void) => () => void;
   init?: () => Promise<unknown>;
 };
 

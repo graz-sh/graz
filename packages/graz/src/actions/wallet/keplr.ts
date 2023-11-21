@@ -19,7 +19,7 @@ import { clearSession } from ".";
 export const getKeplr = (): Wallet => {
   if (typeof window.keplr !== "undefined") {
     const keplr = window.keplr;
-    const subscription: (reconnect: () => void) => void = (reconnect) => {
+    const subscription: (reconnect: () => void) => () => void = (reconnect) => {
       window.addEventListener("keplr_keystorechange", () => {
         clearSession();
         reconnect();

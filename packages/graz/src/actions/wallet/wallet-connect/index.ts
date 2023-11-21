@@ -146,9 +146,10 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     return signClient;
   };
 
-  const subscription: (reconnect: () => void) => void = (reconnect) => {
+  const subscription: (reconnect: () => void) => () => void = (reconnect) => {
     const { wcSignClient } = useGrazSessionStore.getState();
-    if (!wcSignClient) return;
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    if (!wcSignClient) return () => {};
 
     wcSignClient.events.on("session_delete", (_) => {
       _disconnect();

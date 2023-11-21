@@ -26,7 +26,7 @@ import { clearSession } from ".";
 export const getVectis = (): Wallet => {
   if (typeof window.vectis !== "undefined") {
     const vectis = window.vectis.cosmos;
-    const subscription: (reconnect: () => void) => void = (reconnect) => {
+    const subscription: (reconnect: () => void) => () => void = (reconnect) => {
       window.addEventListener("vectis_accountChanged", () => {
         clearSession();
         reconnect();

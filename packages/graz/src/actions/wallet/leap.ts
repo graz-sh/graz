@@ -19,7 +19,7 @@ import { clearSession } from ".";
 export const getLeap = (): Wallet => {
   if (typeof window.leap !== "undefined") {
     const leap = window.leap;
-    const subscription: (reconnect: () => void) => void = (reconnect) => {
+    const subscription: (reconnect: () => void) => () => void = (reconnect) => {
       window.addEventListener("leap_keystorechange", () => {
         clearSession();
         reconnect();

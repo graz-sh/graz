@@ -21,7 +21,7 @@ export const getStation = (): Wallet => {
   if (typeof window.station !== "undefined") {
     const station = window.station.keplr;
 
-    const subscription: (reconnect: () => void) => void = (reconnect) => {
+    const subscription: (reconnect: () => void) => () => void = (reconnect) => {
       window.addEventListener("station_wallet_change", () => {
         clearSession();
         reconnect();

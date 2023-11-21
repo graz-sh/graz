@@ -19,7 +19,7 @@ import { clearSession } from ".";
 export const getCosmostation = (): Wallet => {
   if (typeof window.cosmostation.providers.keplr !== "undefined") {
     const cosmostation = window.cosmostation.providers.keplr;
-    const subscription: (reconnect: () => void) => void = (reconnect) => {
+    const subscription: (reconnect: () => void) => () => void = (reconnect) => {
       window.cosmostation.cosmos.on("accountChanged", () => {
         clearSession();
         reconnect();
