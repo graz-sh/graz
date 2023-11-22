@@ -4,6 +4,10 @@ sidebar_position: 8
 
 # Changelog
 
+## Version 0.1.1
+
+- ✅ Added Station Wallet integration
+
 ## Version 0.1.0
 
 - Multi Chain experience
