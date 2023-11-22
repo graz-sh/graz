@@ -76,6 +76,7 @@ export const ConnectButton: FC = () => {
             {wallets.wc_cosmostation_mobile ? (
               <Button onClick={() => handleConnect(WalletType.WC_COSMOSTATION_MOBILE)}>Cosmostation Mobile</Button>
             ) : null}
+            {wallets.station ? <Button onClick={() => handleConnect(WalletType.STATION)}>Station</Button> : null}
             {wallets.metamask_snap_leap ? (
               <Button onClick={() => handleConnect(WalletType.METAMASK_SNAP_LEAP)}>Metamask Snap Leap</Button>
             ) : null}
