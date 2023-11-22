@@ -19,16 +19,14 @@ import { clearSession } from ".";
 export const getKeplr = (): Wallet => {
   if (typeof window.keplr !== "undefined") {
     const keplr = window.keplr;
-    const subscription: (reconnect: () => void) => void = (reconnect) => {
-      window.addEventListener("keplr_keystorechange", () => {
+    const subscription: (reconnect: () => void) => () => void = (reconnect) => {
+      const listener = () => {
         clearSession();
         reconnect();
-      });
+      };
+      window.addEventListener("keplr_keystorechange", listener);
       return () => {
-        window.removeEventListener("keplr_keystorechange", () => {
-          clearSession();
-          reconnect();
-        });
+        window.removeEventListener("keplr_keystorechange", listener);
       };
     };
     const res = Object.assign(keplr, {

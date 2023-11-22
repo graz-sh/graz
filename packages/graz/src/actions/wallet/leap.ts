@@ -19,16 +19,14 @@ import { clearSession } from ".";
 export const getLeap = (): Wallet => {
   if (typeof window.leap !== "undefined") {
     const leap = window.leap;
-    const subscription: (reconnect: () => void) => void = (reconnect) => {
-      window.addEventListener("leap_keystorechange", () => {
+    const subscription: (reconnect: () => void) => () => void = (reconnect) => {
+      const listener = () => {
         clearSession();
         reconnect();
-      });
+      };
+      window.addEventListener("leap_keystorechange", listener);
       return () => {
-        window.removeEventListener("leap_keystorechange", () => {
-          clearSession();
-          reconnect();
-        });
+        window.removeEventListener("leap_keystorechange", listener);
       };
     };
     const res = Object.assign(leap, {

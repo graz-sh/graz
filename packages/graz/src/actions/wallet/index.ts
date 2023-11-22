@@ -11,6 +11,7 @@ import { getWalletConnect } from "./wallet-connect";
 import { getWCCosmostation } from "./wallet-connect/cosmostation";
 import { getWCKeplr } from "./wallet-connect/keplr";
 import { getWCLeap } from "./wallet-connect/leap";
+import { getStation } from "./station";
 
 /**
  * Function to check whether given {@link WalletType} or default configured wallet exists.
@@ -75,6 +76,9 @@ export const getWallet = (type: WalletType = useGrazInternalStore.getState().wal
     }
     case WalletType.METAMASK_SNAP_LEAP: {
       return getMetamaskSnapLeap();
+    }
+    case WalletType.STATION: {
+      return getStation();
     }
     default: {
       throw new Error("Unknown wallet type");

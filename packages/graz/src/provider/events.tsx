@@ -11,6 +11,7 @@ import { getWalletConnect } from "../actions/wallet/wallet-connect";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import { WalletType } from "../types/wallet";
+import { getStation } from "../actions/wallet/station";
 
 /**
  * Graz custom hook to track `keplr_keystorechange`, `leap_keystorechange`, `accountChanged` event and reconnect state
@@ -74,6 +75,11 @@ export const useGrazEvents = () => {
             void reconnect({ onError: _onReconnectFailed });
           });
         }
+      }
+      if (_reconnectConnector === WalletType.STATION) {
+        getStation().subscription?.(() => {
+          void reconnect({ onError: _onReconnectFailed });
+        });
       }
     }
 

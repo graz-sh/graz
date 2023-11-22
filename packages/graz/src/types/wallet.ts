@@ -14,6 +14,7 @@ export enum WalletType {
   WC_COSMOSTATION_MOBILE = "wc_cosmostation_mobile",
   // eslint-disable-next-line @typescript-eslint/naming-convention
   METAMASK_SNAP_LEAP = "metamask_snap_leap",
+  STATION = "station",
 }
 
 export const WALLET_TYPES = [
@@ -26,6 +27,7 @@ export const WALLET_TYPES = [
   WalletType.WC_LEAP_MOBILE,
   WalletType.WC_COSMOSTATION_MOBILE,
   WalletType.METAMASK_SNAP_LEAP,
+  WalletType.STATION,
 ];
 
 export type Wallet = Pick<
@@ -39,7 +41,7 @@ export type Wallet = Pick<
   | "signDirect"
   | "signAmino"
 > & {
-  subscription?: (reconnect: () => void) => void;
+  subscription?: (reconnect: () => void) => () => void;
   init?: () => Promise<unknown>;
 };
 
