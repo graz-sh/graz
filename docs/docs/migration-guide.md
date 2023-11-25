@@ -137,7 +137,7 @@ interface ConnectResult {
 
 ```diff
 - const querySmart = useQuerySmart(address, message);
-+ const querySmart = useQuerySmart({ address, message });
++ const querySmart = useQuerySmart({ address, queryMsg });
 ```
 
 ### `useQueryRaw`
