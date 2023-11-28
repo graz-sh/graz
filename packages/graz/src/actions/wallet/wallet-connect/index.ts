@@ -232,15 +232,19 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     });
     const lastSession = checkSession(chainId);
     if (!lastSession) {
-      const { uri, approval } = await signClient.connect({
-        requiredNamespaces: {
-          cosmos: {
-            methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
-            chains: chainId.map((i) => `cosmos:${i}`),
-            events: ["chainChanged", "accountsChanged"],
+      const { uri, approval } = await promiseWithTimeout(
+        signClient.connect({
+          requiredNamespaces: {
+            cosmos: {
+              methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
+              chains: chainId.map((i) => `cosmos:${i}`),
+              events: ["chainChanged", "accountsChanged"],
+            },
           },
-        },
-      });
+        }),
+        15000,
+        new Error("Connection timeout"),
+      );
       if (!uri) throw new Error("No wallet connect uri");
       if (!params) {
         await web3Modal.openModal({ uri });
