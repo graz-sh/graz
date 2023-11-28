@@ -335,7 +335,6 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
     const topic = getSession([chainId])?.topic;
     if (!topic) throw new Error("No wallet connect session");
-    redirectToApp();
     const result: { address: string; algo: string; pubkey: string }[] = await wcSignClient.request({
       topic,
       chainId: `cosmos:${chainId}`,
