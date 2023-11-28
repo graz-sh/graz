@@ -9,7 +9,7 @@ import { getSdkError } from "@walletconnect/utils";
 import Long from "long";
 
 import { useGrazInternalStore, useGrazSessionStore } from "../../../store";
-import type { SignAminoParams, SignDirectParams, Wallet } from "../../../types/wallet";
+import { WalletType, type SignAminoParams, type SignDirectParams, type Wallet } from "../../../types/wallet";
 import { isAndroid, isIos, isMobile } from "../../../utils/os";
 import { promiseWithTimeout } from "../../../utils/timeout";
 import { clearSession } from "..";
@@ -20,6 +20,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     throw new Error("walletConnect.options.projectId is not defined");
   }
 
+  const walletType = params?.walletType || WalletType.WALLETCONNECT;
   const encoding = params?.encoding || "base64";
 
   const redirectToApp = (wcUri?: string) => {
@@ -45,7 +46,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   };
 
   const _disconnect = () => {
-    const { wcSignClient } = useGrazSessionStore.getState();
+    const { wcSignClients } = useGrazSessionStore.getState();
+    const wcSignClient = wcSignClients.get(walletType);
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
 
     clearSession();
@@ -57,7 +59,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   };
 
   const wcDisconnect = async (topic?: string) => {
-    const { wcSignClient } = useGrazSessionStore.getState();
+    const { wcSignClients } = useGrazSessionStore.getState();
+    const wcSignClient = wcSignClients.get(walletType);
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
     if (!topic) throw new Error("No wallet connect session");
 
@@ -71,7 +74,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
   const getSession = (chainId: string[]) => {
     try {
-      const { wcSignClient } = useGrazSessionStore.getState();
+      const { wcSignClients } = useGrazSessionStore.getState();
+      const wcSignClient = wcSignClients.get(walletType);
       if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
 
       const lastSession = wcSignClient.session.getAll().at(-1);
@@ -136,18 +140,20 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   const init = async () => {
     const { walletConnect } = useGrazInternalStore.getState();
     if (!walletConnect?.options) throw new Error("walletConnect.options is not defined");
-    const { wcSignClient } = useGrazSessionStore.getState();
+    const { wcSignClients } = useGrazSessionStore.getState();
+    const wcSignClient = wcSignClients.get(walletType);
     if (wcSignClient) {
-      useGrazSessionStore.setState({ wcSignClient });
       return wcSignClient;
     }
     const signClient = await SignClient.init(walletConnect.options);
-    useGrazSessionStore.setState({ wcSignClient: signClient });
+    wcSignClients.set(walletType, signClient);
+    useGrazSessionStore.setState({ wcSignClients });
     return signClient;
   };
 
   const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-    const { wcSignClient } = useGrazSessionStore.getState();
+    const { wcSignClients } = useGrazSessionStore.getState();
+    const wcSignClient = wcSignClients.get(walletType);
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     if (!wcSignClient) return () => {};
 
@@ -202,7 +208,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
   const enable = async (_chainId: string[]) => {
     const chainId = typeof _chainId === "string" ? [_chainId] : _chainId;
-    const { wcSignClient: signClient } = useGrazSessionStore.getState();
+    const { wcSignClients } = useGrazSessionStore.getState();
+    const signClient = wcSignClients.get(walletType);
     if (!signClient) throw new Error("enable walletConnect.signClient is not defined");
     const { walletConnect, chains } = useGrazInternalStore.getState();
     if (!walletConnect?.options?.projectId) throw new Error("walletConnect.options.projectId is not defined");
@@ -335,7 +342,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   };
 
   const getAccount = async (chainId: string): Promise<AccountData> => {
-    const { wcSignClient } = useGrazSessionStore.getState();
+    const { wcSignClients } = useGrazSessionStore.getState();
+    const wcSignClient = wcSignClients.get(walletType);
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
     const topic = getSession([chainId])?.topic;
     if (!topic) throw new Error("No wallet connect session");
@@ -370,7 +378,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
   const wcSignDirect = async (...args: SignDirectParams) => {
     const [chainId, signer, signDoc] = args;
-    const { accounts: account, wcSignClient } = useGrazSessionStore.getState();
+    const { accounts: account, wcSignClients } = useGrazSessionStore.getState();
+    const wcSignClient = wcSignClients.get(walletType);
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
     if (!account) throw new Error("account is not defined");
 
@@ -416,7 +425,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
   const wcSignAmino = async (...args: SignAminoParams) => {
     const [chainId, signer, signDoc, _signOptions] = args;
-    const { wcSignClient } = useGrazSessionStore.getState();
+    const { wcSignClients } = useGrazSessionStore.getState();
+    const wcSignClient = wcSignClients.get(walletType);
     const { accounts: account } = useGrazSessionStore.getState();
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
     if (!account) throw new Error("account is not defined");
