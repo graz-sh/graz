@@ -72,7 +72,6 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       reason: getSdkError("USER_DISCONNECTED"),
     });
     await deleteInactivePairings(wcSignClient);
-    _disconnect();
   };
 
   const getSession = (chainId: string[]) => {
@@ -188,7 +187,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     };
   };
 
-  const enable = async (_chainId: string[]) => {
+  const enable = async (_chainId: string | string[]) => {
     const chainId = typeof _chainId === "string" ? [_chainId] : _chainId;
     const { wcSignClients } = useGrazSessionStore.getState();
     const signClient = wcSignClients.get(walletType);
@@ -473,6 +472,24 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
   return {
     enable,
+    disable: async (chainIds?: string | string[]) => {
+      const { wcSignClients } = useGrazSessionStore.getState();
+      const signClient = wcSignClients.get(walletType);
+
+      if (chainIds === undefined) {
+        const sessions = signClient?.session.getAll();
+        if (sessions !== undefined) await Promise.all(sessions.map((s) => wcDisconnect(s.topic)));
+      } else if (typeof chainIds === "string") {
+        await wcDisconnect(getSession([chainIds])?.topic);
+      } else {
+        await Promise.all(chainIds.map((x) => wcDisconnect(getSession([x])?.topic)));
+      }
+
+      // if no more sessions, remove signClient
+      if (signClient?.session.getAll().length === 0) {
+        _disconnect();
+      }
+    },
     experimentalSuggestChain,
     getKey,
     getOfflineSigner,
