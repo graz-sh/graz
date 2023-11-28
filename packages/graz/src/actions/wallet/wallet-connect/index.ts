@@ -3,7 +3,7 @@ import { fromBech32, toBech32 } from "@cosmjs/encoding";
 import type { AccountData, Algo, DirectSignResponse } from "@cosmjs/proto-signing";
 import type { Keplr, Key } from "@keplr-wallet/types";
 import { SignClient } from "@walletconnect/sign-client";
-import type { ISignClient } from "@walletconnect/types";
+import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import { getSdkError } from "@walletconnect/utils";
 // eslint-disable-next-line import/no-named-as-default
 import Long from "long";
@@ -157,13 +157,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     if (!wcSignClient) return () => {};
 
-    wcSignClient.events.on("session_delete", (_) => {
-      _disconnect();
-    });
-    wcSignClient.events.on("session_expire", (_) => {
-      _disconnect();
-    });
-    wcSignClient.events.on("session_event", (args) => {
+    const sessionEventListener = (args: SignClientTypes.EventArguments["session_event"]) => {
       const _accounts = useGrazSessionStore.getState().accounts;
       if (
         args.params.event.name === "accountsChanged" &&
@@ -178,31 +172,16 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       } else {
         reconnect();
       }
-    });
+    };
+
+    wcSignClient.events.on("session_delete", _disconnect);
+    wcSignClient.events.on("session_expire", _disconnect);
+    wcSignClient.events.on("session_event", sessionEventListener);
 
     return () => {
-      wcSignClient.events.off("session_delete", (_) => {
-        _disconnect();
-      });
-      wcSignClient.events.off("session_expire", (_) => {
-        _disconnect();
-      });
-      wcSignClient.events.off("session_event", (args) => {
-        const _accounts = useGrazSessionStore.getState().accounts;
-        if (
-          args.params.event.name === "accountsChanged" &&
-          _accounts &&
-          !Object.values(_accounts)
-            .map((x) => x.bech32Address)
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            .includes(args.params.event.data[0])
-        ) {
-          const chainId = args.params.chainId.split(":")[1];
-          chainId && void enable([chainId]);
-        } else {
-          reconnect();
-        }
-      });
+      wcSignClient.events.off("session_delete", _disconnect);
+      wcSignClient.events.off("session_expire", _disconnect);
+      wcSignClient.events.off("session_event", sessionEventListener);
     };
   };
 
