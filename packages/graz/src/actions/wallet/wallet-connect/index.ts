@@ -12,7 +12,6 @@ import { useGrazInternalStore, useGrazSessionStore } from "../../../store";
 import { WalletType, type SignAminoParams, type SignDirectParams, type Wallet } from "../../../types/wallet";
 import { isAndroid, isIos, isMobile } from "../../../utils/os";
 import { promiseWithTimeout } from "../../../utils/timeout";
-import { clearSession } from "..";
 import type { GetWalletConnectParams, WalletConnectSignDirectResponse } from "./types";
 
 export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
@@ -50,7 +49,11 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     const wcSignClient = wcSignClients.get(walletType);
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
 
-    clearSession();
+    wcSignClients.delete(walletType);
+    useGrazSessionStore.setState({
+      wcSignClients,
+    });
+
     useGrazInternalStore.setState({
       _reconnect: false,
       _reconnectConnector: null,
