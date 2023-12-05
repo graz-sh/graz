@@ -42,7 +42,7 @@ export interface GrazSessionStore {
   accounts: Record<string, Key> | null;
   activeChainIds: string[] | null;
   status: "connected" | "connecting" | "reconnecting" | "disconnected";
-  wcSignClient?: ISignClient | null;
+  wcSignClients: Map<WalletType, ISignClient>;
 }
 
 export type GrazSessionPersistedStore = Pick<GrazSessionStore, "accounts" | "activeChainIds">;
@@ -72,7 +72,7 @@ export const grazSessionDefaultValues: GrazSessionStore = {
   accounts: null,
   activeChainIds: null,
   status: "disconnected",
-  wcSignClient: null,
+  wcSignClients: new Map(),
 };
 
 const sessionOptions: PersistOptions<GrazSessionStore, GrazSessionPersistedStore> = {
