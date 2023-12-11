@@ -100,6 +100,7 @@ export const getStation = (): Wallet => {
       getOfflineSigner,
       experimentalSuggestChain,
       enable: (chainIds: string | string[]) => station.enable(chainIds),
+      disable: (chainIds?: string | string[]) => station.disable(chainIds),
       getOfflineSignerAuto: (chainId: string) => station.getOfflineSignerAuto(chainId),
       getOfflineSignerOnlyAmino: (chainId: string) => station.getOfflineSignerOnlyAmino(chainId),
       signDirect: () => station.signDirect(),

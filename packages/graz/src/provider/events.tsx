@@ -6,12 +6,12 @@ import { checkWallet } from "../actions/wallet";
 import { getCosmostation } from "../actions/wallet/cosmostation";
 import { getKeplr } from "../actions/wallet/keplr";
 import { getLeap } from "../actions/wallet/leap";
+import { getStation } from "../actions/wallet/station";
 import { getVectis } from "../actions/wallet/vectis";
 import { getWalletConnect } from "../actions/wallet/wallet-connect";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import { WalletType } from "../types/wallet";
-import { getStation } from "../actions/wallet/station";
 
 /**
  * Graz custom hook to track `keplr_keystorechange`, `leap_keystorechange`, `accountChanged` event and reconnect state
@@ -22,7 +22,7 @@ export const useGrazEvents = () => {
   const isSessionActive =
     typeof window !== "undefined" && window.sessionStorage.getItem(RECONNECT_SESSION_KEY) === "Active";
   const { _reconnect, _onReconnectFailed, _reconnectConnector } = useGrazInternalStore();
-  const { activeChainIds: activeChains, wcSignClient } = useGrazSessionStore();
+  const { activeChainIds: activeChains, wcSignClients } = useGrazSessionStore();
   const isReconnectConnectorReady = checkWallet(_reconnectConnector || undefined);
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export const useGrazEvents = () => {
         });
       }
       if (_reconnectConnector === WalletType.WALLETCONNECT) {
-        if (wcSignClient) {
+        if (wcSignClients.has(WalletType.WALLETCONNECT)) {
           getWalletConnect().subscription?.(() => {
             void reconnect({ onError: _onReconnectFailed });
           });
@@ -84,7 +84,7 @@ export const useGrazEvents = () => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [_reconnectConnector, wcSignClient, isReconnectConnectorReady]);
+  }, [_reconnectConnector, wcSignClients, isReconnectConnectorReady]);
 
   return null;
 };

@@ -43,6 +43,7 @@ export type Wallet = Pick<
 > & {
   subscription?: (reconnect: () => void) => () => void;
   init?: () => Promise<unknown>;
+  disable?: (chainIds?: string | undefined) => Promise<void>;
 };
 
 export type SignDirectParams = Parameters<Wallet["signDirect"]>;
