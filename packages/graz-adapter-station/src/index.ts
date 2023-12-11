@@ -1,8 +1,8 @@
+import type { DirectSignResponse } from "@cosmjs/proto-signing";
 import type { ChainInfo } from "@keplr-wallet/types";
+import type { ChainInfoResponse } from "@terra-money/station-connector/keplrConnector";
+import type { SignDoc } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import type { AccountData, GrazAdapter } from "graz";
-import { SignDoc } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-import { DirectSignResponse } from "@cosmjs/proto-signing";
-import { ChainInfoResponse } from "@terra-money/station-connector/keplrConnector";
 
 export class StationAdapter implements GrazAdapter {
   name = "Station";

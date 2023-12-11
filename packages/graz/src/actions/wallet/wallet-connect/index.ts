@@ -9,7 +9,7 @@ import { getSdkError } from "@walletconnect/utils";
 import Long from "long";
 
 import { useGrazInternalStore, useGrazSessionStore } from "../../../store";
-import { WalletType, type SignAminoParams, type SignDirectParams, type Wallet } from "../../../types/wallet";
+import { type SignAminoParams, type SignDirectParams, type Wallet, WalletType } from "../../../types/wallet";
 import { isAndroid, isIos, isMobile } from "../../../utils/os";
 import { promiseWithTimeout } from "../../../utils/timeout";
 import type { GetWalletConnectParams, WalletConnectSignDirectResponse } from "./types";

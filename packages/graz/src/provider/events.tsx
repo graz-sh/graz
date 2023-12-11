@@ -6,12 +6,12 @@ import { checkWallet } from "../actions/wallet";
 import { getCosmostation } from "../actions/wallet/cosmostation";
 import { getKeplr } from "../actions/wallet/keplr";
 import { getLeap } from "../actions/wallet/leap";
+import { getStation } from "../actions/wallet/station";
 import { getVectis } from "../actions/wallet/vectis";
 import { getWalletConnect } from "../actions/wallet/wallet-connect";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import { WalletType } from "../types/wallet";
-import { getStation } from "../actions/wallet/station";
 
 /**
  * Graz custom hook to track `keplr_keystorechange`, `leap_keystorechange`, `accountChanged` event and reconnect state

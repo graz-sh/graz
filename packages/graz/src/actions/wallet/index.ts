@@ -6,12 +6,12 @@ import { getCosmostation } from "./cosmostation";
 import { getKeplr } from "./keplr";
 import { getLeap } from "./leap";
 import { getMetamaskSnapLeap } from "./metamask-snap/leap";
+import { getStation } from "./station";
 import { getVectis } from "./vectis";
 import { getWalletConnect } from "./wallet-connect";
 import { getWCCosmostation } from "./wallet-connect/cosmostation";
 import { getWCKeplr } from "./wallet-connect/keplr";
 import { getWCLeap } from "./wallet-connect/leap";
-import { getStation } from "./station";
 
 /**
  * Function to check whether given {@link WalletType} or default configured wallet exists.
