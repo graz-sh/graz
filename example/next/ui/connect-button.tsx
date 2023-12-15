@@ -64,6 +64,7 @@ export const ConnectButton: FC = () => {
               <Button onClick={() => handleConnect(WalletType.COSMOSTATION)}>Cosmostation</Button>
             ) : null}
             {wallets.vectis ? <Button onClick={() => handleConnect(WalletType.VECTIS)}>Vectis</Button> : null}
+            {wallets.xdefi ? <Button onClick={() => handleConnect(WalletType.XDEFI)}>XDefi</Button> : null}
             {wallets.walletconnect ? (
               <Button onClick={() => handleConnect(WalletType.WALLETCONNECT)}>WalletConnect</Button>
             ) : null}

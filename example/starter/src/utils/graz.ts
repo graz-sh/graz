@@ -30,6 +30,10 @@ export const listedWallets = {
     name: "Station",
     imgSrc: "/assets/wallet-icon-station.svg",
   },
+  [WalletType.XDEFI]: {
+    name: "XDefi",
+    imgSrc: "/assets/wallet-icon-xdefi.jpeg",
+  },
   [WalletType.METAMASK_SNAP_LEAP]: {
     name: "Metamask Snap Leap",
     imgSrc: "/assets/wallet-icon-metamask.png",
