@@ -9,6 +9,7 @@ import { getLeap } from "../actions/wallet/leap";
 import { getStation } from "../actions/wallet/station";
 import { getVectis } from "../actions/wallet/vectis";
 import { getWalletConnect } from "../actions/wallet/wallet-connect";
+import { getXDefi } from "../actions/wallet/xdefi";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import { WalletType } from "../types/wallet";
@@ -78,6 +79,11 @@ export const useGrazEvents = () => {
       }
       if (_reconnectConnector === WalletType.STATION) {
         getStation().subscription?.(() => {
+          void reconnect({ onError: _onReconnectFailed });
+        });
+      }
+      if (_reconnectConnector === WalletType.XDEFI) {
+        getXDefi().subscription?.(() => {
           void reconnect({ onError: _onReconnectFailed });
         });
       }

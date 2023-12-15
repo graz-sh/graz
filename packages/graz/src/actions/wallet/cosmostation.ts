@@ -17,16 +17,16 @@ import { clearSession } from ".";
  * @see https://docs.cosmostation.io/integration-extension/cosmos/integrate-keplr
  */
 export const getCosmostation = (): Wallet => {
-  if (typeof window.cosmostation.providers.keplr !== "undefined") {
+  if (typeof window.cosmostation?.providers.keplr !== "undefined") {
     const cosmostation = window.cosmostation.providers.keplr;
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
       const listener = () => {
         clearSession();
         reconnect();
       };
-      window.cosmostation.cosmos.on("accountChanged", listener);
+      window.cosmostation?.cosmos.on("accountChanged", listener);
       return () => {
-        window.cosmostation.cosmos.off("accountChanged", listener);
+        window.cosmostation?.cosmos.off("accountChanged", listener);
       };
     };
     const res = Object.assign(cosmostation, {

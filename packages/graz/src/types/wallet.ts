@@ -15,6 +15,7 @@ export enum WalletType {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   METAMASK_SNAP_LEAP = "metamask_snap_leap",
   STATION = "station",
+  XDEFI = "xdefi",
 }
 
 export const WALLET_TYPES = [
@@ -28,6 +29,7 @@ export const WALLET_TYPES = [
   WalletType.WC_COSMOSTATION_MOBILE,
   WalletType.METAMASK_SNAP_LEAP,
   WalletType.STATION,
+  WalletType.XDEFI,
 ];
 
 export type Wallet = Pick<
