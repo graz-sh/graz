@@ -4,6 +4,11 @@ sidebar_position: 8
 
 # Changelog
 
+## Version 0.1.3
+
+- ✅ Added `signArbitrary` to `Wallet` type
+- ✅ Added XDefi wallet integration
+
 ## Version 0.1.2
 
 - Various bug fixes for Wallet Connect
