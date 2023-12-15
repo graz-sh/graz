@@ -41,6 +41,7 @@ export type Wallet = Pick<
   | "signDirect"
   | "signAmino"
 > & {
+  signArbitrary?: Keplr["signArbitrary"];
   subscription?: (reconnect: () => void) => () => void;
   init?: () => Promise<unknown>;
   disable?: (chainIds?: string | undefined) => Promise<void>;
