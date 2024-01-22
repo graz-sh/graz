@@ -61,6 +61,21 @@ export const useChainInfo = ({ chainId }: { chainId?: string }) => {
 };
 
 /**
+ * graz hook to retrieve ChainInfo objects from GrazProvider with given chainId
+ *
+ * @param chainId - chainId to search
+ *
+ * @example
+ * ```ts
+ * import { useChainInfos } from "graz";
+ * const chainInfos = useChainInfos({chainId: ["cosmoshub-4", "juno-1"]});
+ * ```
+ */
+export const useChainInfos = ({ chainId }: { chainId?: string[] }) => {
+  return useGrazInternalStore().chains?.filter((x) => chainId?.includes(x.chainId));
+};
+
+/**
  * graz hook to retrieve specific connected chains currency
  *
  * @param denom - Currency denom to search
