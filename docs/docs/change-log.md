@@ -4,6 +4,13 @@ sidebar_position: 8
 
 # Changelog
 
+## Version 0.1.4
+
+- Improve `useChainInfos` and `useChainInfo` to return `ChainInfo` object from `GrazProvider` with given `chainId`
+- Added Actions `getChainInfos` and `getChainInfo` to retrieve `ChainInfo` object from `GrazProvider` with given `chainId`
+- Improve wallet connect `getKey`
+- Improve Metamask Snap if okxwallet inject ethereum object to window
+
 ## Version 0.1.3
 
 - ✅ Added `signArbitrary` to `Wallet` type
