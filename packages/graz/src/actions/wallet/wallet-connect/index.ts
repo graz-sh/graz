@@ -344,17 +344,16 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     };
   };
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const getKey = async (chainId: string): Promise<Key> => {
-    const { address, algo, pubkey } = await getAccount(chainId);
-    return {
-      address: fromBech32(address).data,
-      algo,
-      bech32Address: address,
-      name: "",
-      pubKey: pubkey,
-      isKeystone: false,
-      isNanoLedger: false,
-    };
+    const session = getSession([chainId]);
+    if (!session?.topic) throw new Error("No wallet connect session");
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const key: Key | undefined = session.sessionProperties && JSON.parse(String(session.sessionProperties.keys))[0];
+    if (!key) throw new Error("No wallet connect key");
+
+    return key;
   };
 
   const wcSignDirect = async (...args: SignDirectParams) => {
