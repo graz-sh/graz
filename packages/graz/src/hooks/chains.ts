@@ -46,6 +46,21 @@ export const useActiveChains = (): ChainInfo[] | undefined => {
 };
 
 /**
+ * graz hook to retrieve ChainInfo object from GrazProvider with given chainId
+ *
+ * @param chainId - chainId to search
+ *
+ * @example
+ * ```ts
+ * import { useChain } from "graz";
+ * const chainInfo = useChainInfo({chainId: "cosmoshub-4"});
+ * ```
+ */
+export const useChainInfo = ({ chainId }: { chainId?: string }) => {
+  return useGrazInternalStore().chains?.find((x) => x.chainId === chainId);
+};
+
+/**
  * graz hook to retrieve specific connected chains currency
  *
  * @param denom - Currency denom to search
