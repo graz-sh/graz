@@ -19,6 +19,14 @@ export const getRecentChains = (): ChainInfo[] | null => {
   return recentChains?.map((chainId) => chains!.find((x) => x.chainId === chainId)!) ?? null;
 };
 
+export const getChainInfo = ({ chainId }: { chainId?: string }): ChainInfo | undefined => {
+  return useGrazInternalStore.getState().chains?.find((x) => x.chainId === chainId);
+};
+
+export const getChainInfos = ({ chainId }: { chainId?: string[] }): ChainInfo[] | undefined => {
+  return useGrazInternalStore.getState().chains?.filter((x) => chainId?.includes(x.chainId));
+};
+
 export interface SuggestChainArgs {
   chainInfo: ChainInfo;
   walletType: WalletType;

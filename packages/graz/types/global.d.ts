@@ -16,6 +16,7 @@ declare global {
       };
     };
     ethereum?: import("@metamask/providers").MetaMaskInpageProvider;
+    okxwallet?: import("@metamask/providers").BaseProvider;
     station?: Station;
     xfi?: {
       keplr: KeplrWindow["keplr"];
