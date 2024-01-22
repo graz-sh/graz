@@ -72,7 +72,16 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       });
 
       const isMetamask = (clientVersion as string).includes("MetaMask");
+
       if (!isMetamask) throw new Error("Metamask is not installed");
+
+      if (typeof window.okxwallet !== "undefined") {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        if (window.okxwallet.isOkxWallet) {
+          throw new Error("You have OKX Wallet installed. Please disable and reload the page to use Metamask Snap.");
+        }
+      }
       const version = (clientVersion as string).split("MetaMask/v")[1]?.split(".")[0];
       const isSupportMMSnap = Number(version) >= 11;
       if (!isSupportMMSnap) throw new Error("Metamask Snap is not supported in this version");
