@@ -4,6 +4,10 @@ sidebar_position: 8
 
 # Changelog
 
+## Version 0.1.5
+
+- Fix typing on SigningClient hooks for single chain `opts` param
+
 ## Version 0.1.4
 
 - Improve `useChainInfos` and `useChainInfo` to return `ChainInfo` object from `GrazProvider` with given `chainId`
