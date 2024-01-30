@@ -16,7 +16,7 @@ import { useTendermintClient } from "./clients";
 
 interface SiginingClientSinglechainArgs<T> {
   multiChain?: false;
-  opts?: Record<string, T>;
+  opts?: T;
 }
 
 interface SiginingClientMultichainArgs<T> {
