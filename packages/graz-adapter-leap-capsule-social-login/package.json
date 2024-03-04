@@ -1,0 +1,44 @@
+{
+  "name": "graz-adapter-leap-capsule-social-login",
+  "description": "Graz adapter for Leap capsule social login",
+  "version": "0.0.2",
+  "repository": "https://github.com/graz-sh/graz.git",
+  "homepage": "https://github.com/graz-sh/graz",
+  "bugs": "https://github.com/graz-sh/graz/issues",
+  "files": [
+    "dist/*.d.ts",
+    "dist/*.js",
+    "dist/*.mjs"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
+    "prepublishOnly": "pnpm build"
+  },
+  "peerDependencies": {
+    "graz": ">=0.0.37"
+  },
+  "devDependencies": {
+    "graz": "*",
+    "typescript": "^5.2.2"
+  },
+  "keywords": [
+    "graz",
+    "graz-adapter",
+    "graz-adapter-leap",
+    "graz-adapter-leap-capsule",
+    "capsule",
+    "use-leap-capsule"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@cosmjs/amino": "^0.32.2",
+    "@cosmjs/proto-signing": "^0.32.2",
+    "@leapwallet/capsule-web-sdk-lite": "^0.29.1",
+    "@leapwallet/cosmos-social-login-capsule-provider": "^0.0.30",
+    "@vectis/extension-client": "^0.7.2",
+    "cosmjs-types": "^0.8.0"
+  }
+}
