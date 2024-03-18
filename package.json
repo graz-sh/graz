@@ -9,16 +9,14 @@
   "scripts": {
     "build": "turbo run build --filter=!@project/example-next --filter=!@project/starter --filter=!@project/example-vite",
     "clean": "turbo run clean",
-    "dev": "turbo run dev --filter=!@project/docs --filter=!create-graz-app --filter=!create-graz-app --filter=!\"graz-adapter-*\" ",
+    "dev": "turbo run dev --filter=!@project/docs",
     "project:docs": "pnpm --dir docs",
     "example:next": "pnpm --dir example/next",
     "example:vite": "pnpm --dir example/vite",
     "example:starter": "pnpm --dir example/starter",
     "graz": "pnpm --dir packages/graz",
-    "create-graz-app": "pnpm --dir packages/create-graz-app",
     "lint": "turbo run lint",
     "release": "turbo run build --filter=graz && pnpm publish --filter graz",
-    "release-adapter": "turbo run build --filter=\"graz-adapter-*\" && pnpm publish --filter=\"graz-adapter-*\"",
     "test": "turbo run test"
   },
   "devDependencies": {

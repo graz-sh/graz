@@ -61,7 +61,7 @@
     "@keplr-wallet/types": "^0.12.23",
     "@metamask/providers": "^12.0.0",
     "@tanstack/react-query": "^4.35.0",
-    "@terra-money/station-connector": "^1.0.15",
+    "@terra-money/station-connector": "^1.1.0",
     "@vectis/extension-client": "^0.7.2",
     "@walletconnect/sign-client": "^2.10.0",
     "@walletconnect/types": "^2.10.0",
