@@ -5,7 +5,6 @@ import type { Keplr, Key } from "@keplr-wallet/types";
 import { SignClient } from "@walletconnect/sign-client";
 import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import { getSdkError } from "@walletconnect/utils";
-// eslint-disable-next-line import/no-named-as-default
 import Long from "long";
 
 import { useGrazInternalStore, useGrazSessionStore } from "../../../store";
@@ -498,5 +497,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     signDirect,
     subscription,
     init,
+    setDefaultOptions: () => {
+      console.log("setDefaultOptions not supported by WalletConnect");
+    },
   };
 };

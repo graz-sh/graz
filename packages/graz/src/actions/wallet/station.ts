@@ -106,6 +106,9 @@ export const getStation = (): Wallet => {
       signDirect: () => station.signDirect(),
       signAmino: (chainId: string, signer: string, signDoc: StdSignDoc, _signOptions?: KeplrSignOptions) =>
         station.signAmino(chainId, signer, signDoc),
+      setDefaultOptions: () => {
+        console.log("setDefaultOptions not supported by WalletConnect");
+      },
     };
   }
 

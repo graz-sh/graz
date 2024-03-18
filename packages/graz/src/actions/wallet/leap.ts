@@ -1,3 +1,5 @@
+import type { KeplrIntereactionOptions } from "@keplr-wallet/types";
+
 import { useGrazInternalStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
 import { clearSession } from ".";
@@ -29,8 +31,12 @@ export const getLeap = (): Wallet => {
         window.removeEventListener("leap_keystorechange", listener);
       };
     };
+    const setDefaultOptions = (options: KeplrIntereactionOptions) => {
+      leap.defaultOptions = options;
+    };
     const res = Object.assign(leap, {
       subscription,
+      setDefaultOptions,
     });
     return res;
   }

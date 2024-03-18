@@ -1,4 +1,4 @@
-import type { Keplr } from "@keplr-wallet/types";
+import type { Keplr, KeplrIntereactionOptions } from "@keplr-wallet/types";
 
 export enum WalletType {
   KEPLR = "keplr",
@@ -47,6 +47,7 @@ export type Wallet = Pick<
   subscription?: (reconnect: () => void) => () => void;
   init?: () => Promise<unknown>;
   disable?: (chainIds?: string | undefined) => Promise<void>;
+  setDefaultOptions?: (options: KeplrIntereactionOptions) => void;
 };
 
 export type SignDirectParams = Parameters<Wallet["signDirect"]>;

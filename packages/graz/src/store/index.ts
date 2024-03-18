@@ -1,4 +1,4 @@
-import type { ChainInfo, Key } from "@keplr-wallet/types";
+import type { ChainInfo, Keplr, Key } from "@keplr-wallet/types";
 import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import type { Web3ModalConfig } from "@web3modal/standalone";
 import { create } from "zustand";
@@ -32,6 +32,7 @@ export interface GrazInternalStore {
   multiChainFetchConcurrency: number;
   walletType: WalletType;
   walletConnect: WalletConnectStore | null;
+  walletDefaultOptions: Keplr["defaultOptions"] | null;
   _notFoundFn: () => void;
   _reconnect: boolean;
   _reconnectConnector: WalletType | null;
@@ -62,6 +63,7 @@ export const grazInternalDefaultValues: GrazInternalStore = {
     options: null,
     web3Modal: null,
   },
+  walletDefaultOptions: null,
   _notFoundFn: () => null,
   _onReconnectFailed: () => null,
   _reconnect: false,

@@ -2,7 +2,6 @@ import type { AminoSignResponse } from "@cosmjs/amino";
 import { fromBech32 } from "@cosmjs/encoding";
 import type { DirectSignResponse } from "@cosmjs/proto-signing";
 import type { Key } from "@keplr-wallet/types";
-// eslint-disable-next-line import/no-named-as-default
 import Long from "long";
 
 import { useGrazInternalStore } from "../../store";
@@ -90,6 +89,9 @@ export const getVectis = (): Wallet => {
       experimentalSuggestChain,
       signDirect,
       signAmino,
+      setDefaultOptions: () => {
+        console.log("setDefaultOptions not supported by Vectis");
+      },
     };
   }
 

@@ -50,44 +50,52 @@ export const clearSession = () => {
  * @see {@link getKeplr}
  */
 export const getWallet = (type: WalletType = useGrazInternalStore.getState().walletType): Wallet => {
-  switch (type) {
-    case WalletType.KEPLR: {
-      return getKeplr();
+  const wallet = (() => {
+    switch (type) {
+      case WalletType.KEPLR: {
+        return getKeplr();
+      }
+      case WalletType.LEAP: {
+        return getLeap();
+      }
+      case WalletType.COSMOSTATION: {
+        return getCosmostation();
+      }
+      case WalletType.VECTIS: {
+        return getVectis();
+      }
+      case WalletType.WALLETCONNECT: {
+        return getWalletConnect();
+      }
+      case WalletType.WC_KEPLR_MOBILE: {
+        return getWCKeplr();
+      }
+      case WalletType.WC_LEAP_MOBILE: {
+        return getWCLeap();
+      }
+      case WalletType.WC_COSMOSTATION_MOBILE: {
+        return getWCCosmostation();
+      }
+      case WalletType.METAMASK_SNAP_LEAP: {
+        return getMetamaskSnapLeap();
+      }
+      case WalletType.STATION: {
+        return getStation();
+      }
+      case WalletType.XDEFI: {
+        return getXDefi();
+      }
+      default: {
+        throw new Error("Unknown wallet type");
+      }
     }
-    case WalletType.LEAP: {
-      return getLeap();
-    }
-    case WalletType.COSMOSTATION: {
-      return getCosmostation();
-    }
-    case WalletType.VECTIS: {
-      return getVectis();
-    }
-    case WalletType.WALLETCONNECT: {
-      return getWalletConnect();
-    }
-    case WalletType.WC_KEPLR_MOBILE: {
-      return getWCKeplr();
-    }
-    case WalletType.WC_LEAP_MOBILE: {
-      return getWCLeap();
-    }
-    case WalletType.WC_COSMOSTATION_MOBILE: {
-      return getWCCosmostation();
-    }
-    case WalletType.METAMASK_SNAP_LEAP: {
-      return getMetamaskSnapLeap();
-    }
-    case WalletType.STATION: {
-      return getStation();
-    }
-    case WalletType.XDEFI: {
-      return getXDefi();
-    }
-    default: {
-      throw new Error("Unknown wallet type");
-    }
+  })();
+  const options = useGrazInternalStore.getState().walletDefaultOptions;
+  if (options) {
+    wallet.setDefaultOptions?.(options);
   }
+
+  return wallet;
 };
 
 export const getAvailableWallets = (): Record<WalletType, boolean> => {

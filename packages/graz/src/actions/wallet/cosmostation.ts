@@ -1,3 +1,5 @@
+import type { KeplrIntereactionOptions } from "@keplr-wallet/types";
+
 import { useGrazInternalStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
 import { clearSession } from ".";
@@ -29,8 +31,13 @@ export const getCosmostation = (): Wallet => {
         window.cosmostation?.cosmos.off("accountChanged", listener);
       };
     };
+
+    const setDefaultOptions = (options: KeplrIntereactionOptions) => {
+      cosmostation.defaultOptions = options;
+    };
     const res = Object.assign(cosmostation, {
       subscription,
+      setDefaultOptions,
     });
     return res;
   }
