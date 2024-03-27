@@ -23,7 +23,7 @@ export class VectisAdapter implements GrazAdapter {
 
   private getConnector() {
     if (typeof window.leapCapsuleClient !== "undefined") return window.leapCapsuleClient;
-    throw new Error("window.vectis is not defined");
+    throw new Error("window.leapCapsuleClient is not defined");
   }
 
   checkConnector() {
