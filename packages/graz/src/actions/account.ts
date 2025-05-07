@@ -25,14 +25,17 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   try {
     const { recentChainIds: recentChains, chains, walletType } = useGrazInternalStore.getState();
 
-    const walletConnectInstance = getWallet(WalletType.WALLETCONNECT);
-    const { disable: walletConnectDisable } = walletConnectInstance;
+    const currentWalletType = args?.walletType || walletType;
 
-    if (walletConnectDisable) {
-      void walletConnectDisable();
+    if (isWalletConnect(currentWalletType)) {
+      const walletConnectInstance = getWallet(WalletType.WALLETCONNECT);
+      const { disable: walletConnectDisable } = walletConnectInstance;
+
+      if (walletConnectDisable) {
+        void walletConnectDisable();
+      }
     }
 
-    const currentWalletType = args?.walletType || walletType;
     const isWalletAvailable = checkWallet(currentWalletType);
     if (!isWalletAvailable) {
       throw new Error(`${currentWalletType} is not available`);
@@ -156,11 +159,13 @@ export const disconnect = (args?: { chainId?: ChainId }) => {
   typeof window !== "undefined" && window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
   const chainId = typeof args?.chainId === "string" ? [args.chainId] : args?.chainId;
 
-  const walletConnectInstance = getWallet(WalletType.WALLETCONNECT);
-  const { disable: walletConnectDisable } = walletConnectInstance;
+  if (isWalletConnect(useGrazInternalStore.getState().walletType)) {
+    const walletConnectInstance = getWallet(WalletType.WALLETCONNECT);
+    const { disable: walletConnectDisable } = walletConnectInstance;
 
-  if (walletConnectDisable) {
-    void walletConnectDisable();
+    if (walletConnectDisable) {
+      void walletConnectDisable();
+    }
   }
 
   if (chainId) {
