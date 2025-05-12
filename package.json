@@ -1,5 +1,5 @@
 {
-  "name": "@graz-sh/graz",
+  "name": "graz-sh",
   "version": "0.0.0",
   "workspaces": [
     "docs",
@@ -16,10 +16,11 @@
     "example:starter": "pnpm --dir example/starter",
     "graz": "pnpm --dir packages/graz",
     "lint": "turbo run lint",
-    "release": "turbo run build --filter=graz && pnpm publish --filter graz",
+    "release": "pnpm graz build && changeset publish",
     "test": "turbo run test"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.2",
     "@graz-sh/style-guide": "^4.0.1",
     "eslint": "^8.49.0",
     "p-map": "^6.0.0",

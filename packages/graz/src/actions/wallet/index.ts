@@ -135,6 +135,15 @@ export const isCapsule = (type: WalletType): boolean => {
   return type === WalletType.CAPSULE;
 };
 
+export const isLeapSnaps = (type: WalletType): boolean => {
+  return type === WalletType.METAMASK_SNAP_LEAP;
+};
+
+export const isLeapDappBrowser = (): boolean => {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  return Boolean(navigator?.userAgent) && /LeapCosmos/i.test(navigator.userAgent);
+};
+
 export const isWalletConnect = (type: WalletType): boolean => {
   return (
     type === WalletType.WALLETCONNECT ||

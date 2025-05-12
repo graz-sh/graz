@@ -4,7 +4,8 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "rootDir": ".",
-    "target": "esnext"
+    "target": "esnext",
+    "esModuleInterop": true
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
 }

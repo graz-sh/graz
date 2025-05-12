@@ -1,6 +1,6 @@
 {
   "name": "@project/starter",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "private": true,
   "scripts": {
     "export:docs": "next build && next export --outdir ../../docs/build/examples/starter",

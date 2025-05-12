@@ -35,21 +35,6 @@ yarn add graz
 pnpm add graz
 ```
 
-### Install peer dependencies
-
-To avoid version mismatch we decided to make these packages as peer dependencies:
-
-```shell
-# using npm
-npm install @cosmjs/cosmwasm-stargate @cosmjs/launchpad @cosmjs/proto-signing @cosmjs/stargate @cosmjs/tendermint-rpc long
-
-# using yarn
-yarn add @cosmjs/cosmwasm-stargate @cosmjs/launchpad @cosmjs/proto-signing @cosmjs/stargate @cosmjs/tendermint-rpc long
-
-# using pnpm
-pnpm add @cosmjs/cosmwasm-stargate @cosmjs/launchpad @cosmjs/proto-signing @cosmjs/stargate @cosmjs/tendermint-rpc long
-```
-
 ## Quick start
 
 Wrap your React app with `<QueryClientProvider />` and `<GrazProvider />`, and use available `graz` hooks anywhere:

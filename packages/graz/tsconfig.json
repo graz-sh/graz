@@ -1,9 +1,21 @@
 {
-  "extends": "@graz-sh/style-guide/tsconfig/next.json",
   "compilerOptions": {
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "allowJs": true,
+    "isolatedModules": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
     "jsx": "react-jsx",
     "incremental": false,
-    "target": "es6"
   },
   "exclude": ["node_modules"],
   "include": ["**/*.ts", "**/*.tsx"]

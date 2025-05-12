@@ -1,11 +1,11 @@
 {
   "name": "@project/example-vite",
-  "version": "0.0.0",
+  "version": "0.0.5",
   "type": "module",
   "scripts": {
     "build": "tsc && vite build",
     "dev": "vite",
-    "export:docs": "tsc && vite build --emptyOutDir --outDir ../../docs/build/examples/vite",
+    "export:docs": "vite build --emptyOutDir --outDir ../../docs/build/examples/vite",
     "preview": "vite preview"
   },
   "dependencies": {
