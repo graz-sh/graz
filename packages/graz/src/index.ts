@@ -3,6 +3,7 @@ export * from "./actions/chains";
 export * from "./actions/configure";
 export * from "./actions/methods";
 export * from "./actions/wallet";
+export * from "./actions/wallet/cactus";
 export * from "./actions/wallet/cosmostation";
 export * from "./actions/wallet/keplr";
 export * from "./actions/wallet/leap";

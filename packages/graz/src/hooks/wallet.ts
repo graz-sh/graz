@@ -31,6 +31,7 @@ export const useActiveWalletType = () => {
       isStation: x.walletType === WalletType.STATION,
       isCapsule: x.walletType === WalletType.CAPSULE,
       isCosmiframe: x.walletType === WalletType.COSMIFRAME,
+      isCactusCosmos: x.walletType === WalletType.CACTUSCOSMOS,
     }),
     shallow,
   );

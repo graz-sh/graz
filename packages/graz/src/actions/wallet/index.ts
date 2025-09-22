@@ -2,6 +2,7 @@ import { RECONNECT_SESSION_KEY } from "../../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
 import { WALLET_TYPES, WalletType } from "../../types/wallet";
+import { getCactusCosmos } from "./cactus";
 import { getCapsule } from "./capsule";
 import { getCompass } from "./compass";
 import { getCosmiframe } from "./cosmiframe";
@@ -113,7 +114,9 @@ export const getWallet = (type: WalletType = useGrazInternalStore.getState().wal
       case WalletType.OKX: {
         return getOkx();
       }
-
+      case WalletType.CACTUSCOSMOS: {
+        return getCactusCosmos();
+      }
       default: {
         throw new Error("Unknown wallet type");
       }

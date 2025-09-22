@@ -60,6 +60,7 @@ export const ConnectButton: FC = () => {
           <Stack p={4} spacing={3}>
             {wallets.keplr ? <Button onClick={() => handleConnect(WalletType.KEPLR)}>Keplr</Button> : null}
             {wallets.leap ? <Button onClick={() => handleConnect(WalletType.LEAP)}>Leap</Button> : null}
+            {wallets.cactuscosmos ? <Button onClick={() => handleConnect(WalletType.CACTUSCOSMOS)}>Cactus Link</Button> : null}
             {wallets.cosmostation ? (
               <Button onClick={() => handleConnect(WalletType.COSMOSTATION)}>Cosmostation</Button>
             ) : null}

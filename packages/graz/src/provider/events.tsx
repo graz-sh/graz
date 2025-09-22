@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 import { connect, reconnect } from "../actions/account";
 import { checkWallet } from "../actions/wallet";
+import { getCactusCosmos } from "../actions/wallet/cactus";
 import { getCompass } from "../actions/wallet/compass";
 import { getCosmiframe } from "../actions/wallet/cosmiframe";
 import { getCosmostation } from "../actions/wallet/cosmostation";
@@ -85,6 +86,11 @@ export const useGrazEvents = () => {
       }
       if (_reconnectConnector === WalletType.KEPLR) {
         getKeplr().subscription?.(() => {
+          void reconnect({ onError: _onReconnectFailed });
+        });
+      }
+      if (_reconnectConnector === WalletType.CACTUSCOSMOS) {
+        getCactusCosmos().subscription?.(() => {
           void reconnect({ onError: _onReconnectFailed });
         });
       }

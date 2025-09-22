@@ -73,4 +73,8 @@ export const listedWallets = {
     name: "Compass",
     imgSrc: "/assets/wallet-icon-compass.png",
   },
+  [WalletType.CACTUSCOSMOS]: {
+    name: "Cactus Link",
+    imgSrc: "/assets/wallet-icon-cactus.png",
+  },
 };
