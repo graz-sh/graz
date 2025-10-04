@@ -15,13 +15,18 @@ const queryClient = new QueryClient();
 
 // Get an API key at https://developer.getpara.com
 // Modal will open with fake key but will not authenticate
-export const para = new ParaWeb(Environment.BETA, process.env.NEXT_PUBLIC_PARA_API_KEY || "");
+// Only initialize Para if API key is provided
+export const para = process.env.NEXT_PUBLIC_PARA_API_KEY
+  ? new ParaWeb(Environment.BETA, process.env.NEXT_PUBLIC_PARA_API_KEY)
+  : null;
 
-const paraConfig: ParaGrazConfig = {
-  paraWeb: para,
-  modalProps: { appName: "MyApp" },
-  queryClient: queryClient,
-};
+const paraConfig: ParaGrazConfig | undefined = para
+  ? {
+      paraWeb: para,
+      modalProps: { appName: "MyApp" },
+      queryClient: queryClient,
+    }
+  : undefined;
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

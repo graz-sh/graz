@@ -33,5 +33,17 @@
   },
   "prettier": "@graz-sh/style-guide/prettier",
   "private": true,
-  "license": "MIT"
+  "license": "MIT",
+  "pnpm": {
+    "overrides": {
+      "ses": ">=0.18.7",
+      "trim": ">=0.0.3",
+      "axios": ">=0.30.2",
+      "next": ">=14.2.15",
+      "got": ">=11.8.5",
+      "esbuild": ">=0.25.0",
+      "webpack-dev-server": ">=5.2.1",
+      "vite": ">=5.4.20"
+    }
+  }
 }
