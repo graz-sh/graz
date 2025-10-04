@@ -25,7 +25,7 @@
     "@changesets/cli": "^2.29.2",
     "@graz-sh/style-guide": "^4.0.1",
     "eslint": "^8.49.0",
-    "p-map": "^6.0.0",
+    "p-map": "^4.0.0",
     "prettier": "^3.0.3",
     "tsup": "^7.2.0",
     "turbo": "^1.10.13",

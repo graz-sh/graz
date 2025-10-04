@@ -41,6 +41,7 @@
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
     "prepublishOnly": "pnpm build",
     "test": "vitest run",
+    "test:cli": "vitest run src/__tests__/cli.test.ts",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "type-check": "tsc --noEmit"
@@ -68,7 +69,7 @@
     "@walletconnect/modal": "2.7.0",
     "cosmos-directory-client": "0.0.6",
     "long": "4",
-    "p-map": "^7.0.0",
+    "p-map": "^4.0.0",
     "starknet": "^6",
     "zustand": "5.0.4"
   },

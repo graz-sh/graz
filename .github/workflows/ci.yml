@@ -45,6 +45,9 @@ jobs:
       - name: Run tests
         run: pnpm test
 
+      - name: Run CLI tests
+        run: pnpm --filter graz test:cli
+
       - name: Type check
         run: pnpm --filter graz type-check
 
@@ -71,8 +74,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build graz package first
+      - name: Build graz package
         run: pnpm --filter graz build
 
-      - name: Build all packages including examples
-        run: pnpm build-all
+      - name: Build examples and docs
+        run: pnpm exec turbo run build --filter=!graz
