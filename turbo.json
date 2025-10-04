@@ -16,6 +16,10 @@
       "dependsOn": ["^build", "^lint"],
       "outputs": []
     },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
     "start": {
       "cache": false,
       "dependsOn": ["^build", "build"]
