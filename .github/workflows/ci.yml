@@ -46,7 +46,7 @@ jobs:
         run: pnpm test
 
       - name: Type check
-        run: pnpm graz tsc --noEmit
+        run: pnpm --filter graz type-check
 
   build-examples:
     name: Build Examples
