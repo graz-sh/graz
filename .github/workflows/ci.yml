@@ -21,10 +21,6 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18, 20]
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -34,10 +30,10 @@ jobs:
         with:
           version: 9
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20
           cache: pnpm
 
       - name: Install dependencies
@@ -70,7 +66,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           cache: pnpm
-          node-version-file: ".nvmrc"
+          node-version: 20
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -95,7 +91,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           cache: pnpm
-          node-version-file: ".nvmrc"
+          node-version: 20
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

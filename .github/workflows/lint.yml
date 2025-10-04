@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           cache: pnpm
-          node-version-file: ".nvmrc"
+          node-version: 20
       - run: |
           pnpm install
           pnpm lint
