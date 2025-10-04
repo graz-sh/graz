@@ -2,7 +2,7 @@
 
 hook to retrieve `ChainInfo` object from `GrazProvider` with given `chainId`
 
-#### Usage
+## Usage
 
 ```tsx
 import { useChainInfo } from "graz";
@@ -18,7 +18,7 @@ function App() {
 }
 ```
 
-#### Return Value
+## Return Value
 
 ```tsx
 ChainInfo | undefined; // @keplr-wallet/types

@@ -1,79 +1,72 @@
 # useBalanceStaked
 
-Hook to retrieve list of staked balances from current account or given address
+Hook to retrieve staked balance from current account or given address. Returns staked balances in a `Record<chainId, Coin>` format.
 
-#### Usage
-
-##### Single chain
+## Usage
 
 ```tsx
 import { useBalanceStaked } from "graz";
+
 function App() {
-  const { data: balanceStaked, isLoading } = useBalanceStaked({
+  const { data: stakedBalances, isLoading } = useBalanceStaked({
+    chainId: ["cosmoshub-4", "osmosis-1"],
     bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
   });
 
   return (
     <div>
-      Balances:
+      <h3>Staked Balances</h3>
       {isLoading ? (
-        "Fetching staked balance..."
+        "Loading..."
       ) : (
-        <p>
-          {balanceStaked?.amount} {balanceStaked?.denom}
-        </p>
+        stakedBalances && Object.entries(stakedBalances).map(([chainId, coin]) => (
+          <div key={chainId}>
+            <p>{chainId}: {coin.amount} {coin.denom}</p>
+          </div>
+        ))
       )}
     </div>
   );
 }
 ```
 
-##### Multi chain
-
-`useBalanceStaked` address handles multi chain addresses, so you need only to pass 1 chain address it will automatically convert address in other chain
+### Connected Account
 
 ```tsx
-import { useBalanceStaked } from "graz";
-function App() {
-  const { data: balanceStaked, isLoading } = useBalanceStaked({
-    bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
-    chainId: ["cosmoshub-4", "sommelier-1"],
-    multiChain: true,
+import { useBalanceStaked, useAccount } from "graz";
+
+function MyStakedBalance() {
+  const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+
+  // bech32Address is optional - uses connected account if not provided
+  const { data: stakedBalances } = useBalanceStaked({
+    chainId: ["cosmoshub-4"],
   });
+
+  const staked = stakedBalances?.["cosmoshub-4"];
 
   return (
     <div>
-      Balances:
-      {isLoading ? (
-        "Fetching staked balance..."
-      ) : balanceStaked && Object.entries(balanceStaked).map([chainId, coin] => {
-          return(
-            <div>
-              <p>{chainId} balance staked : {coin.amount} {coin.denom}</p>
-            </div>
-          );
-        })
-      }
+      Staked: {staked?.amount} {staked?.denom}
     </div>
   );
 }
 ```
 
-#### Hook Params
-
-```tsx
-<TMultiChain extends boolean>{
-  chainId?: string | string[];
-  multiChain?: TMultiChain; // boolean
-  bech32Address?: string // Optional bech32 account address, defaults to connected account address
-}
-```
-
-#### Return Value
+## Hook Params
 
 ```tsx
 {
-  data: TMultiChain extends true ? Record<string,  Coin> :  Coin; // from @cosmjs/proto-signing
+  chainId?: string[]; // Array of chain IDs
+  bech32Address?: string; // Optional address, defaults to connected account
+}
+```
+
+## Return Value
+
+```tsx
+{
+  data?: Record<string, Coin>; // Coin from @cosmjs/proto-signing
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -87,12 +80,11 @@ function App() {
   isLoadingError: boolean;
   isPaused: boolean;
   isPlaceholderData: boolean;
-  isPreviousData: boolean;
   isRefetchError: boolean;
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<TMultiChain extends true ? Record<string,  Coin> :  Coin, unknown>>;
+  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Record<string, Coin>, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

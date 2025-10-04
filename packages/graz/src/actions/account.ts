@@ -6,11 +6,16 @@ import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } f
 import type { Maybe } from "../types/core";
 import type { Key } from "../types/wallet";
 import { WalletType } from "../types/wallet";
-import type { ChainId } from "../utils/multi-chain";
 import { checkWallet, getWallet, isLeapDappBrowser, isLeapSnaps, isPara, isWalletConnect } from "./wallet";
 
+/**
+ * Chain ID type for actions - supports both string and string[] for backward compatibility.
+ * Actions normalize this internally to string[].
+ */
+export type ActionChainId = string | string[];
+
 export type ConnectArgs = Maybe<{
-  chainId: ChainId;
+  chainId: ActionChainId;
   walletType?: WalletType;
   autoReconnect?: boolean;
 }>;
@@ -135,7 +140,7 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   }
 };
 
-export const disconnect = (args?: { chainId?: ChainId }) => {
+export const disconnect = (args?: { chainId?: ActionChainId }) => {
   typeof window !== "undefined" && window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
   const chainId = typeof args?.chainId === "string" ? [args.chainId] : args?.chainId;
   const disable = () => {

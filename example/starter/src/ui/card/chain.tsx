@@ -9,18 +9,24 @@ import { SendTokenModal } from "../modal/send-token-modal";
 
 export const Card = ({ chain }: { chain: ChainInfo }) => {
   const toast = useToast();
-  const { data: account, isConnecting } = useAccount({
-    chainId: chain.chainId,
+  // NEW API: chainId must be an array, hooks return Record format
+  const { data: accounts, isConnecting } = useAccount({
+    chainId: [chain.chainId],
   });
-  const { data: balance } = useBalance({
-    chainId: chain.chainId,
+  const account = accounts?.[chain.chainId]; // Extract from Record
+
+  const { data: balances } = useBalance({
+    chainId: [chain.chainId],
     bech32Address: account?.bech32Address,
     denom: chain.stakeCurrency.coinMinimalDenom,
   });
-  const { data: stakedBalance } = useBalanceStaked({
-    chainId: chain.chainId,
+  const balance = balances?.[chain.chainId]; // Extract from Record
+
+  const { data: stakedBalances } = useBalanceStaked({
+    chainId: [chain.chainId],
     bech32Address: account?.bech32Address,
   });
+  const stakedBalance = stakedBalances?.[chain.chainId]; // Extract from Record
   const { disconnect } = useDisconnect({
     onSuccess: () => {
       toast({
@@ -52,7 +58,7 @@ export const Card = ({ chain }: { chain: ChainInfo }) => {
               colorScheme="red"
               onClick={() => {
                 disconnect({
-                  chainId: chain.chainId,
+                  chainId: [chain.chainId],
                 });
               }}
               size="xs"

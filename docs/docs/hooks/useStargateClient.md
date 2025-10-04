@@ -1,54 +1,67 @@
 # useStargateClient
 
-Hook to retrieve a StargateClient.
+Hook to retrieve a StargateClient. Returns clients in a `Record<chainId, StargateClient>` format.
 
-#### Usage
-
-##### Single Chain
+## Usage
 
 ```tsx
 import { useStargateClient } from "graz";
 
 function App() {
-  const { data: client, isFetching, refetch, ... } = useStargateClient();
-
-  async function getAccountFromClient() {
-    return await client.getAccount("address")
-  }
-}
-```
-
-##### Multi Chain
-
-```tsx
-import { useStargateClient } from "graz";
-
-function App() {
-  const { data: client, isFetching, refetch, ... } = useStargateClient({
-    chainId: ["cosmoshub-4", "sommelier-1"],
-    multiChain: true
+  const { data: clients, isFetching, refetch } = useStargateClient({
+    chainId: ["cosmoshub-4", "osmosis-1"],
   });
 
-  async function getAccountFromClient() {
-    return await client["cosmoshub-4"].getAccount("address")
+  async function getAccountsFromClients() {
+    const cosmosClient = clients?.["cosmoshub-4"];
+    const osmosisClient = clients?.["osmosis-1"];
+
+    if (!cosmosClient || !osmosisClient) return;
+
+    const cosmosAccount = await cosmosClient.getAccount("cosmos1...");
+    const osmosisAccount = await osmosisClient.getAccount("osmo1...");
+
+    return { cosmosAccount, osmosisAccount };
   }
+
+  return <div>...</div>;
 }
 ```
 
-#### Hook Params
+### All Active Chains
 
 ```tsx
-<TMultiChain extends boolean>{
-  chainId?: string | string[];
-  multiChain?: TMultiChain; // boolean
+import { useStargateClient } from "graz";
+
+function App() {
+  // Without chainId, uses all active chains
+  const { data: clients } = useStargateClient();
+
+  return (
+    <div>
+      {clients && Object.entries(clients).map(([chainId, client]) => (
+        <div key={chainId}>
+          Client ready for {chainId}
+        </div>
+      ))}
+    </div>
+  );
 }
 ```
 
-#### Return Value
+## Hook Params
 
 ```tsx
 {
-  data?: TMultiChain extends true ? Record<string, StargateClient> : StargateClient;
+  chainId?: string[]; // Array of chain IDs, defaults to active chains
+}
+```
+
+## Return Value
+
+```tsx
+{
+  data?: Record<string, StargateClient>; // StargateClient from @cosmjs/stargate
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -62,12 +75,11 @@ function App() {
   isLoadingError: boolean;
   isPaused: boolean;
   isPlaceholderData: boolean;
-  isPreviousData: boolean;
   isRefetchError: boolean;
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<TMultiChain extends true ? Record<string, StargateClient> : StargateClient;, unknown>>;
+  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Record<string, StargateClient>, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

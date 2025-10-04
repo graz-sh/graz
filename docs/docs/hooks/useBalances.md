@@ -1,90 +1,83 @@
 # useBalances
 
-Hook to retrieve all balances from current account or given address
+Hook to retrieve all balances from current account or given address. Returns balances in a `Record<chainId, Coin[]>` format.
 
-#### Usage
-
-##### Single chain
+## Usage
 
 ```tsx
 import { useBalances } from "graz";
+
 function App() {
   const { data: balances, isLoading } = useBalances({
+    chainId: ["cosmoshub-4", "osmosis-1"],
     bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
   });
 
   return (
     <div>
-      Balances:
+      <h3>Balances</h3>
       {isLoading ? (
-        "Fetching balances..."
+        "Loading..."
       ) : (
-        <ul>
-          {balances?.map((coin) => (
-            <li key={coin.denom}>
-              {coin.amount} {coin.denom}
-            </li>
-          ))}
-        </ul>
+        balances && Object.entries(balances).map(([chainId, coins]) => (
+          <div key={chainId}>
+            <h4>{chainId}</h4>
+            <ul>
+              {coins?.map((coin) => (
+                <li key={coin.denom}>
+                  {coin.amount} {coin.denom}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
       )}
     </div>
   );
 }
 ```
 
-##### Multi chain
-
-`useBalances` address handles multi chain addresses, so you need only to pass 1 chain address it will automatically convert address in other chain
+### Connected Account
 
 ```tsx
-import { useBalances } from "graz";
-function App() {
-  const { data: balances, isLoading } = useBalances({
-    bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
-    chainId: ["cosmoshub-4", "sommelier-1"],
-    multiChain: true,
+import { useBalances, useAccount } from "graz";
+
+function MyBalances() {
+  const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+
+  // bech32Address is optional - uses connected account if not provided
+  const { data: balances } = useBalances({
+    chainId: ["cosmoshub-4"],
   });
+
+  const cosmosBalances = balances?.["cosmoshub-4"];
 
   return (
     <div>
-      Balances:
-      {isLoading ? (
-        "Fetching balances..."
-      ) : balances && Object.entries(balances).map([chainId, coins] => {
-          return(
-            <div>
-              <p>{chainId} balances</p>
-              <ul>
-                {coins?.map((coin) => (
-                  <li key={coin.denom}>
-                    {coin.amount} {coin.denom}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })
-      }
+      {cosmosBalances?.map((coin) => (
+        <div key={coin.denom}>
+          {coin.amount} {coin.denom}
+        </div>
+      ))}
     </div>
   );
 }
 ```
 
-#### Hook Params
-
-```tsx
-<TMultiChain extends boolean>{
-  chainId?: string | string[];
-  multiChain?: TMultiChain; // boolean
-  bech32Address?: string // Optional bech32 account address, defaults to connected account address
-}
-```
-
-#### Return Value
+## Hook Params
 
 ```tsx
 {
-  data: TMultiChain extends true ? Record<string,  Coin[]> :  Coin[]; // from @cosmjs/proto-signing
+  chainId?: string[]; // Array of chain IDs
+  bech32Address?: string; // Optional address, defaults to connected account
+}
+```
+
+## Return Value
+
+```tsx
+{
+  data?: Record<string, Coin[]>; // Coin from @cosmjs/proto-signing
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -98,12 +91,11 @@ function App() {
   isLoadingError: boolean;
   isPaused: boolean;
   isPlaceholderData: boolean;
-  isPreviousData: boolean;
   isRefetchError: boolean;
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<TMultiChain extends true ? Record<string,  Coin[]> :  Coin[], unknown>>;
+  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Record<string, Coin[]>, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

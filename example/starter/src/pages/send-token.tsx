@@ -1,14 +1,17 @@
-import { Box, Button, FormControl, FormLabel, Heading, Input, Select, Stack, useToast } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormLabel, Heading, HStack, Input, Select, Stack, useToast } from "@chakra-ui/react";
 import { useStargateSigningClient } from "graz";
 import { useAccount, useActiveChains, useSendTokens } from "graz";
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageNavigation } from "src/ui/core/page-navigation";
 
 const SendToken = () => {
-  const { data: accountData, isConnected } = useAccount();
+  // NEW API: Hooks return Record format
+  const { data: accounts, isConnected } = useAccount();
   const activeChains = useActiveChains();
   const toast = useToast();
-  const { data: signingClient } = useStargateSigningClient();
+
+  const { data: signingClients } = useStargateSigningClient();
 
   const { sendTokensAsync, isLoading } = useSendTokens({
     onError: (_, data) => {
@@ -22,11 +25,19 @@ const SendToken = () => {
   });
 
   const [formData, setFormData] = useState({
+    chainId: "",
     coin: "",
     recipientAddress: "",
     amount: "",
     memo: "",
   });
+
+  // Get account and signing client for selected chain
+  const accountData = formData.chainId ? accounts?.[formData.chainId] : undefined;
+  const signingClient = formData.chainId ? signingClients?.[formData.chainId] : undefined;
+
+  // Get selected chain info
+  const selectedChain = activeChains?.find((chain) => chain.chainId === formData.chainId);
 
   const handleSubmit = (event: FormEvent) => {
     const fee = {
@@ -38,8 +49,10 @@ const SendToken = () => {
     const sendToken = async () => {
       try {
         if (!signingClient) throw new Error("signingClient is not ready");
+        if (!accountData) throw new Error("account is not ready");
         const result = await sendTokensAsync({
           signingClient,
+          senderAddress: accountData.bech32Address,
           recipientAddress: formData.recipientAddress,
           amount: [
             {
@@ -87,10 +100,33 @@ const SendToken = () => {
 
   return (
     <Stack spacing={6} w="full">
-      <Heading>Send Token</Heading>
+      <HStack justifyContent="space-between">
+        <Heading size="md">Send Token</Heading>
+        <PageNavigation />
+      </HStack>
       {isConnected ? (
         <Stack as="form" onSubmit={handleSubmit} spacing={4}>
           <FormControl isRequired>
+            <FormLabel>Chain</FormLabel>
+            <Select
+              onChange={(event) =>
+                setFormData({
+                  ...formData,
+                  chainId: event.currentTarget.value,
+                  coin: "", // Reset coin when chain changes
+                })
+              }
+              placeholder="Select chain"
+              value={formData.chainId}
+            >
+              {activeChains?.map((chain) => (
+                <option key={chain.chainId} value={chain.chainId}>
+                  {chain.chainName} ({chain.chainId})
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl isRequired isDisabled={!formData.chainId}>
             <FormLabel>Coin</FormLabel>
             <Select
               onChange={(event) =>
@@ -99,12 +135,12 @@ const SendToken = () => {
                   coin: event.currentTarget.value,
                 })
               }
-              placeholder="Select option"
+              placeholder="Select coin"
               value={formData.coin}
             >
-              {activeChains?.[0]?.currencies.map((currency) => (
+              {selectedChain?.currencies.map((currency) => (
                 <option key={currency.coinMinimalDenom} value={currency.coinMinimalDenom}>
-                  {currency.coinMinimalDenom}
+                  {currency.coinDenom} ({currency.coinMinimalDenom})
                 </option>
               ))}
             </Select>

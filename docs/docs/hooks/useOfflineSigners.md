@@ -1,47 +1,54 @@
 # useOfflineSigners
 
-Hook to retrieve offline signer objects (default, amino enabled, and auto)
+Hook to retrieve offline signer objects (default, amino enabled, and auto). Returns signers in a `Record<chainId, OfflineSigners>` format.
 
-#### Usage
-
-##### Single Chain
+## Usage
 
 ```tsx
 import { useOfflineSigners } from "graz";
 
 function App() {
-  const { data } = useOfflineSigners();
-  data.offlineSigner;
-  data.offlineSignerAmino;
-  data.offlineSignerAuto;
-}
-```
-
-##### Multi Chain
-
-```tsx
-import { useOfflineSigners } from "graz";
-
-function App() {
-  const { data } = useOfflineSigners({
-    chainId: ["cosmoshub-4", "sommelier-1"],
-    multiChain: true,
+  const { data: signers } = useOfflineSigners({
+    chainId: ["cosmoshub-4", "osmosis-1"],
   });
-  const cosmoshubSigner = data?.["cosmoshub-4"].offlineSignerAuto;
-  const sommSigner = data?.["sommelier-1"].offlineSignerAuto;
+
+  const cosmoshubSigner = signers?.["cosmoshub-4"]?.offlineSignerAuto;
+  const osmosisSigner = signers?.["osmosis-1"]?.offlineSignerAuto;
+
+  return <div>Signers ready for {Object.keys(signers || {}).length} chains</div>;
 }
 ```
 
-#### Hook Params
+### All Active Chains
 
 ```tsx
-<TMultiChain extends boolean>{
-  chainId?: string | string[];
-  multiChain?: TMultiChain; // boolean
+import { useOfflineSigners } from "graz";
+
+function App() {
+  // Without chainId, uses all active chains
+  const { data: signers } = useOfflineSigners();
+
+  return (
+    <div>
+      {signers && Object.entries(signers).map(([chainId, signer]) => (
+        <div key={chainId}>
+          {chainId} signer ready
+        </div>
+      ))}
+    </div>
+  );
 }
 ```
 
-#### Types
+## Hook Params
+
+```tsx
+{
+  chainId?: string[]; // Array of chain IDs, defaults to active chains
+}
+```
+
+## Types
 
 ```ts
 interface OfflineSigners {
@@ -51,11 +58,11 @@ interface OfflineSigners {
 }
 ```
 
-#### Return Value
+## Return Value
 
 ```tsx
 {
-  data: TMultiChain extends true ? Record<string,  OfflineSigners> :  OfflineSigners; // from @cosmjs/proto-signing
+  data?: Record<string, OfflineSigners>; // From @cosmjs/proto-signing
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -69,12 +76,11 @@ interface OfflineSigners {
   isLoadingError: boolean;
   isPaused: boolean;
   isPlaceholderData: boolean;
-  isPreviousData: boolean;
   isRefetchError: boolean;
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<TMultiChain extends true ? Record<string,  OfflineSigners> :  OfflineSigners, unknown>>;
+  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Record<string, OfflineSigners>, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

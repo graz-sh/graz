@@ -2,7 +2,7 @@
 
 hook to retrieve last connected chainIds
 
-#### Usage
+## Usage
 
 ```tsx
 import { useRecentChainIds } from "graz";
@@ -18,7 +18,7 @@ function App() {
 }
 ```
 
-#### Return Value
+## Return Value
 
 ```tsx
 string[] | undefined; // @keplr-wallet/types

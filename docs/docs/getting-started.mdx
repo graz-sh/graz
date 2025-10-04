@@ -8,102 +8,404 @@ import CodeBlock from "@theme/CodeBlock";
 
 # Getting Started
 
-## Requirements
+This guide will walk you through setting up `graz` in your React application, from installation to your first wallet connection.
 
-`graz` requires `react@>=17` due to using [function components and hooks](https://reactjs.org/blog/2019/02/06/react-v16.8.0.html) and the [new JSX transform](https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html).
+## What You'll Build
 
-## Installation
+By the end of this guide, you'll have a React app that can:
+- Connect to Cosmos wallets (Keplr, Leap, etc.)
+- Display user account information
+- Query balances
+- Handle multi-chain connections
 
-Install `graz`
+## Prerequisites
+
+- **React** `>=17` - Using function components and hooks
+- **Node.js** `>=14` - For package management
+- Basic knowledge of React and TypeScript
+
+## Step 1: Installation
+
+Install `graz` and its peer dependencies:
+
+<Tabs>
+<TabItem value="npm" label="npm">
 
 ```shell
-# using npm
+# Install graz
 npm install graz
 
-# using yarn
-yarn add graz
-
-# using pnpm
-pnpm add graz
+# Install peer dependencies
+npm install @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding @tanstack/react-query
 ```
 
-## Install peer dependencies
-
-To avoid version mismatch we decided to make these packages as peer dependencies:
+</TabItem>
+<TabItem value="yarn" label="yarn">
 
 ```shell
-# using npm
-npm install @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding
+# Install graz
+yarn add graz
 
-# using yarn
-yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding
-
-# using pnpm
-pnpm add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding
+# Install peer dependencies
+yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding @tanstack/react-query
 ```
 
-## Quick start
+</TabItem>
+<TabItem value="pnpm" label="pnpm">
 
-### 1. Wrap app with `<GrazProvider />`
+```shell
+# Install graz
+pnpm add graz
 
-```jsx
-import { GrazProvider } from "graz";
-
-function App() {
-  return (
-    <GrazProvider>
-      <Wallet />
-    </GrazProvider>
-  );
-}
+# Install peer dependencies
+pnpm add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding @tanstack/react-query
 ```
 
-### 2. Configure `grazOptions`
+</TabItem>
+</Tabs>
 
-```tsx
+:::tip Why peer dependencies?
+We keep CosmJS and React Query as peer dependencies to avoid version conflicts and reduce bundle size. This gives you control over which versions to use.
+:::
+
+## Step 2: Configure Chain Information
+
+Create a chain configuration file. You can use the [chain registry](https://github.com/cosmos/chain-registry) or define your own:
+
+```ts title="config/chains.ts"
 import { ChainInfo } from "@keplr-wallet/types";
-import { GrazProvider } from "graz";
 
-const cosmoshub: ChainInfo = {
+export const cosmoshub: ChainInfo = {
   chainId: "cosmoshub-4",
   chainName: "Cosmos Hub",
-  //... rest of cosmoshub ChainInfo
+  rpc: "https://rpc.cosmos.network",
+  rest: "https://lcd.cosmos.network",
+  bip44: {
+    coinType: 118,
+  },
+  bech32Config: {
+    bech32PrefixAccAddr: "cosmos",
+    bech32PrefixAccPub: "cosmospub",
+    bech32PrefixValAddr: "cosmosvaloper",
+    bech32PrefixValPub: "cosmosvaloperpub",
+    bech32PrefixConsAddr: "cosmosvalcons",
+    bech32PrefixConsPub: "cosmosvalconspub",
+  },
+  currencies: [
+    {
+      coinDenom: "ATOM",
+      coinMinimalDenom: "uatom",
+      coinDecimals: 6,
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: "ATOM",
+      coinMinimalDenom: "uatom",
+      coinDecimals: 6,
+      gasPriceStep: {
+        low: 0.01,
+        average: 0.025,
+        high: 0.03,
+      },
+    },
+  ],
+  stakeCurrency: {
+    coinDenom: "ATOM",
+    coinMinimalDenom: "uatom",
+    coinDecimals: 6,
+  },
 };
+```
+
+:::tip Quick Chain Info
+Use the [graz CLI](./generate-chain-info) to quickly generate chain configurations from the chain registry.
+:::
+
+## Step 3: Set Up Providers
+
+Wrap your application with both `QueryClientProvider` and `GrazProvider`:
+
+```tsx title="App.tsx"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GrazProvider } from "graz";
+import { cosmoshub } from "./config/chains";
+
+// Create a query client instance
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <GrazProvider
-      grazOptions={{
-        chains: [cosmoshub],
-      }}
-    >
-      <Wallet />
-    </GrazProvider>
+    <QueryClientProvider client={queryClient}>
+      <GrazProvider
+        grazOptions={{
+          chains: [cosmoshub],
+        }}
+      >
+        <YourApp />
+      </GrazProvider>
+    </QueryClientProvider>
   );
 }
 ```
 
-### 3. You're good to go!
+### Provider Options
 
-Use hooks! Every component inside the GrazProvider is now set up to use the graz hooks.
+Configure `graz` behavior through `grazOptions`:
 
-```jsx
+```tsx
+<GrazProvider
+  grazOptions={{
+    chains: [cosmoshub, osmosis],
+    chainsConfig: {
+      "cosmoshub-4": {
+        gas: { price: "0.025", denom: "uatom" },
+        rpcHeaders: { "X-Custom-Header": "value" },
+      },
+    },
+    defaultWalletType: WalletType.KEPLR,
+  }}
+>
+```
+
+## Step 4: Build Your First Component
+
+Create a wallet connection component using graz hooks:
+
+```tsx title="components/WalletConnect.tsx"
 import { useAccount, useConnect, useDisconnect } from "graz";
 
-function Wallet() {
+export function WalletConnect() {
   const { connect, status } = useConnect();
-  const { data: account, isConnected } = useAccount();
+  const { data: accounts, isConnected } = useAccount({
+    chainId: ["cosmoshub-4"],
+  });
   const { disconnect } = useDisconnect();
 
-  function handleConnect() {
-    return isConnected ? disconnect() : connect();
-  }
+  // Extract the account for Cosmos Hub
+  const account = accounts?.["cosmoshub-4"];
+
+  const handleConnect = () => {
+    if (isConnected) {
+      disconnect();
+    } else {
+      connect({ chainId: ["cosmoshub-4"] });
+    }
+  };
 
   return (
     <div>
-      {account ? `Connected to ${account.bech32Address}` : status}
-      <button onClick={handleConnect}>{isConnected ? "Disconnect" : "Connect"}</button>
+      <h2>Wallet Status</h2>
+
+      {account ? (
+        <div>
+          <p>Connected to: {account.bech32Address}</p>
+          <p>Name: {account.name}</p>
+          <button onClick={handleConnect}>Disconnect</button>
+        </div>
+      ) : (
+        <div>
+          <p>Status: {status}</p>
+          <button onClick={handleConnect}>Connect Wallet</button>
+        </div>
+      )}
     </div>
   );
 }
 ```
+
+## Step 5: Query Balances
+
+Add balance queries to your component:
+
+```tsx title="components/BalanceDisplay.tsx"
+import { useAccount, useBalance } from "graz";
+
+export function BalanceDisplay() {
+  const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+  const { data: balances, isLoading } = useBalance({
+    chainId: ["cosmoshub-4"],
+    denom: "uatom",
+  });
+
+  const account = accounts?.["cosmoshub-4"];
+  const balance = balances?.["cosmoshub-4"];
+
+  if (!account) return <p>Please connect your wallet</p>;
+
+  return (
+    <div>
+      <h3>Your Balance</h3>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <p>
+          {(Number(balance?.amount) / 1_000_000).toFixed(6)} ATOM
+        </p>
+      )}
+    </div>
+  );
+}
+```
+
+## Multi-Chain Applications
+
+Connect to multiple chains simultaneously:
+
+```tsx title="components/MultiChainWallet.tsx"
+import { useAccount, useConnect, useBalance } from "graz";
+
+export function MultiChainWallet() {
+  const { connect } = useConnect();
+  const { data: accounts } = useAccount({
+    chainId: ["cosmoshub-4", "osmosis-1"],
+  });
+  const { data: balances } = useBalance({
+    chainId: ["cosmoshub-4", "osmosis-1"],
+    denom: "uatom",
+  });
+
+  const handleConnect = () => {
+    connect({ chainId: ["cosmoshub-4", "osmosis-1"] });
+  };
+
+  return (
+    <div>
+      <button onClick={handleConnect}>Connect Multi-Chain</button>
+
+      {accounts && Object.entries(accounts).map(([chainId, account]) => (
+        <div key={chainId}>
+          <h3>{chainId}</h3>
+          <p>Address: {account.bech32Address}</p>
+          <p>Balance: {balances?.[chainId]?.amount}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+## Next Steps
+
+Now that you have a working setup, explore more features:
+
+### Learn Core Concepts
+- 📖 [Multi-Chain Guide](./guides/multi-chain) - Work with multiple chains
+- 🔗 [Wallet Connect Guide](./wallet-connect) - WalletConnect integration
+- 🎯 [Specific Wallet Guide](./guides/connect-specific-wallet) - Target specific wallets
+
+### Explore Hooks
+- 🪝 [useAccount](./hooks/useAccount) - Account information
+- 💰 [useBalance](./hooks/useBalance) - Query balances
+- 📤 [useSendTokens](./hooks/useSendTokens) - Send transactions
+- 📜 [useExecuteContract](./hooks/useExecuteContract) - Smart contract interactions
+
+### Advanced Topics
+- ⚙️ [Generate Chain Info](./generate-chain-info) - CLI tool for chain configs
+- 🔧 [Provider Configuration](./provider/grazProvider) - Advanced provider options
+- 📋 [Migration Guide](./migration-guide) - Upgrade from older versions
+
+## Common Patterns
+
+### Handle Loading States
+
+```tsx
+function Component() {
+  const { data: accounts, isLoading, isConnecting } = useAccount({
+    chainId: ["cosmoshub-4"],
+  });
+
+  if (isLoading || isConnecting) return <Spinner />;
+  if (!accounts) return <ConnectPrompt />;
+
+  return <YourComponent account={accounts["cosmoshub-4"]} />;
+}
+```
+
+### Error Handling
+
+```tsx
+function Component() {
+  const { connect } = useConnect({
+    onError: (error) => {
+      console.error("Connection failed:", error);
+      toast.error("Failed to connect wallet");
+    },
+    onSuccess: (data) => {
+      console.log("Connected:", data.accounts);
+      toast.success("Wallet connected!");
+    },
+  });
+
+  return <button onClick={() => connect({ chainId: ["cosmoshub-4"] })}>Connect</button>;
+}
+```
+
+### Refetch Data
+
+```tsx
+function Component() {
+  const { data: balance, refetch } = useBalance({
+    chainId: ["cosmoshub-4"],
+    denom: "uatom",
+  });
+
+  return (
+    <div>
+      <p>Balance: {balance?.["cosmoshub-4"]?.amount}</p>
+      <button onClick={() => refetch()}>Refresh</button>
+    </div>
+  );
+}
+```
+
+## Troubleshooting
+
+### Wallet Not Detected
+
+Make sure users have the wallet extension installed:
+
+```tsx
+import { useCheckWallet, WalletType } from "graz";
+
+function Component() {
+  const { data: isKeplrInstalled } = useCheckWallet(WalletType.KEPLR);
+
+  if (!isKeplrInstalled) {
+    return (
+      <a href="https://www.keplr.app/" target="_blank">
+        Install Keplr Wallet
+      </a>
+    );
+  }
+
+  return <ConnectButton />;
+}
+```
+
+### Chain Not Configured
+
+If a chain isn't in the wallet, use `useSuggestChain`:
+
+```tsx
+import { useSuggestChainAndConnect } from "graz";
+
+function Component() {
+  const { suggestAndConnect } = useSuggestChainAndConnect();
+
+  const handleConnect = () => {
+    suggestAndConnect({
+      chainInfo: myCustomChain,
+      walletType: WalletType.KEPLR,
+    });
+  };
+
+  return <button onClick={handleConnect}>Connect</button>;
+}
+```
+
+## Need Help?
+
+- 💬 [GitHub Discussions](https://github.com/graz-sh/graz/discussions)
+- 🐛 [Report Issues](https://github.com/graz-sh/graz/issues)
+- 📖 [Full Documentation](https://graz.sh)

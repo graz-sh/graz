@@ -61,7 +61,7 @@ import { para } from "@/lib/para/client"; // From Step 2
 import { ParaGrazConfig } from "@getpara/graz-integration";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GrazProvider } from "graz"; // Note: Use "graz" import path
-import { cosmosicsprovidertestnet } from "graz/chains"; // Example chain; adjust as needed
+import { cosmoshub } from "graz/chains"; // Example chain; adjust as needed
 import { PropsWithChildren } from "react";
 
 const queryClient = new QueryClient();
@@ -77,7 +77,7 @@ export const Provider: React.FC<PropsWithChildren> = ({ children }) => {
     <QueryClientProvider client={queryClient}>
       <GrazProvider
         grazOptions={{
-          chains: [cosmosicsprovidertestnet], // Add your chains
+          chains: [cosmoshub], // Add your chains
           paraConfig,
         }}
       >
@@ -117,18 +117,26 @@ Example in a header component:
 import { useAccount, useConnect, WalletType } from "graz";
 
 export default function Header() {
-  const { data: account, isConnected } = useAccount();
+  const { data: accounts, isConnected } = useAccount({
+    chainId: ["cosmoshub-4"], // Use your configured chain
+  });
   const { connect } = useConnect();
 
+  // Extract account for the specific chain
+  const account = accounts?.["cosmoshub-4"];
+
   const handleConnect = () => {
-    connect({ walletType: WalletType.PARA }); // Triggers Para modal if needed
+    connect({
+      chainId: ["cosmoshub-4"],
+      walletType: WalletType.PARA
+    }); // Triggers Para modal if needed
   };
 
   return (
     <header>
-      {isConnected ? (
+      {isConnected && account ? (
         <button>
-          Connected: {account?.bech32Address?.slice(0, 12)}...{account?.bech32Address?.slice(-6)}
+          Connected: {account.bech32Address.slice(0, 12)}...{account.bech32Address.slice(-6)}
         </button>
       ) : (
         <button onClick={handleConnect}>Connect Para Wallet</button>

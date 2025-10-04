@@ -39,7 +39,11 @@
     "cli": "node dist/cli.js",
     "dev": "tsup --watch",
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui"
   },
   "peerDependencies": {
     "@tanstack/react-query": ">=5.62.0",
@@ -64,6 +68,7 @@
     "@walletconnect/modal": "2.7.0",
     "cosmos-directory-client": "0.0.6",
     "long": "4",
+    "p-map": "^7.0.0",
     "starknet": "^6",
     "zustand": "5.0.4"
   },
@@ -71,9 +76,12 @@
     "@types/node": "^18.17.15",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
+    "@vitest/ui": "^1.0.0",
     "arg": "^5.0.2",
+    "jsdom": "^23.0.0",
     "react": "^18.2.0",
     "typescript": "^5.4.0",
+    "vitest": "^1.0.0",
     "@getpara/graz-connector": ">=2.0.0-alpha.51 <2.0.0-beta",
     "@getpara/graz-integration": ">=2.0.0-alpha.51 <2.0.0-beta"
   },

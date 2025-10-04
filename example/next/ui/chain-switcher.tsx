@@ -7,10 +7,13 @@ export const ChainSwitcher: FC = () => {
   const {
     isConnecting,
     isReconnecting,
-    data: account,
+    data: accounts,
   } = useAccount({
-    chainId: osmosistestnet.chainId,
+    chainId: [osmosistestnet.chainId],
   });
+
+  // Extract account from Record using the chain ID
+  const account = accounts?.[osmosistestnet.chainId];
 
   const { suggestAndConnect } = useSuggestChainAndConnect();
 

@@ -8,9 +8,13 @@ import { ConnectStatus } from "ui/connect-status";
 import { ToggleTheme } from "ui/toggle-theme";
 
 const HomePage: NextPage = () => {
-  const { data: accountData } = useAccount({
-    chainId: "cosmoshub-4",
+  // NEW API: useAccount returns Record<chainId, Key>
+  const { data: accounts } = useAccount({
+    chainId: ["cosmoshub-4"], // chainId now requires array
   });
+
+  // Extract account from Record using the chain ID
+  const accountData = accounts?.["cosmoshub-4"];
 
   return (
     <Center minH="100vh">

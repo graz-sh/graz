@@ -4,7 +4,7 @@ You can connect to a specific wallet by using the `useConnect` hook. You can con
 
 Read more about [wallet types](../types/walletType.md).
 
-### Set default wallet
+## Set default wallet
 
 You can set a default wallet type by passing the `defaultWalletType` parameter into `grazProvider` in `<GrazProvider/>`.
 
@@ -30,11 +30,11 @@ You don't need to pass the walletType parameter to the connect function, it will
 ```tsx
 const Connect = () => {
   const { connect } = useConnect();
-  return <button onClick={() => connect({ chainId: "cosmoshub-4" })}>Connect</button>;
+  return <button onClick={() => connect({ chainId: ["cosmoshub-4"] })}>Connect</button>;
 };
 ```
 
-### Connect to a specific wallet
+## Connect to a specific wallet
 
 Here is our list of supported wallets: [WalletType](../types/walletType.md).
 
@@ -42,11 +42,11 @@ Here is our list of supported wallets: [WalletType](../types/walletType.md).
 import { WalletType } from "graz";
 const Connect = () => {
   const { connect } = useConnect();
-  return <button onClick={() => connect({ chainId: "cosmoshub-4", walletType: WalletType.LEAP })}>Connect</button>;
+  return <button onClick={() => connect({ chainId: ["cosmoshub-4"], walletType: WalletType.LEAP })}>Connect</button>;
 };
 ```
 
-### Check if wallet supported
+## Check if wallet supported
 
 ```tsx
 import { WalletType, checkWallet } from "graz";
@@ -56,13 +56,13 @@ const isKeplrSupported = checkWallet(WalletType.KEPLR);
 return (
   <>
     {isKeplrSupported && (
-      <button onClick={() => connect({ chainId: "cosmoshub-4", walletType: WalletType.KEPLR })}>Connect</button>
+      <button onClick={() => connect({ chainId: ["cosmoshub-4"], walletType: WalletType.KEPLR })}>Connect</button>
     )}
   </>
 );
 ```
 
-### List all wallet
+## List all wallet
 
 We have `WALLET_TYPES` it's an array of WalletType.
 
@@ -78,7 +78,7 @@ export const SupportedWallet = () => {
   return (
     <div>
       {WALLET_TYPES.map((name) => (
-        <button onClick={connect({ chainId: "cosmoshub-4", walletType: name })} key={name}>
+        <button onClick={() => connect({ chainId: ["cosmoshub-4"], walletType: name })} key={name}>
           {name}
         </button>
       ))}
@@ -87,7 +87,7 @@ export const SupportedWallet = () => {
 };
 ```
 
-### List all wallets but show only supported wallet
+## List all wallets but show only supported wallet
 
 You can combine `WALLET_TYPES` and `checkWallet` to show only supported wallets.
 
@@ -99,7 +99,7 @@ export const SupportedWallet = () => {
   return (
     <div>
       {WALLET_TYPES.filter((name) => checkWallet(name)).map((name) => (
-        <button onClick={connect({ chainId: "cosmoshub-4", walletType: name })} key={name}>
+        <button onClick={() => connect({ chainId: ["cosmoshub-4"], walletType: name })} key={name}>
           {name}
         </button>
       ))}

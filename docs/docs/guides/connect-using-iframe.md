@@ -2,7 +2,7 @@
 
 First you have to set the allowed origins for the iframe wallet, then you can connect.
 
-### Pass allowed iframe parent origins to `grazOptions` in `GrazProvider`
+## Pass allowed iframe parent origins to `grazOptions` in `GrazProvider`
 
 Graz using [cosmiframe](https://github.com/DA0-DA0/cosmiframe) for establishing a Cosmos wallet connection through an iframe.
 
@@ -23,7 +23,7 @@ Cosmiframe enforces security by requiring you to specify allowed origins in the 
 </GrazProvider>
 ```
 
-### Connect
+## Connect
 
 Here is our list of supported wallets: [WalletType](../types/walletType.md).
 
@@ -32,12 +32,12 @@ import { WalletType } from "graz";
 const Connect = () => {
   const { connect } = useConnect();
   return (
-    <button onClick={() => connect({ chainId: "cosmoshub-4", walletType: WalletType.COSMIFRAME })}>Connect</button>
+    <button onClick={() => connect({ chainId: ["cosmoshub-4"], walletType: WalletType.COSMIFRAME })}>Connect</button>
   );
 };
 ```
 
-### Check if iframe wallet available
+## Check if iframe wallet available
 
 ```tsx
 import { WalletType, checkWallet } from "graz";
@@ -47,7 +47,7 @@ const isIframeAvailable = checkWallet(WalletType.COSMIFRAME);
 return (
   <>
     {isIframeAvailable && (
-      <button onClick={() => connect({ chainId: "cosmoshub-4", walletType: WalletType.COSMIFRAME })}>Connect</button>
+      <button onClick={() => connect({ chainId: ["cosmoshub-4"], walletType: WalletType.COSMIFRAME })}>Connect</button>
     )}
   </>
 );

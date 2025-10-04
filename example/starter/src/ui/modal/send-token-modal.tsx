@@ -21,21 +21,29 @@ import { useState } from "react";
 
 export const SendTokenModal = ({ chain }: { chain: ChainInfo }) => {
   const toast = useToast();
-  const { data: account } = useAccount({
-    chainId: chain.chainId,
+  // NEW API: chainId must be an array, hooks return Record format
+  const { data: accounts } = useAccount({
+    chainId: [chain.chainId],
   });
+  const account = accounts?.[chain.chainId]; // Extract from Record
+
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   const coin = chain.stakeCurrency;
-  const balance = useBalance({
-    chainId: chain.chainId,
+  const balanceQuery = useBalance({
+    chainId: [chain.chainId],
     bech32Address: account?.bech32Address,
     denom: coin.coinMinimalDenom,
   });
+  const balance = {
+    ...balanceQuery,
+    data: balanceQuery.data?.[chain.chainId], // Extract from Record
+  };
 
-  const { data: signingClient, isLoading: isSCLoading } = useStargateSigningClient({
-    chainId: chain.chainId,
+  const { data: signingClients, isLoading: isSCLoading } = useStargateSigningClient({
+    chainId: [chain.chainId],
   });
+  const signingClient = signingClients?.[chain.chainId]; // Extract from Record
 
   const { isLoading, sendTokensAsync } = useSendTokens({
     onSuccess: () => {

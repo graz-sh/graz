@@ -11,7 +11,7 @@ With `graz generate` you can generate mainnet and testnet chain `ChainInfo` dire
 yarn graz generate
 ```
 
-#### Options:
+## Options:
 
 ```shell
 
@@ -19,7 +19,7 @@ yarn graz generate
   -h, --help            Show this help message
 ```
 
-#### Generate options:
+## Generate options:
 
 ```shell
   -b, --best            Set REST and RPC endpoint to best available nodes instead or first listed ones
@@ -29,7 +29,7 @@ yarn graz generate
 
 ```
 
-#### Add it to your project
+## Add it to your project
 
 in your package.json add it to in your install or postInstall scripts
 
@@ -43,7 +43,7 @@ in your package.json add it to in your install or postInstall scripts
 }
 ```
 
-#### Import generated chains
+## Import generated chains
 
 After you generate `ChainInfo` you can use it in you project
 

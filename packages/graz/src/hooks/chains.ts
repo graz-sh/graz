@@ -88,7 +88,7 @@ export const useChainInfos = ({ chainId }: { chainId?: string[] }) => {
  */
 export const useActiveChainCurrency = ({ denom }: { denom: string }): UseQueryResult<AppCurrency | undefined> => {
   const chains = useActiveChains();
-  const queryKey = ["USE_ACTIVE_CHAIN_CURRENCY", denom] as const;
+  const queryKey = ["USE_ACTIVE_CHAIN_CURRENCY", denom];
   const query = useQuery({
     queryKey,
     queryFn: ({ queryKey: [, _denom] }) =>
@@ -117,12 +117,12 @@ export const useQueryClientValidators = <T extends QueryClient & StakingExtensio
   status?: BondStatusString;
 }): UseQueryResult<QueryValidatorsResponse> => {
   const status = args.status ?? "BOND_STATUS_BONDED";
-  const queryKey = ["USE_ACTIVE_CHAIN_VALIDATORS", args.queryClient, status] as const;
+  const queryKey = ["USE_ACTIVE_CHAIN_VALIDATORS", args.queryClient, status];
   const query = useQuery({
     queryKey,
-    queryFn: async ({ queryKey: [, _queryClient, _status] }) => {
-      if (!_queryClient) throw new Error("Query client is not defined");
-      const res = await _queryClient.staking.validators(_status);
+    queryFn: async () => {
+      if (!args.queryClient) throw new Error("Query client is not defined");
+      const res = await args.queryClient.staking.validators(status);
       return res;
     },
     enabled: typeof args.queryClient !== "undefined",

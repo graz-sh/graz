@@ -8,20 +8,27 @@ import {
   ModalOverlay,
   Stack,
   Text,
+  Tooltip,
   useDisclosure,
 } from "@chakra-ui/react";
 import type { ChainInfo } from "@graz-sh/types";
 import { useAccount, useBalances } from "graz";
+import { truncateDenom } from "src/utils/truncateDenom";
 
 export const AllBalancesModal = ({ chain }: { chain: ChainInfo }) => {
   const modal = useDisclosure();
-  const { data: account } = useAccount({
-    chainId: chain.chainId,
+  // NEW API: chainId must be an array, hooks return Record format
+  const { data: accounts } = useAccount({
+    chainId: [chain.chainId],
   });
-  const { data: balances } = useBalances({
-    chainId: chain.chainId,
+  const account = accounts?.[chain.chainId]; // Extract from Record
+
+  const { data: balancesRecord } = useBalances({
+    chainId: [chain.chainId],
     bech32Address: account?.bech32Address,
   });
+  const balances = balancesRecord?.[chain.chainId]; // Extract from Record
+
   return (
     <>
       <Button onClick={modal.onOpen} size="xs">
@@ -42,11 +49,11 @@ export const AllBalancesModal = ({ chain }: { chain: ChainInfo }) => {
                       <Text fontFamily="mono" fontWeight="bold">
                         {Number(balance.amount)}
                       </Text>
-                      <Text fontFamily="mono" fontWeight="semibold" textTransform="uppercase">
-                        {balance.denom.length > 5
-                          ? `${balance.denom.slice(0, 6)}...${balance.denom.slice(-6)}`
-                          : balance.denom}
-                      </Text>
+                      <Tooltip label={balance.denom} placement="top" hasArrow>
+                        <Text fontFamily="mono" fontWeight="semibold" textTransform="uppercase">
+                          {truncateDenom(balance.denom)}
+                        </Text>
+                      </Tooltip>
                     </HStack>
                   );
                 })}

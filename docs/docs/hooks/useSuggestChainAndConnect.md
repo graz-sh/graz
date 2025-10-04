@@ -2,7 +2,7 @@
 
 mutation hook for [Suggesting a chain](useSuggestChain.md) and [connect](./useConnect.md) to a wallet in one hook.
 
-#### Usage
+## Usage
 
 ```tsx
 import { Bech32Address } from "@keplr-wallet/cosmos";
@@ -49,7 +49,7 @@ function App() {
 }
 ```
 
-#### Types
+## Types
 
 - `SuggestChainAndConnectArgs`
   ```tsx
@@ -65,7 +65,7 @@ function App() {
   }
   ```
 
-#### Hook Params
+## Hook Params
 
 ```ts
 {
@@ -78,7 +78,7 @@ function App() {
               }) => void}
 ```
 
-#### Types
+## Types
 
 ```ts
 interface SuggestChainAndConnectArgs {
@@ -88,7 +88,7 @@ interface SuggestChainAndConnectArgs {
 }
 ```
 
-#### Return Value
+## Return Value
 
 ```tsx
 {

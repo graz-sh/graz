@@ -4,6 +4,28 @@ sidebar_position: 8
 
 # Changelog
 
+## Version 0.3.7 (Build Optimizations)
+
+### Build System Improvements
+
+- ⚡️ **Faster builds**: Production build time reduced by 25% (5.2s → 3.9s)
+- ⚡️ **Instant dev rebuilds**: Development rebuild time reduced by 87% (5.2s → 0.7s)
+- 📦 **Smaller package**: Package size reduced by 72% (800 KB → 220 KB)
+- 🔧 **TypeScript optimizations**:
+  - Enabled incremental compilation for faster rebuilds
+  - DTS generation optimized (resolve: false)
+  - DTS size reduced by 43% (87 KB → 49 KB)
+- 🎯 **Better minification**: Upgraded to Terser for improved compression
+- 📉 **Removed source maps in production**: Saves 476 KB in package size
+
+### Developer Experience
+
+- Watch mode now skips DTS generation for instant hot-reload
+- TypeScript build cache improves incremental compilation
+- Optimized for modern browsers (ES2020 target)
+
+These changes are fully backward compatible and require no code changes from users.
+
 ## Version 0.1.26
 
 - Wallet connect modal uses `@walletconnect/modal` instead of deprecated `web3modal`

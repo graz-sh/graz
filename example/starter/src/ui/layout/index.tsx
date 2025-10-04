@@ -14,9 +14,8 @@ const glowAnimation = keyframes`100% {
 
 export const Layout = ({ children }: { children: ReactNode }) => {
   const toast = useToast();
-  const { isConnected } = useAccount({
-    multiChain: true,
-  });
+  // NEW API: multiChain parameter removed, always returns Record
+  const { isConnected } = useAccount();
   const { disconnect } = useDisconnect({
     onSuccess: () => {
       toast({

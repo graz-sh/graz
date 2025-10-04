@@ -1,59 +1,74 @@
 # useBalance
 
-Hook to retrieve specific asset balance from current account or given address
+Hook to retrieve specific asset balance from current account or given address. Returns balances in a `Record<chainId, Coin>` format.
 
-#### Usage
+## Usage
 
 ```tsx
 import { useBalance } from "graz";
+
 function App() {
-  const {
-    data: balance,
-    isLoading,
-    refetch,
-  } = useBalance({
+  const { data: balances, isLoading, refetch } = useBalance({
+    chainId: ["cosmoshub-4", "osmosis-1"],
     denom: "uatom",
     bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
   });
 
+  const cosmosBalance = balances?.["cosmoshub-4"];
+  const osmosisBalance = balances?.["osmosis-1"];
+
   return (
     <div>
-      Balance:
       {isLoading ? (
-        "Fetching balances..."
+        "Loading..."
       ) : (
-        <span>
-          {balance.amount} {balance.denom}
-        </span>
+        <>
+          <div>Cosmos Hub: {cosmosBalance?.amount} {cosmosBalance?.denom}</div>
+          <div>Osmosis: {osmosisBalance?.amount} {osmosisBalance?.denom}</div>
+        </>
       )}
-      <button
-        onClick={() => {
-          void refetch();
-        }}
-      >
-        Refresh
-      </button>
+      <button onClick={() => void refetch()}>Refresh</button>
     </div>
   );
 }
 ```
 
-#### Hook Params
+### Connected Account
 
-```ts
-{
-  denom: string // Asset denom to search
-  chainId: string
-  bech32Address?: string // Optional bech32 account address, defaults to connected account address
+```tsx
+import { useBalance, useAccount } from "graz";
 
+function MyBalance() {
+  const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+  const account = accounts?.["cosmoshub-4"];
+
+  // bech32Address is optional - uses connected account if not provided
+  const { data: balances } = useBalance({
+    chainId: ["cosmoshub-4"],
+    denom: "uatom",
+  });
+
+  const balance = balances?.["cosmoshub-4"];
+
+  return <div>{balance?.amount} ATOM</div>;
 }
 ```
 
-#### Return Value
+## Hook Params
+
+```ts
+{
+  chainId?: string[]; // Array of chain IDs
+  denom: string; // Asset denom to search
+  bech32Address?: string; // Optional address, defaults to connected account
+}
+```
+
+## Return Value
 
 ```tsx
 {
-  data: Coin | null; // from @cosmjs/proto-signing
+  data?: Record<string, Coin>; // Coin from @cosmjs/proto-signing
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -67,12 +82,11 @@ function App() {
   isLoadingError: boolean;
   isPaused: boolean;
   isPlaceholderData: boolean;
-  isPreviousData: boolean;
   isRefetchError: boolean;
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Coin, unknown>>;
+  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Record<string, Coin>, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

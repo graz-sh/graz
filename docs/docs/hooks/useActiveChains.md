@@ -2,7 +2,7 @@
 
 hook to retrieve connected account's active `ChainInfo`s
 
-#### Usage
+## Usage
 
 ```tsx
 import { useActiveChains } from "graz";
@@ -18,7 +18,7 @@ function App() {
 }
 ```
 
-#### Return Value
+## Return Value
 
 ```tsx
 ChainInfo[] | undefined; // @keplr-wallet/types

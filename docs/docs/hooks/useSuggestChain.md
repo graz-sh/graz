@@ -11,7 +11,7 @@ https://docs.keplr.app/api/suggest-chain.html
 
 :::
 
-#### Usage
+## Usage
 
 You need to populate a full `ChainInfo` record to use `suggest` on `useSuggestChain`
 
@@ -111,7 +111,7 @@ function App() {
 }
 ```
 
-#### Hook Params
+## Hook Params
 
 ```ts
   onError?: (error: unknown, data: ChainInfo) => void
@@ -119,7 +119,7 @@ function App() {
   onSuccess?: (data: chainInfo) => void
 ```
 
-#### Types
+## Types
 
 ```ts
 interface SuggestChainArgs {
@@ -128,7 +128,7 @@ interface SuggestChainArgs {
 }
 ```
 
-#### Return Value
+## Return Value
 
 ```tsx
 {

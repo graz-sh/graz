@@ -8,6 +8,8 @@
 .vercel/
 package-lock.json
 tsconfig.tsbuildinfo
+*.tsbuildinfo
+.tsbuildinfo
 
 # allowed directories/files
 !.gitkeep

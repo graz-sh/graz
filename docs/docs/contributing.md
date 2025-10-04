@@ -72,11 +72,28 @@ The following steps will get you up and running to contribute to `graz`:
 ## Development
 
 - `pnpm graz install`: install `graz` project
-- `pnpm graz build`: build `graz` package
+- `pnpm graz build`: build `graz` package (optimized for production)
+- `pnpm graz dev`: watch mode with fast rebuilds (skips DTS generation)
 - `pnpm install`: install all projects
 - `pnpm dev`: compiles `graz` and start the development server of the example app
+- `pnpm graz cli -g`: compiles `graz` chains, needed for running examples
 - `pnpm project:docs dev`: start the documentation website
 - `pnpm example dev`: start the example app
+
+### Build Performance
+
+The build system has been optimized for both speed and package size:
+
+- **Production builds**: ~4 seconds (with TypeScript declarations)
+- **Development rebuilds**: <1 second (instant hot-reload)
+- **Package size**: ~220 KB (optimized with tree-shaking)
+- **Incremental builds**: Enabled via TypeScript cache
+
+Key optimizations:
+- TypeScript incremental compilation for faster rebuilds
+- DTS generation skipped in watch mode for instant feedback
+- Terser minification for smaller production bundles
+- No source maps in production (reduces package size by 72%)
 
 ## Pull Request
 

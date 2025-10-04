@@ -17,8 +17,9 @@ export const ConnectButton: FC = () => {
   const toast = useToast();
   const { isOpen, onClose, onOpen } = useDisclosure();
 
+  // NEW API: chainId must be an array
   const { isConnected, isConnecting, isReconnecting, reconnect } = useAccount({
-    chainId: "cosmoshub-4",
+    chainId: ["cosmoshub-4"],  // Changed to array format
     onConnect: ({ walletType, chains }) => {
       toast({
         status: "success",
@@ -40,10 +41,10 @@ export const ConnectButton: FC = () => {
   });
 
   const handleConnect = (wallet: WalletType) => {
-    connect({ walletType: wallet, chainId: "cosmoshub-4" });
+    connect({ walletType: wallet, chainId: ["cosmoshub-4"] });
     onClose();
   };
-  
+
   const availableWallets = getAvailableWallets();
   const wallets = Object.entries(availableWallets)
     .filter(([_, isAvailable]) => isAvailable)
@@ -75,7 +76,7 @@ export const ConnectButton: FC = () => {
               <>
                 <Stack spacing={2}>
                   <strong>Social Login</strong>
-                  <Button 
+                  <Button
                     onClick={() => handleConnect(paraWallet.walletType)}
                     colorScheme="blue"
                     width="100%"
@@ -85,7 +86,7 @@ export const ConnectButton: FC = () => {
                 </Stack>
               </>
             )}
-            
+
             {otherWallets.length > 0 && (
               <>
                 {paraWallet && <hr style={{ margin: "16px 0" }} />}

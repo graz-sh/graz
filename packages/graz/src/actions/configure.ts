@@ -18,7 +18,8 @@ export interface ConfigureGrazArgs {
    */
   autoReconnect?: boolean;
   /**
-   * Graz will use this number to determine how many concurrent requests to make when using `multiChain` args in hooks.
+   * Graz will use this number to determine how many concurrent requests to make when querying multiple chains.
+   * All hooks now operate on multiple chains by default (returning Record<chainId, T>).
    * Defaults to 3.
    */
   multiChainFetchConcurrency?: number;

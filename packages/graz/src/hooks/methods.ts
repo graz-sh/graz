@@ -20,25 +20,30 @@ import {
   sendTokens,
 } from "../actions/methods";
 import type { MutationEventArgs } from "../types/hooks";
-import { useAccount } from "./account";
 import { useCosmWasmClient } from "./clients";
 
 /**
- * graz mutation hook to send tokens. Note: if `senderAddress` undefined, it will use current connected account address.
+ * graz mutation hook to send tokens.
  *
  * @example
  * ```ts
- * import { useSendTokens, useStargateSigningClient } from "graz";
+ * import { useSendTokens, useStargateSigningClient, useAccount } from "graz";
  *
- * // basic example
- * const { data: signingClient } = useStargateSigningClient()
+ * // Get the account and signing client
+ * const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+ * const { data: signingClients } = useStargateSigningClient({ chainId: ["cosmoshub-4"] });
+ *
+ * const account = accounts?.["cosmoshub-4"];
+ * const signingClient = signingClients?.["cosmoshub-4"];
+ *
  * const { sendTokens } = useSendTokens();
  *
  * sendTokens({
  *    signingClient,
- *    recipientAddress: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430";
- *    amount: [coin];
- *    ...
+ *    senderAddress: account.bech32Address,
+ *    recipientAddress: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
+ *    amount: [coin],
+ *    fee: "auto"
  * })
  * ```
  *
@@ -49,12 +54,9 @@ export const useSendTokens = ({
   onLoading,
   onSuccess,
 }: MutationEventArgs<SendTokensArgs, DeliverTxResponse> = {}) => {
-  const { data: account } = useAccount();
-  const accountAddress = account?.bech32Address;
-
   const mutation = useMutation({
-    mutationKey: ["USE_SEND_TOKENS", onError, onLoading, onSuccess, accountAddress],
-    mutationFn: (args: SendTokensArgs) => sendTokens({ senderAddress: accountAddress, ...args }),
+    mutationKey: ["USE_SEND_TOKENS", onError, onLoading, onSuccess],
+    mutationFn: sendTokens,
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
     onMutate: onLoading,
     onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
@@ -70,22 +72,27 @@ export const useSendTokens = ({
   };
 };
 /**
- * graz mutation hook to send IBC tokens. Note: if `senderAddress` undefined, it will use current connected account address.
- *
+ * graz mutation hook to send IBC tokens.
  *
  * @example
  * ```ts
- * import { useSendIbcTokens, useStargateSigningClient } from "graz";
+ * import { useSendIbcTokens, useStargateSigningClient, useAccount } from "graz";
  *
- * // basic example
- * const { data: signingClient } = useStargateSigningClient()
+ * // Get the account and signing client
+ * const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+ * const { data: signingClients } = useStargateSigningClient({ chainId: ["cosmoshub-4"] });
+ *
+ * const account = accounts?.["cosmoshub-4"];
+ * const signingClient = signingClients?.["cosmoshub-4"];
+ *
  * const { sendIbcTokens } = useSendIbcTokens();
  *
  * sendIbcTokens({
  *    signingClient,
+ *    senderAddress: account.bech32Address,
  *    recipientAddress: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
  *    transferAmount: coin,
- *    ...
+ *    fee: "auto"
  * })
  * ```
  */
@@ -94,12 +101,9 @@ export const useSendIbcTokens = ({
   onLoading,
   onSuccess,
 }: MutationEventArgs<SendIbcTokensArgs, DeliverTxResponse> = {}) => {
-  const { data: account } = useAccount();
-  const accountAddress = account?.bech32Address;
-
   const mutation = useMutation({
-    mutationKey: ["USE_SEND_IBC_TOKENS", onError, onLoading, onSuccess, accountAddress],
-    mutationFn: (args: SendIbcTokensArgs) => sendIbcTokens({ senderAddress: accountAddress, ...args }),
+    mutationKey: ["USE_SEND_IBC_TOKENS", onError, onLoading, onSuccess],
+    mutationFn: sendIbcTokens,
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
     onMutate: onLoading,
     onSuccess: (txResponse) => Promise.resolve(onSuccess?.(txResponse)),
@@ -124,9 +128,15 @@ export type UseInstantiateContractArgs<Message extends Record<string, unknown>> 
  *
  * @example
  * ```ts
- * import { useInstantiateContract, useCosmwasmSigningClient } from "graz"
+ * import { useInstantiateContract, useCosmWasmSigningClient, useAccount } from "graz"
  *
- * const { data: signingClient } = useCosmwasmSigningClient()
+ * // Get the account and signing client
+ * const { data: accounts } = useAccount({ chainId: ["juno-1"] });
+ * const { data: signingClients } = useCosmWasmSigningClient({ chainId: ["juno-1"] });
+ *
+ * const account = accounts?.["juno-1"];
+ * const signingClient = signingClients?.["juno-1"];
+ *
  * const { instantiateContract: instantiateMyContract } = useInstantiateContract({
  *   codeId: 4,
  *   onSuccess: ({ contractAddress }) => console.log('Address:', contractAddress)
@@ -135,8 +145,10 @@ export type UseInstantiateContractArgs<Message extends Record<string, unknown>> 
  * const instantiateMessage = { foo: 'bar' };
  * instantiateMyContract({
  *  signingClient,
- *  msg: instatiateMessage,
- *  label: "test"
+ *  senderAddress: account.bech32Address,
+ *  msg: instantiateMessage,
+ *  label: "test",
+ *  fee: "auto"
  * });
  * ```
  */
@@ -146,23 +158,16 @@ export const useInstantiateContract = <Message extends Record<string, unknown>>(
   onLoading,
   onSuccess,
 }: UseInstantiateContractArgs<Message>) => {
-  const { data: account } = useAccount();
-  const accountAddress = account?.bech32Address;
-
   const mutationFn = (args: InstantiateContractMutationArgs<Message>) => {
-    if (!accountAddress) throw new Error("senderAddress is undefined");
-    const contractArgs: InstantiateContractArgs<Message> = {
+    return instantiateContract({
       ...args,
       fee: args.fee ?? "auto",
-      senderAddress: accountAddress,
       codeId,
-    };
-
-    return instantiateContract(contractArgs);
+    });
   };
 
   const mutation = useMutation({
-    mutationKey: ["USE_INSTANTIATE_CONTRACT", onError, onLoading, onSuccess, codeId, accountAddress],
+    mutationKey: ["USE_INSTANTIATE_CONTRACT", onError, onLoading, onSuccess, codeId],
     mutationFn,
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
     onMutate: onLoading,
@@ -189,28 +194,33 @@ export type UseExecuteContractArgs<Message extends Record<string, unknown>> = {
  *
  * @example
  * ```ts
- * import { useExecuteContract, useCosmWasmSigningClient } from "graz"
+ * import { useExecuteContract, useCosmWasmSigningClient, useAccount } from "graz"
  *
- * interface GreetMessage {
- *   name: string;
+ * interface ExecuteMessage {
+ *   foo: string;
  * }
  *
- * interface GreetResponse {
- *   message: string;
- * }
+ * const contractAddress = "juno1...";
  *
- * const contractAddress = "cosmosfoobarbaz";
+ * // Get the account and signing client
+ * const { data: accounts } = useAccount({ chainId: ["juno-1"] });
+ * const { data: signingClients } = useCosmWasmSigningClient({ chainId: ["juno-1"] });
  *
- * const { data: signingClient } = useCosmWasmSigningClient()
- * const { executeContract } = useExecuteContract<ExecuteMessage>({ contractAddress });
+ * const account = accounts?.["juno-1"];
+ * const signingClient = signingClients?.["juno-1"];
+ *
+ * const { executeContract } = useExecuteContract<ExecuteMessage>({
+ *   contractAddress,
+ *   onSuccess: (result) => console.log('Tx hash:', result.transactionHash)
+ * });
  *
  * executeContract({
  *  signingClient,
- *  msg: {
- *    foo: "bar"
- *  }}, {
- *    onSuccess: (data: GreetResponse) => console.log('Got message:', data.message);
- *  });
+ *  senderAddress: account.bech32Address,
+ *  msg: { foo: "bar" },
+ *  fee: "auto",
+ *  funds: []
+ * });
  * ```
  */
 export const useExecuteContract = <Message extends Record<string, unknown>>({
@@ -219,25 +229,18 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
   onLoading,
   onSuccess,
 }: UseExecuteContractArgs<Message>) => {
-  const { data: account } = useAccount();
-  const accountAddress = account?.bech32Address;
-
   const mutationFn = (args: ExecuteContractMutationArgs<Message>) => {
-    if (!accountAddress) throw new Error("senderAddress is undefined");
-    const executeArgs: ExecuteContractArgs<Message> = {
+    return executeContract({
       ...args,
       fee: args.fee ?? "auto",
-      senderAddress: accountAddress,
       contractAddress,
       memo: args.memo ?? "",
       funds: args.funds ?? [],
-    };
-
-    return executeContract(executeArgs);
+    });
   };
 
   const mutation = useMutation({
-    mutationKey: ["USE_EXECUTE_CONTRACT", onError, onLoading, onSuccess, contractAddress, accountAddress],
+    mutationKey: ["USE_EXECUTE_CONTRACT", onError, onLoading, onSuccess, contractAddress],
     mutationFn,
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
     onMutate: onLoading,
@@ -266,7 +269,8 @@ export const useQuerySmart = <TData, TError>(args?: {
   address?: string;
   queryMsg?: Record<string, unknown>;
 }): UseQueryResult<TData, TError> => {
-  const { data: client } = useCosmWasmClient();
+  const { data: clients } = useCosmWasmClient();
+  const client = clients && Object.values(clients)[0];
   const query: UseQueryResult<TData, TError> = useQuery({
     queryKey: ["USE_QUERY_SMART", args?.address, args?.queryMsg, client],
     queryFn: ({ queryKey: [, _address] }) => {
@@ -290,8 +294,9 @@ export const useQueryRaw = <TError>(args?: {
   address?: string;
   key?: string;
 }): UseQueryResult<Uint8Array | null, TError> => {
-  const { data: client } = useCosmWasmClient();
-  const queryKey = ["USE_QUERY_RAW", args?.key, args?.address, client] as const;
+  const { data: clients } = useCosmWasmClient();
+  const client = clients && Object.values(clients)[0];
+  const queryKey = ["USE_QUERY_RAW", args?.key, args?.address, client];
   const query: UseQueryResult<Uint8Array | null, TError> = useQuery({
     queryKey,
     queryFn: ({ queryKey: [, _address] }) => {

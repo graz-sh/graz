@@ -2,9 +2,9 @@
 
 Mutation hook to execute wallet connection with optional arguments to invoke given functions on error, loading, or success event
 
-#### Usage
+## Usage
 
-#### Single Chain
+## Single Chain
 
 ```tsx
 import { useAccount, useConnect, WalletType } from "graz";
@@ -21,7 +21,7 @@ function App() {
 }
 ```
 
-#### Multi Chain
+## Multi Chain
 
 ```tsx
 import { useAccount, useConnect, WalletType } from "graz";
@@ -30,7 +30,6 @@ function App() {
   const { connect } = useConnect();
   const { isConnected, data: account } = useAccount({
     chainId: ["cosmoshub-4", "sommelier-1"],
-    multiChain: true
   });
 
   return (
@@ -43,7 +42,7 @@ function App() {
 }
 ```
 
-#### Types
+## Types
 
 - `ConnectArgs`
   ```tsx
@@ -54,7 +53,7 @@ function App() {
   }
   ```
 
-#### Hook Params
+## Hook Params
 
 ````ts
 {
@@ -64,7 +63,7 @@ function App() {
 }
 ```
 
-##### `ConnectResult`
+### `ConnectResult`
 
 ```tsx
 {
@@ -74,7 +73,7 @@ function App() {
 }
 ````
 
-#### Return Value
+## Return Value
 
 ```tsx
 {
