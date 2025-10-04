@@ -74,5 +74,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build graz package
+        run: pnpm --filter graz build
+
+      - name: Generate chain definitions
+        run: pnpm graz cli --generate
+
       - name: Build all packages
         run: pnpm build-all
