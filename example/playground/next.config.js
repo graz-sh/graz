@@ -31,10 +31,7 @@ const nextConfig = {
     }
 
     // Ignore pino-pretty import warnings
-    config.ignoreWarnings = [
-      { module: /node_modules\/pino/ },
-      { file: /node_modules\/pino/ },
-    ];
+    config.ignoreWarnings = [{ module: /node_modules\/pino/ }, { file: /node_modules\/pino/ }];
 
     return config;
   },
