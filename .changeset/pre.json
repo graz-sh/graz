@@ -1,0 +1,13 @@
+{
+  "mode": "pre",
+  "tag": "alpha",
+  "initialVersions": {
+    "@project/docs": "0.0.0",
+    "@project/example-playground": "0.0.1",
+    "@project/example-vite": "0.0.14",
+    "graz": "0.3.7"
+  },
+  "changesets": [
+    "security-dependencies-update"
+  ]
+}
