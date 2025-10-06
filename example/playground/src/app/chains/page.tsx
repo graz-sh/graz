@@ -57,10 +57,10 @@ export default function ChainsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Chain Management</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Chain Management</h1>
+          <p className="text-sm md:text-base text-muted-foreground mt-2">
             Manage multiple chains using <code className="text-sm bg-muted px-1 py-0.5 rounded">useSuggestChain()</code>
             , <code className="text-sm bg-muted px-1 py-0.5 rounded">useSuggestChainAndConnect()</code>, and{" "}
             <code className="text-sm bg-muted px-1 py-0.5 rounded">useAddChain()</code>
@@ -89,8 +89,8 @@ export default function ChainsPage() {
                   {activeChains?.map((chain) => {
                     const account = accounts?.[chain.chainId];
                     return (
-                      <div key={chain.chainId} className="p-4 border rounded-lg">
-                        <div className="flex items-center justify-between mb-3">
+                      <div key={chain.chainId} className="p-3 sm:p-4 border rounded-lg">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
                           <div>
                             <h3 className="font-semibold flex items-center gap-2">
                               <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -98,13 +98,16 @@ export default function ChainsPage() {
                             </h3>
                             <p className="text-sm text-muted-foreground font-mono">{chain.chainId}</p>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="default">Connected</Badge>
+                          <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <Badge variant="default" className="text-xs">
+                              Connected
+                            </Badge>
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleDisconnectChain(chain.chainId)}
                               disabled={isDisconnecting}
+                              className="text-xs"
                             >
                               <Unlink className="h-3 w-3 mr-1" />
                               Disconnect
@@ -143,12 +146,14 @@ export default function ChainsPage() {
                   <CardDescription>Add Cosmos Hub to wallet without connecting</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="p-4 border rounded-lg bg-muted/5">
-                    <h3 className="font-semibold">{cosmoshub.chainName}</h3>
-                    <p className="text-sm text-muted-foreground font-mono mt-1">{cosmoshub.chainId}</p>
-                    <p className="text-xs text-muted-foreground mt-2">RPC: {cosmoshub.rpc}</p>
+                  <div className="p-3 sm:p-4 border rounded-lg bg-muted/5">
+                    <h3 className="font-semibold text-sm sm:text-base">{cosmoshub.chainName}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground font-mono mt-1 break-all">
+                      {cosmoshub.chainId}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-2 break-all">RPC: {cosmoshub.rpc}</p>
                   </div>
-                  <div className="p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <div className="p-2.5 sm:p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                     <p className="text-xs text-blue-900 dark:text-blue-100">
                       <strong>Note:</strong> This uses <code className="font-mono">useSuggestChain</code> which only
                       suggests the chain to your wallet. You'll need to connect manually afterwards.
@@ -174,12 +179,14 @@ export default function ChainsPage() {
                   <CardDescription>Add and automatically connect to Osmosis Testnet</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="p-4 border rounded-lg bg-muted/5">
-                    <h3 className="font-semibold">{osmosistestnet.chainName}</h3>
-                    <p className="text-sm text-muted-foreground font-mono mt-1">{osmosistestnet.chainId}</p>
-                    <p className="text-xs text-muted-foreground mt-2">RPC: {osmosistestnet.rpc}</p>
+                  <div className="p-3 sm:p-4 border rounded-lg bg-muted/5">
+                    <h3 className="font-semibold text-sm sm:text-base">{osmosistestnet.chainName}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground font-mono mt-1 break-all">
+                      {osmosistestnet.chainId}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-2 break-all">RPC: {osmosistestnet.rpc}</p>
                   </div>
-                  <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
+                  <div className="p-2.5 sm:p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
                     <p className="text-xs text-green-900 dark:text-green-100">
                       <strong>Note:</strong> This uses <code className="font-mono">useSuggestChainAndConnect</code>{" "}
                       which suggests the chain AND connects automatically.
@@ -210,8 +217,11 @@ export default function ChainsPage() {
                 {chainInfos?.map((chain) => {
                   const isActive = activeChains?.some((ac) => ac.chainId === chain.chainId);
                   return (
-                    <div key={chain.chainId} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1 min-w-0">
+                    <div
+                      key={chain.chainId}
+                      className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-4 border rounded-lg"
+                    >
+                      <div className="flex-1 min-w-0 w-full sm:w-auto">
                         <div className="flex items-center gap-2">
                           <p className="font-medium truncate">{chain.chainName}</p>
                           {isActive && <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />}
@@ -221,7 +231,7 @@ export default function ChainsPage() {
                           Prefix: {chain.bech32Config?.bech32PrefixAccAddr || "N/A"}
                         </p>
                       </div>
-                      <div className="flex flex-col gap-2 items-end ml-2">
+                      <div className="flex flex-col gap-2 items-start sm:items-end w-full sm:w-auto sm:ml-2">
                         <div className="flex items-center gap-2">
                           <Badge variant={isActive ? "default" : "outline"}>{isActive ? "Active" : "Configured"}</Badge>
                           {!isActive && isConnected && (

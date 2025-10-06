@@ -3,19 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-  Home,
-  Wallet,
-  Coins,
-  Send,
-  FileCode,
-  Network,
-  Link2,
-  Github,
-  BookOpen,
-  Twitter,
-  User,
-} from "lucide-react";
+import { Home, Wallet, Coins, Send, FileCode, Network, Link2, Github, BookOpen, Twitter, User } from "lucide-react";
 
 const navigation = [
   { name: "Overview", href: "/", icon: Home },
@@ -32,7 +20,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full w-64 flex-col border-r bg-card">
+    <div className="hidden lg:flex h-full w-64 flex-col border-r bg-card">
       <div className="flex h-16 items-center border-b px-6">
         <h1 className="text-xl font-bold">Graz Playground</h1>
       </div>
@@ -47,7 +35,7 @@ export function Sidebar() {
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
               )}
             >
               <item.icon className="h-4 w-4" />
@@ -86,9 +74,7 @@ export function Sidebar() {
             <span>Twitter</span>
           </a>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Built with Graz, Next.js, and shadcn/ui
-        </p>
+        <p className="text-xs text-muted-foreground">Built with Graz, Next.js, and shadcn/ui</p>
       </div>
     </div>
   );

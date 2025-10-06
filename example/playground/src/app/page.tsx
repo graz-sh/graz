@@ -5,7 +5,23 @@ import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAccount, useActiveChains, useConnect } from "graz";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Wallet, Network, Code2, Sparkles, DollarSign, User, ExternalLink, Github, BookOpen, Zap, Shield, Package, Heart, ChevronRight, ArrowRight } from "lucide-react";
+import {
+  Wallet,
+  Network,
+  Code2,
+  Sparkles,
+  DollarSign,
+  User,
+  ExternalLink,
+  Github,
+  BookOpen,
+  Zap,
+  Shield,
+  Package,
+  Heart,
+  ChevronRight,
+  ArrowRight,
+} from "lucide-react";
 import { chainIds } from "@/utils/graz";
 import Link from "next/link";
 import { CodeBlock } from "@/components/code-block";
@@ -103,32 +119,29 @@ export default function HomePage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-10">
+      <div className="space-y-6 md:space-y-10">
         {/* Hero Section */}
-        <div className="space-y-6 py-12 max-w-4xl">
-          <div className="space-y-3">
-            <Badge variant="secondary" className="text-xs px-3 py-1 w-fit">
+        <div className="space-y-4 md:space-y-6 py-6 md:py-12 max-w-4xl">
+          <div className="space-y-2 md:space-y-3">
+            <Badge variant="secondary" className="text-xs px-2 md:px-3 py-1 w-fit">
               ~50KB gzipped • Tree-shakeable
             </Badge>
-            <h1 className="text-5xl font-bold tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
               Build Cosmos dApps
               <br />
               <span className="text-primary">with React Hooks</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl">
-              The most powerful and developer-friendly library for integrating Cosmos wallets and chains into your React applications
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl">
+              The most powerful and developer-friendly library for integrating Cosmos wallets and chains into your React
+              applications
             </p>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-start gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 sm:gap-4 pt-2 md:pt-4">
             {!isConnected ? (
               <>
-                <Button
-                  size="lg"
-                  onClick={() => connect({ chainId: chainIds })}
-                  className="gap-2 text-base px-8"
-                >
+                <Button size="lg" onClick={() => connect({ chainId: chainIds })} className="gap-2 text-base px-8">
                   <Wallet className="h-5 w-5" />
                   Connect Wallet
                   <ArrowRight className="h-4 w-4" />
@@ -160,7 +173,7 @@ export default function HomePage() {
           </div>
 
           {/* Quick Links */}
-          <div className="flex items-center gap-6 pt-4 text-sm">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2 md:pt-4 text-xs sm:text-sm">
             <a
               href="https://github.com/graz-sh/graz"
               target="_blank"
@@ -221,9 +234,7 @@ export default function HomePage() {
                 <CardTitle className="text-3xl">{accountCount}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xs text-muted-foreground">
-                  Multi-chain account management active
-                </p>
+                <p className="text-xs text-muted-foreground">Multi-chain account management active</p>
               </CardContent>
             </Card>
 
@@ -233,9 +244,7 @@ export default function HomePage() {
                 <CardTitle className="text-xl text-green-600">Connected</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xs text-muted-foreground">
-                  Ready to interact with Cosmos chains
-                </p>
+                <p className="text-xs text-muted-foreground">Ready to interact with Cosmos chains</p>
               </CardContent>
             </Card>
           </div>
@@ -243,11 +252,13 @@ export default function HomePage() {
 
         {/* Why Developers Love Graz */}
         <div>
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">Why Developers Love Graz</h2>
-            <p className="text-muted-foreground">Built for speed, developer experience, and production readiness</p>
+          <div className="mb-4 md:mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">Why Developers Love Graz</h2>
+            <p className="text-sm md:text-base text-muted-foreground">
+              Built for speed, developer experience, and production readiness
+            </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {whyGraz.map((item) => (
               <Card key={item.title}>
                 <CardHeader>
@@ -264,8 +275,8 @@ export default function HomePage() {
 
         {/* Features Grid */}
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Explore Features</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <h2 className="text-xl md:text-2xl font-semibold mb-3 md:mb-4">Explore Features</h2>
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
               <Link key={feature.title} href={feature.href}>
                 <Card className="hover:shadow-lg transition-all hover:scale-[1.02] cursor-pointer h-full">
@@ -293,14 +304,12 @@ export default function HomePage() {
           <CardContent className="space-y-4">
             <div>
               <p className="text-sm font-medium mb-2">1. Install Graz</p>
-              <CodeBlock
-                code={`npm install graz`}
-                language="bash"
-              />
+              <CodeBlock code={`npm install graz`} language="bash" />
             </div>
             <div>
               <p className="text-sm font-medium mb-2">2. Set up the provider</p>
               <CodeBlock
+                language="tsx"
                 code={`import { GrazProvider } from "graz";
 
 <GrazProvider
@@ -315,6 +324,7 @@ export default function HomePage() {
             <div>
               <p className="text-sm font-medium mb-2">3. Use hooks in your components</p>
               <CodeBlock
+                language="typescript"
                 code={`import { useAccount, useConnect, useBalance } from "graz";
 
 const { connect } = useConnect();
@@ -333,19 +343,15 @@ const { data: balance } = useBalance({
 
         {/* Projects Using Graz */}
         <div>
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">Powering Leading Cosmos Projects</h2>
-            <p className="text-muted-foreground">Trusted by top teams building in the Cosmos ecosystem</p>
+          <div className="mb-4 md:mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">Powering Leading Cosmos Projects</h2>
+            <p className="text-sm md:text-base text-muted-foreground">
+              Trusted by top teams building in the Cosmos ecosystem
+            </p>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((project) => (
-              <a
-                key={project.name}
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block"
-              >
+              <a key={project.name} href={project.url} target="_blank" rel="noopener noreferrer" className="block">
                 <Card className="hover:shadow-lg transition-all hover:scale-[1.02] h-full">
                   <CardHeader>
                     <div className="flex items-center gap-3">
@@ -355,9 +361,7 @@ const { data: balance } = useBalance({
                           <CardTitle className="text-base">{project.name}</CardTitle>
                           <ExternalLink className="h-3 w-3 text-muted-foreground" />
                         </div>
-                        <CardDescription className="text-xs mt-1">
-                          {project.description}
-                        </CardDescription>
+                        <CardDescription className="text-xs mt-1">{project.description}</CardDescription>
                       </div>
                     </div>
                   </CardHeader>
@@ -369,23 +373,23 @@ const { data: balance } = useBalance({
 
         {/* Stats */}
         <Card className="bg-primary/5 border-primary/20">
-          <CardContent className="pt-6">
-            <div className="grid gap-6 md:grid-cols-4">
+          <CardContent className="pt-4 md:pt-6">
+            <div className="grid gap-4 sm:gap-6 grid-cols-2 md:grid-cols-4">
               <div>
-                <div className="text-3xl font-bold">20+</div>
-                <div className="text-sm text-muted-foreground mt-1">React Hooks</div>
+                <div className="text-2xl sm:text-3xl font-bold">20+</div>
+                <div className="text-xs sm:text-sm text-muted-foreground mt-1">React Hooks</div>
               </div>
               <div>
-                <div className="text-3xl font-bold">~50KB</div>
-                <div className="text-sm text-muted-foreground mt-1">Bundle Size (gzipped)</div>
+                <div className="text-2xl sm:text-3xl font-bold">~50KB</div>
+                <div className="text-xs sm:text-sm text-muted-foreground mt-1">Bundle Size (gzipped)</div>
               </div>
               <div>
-                <div className="text-3xl font-bold">13+</div>
-                <div className="text-sm text-muted-foreground mt-1">Wallet Integrations</div>
+                <div className="text-2xl sm:text-3xl font-bold">13+</div>
+                <div className="text-xs sm:text-sm text-muted-foreground mt-1">Wallet Integrations</div>
               </div>
               <div>
-                <div className="text-3xl font-bold">100%</div>
-                <div className="text-sm text-muted-foreground mt-1">TypeScript Coverage</div>
+                <div className="text-2xl sm:text-3xl font-bold">100%</div>
+                <div className="text-xs sm:text-sm text-muted-foreground mt-1">TypeScript Coverage</div>
               </div>
             </div>
           </CardContent>

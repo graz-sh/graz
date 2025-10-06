@@ -7,6 +7,7 @@ import { useAccount, useSendTokens, useStargateSigningClient, useActiveChains } 
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Send, Copy, ExternalLink, CheckCheck } from "lucide-react";
+import { CodeBlock } from "@/components/code-block";
 
 export default function SendTokensPage() {
   const { isConnected, data: accounts } = useAccount();
@@ -258,8 +259,9 @@ export default function SendTokensPage() {
             <CardDescription>Example code for this page</CardDescription>
           </CardHeader>
           <CardContent>
-            <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
-              <code>{`import { useSendTokens, useStargateSigningClient, useAccount } from "graz";
+            <CodeBlock
+              language="typescript"
+              code={`import { useSendTokens, useStargateSigningClient, useAccount } from "graz";
 
 const { data: accounts } = useAccount();
 const { data: signingClients } = useStargateSigningClient();
@@ -299,8 +301,8 @@ if (isSuccess && data) {
 
   // Open in explorer
   window.open(\`https://mintscan.io/cosmos/txs/\${data.transactionHash}\`);
-}`}</code>
-            </pre>
+}`}
+            />
           </CardContent>
         </Card>
       </div>

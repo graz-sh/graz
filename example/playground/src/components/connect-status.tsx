@@ -34,12 +34,17 @@ export const ConnectStatus: FC = () => {
         <span className="text-xs">Connected</span>
       </Badge>
       {activeChains && activeChains.length > 0 && (
-        <div className="flex items-center gap-1">
-          {activeChains.map((chainId) => (
+        <div className="hidden md:flex items-center gap-1 flex-wrap">
+          {activeChains.slice(0, 3).map((chainId) => (
             <Badge key={chainId} variant="secondary" className="text-xs">
               {chainId}
             </Badge>
           ))}
+          {activeChains.length > 3 && (
+            <Badge variant="secondary" className="text-xs">
+              +{activeChains.length - 3}
+            </Badge>
+          )}
         </div>
       )}
     </div>

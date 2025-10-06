@@ -1,19 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { getAvailableWallets, useAccount, useConnect, useDisconnect, WalletType } from "graz";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Wallet } from "lucide-react";
 import type { FC } from "react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { chainIds } from "@/utils/graz";
+import { getWalletInfo } from "@/utils/wallet";
 
 export const ConnectButton: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,13 +43,7 @@ export const ConnectButton: FC = () => {
   const availableWallets = getAvailableWallets();
   const wallets = Object.entries(availableWallets)
     .filter(([_, isAvailable]) => isAvailable)
-    .map(([walletType]) => ({
-      walletType: walletType as WalletType,
-      name: walletType
-        .split("_")
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(" "),
-    }));
+    .map(([walletType]) => walletType as WalletType);
 
   return (
     <>
@@ -64,8 +53,15 @@ export const ConnectButton: FC = () => {
             <Button
               disabled={isConnecting || isReconnecting}
               onClick={() => (isConnected ? disconnect() : setIsOpen(true))}
+              className="gap-2"
             >
-              {isConnecting || isReconnecting ? "Connecting..." : isConnected ? "Disconnect" : "Connect Wallet"}
+              <Wallet className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {isConnecting || isReconnecting ? "Connecting..." : isConnected ? "Disconnect" : "Connect Wallet"}
+              </span>
+              <span className="sm:hidden">
+                {isConnecting || isReconnecting ? "..." : isConnected ? "Disconnect" : "Connect"}
+              </span>
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -73,21 +69,25 @@ export const ConnectButton: FC = () => {
               <DialogTitle>Select a wallet</DialogTitle>
             </DialogHeader>
             <div className="space-y-2">
-              {wallets.map((wallet) => (
-                <Button
-                  key={wallet.walletType}
-                  onClick={() => handleConnect(wallet.walletType)}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Connect with {wallet.name}
-                </Button>
-              ))}
+              {wallets.map((walletType) => {
+                const walletInfo = getWalletInfo(walletType);
+                return (
+                  <Button
+                    key={walletType}
+                    onClick={() => handleConnect(walletType)}
+                    variant="outline"
+                    className="w-full justify-start gap-3"
+                  >
+                    {walletInfo.logo && <img src={walletInfo.logo} alt={walletInfo.name} className="h-6 w-6 rounded" />}
+                    <span>Connect with {walletInfo.name}</span>
+                  </Button>
+                );
+              })}
             </div>
           </DialogContent>
         </Dialog>
         {isConnected && (
-          <Button size="icon" variant="outline" onClick={() => void reconnect()}>
+          <Button size="icon" variant="outline" onClick={() => void reconnect()} className="hidden sm:flex">
             <RefreshCw className="h-4 w-4" />
           </Button>
         )}
