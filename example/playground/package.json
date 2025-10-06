@@ -4,6 +4,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "export:docs": "EXPORT_DOCS=true next build && mv out ../../docs/build/examples/playground",
     "lint": "eslint --fix \"**/*.{ts,tsx}\"",
     "start": "next start"
   },

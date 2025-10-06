@@ -29,6 +29,7 @@ A comprehensive example application showcasing Graz's multi-chain wallet integra
 
 ### Links
 
+- Website: https://graz.sh/examples/playground
 - GitHub: https://github.com/graz-sh/graz/tree/main/example/playground
 
 ### Technology Stack

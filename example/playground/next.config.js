@@ -2,6 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ["graz"],
+  // Enable static export when building for docs
+  output: process.env.EXPORT_DOCS ? "export" : undefined,
+  // Set base path for docs deployment
+  basePath: process.env.EXPORT_DOCS ? "/examples/playground" : "",
+  // Disable image optimization for static export
+  images: {
+    unoptimized: process.env.EXPORT_DOCS ? true : false,
+  },
   webpack: (config, { isServer }) => {
     // Handle pino and other node-specific modules
     if (!isServer) {

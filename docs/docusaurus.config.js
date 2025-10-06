@@ -88,16 +88,12 @@ const config = {
             title: "More",
             items: [
               {
-                label: "Next.js Example",
-                href: "https://graz.sh/examples/next",
+                label: "Playground Example",
+                href: "https://graz.sh/examples/playground",
               },
               {
                 label: "Vite Example",
                 href: "https://graz.sh/examples/vite",
-              },
-              {
-                label: "Starter Example",
-                href: "https://graz.sh/examples/starter",
               },
               {
                 label: "GitHub",

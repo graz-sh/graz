@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc && vite build",
     "dev": "vite",
-    "export:docs": "vite build --emptyOutDir --outDir ../../docs/build/examples/vite",
+    "export:docs": "EXPORT_DOCS=true vite build --emptyOutDir --outDir ../../docs/build/examples/vite",
     "preview": "vite preview",
     "postinstall": "npx setup-para"
   },
