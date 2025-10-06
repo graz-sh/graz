@@ -33,6 +33,10 @@
   "prettier": "@graz-sh/style-guide/prettier",
   "private": true,
   "license": "MIT",
+  "engines": {
+    "node": ">=20.18.0",
+    "pnpm": ">=8.0.0"
+  },
   "pnpm": {
     "overrides": {
       "ses": ">=0.18.7",

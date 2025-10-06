@@ -41,5 +41,8 @@
       "last 1 safari version"
     ]
   },
+  "engines": {
+    "node": ">=20.18.0"
+  },
   "private": true
 }
