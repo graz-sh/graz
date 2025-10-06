@@ -1,5 +1,11 @@
 # graz
 
+## Unreleased
+
+### Patch Changes
+
+- Enhanced methods hooks (`useSendTokens`, `useSendIbcTokens`, `useExecuteContract`, `useInstantiateContract`) to return all React Query mutation properties. Hooks now provide access to additional utilities like `reset`, `variables`, `context`, `failureCount`, `failureReason`, `isPending`, etc., while maintaining backward compatibility with the existing API.
+
 ## 0.3.7
 
 ### Patch Changes

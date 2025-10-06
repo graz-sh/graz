@@ -1,7 +1,6 @@
-import { fromBech32, toBech32 } from "@cosmjs/encoding";
 import type { Coin } from "@cosmjs/proto-signing";
 import type { Key } from "@keplr-wallet/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 
 import type { ConnectArgs, ConnectResult, OfflineSigners, ReconnectArgs } from "../actions/account";
@@ -10,8 +9,7 @@ import { checkWallet } from "../actions/wallet";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { ChainIdToRecord, MutationEventArgs, QueryConfig, UseMultiChainQueryResult } from "../types/hooks";
 import type { WalletType } from "../types/wallet";
-import { isEmpty } from "../utils/isEmpty";
-import type { ChainId, MultiChainHookArgs } from "../utils/multi-chain";
+import type { ChainId } from "../utils/multi-chain";
 import { createMultiChainAsyncFunction, createMultiChainFunction, useChainsFromArgs } from "../utils/multi-chain";
 import { useStargateClient } from "./clients";
 import { useCheckWallet } from "./wallet";
@@ -143,201 +141,114 @@ export function useAccount<const TChainIds extends readonly string[] | undefined
 }
 
 /**
- * graz query hook to retrieve list of balances from current account or given address.
+ * graz query hook to retrieve list of balances for a specific chain and address.
  *
- * Note: Returns multi-chain results by default (Record<chainId, Coin[]>).
- *
- * @param bech32Address - Optional bech32 account address, defaults to connected account address
+ * @param chainId - Chain ID to query balances from
+ * @param bech32Address - Required bech32 account address
  *
  * @example
  * ```ts
  * import { useBalances } from "graz";
  *
- * // Single chain with precise type inference
- * const { data: balances } = useBalances({ chainId: ["cosmoshub-4"] });
- * // Type: { data?: { "cosmoshub-4": Coin[] } }
- * const cosmosBalances = balances?.["cosmoshub-4"];
- *
- * // Multiple chains with precise type inference
  * const { data: balances } = useBalances({
- *   chainId: ["cosmoshub-4", "osmosis-1"]
+ *   chainId: "cosmoshub-4",
+ *   bech32Address: "cosmos1..."
  * });
- * // Type: { data?: { "cosmoshub-4": Coin[], "osmosis-1": Coin[] } }
- * const cosmosBalances = balances?.["cosmoshub-4"]; // ✅ Autocomplete!
- *
- * // All connected chains
- * const { data: balances } = useBalances();
- * // Type: { data?: Record<string, Coin[]> }
+ * // Type: { data?: Coin[] }
  * ```
  */
-
-// Overload: When chainId is provided with specific type
-export function useBalances<const TChainIds extends readonly string[]>(
-  args: { bech32Address?: string; chainId: TChainIds } & QueryConfig,
-): UseMultiChainQueryResult<TChainIds, Coin[]>;
-
-// Overload: When chainId is not provided
-export function useBalances(
-  args?: { bech32Address?: string } & QueryConfig,
-): UseMultiChainQueryResult<undefined, Coin[]>;
-
-// Implementation
-export function useBalances<const TChainIds extends readonly string[] | undefined>(
-  args?: { bech32Address?: string; chainId?: TChainIds } & QueryConfig,
-): UseMultiChainQueryResult<TChainIds, Coin[]> {
-  const chains = useChainsFromArgs({ chainId: args?.chainId as string[] | undefined });
-  const { data: accounts } = useAccount();
-
-  // Get address from provided arg or first available account
-  const address = args?.bech32Address || (accounts && Object.values(accounts)[0]?.bech32Address);
+export const useBalances = (
+  args: { bech32Address: string; chainId: string } & QueryConfig,
+): UseQueryResult<Coin[], unknown> => {
+  const chains = useChainsFromArgs({ chainId: [args.chainId] });
+  const chain = chains[0];
 
   const { data: clients } = useStargateClient({
-    chainId: chains.map((x) => x.chainId) as readonly string[],
-    enabled: (args?.enabled === undefined ? true : args.enabled) && Boolean(address),
+    chainId: [args.chainId] as readonly string[],
+    enabled: args.enabled === undefined ? true : args.enabled,
   });
 
+  const client = clients?.[args.chainId];
+
   const queryKey = useMemo(
-    () => ["USE_ALL_BALANCES", clients, chains, address, args?.chainId],
-    [address, args?.chainId, chains, clients],
+    () => ["USE_ALL_BALANCES", client, args.chainId, args.bech32Address],
+    [args.bech32Address, args.chainId, client],
   );
 
   return useQuery({
     queryKey,
     queryFn: async () => {
-      if (!address) {
-        throw new Error("address is not defined");
+      if (!client) {
+        throw new Error(`Client is not ready for ${args.chainId}`);
       }
-      // Always use multi-chain function
-      const res = await createMultiChainAsyncFunction(chains, async (_chain) => {
-        const stargateClient = clients?.[_chain.chainId];
-        if (!stargateClient) {
-          throw new Error(`Client is not ready ${_chain.chainId}`);
-        }
-        if (!_chain.bech32Config?.bech32PrefixAccAddr) throw new Error(`Bech32Config is missing ${_chain.chainId}`);
-        const balances = await stargateClient.getAllBalances(
-          toBech32(_chain.bech32Config.bech32PrefixAccAddr, fromBech32(address).data),
-        );
-        return balances as Coin[];
-      });
-      return res;
+      if (!chain?.bech32Config?.bech32PrefixAccAddr) {
+        throw new Error(`Bech32Config is missing for ${args.chainId}`);
+      }
+      const balances = await client.getAllBalances(args.bech32Address);
+      return balances as Coin[];
     },
-    enabled:
-      Boolean(address) &&
-      Boolean(chains) &&
-      chains.length > 0 &&
-      !isEmpty(clients) &&
-      (args?.enabled === undefined ? true : args.enabled),
+    enabled: Boolean(client) && Boolean(chain) && (args.enabled === undefined ? true : args.enabled),
     refetchOnMount: false,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
   });
-}
+};
 
 /**
- * graz query hook to retrieve specific asset balance from current account or given address.
+ * graz query hook to retrieve specific asset balance for a specific chain and address.
  *
- * Note: Returns multi-chain results by default (Record<chainId, Coin | undefined>).
- *
+ * @param chainId - Chain ID to query balance from
+ * @param bech32Address - Required bech32 account address
  * @param denom - Asset denom to search
- * @param bech32Address - Optional bech32 account address, defaults to connected account address
  *
  * @example
  * ```ts
  * import { useBalance } from "graz";
  *
- * // Single chain with precise type inference
- * const { data: balances } = useBalance({
- *   chainId: ["cosmoshub-4"],
+ * const { data: balance } = useBalance({
+ *   chainId: "cosmoshub-4",
+ *   bech32Address: "cosmos1...",
  *   denom: "uatom"
  * });
- * // Type: { data?: { "cosmoshub-4": Coin | undefined } }
- * const balance = balances?.["cosmoshub-4"];
- *
- * // Multiple chains with precise type inference
- * const { data: balances } = useBalance({
- *   chainId: ["cosmoshub-4", "osmosis-1"],
- *   denom: "uatom"
- * });
- * // Type: { data?: { "cosmoshub-4": Coin | undefined, "osmosis-1": Coin | undefined } }
- * const cosmosBalance = balances?.["cosmoshub-4"]; // ✅ Autocomplete!
- *
- * // With custom bech32 address
- * useBalance({
- *   chainId: ["cosmoshub-4"],
- *   denom: "uatom",
- *   bech32Address: "cosmos1..."
- * });
+ * // Type: { data?: Coin | undefined }
  * ```
  */
+export const useBalance = (
+  args: { bech32Address: string; chainId: string; denom: string } & QueryConfig,
+): UseQueryResult<Coin | undefined, unknown> => {
+  const chains = useChainsFromArgs({ chainId: [args.chainId] });
+  const chain = chains[0];
 
-// Overload: When chainId is provided with specific type
-export function useBalance<const TChainIds extends readonly string[]>(
-  args: {
-    denom?: string;
-    bech32Address?: string;
-    chainId: TChainIds;
-  } & QueryConfig,
-): UseMultiChainQueryResult<TChainIds, Coin | undefined>;
-
-// Overload: When chainId is required but not const
-export function useBalance(
-  args: {
-    denom?: string;
-    bech32Address?: string;
-    chainId: ChainId;
-  } & QueryConfig,
-): UseMultiChainQueryResult<undefined, Coin | undefined>;
-
-// Implementation
-export function useBalance<const TChainIds extends readonly string[] | undefined>(
-  args: {
-    denom?: string;
-    bech32Address?: string;
-    chainId: ChainId;
-  } & QueryConfig,
-): UseMultiChainQueryResult<TChainIds, Coin | undefined> {
-  const chains = useChainsFromArgs({ chainId: args.chainId });
-  const { data: accounts } = useAccount({
-    chainId: args.chainId,
+  const { data: clients } = useStargateClient({
+    chainId: [args.chainId] as readonly string[],
+    enabled: args.enabled === undefined ? true : args.enabled,
   });
 
-  // Get address from provided arg or first available account
-  const address = args.bech32Address || (accounts && Object.values(accounts)[0]?.bech32Address);
+  const client = clients?.[args.chainId];
 
-  const { data: balances, refetch: _refetch } = useBalances({
-    chainId: chains.map((x) => x.chainId) as readonly string[],
-    bech32Address: address,
-    enabled: Boolean(address) && (args.enabled === undefined ? true : args.enabled),
-  });
+  const queryKey = useMemo(
+    () => ["USE_BALANCE", client, args.chainId, args.bech32Address, args.denom],
+    [args.bech32Address, args.chainId, args.denom, client],
+  );
 
-  const queryKey = ["USE_BALANCE", args.denom, balances, chains, address, args.chainId];
-
-  const query = useQuery({
+  return useQuery({
     queryKey,
-    queryFn: ({ queryKey: [, _denom, _balances] }) => {
-      // _balances is now Record<chainId, Coin[]>
-      // Transform to Record<chainId, Coin | undefined>
-      if (!_balances) return undefined;
-
-      return Object.fromEntries(
-        Object.entries(_balances).map(([chainId, coins]) => [chainId, coins?.find((x: Coin) => x.denom === _denom)]),
-      );
+    queryFn: async () => {
+      if (!client) {
+        throw new Error(`Client is not ready for ${args.chainId}`);
+      }
+      if (!chain?.bech32Config?.bech32PrefixAccAddr) {
+        throw new Error(`Bech32Config is missing for ${args.chainId}`);
+      }
+      const balance = await client.getBalance(args.bech32Address, args.denom);
+      return balance.amount === "0" ? undefined : balance;
     },
-    enabled:
-      Boolean(args.denom) &&
-      Boolean(balances) &&
-      !isEmpty(balances) &&
-      (args.enabled === undefined ? true : args.enabled),
+    enabled: Boolean(client) && Boolean(chain) && (args.enabled === undefined ? true : args.enabled),
+    refetchOnMount: false,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
   });
-
-  return {
-    ...query,
-    refetch: async (options) => {
-      await _refetch();
-      return query.refetch(options);
-    },
-  } as UseMultiChainQueryResult<TChainIds, Coin | undefined>;
-}
+};
 
 export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, ConnectResult>;
 
@@ -515,90 +426,59 @@ export function useOfflineSigners<const TChainIds extends readonly string[] | un
 }
 
 /**
- * graz query hook to retrieve staked balances from current account or given address.
+ * graz query hook to retrieve staked balance for a specific chain and address.
  *
- * Note: Returns multi-chain results by default (Record<chainId, Coin>).
- *
- * @param bech32Address - Optional bech32 account address, defaults to connected account address
+ * @param chainId - Chain ID to query staked balance from
+ * @param bech32Address - Required bech32 account address
  *
  * @example
  * ```ts
- * import { useBalanceStaked } from "graz";
+ * import { useBalanceStaked, useAccount } from "graz";
  *
- * // Single chain with precise type inference
- * const { data: stakedBalances } = useBalanceStaked({ chainId: ["cosmoshub-4"] });
- * // Type: { data?: { "cosmoshub-4": Coin } }
- * const stakedBalance = stakedBalances?.["cosmoshub-4"];
+ * const { data: accounts } = useAccount();
+ * const account = accounts?.["cosmoshub-4"];
  *
- * // Multiple chains with precise type inference
- * const { data: stakedBalances } = useBalanceStaked({
- *   chainId: ["cosmoshub-4", "osmosis-1"]
+ * const { data: stakedBalance } = useBalanceStaked({
+ *   chainId: "cosmoshub-4",
+ *   bech32Address: account?.bech32Address || "",
+ *   enabled: Boolean(account?.bech32Address),
  * });
- * // Type: { data?: { "cosmoshub-4": Coin, "osmosis-1": Coin } }
- * const cosmosStaked = stakedBalances?.["cosmoshub-4"]; // ✅ Autocomplete!
- *
- * // With custom bech32 address
- * useBalanceStaked({
- *   chainId: ["cosmoshub-4"],
- *   bech32Address: "cosmos1..."
- * });
- *
- * // All connected chains
- * const { data: stakedBalances } = useBalanceStaked();
- * // Type: { data?: Record<string, Coin> }
+ * // Type: { data?: Coin }
  * ```
  */
+export const useBalanceStaked = (
+  args: { bech32Address: string; chainId: string } & QueryConfig,
+): UseQueryResult<Coin, unknown> => {
+  const chains = useChainsFromArgs({ chainId: [args.chainId] });
+  const chain = chains[0];
 
-// Overload: When chainId is provided with specific type
-export function useBalanceStaked<const TChainIds extends readonly string[]>(
-  args: { bech32Address?: string; chainId: TChainIds } & QueryConfig,
-): UseMultiChainQueryResult<TChainIds, Coin>;
-
-// Overload: When chainId is not provided
-export function useBalanceStaked(
-  args?: { bech32Address?: string } & QueryConfig,
-): UseMultiChainQueryResult<undefined, Coin>;
-
-// Implementation
-export function useBalanceStaked<const TChainIds extends readonly string[] | undefined>(
-  args?: { bech32Address?: string; chainId?: TChainIds } & QueryConfig,
-): UseMultiChainQueryResult<TChainIds, Coin> {
-  const chains = useChainsFromArgs({ chainId: args?.chainId as string[] | undefined });
-  const { data: accounts } = useAccount();
   const { data: clients } = useStargateClient({
-    chainId: chains.map((x) => x.chainId) as readonly string[],
+    chainId: [args.chainId] as readonly string[],
+    enabled: args.enabled === undefined ? true : args.enabled,
   });
 
-  // Get address from provided arg or first available account
-  const address = args?.bech32Address || (accounts && Object.values(accounts)[0]?.bech32Address);
+  const client = clients?.[args.chainId];
 
-  const queryKey = useMemo(() => ["USE_BALANCE_STAKED", clients, chains, address], [chains, address, clients]);
+  const queryKey = useMemo(
+    () => ["USE_BALANCE_STAKED", client, args.chainId, args.bech32Address],
+    [args.bech32Address, args.chainId, client],
+  );
 
   return useQuery({
     queryKey,
     queryFn: async () => {
-      if (!address) {
-        throw new Error("address is not defined");
+      if (!client) {
+        throw new Error(`Client is not ready for ${args.chainId}`);
       }
-      // Always use multi-chain function
-      const res = await createMultiChainAsyncFunction(chains, async (_chain) => {
-        if (!clients) throw new Error("Client is not ready");
-        if (!_chain.bech32Config?.bech32PrefixAccAddr) throw new Error(`Bech32Config is missing ${_chain.chainId}`);
-        const balance = await clients[_chain.chainId]?.getBalanceStaked(
-          toBech32(_chain.bech32Config.bech32PrefixAccAddr, fromBech32(address).data),
-        );
-        return balance;
-      });
-      return res;
+      if (!chain?.bech32Config?.bech32PrefixAccAddr) {
+        throw new Error(`Bech32Config is missing for ${args.chainId}`);
+      }
+      const balance = await client.getBalanceStaked(args.bech32Address);
+      return balance;
     },
-    enabled:
-      Boolean(address) &&
-      Boolean(chains) &&
-      chains.length > 0 &&
-      Boolean(clients) &&
-      (args?.enabled === undefined ? true : args.enabled),
+    enabled: Boolean(client) && Boolean(chain) && (args.enabled === undefined ? true : args.enabled),
     refetchOnMount: false,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
   });
-}
+};

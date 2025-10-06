@@ -50,7 +50,6 @@ export const useGrazEvents = () => {
           useGrazSessionStore.setState({
             lastPing: Date.now(),
           });
-          return;
         } catch (error) {
           void reconnect({ onError: _onReconnectFailed });
         }

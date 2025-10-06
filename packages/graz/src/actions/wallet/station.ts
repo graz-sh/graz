@@ -1,11 +1,11 @@
+import type { DirectSignResponse } from "@cosmjs/proto-signing";
 import type { ChainInfo, KeplrSignOptions, StdSignDoc } from "@keplr-wallet/types";
 
 import { useGrazInternalStore } from "../../store";
 import type { Key, SignDoc, Wallet } from "../../types/wallet";
 import { clearSession } from ".";
-import { DirectSignResponse } from "@cosmjs/proto-signing";
 
-type ChainInfoResponse = {
+interface ChainInfoResponse {
   chainId: string;
   chainName: string;
   chainSymbolImageUrl: string;
@@ -47,16 +47,16 @@ type ChainInfoResponse = {
       low: number;
     };
   }[];
-};
+}
 
-type GetKeyResponse = {
+interface GetKeyResponse {
   name: string;
   algo: string;
   pubKey: Uint8Array;
   address: Uint8Array;
   bech32Address: string;
   isNanoLedger: boolean;
-};
+}
 
 /**
  * Function to return Station object (which is {@link Wallet}) and throws and error if it does not exist on `window`.

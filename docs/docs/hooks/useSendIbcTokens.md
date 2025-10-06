@@ -4,6 +4,8 @@ Mutation hook to send IBC tokens and returns @cosmjs/stargate's `DeliverTxRespon
 
 **Important**: `senderAddress` is a required parameter that must be explicitly provided.
 
+**Enhanced**: This hook now returns all React Query mutation properties, giving you access to utilities like `reset`, `variables`, `context`, `failureCount`, and more.
+
 ## Usage
 
 ### Basic Example
@@ -136,18 +138,33 @@ Object params for event handlers:
 
 ```tsx
 {
-  error: unknown;
-  isError: boolean;
-  isIdle: boolean;
-  isLoading: boolean;
-  isSuccess: boolean;
-  data?: DeliverTxResponse; // From @cosmjs/stargate
+  // Custom mutation functions
   sendIbcTokens: (args: SendIbcTokensArgs) => void;
   sendIbcTokensAsync: (args: SendIbcTokensArgs) => Promise<DeliverTxResponse>;
-  reset: () => void;
-  status: "error" | "idle" | "loading" | "success";
+
+  // All React Query mutation properties
+  data?: DeliverTxResponse; // From @cosmjs/stargate
+  error: unknown;
+  failureCount: number;
+  failureReason: Error | null;
+  isError: boolean;
+  isIdle: boolean;
+  isPending: boolean;
+  isPaused: boolean;
+  isSuccess: boolean;
+  status: "idle" | "pending" | "error" | "success";
+  variables?: SendIbcTokensArgs; // Arguments passed to the last mutation call
+  submittedAt: number;
+
+  // Mutation methods
+  reset: () => void; // Reset mutation state
+
+  // Context (from onMutate)
+  context: unknown;
 }
 ```
+
+Note: `isLoading` has been replaced by `isPending` in React Query v5. Both work, but `isPending` is the modern property name.
 
 ## Migration from Previous Version
 

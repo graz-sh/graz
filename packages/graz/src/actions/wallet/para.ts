@@ -1,5 +1,6 @@
-import { useGrazInternalStore, useGrazSessionStore } from "../../store";
 import type { ParaGrazConnector } from "@getpara/graz-connector";
+
+import { useGrazInternalStore, useGrazSessionStore } from "../../store";
 import type { Key, Wallet } from "../../types/wallet";
 import { WalletType } from "../../types/wallet";
 
@@ -16,7 +17,7 @@ export const getPara = (): Wallet => {
 
   const paraConfig = useGrazInternalStore.getState().paraConfig;
 
-  if (!paraConfig || !paraConfig.paraWeb) {
+  if (!paraConfig?.paraWeb) {
     throw new Error("Missing Para config. Provide paraConfig with 'paraWeb' to GrazProvider.");
   }
 
@@ -24,7 +25,7 @@ export const getPara = (): Wallet => {
     if (initPromise) return initPromise;
 
     initPromise = (async (): Promise<ParaGrazConnector> => {
-      let existing = useGrazSessionStore.getState().paraConnector as ParaGrazConnector | null;
+      const existing = useGrazSessionStore.getState().paraConnector;
       if (existing) return existing;
 
       try {

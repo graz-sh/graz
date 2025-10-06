@@ -2,8 +2,9 @@
  * Unit tests for createMultiChainAsyncFunction (async operations)
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { ChainInfo } from "@keplr-wallet/types";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { createMultiChainAsyncFunction } from "../multi-chain";
 
 describe("createMultiChainAsyncFunction", () => {

@@ -223,13 +223,14 @@ import { useAccount, useBalance } from "graz";
 
 export function BalanceDisplay() {
   const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
-  const { data: balances, isLoading } = useBalance({
-    chainId: ["cosmoshub-4"],
-    denom: "uatom",
-  });
-
   const account = accounts?.["cosmoshub-4"];
-  const balance = balances?.["cosmoshub-4"];
+
+  const { data: balance, isLoading } = useBalance({
+    chainId: "cosmoshub-4",
+    bech32Address: account?.bech32Address || "",
+    denom: "uatom",
+    enabled: Boolean(account?.bech32Address),
+  });
 
   if (!account) return <p>Please connect your wallet</p>;
 
@@ -260,9 +261,22 @@ export function MultiChainWallet() {
   const { data: accounts } = useAccount({
     chainId: ["cosmoshub-4", "osmosis-1"],
   });
-  const { data: balances } = useBalance({
-    chainId: ["cosmoshub-4", "osmosis-1"],
+
+  const cosmosAccount = accounts?.["cosmoshub-4"];
+  const osmosisAccount = accounts?.["osmosis-1"];
+
+  const { data: cosmosBalance } = useBalance({
+    chainId: "cosmoshub-4",
+    bech32Address: cosmosAccount?.bech32Address || "",
     denom: "uatom",
+    enabled: Boolean(cosmosAccount?.bech32Address),
+  });
+
+  const { data: osmosisBalance } = useBalance({
+    chainId: "osmosis-1",
+    bech32Address: osmosisAccount?.bech32Address || "",
+    denom: "uosmo",
+    enabled: Boolean(osmosisAccount?.bech32Address),
   });
 
   const handleConnect = () => {
@@ -273,13 +287,17 @@ export function MultiChainWallet() {
     <div>
       <button onClick={handleConnect}>Connect Multi-Chain</button>
 
-      {accounts && Object.entries(accounts).map(([chainId, account]) => (
-        <div key={chainId}>
-          <h3>{chainId}</h3>
-          <p>Address: {account.bech32Address}</p>
-          <p>Balance: {balances?.[chainId]?.amount}</p>
-        </div>
-      ))}
+      <div>
+        <h3>Cosmos Hub</h3>
+        <p>Address: {cosmosAccount?.bech32Address}</p>
+        <p>Balance: {cosmosBalance?.amount} uatom</p>
+      </div>
+
+      <div>
+        <h3>Osmosis</h3>
+        <p>Address: {osmosisAccount?.bech32Address}</p>
+        <p>Balance: {osmosisBalance?.amount} uosmo</p>
+      </div>
     </div>
   );
 }
@@ -345,14 +363,19 @@ function Component() {
 
 ```tsx
 function Component() {
+  const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+  const account = accounts?.["cosmoshub-4"];
+
   const { data: balance, refetch } = useBalance({
-    chainId: ["cosmoshub-4"],
+    chainId: "cosmoshub-4",
+    bech32Address: account?.bech32Address || "",
     denom: "uatom",
+    enabled: Boolean(account?.bech32Address),
   });
 
   return (
     <div>
-      <p>Balance: {balance?.["cosmoshub-4"]?.amount}</p>
+      <p>Balance: {balance?.amount}</p>
       <button onClick={() => refetch()}>Refresh</button>
     </div>
   );

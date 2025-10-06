@@ -1,17 +1,18 @@
+import type {
+  ParaGrazConfig as BaseParaGrazConfig,
+  ParaGrazConnector as BaseParaGrazConnector,
+} from "@getpara/graz-connector";
 import type { ChainInfo, Keplr } from "@keplr-wallet/types";
-import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import type { WalletConnectModalConfig } from "@walletconnect/modal";
+import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import { create } from "zustand";
 import type { PersistOptions } from "zustand/middleware";
 import { createJSONStorage } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
 import type { Dictionary } from "../types/core";
-import { Key, WalletType } from "../types/wallet";
-import type {
-  ParaGrazConfig as BaseParaGrazConfig,
-  ParaGrazConnector as BaseParaGrazConnector,
-} from "@getpara/graz-connector";
+import type { Key } from "../types/wallet";
+import { WalletType } from "../types/wallet";
 
 export interface ChainConfig {
   path?: string;
@@ -88,7 +89,7 @@ export type GrazSessionPersistedStore = Pick<GrazSessionStore, "accounts" | "act
 
 export type GrazInternalPersistedStore = Pick<
   GrazInternalStore,
-  "recentChainIds" | "_reconnect" | "_reconnectConnector" | "walletType"
+  "recentChainIds" | "_reconnect" | "_reconnectConnector" | "walletType" | "chains"
 >;
 
 export const grazInternalDefaultValues: GrazInternalStore = {
@@ -139,8 +140,9 @@ const persistOptions: PersistOptions<GrazInternalStore, GrazInternalPersistedSto
     _reconnect: x._reconnect,
     _reconnectConnector: x._reconnectConnector,
     walletType: x.walletType,
+    chains: x.chains,
   }),
-  version: 2,
+  version: 3,
 };
 
 export const useGrazSessionStore = create(

@@ -4,9 +4,7 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import type {
-  ExecuteContractArgs,
   ExecuteContractMutationArgs,
-  InstantiateContractArgs,
   InstantiateContractMutationArgs,
   SendIbcTokensArgs,
   SendTokensArgs,
@@ -54,7 +52,7 @@ export const useSendTokens = ({
   onLoading,
   onSuccess,
 }: MutationEventArgs<SendTokensArgs, DeliverTxResponse> = {}) => {
-  const mutation = useMutation({
+  const { mutate, mutateAsync, ...mutation } = useMutation({
     mutationKey: ["USE_SEND_TOKENS", onError, onLoading, onSuccess],
     mutationFn: sendTokens,
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
@@ -63,12 +61,9 @@ export const useSendTokens = ({
   });
 
   return {
-    error: mutation.error,
-    isLoading: mutation.isPending,
-    isSuccess: mutation.isSuccess,
-    sendTokens: mutation.mutate,
-    sendTokensAsync: mutation.mutateAsync,
-    status: mutation.status,
+    ...mutation,
+    sendTokens: mutate,
+    sendTokensAsync: mutateAsync,
   };
 };
 /**
@@ -101,7 +96,7 @@ export const useSendIbcTokens = ({
   onLoading,
   onSuccess,
 }: MutationEventArgs<SendIbcTokensArgs, DeliverTxResponse> = {}) => {
-  const mutation = useMutation({
+  const { mutate, mutateAsync, ...mutation } = useMutation({
     mutationKey: ["USE_SEND_IBC_TOKENS", onError, onLoading, onSuccess],
     mutationFn: sendIbcTokens,
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
@@ -110,12 +105,9 @@ export const useSendIbcTokens = ({
   });
 
   return {
-    error: mutation.error,
-    isLoading: mutation.isPending,
-    isSuccess: mutation.isSuccess,
-    sendIbcTokens: mutation.mutate,
-    sendIbcTokensAsync: mutation.mutateAsync,
-    status: mutation.status,
+    ...mutation,
+    sendIbcTokens: mutate,
+    sendIbcTokensAsync: mutateAsync,
   };
 };
 
@@ -166,7 +158,7 @@ export const useInstantiateContract = <Message extends Record<string, unknown>>(
     });
   };
 
-  const mutation = useMutation({
+  const { mutate, mutateAsync, ...mutation } = useMutation({
     mutationKey: ["USE_INSTANTIATE_CONTRACT", onError, onLoading, onSuccess, codeId],
     mutationFn,
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
@@ -175,12 +167,9 @@ export const useInstantiateContract = <Message extends Record<string, unknown>>(
   });
 
   return {
-    error: mutation.error,
-    isLoading: mutation.isPending,
-    isSuccess: mutation.isSuccess,
-    instantiateContract: mutation.mutate,
-    instantiateContractAsync: mutation.mutateAsync,
-    status: mutation.status,
+    ...mutation,
+    instantiateContract: mutate,
+    instantiateContractAsync: mutateAsync,
   };
 };
 
@@ -239,7 +228,7 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
     });
   };
 
-  const mutation = useMutation({
+  const { mutate, mutateAsync, ...mutation } = useMutation({
     mutationKey: ["USE_EXECUTE_CONTRACT", onError, onLoading, onSuccess, contractAddress],
     mutationFn,
     onError: (err, data) => Promise.resolve(onError?.(err, data)),
@@ -248,12 +237,9 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
   });
 
   return {
-    error: mutation.error,
-    isLoading: mutation.isPending,
-    isSuccess: mutation.isSuccess,
-    executeContract: mutation.mutate,
-    executeContractAsync: mutation.mutateAsync,
-    status: mutation.status,
+    ...mutation,
+    executeContract: mutate,
+    executeContractAsync: mutateAsync,
   };
 };
 

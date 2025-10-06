@@ -1,12 +1,12 @@
 import type { AminoSignResponse } from "@cosmjs/amino";
 import { fromBech32 } from "@cosmjs/encoding";
-import type { DirectSignResponse, OfflineSigner } from "@cosmjs/proto-signing";
+import type { DirectSignResponse } from "@cosmjs/proto-signing";
+import type { ChainInfo } from "@vectis/extension-client";
 import Long from "long";
 
 import { useGrazInternalStore } from "../../store";
-import type { Key, SignAminoParams, SignDirectParams, SignDoc, Wallet } from "../../types/wallet";
+import type { Key, SignAminoParams, SignDirectParams, Wallet } from "../../types/wallet";
 import { clearSession } from ".";
-import { ChainInfo } from "@vectis/extension-client";
 
 /**
  * Function to return {@link Wallet} object and throws and error if it does not exist on `window`.
@@ -48,7 +48,7 @@ export const getVectis = (): Wallet => {
         rpcUrl: chainInfo.rpc,
         restUrl: chainInfo.rest,
         prettyName: chainInfo.chainName.replace(" ", ""),
-        bech32Prefix: chainInfo.bech32Config?.bech32PrefixAccAddr,
+        bech32Prefix: chainInfo.bech32Config.bech32PrefixAccAddr,
         currencies: chainInfo.currencies,
         feeCurrencies: chainInfo.feeCurrencies,
         chainId: chainInfo.chainId,
@@ -106,7 +106,7 @@ export const getVectis = (): Wallet => {
           signAmino: os.signAmino,
           signDirect: async (signer, signDoc) => {
             const res = await os.signDirect(signer, {
-              accountNumber: Long.fromString(signDoc.accountNumber?.toString() || "", false),
+              accountNumber: Long.fromString(signDoc.accountNumber.toString() || "", false),
               authInfoBytes: signDoc.authInfoBytes,
               bodyBytes: signDoc.bodyBytes,
               chainId: signDoc.chainId || "",
@@ -133,7 +133,7 @@ export const getVectis = (): Wallet => {
             getAccounts: os.getAccounts,
             signDirect: async (signer, signDoc) => {
               const res = await os.signDirect(signer, {
-                accountNumber: Long.fromString(signDoc.accountNumber?.toString() || "", false),
+                accountNumber: Long.fromString(signDoc.accountNumber.toString() || "", false),
                 authInfoBytes: signDoc.authInfoBytes,
                 bodyBytes: signDoc.bodyBytes,
                 chainId: signDoc.chainId || "",

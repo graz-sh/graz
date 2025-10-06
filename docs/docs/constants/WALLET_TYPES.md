@@ -1,6 +1,6 @@
 # WALLET_TYPES
 
-`graz` supports 12+ wallet integrations. We provide a constant array that contains all supported wallet types.
+`graz` supports 13+ wallet integrations. We provide a constant array that contains all supported wallet types.
 
 ## Supported Wallets
 
@@ -13,6 +13,7 @@
 - **Compass** - Compass wallet
 - **Initia** - Initia wallet
 - **OKX** - OKX wallet
+- **Cactus Cosmos** - Cactus link Cosmos wallet
 - **Para** - Para embedded wallet
 - **Cosmiframe** - Iframe-based wallet integration
 - **WalletConnect** - Generic WalletConnect integration

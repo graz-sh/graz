@@ -2,9 +2,10 @@
  * Tests for Record format consistency between sync and async multi-chain functions
  */
 
-import { describe, it, expect } from "vitest";
 import type { ChainInfo } from "@keplr-wallet/types";
-import { createMultiChainFunction, createMultiChainAsyncFunction } from "../multi-chain";
+import { describe, expect, it } from "vitest";
+
+import { createMultiChainAsyncFunction, createMultiChainFunction } from "../multi-chain";
 
 describe("Multi-Chain Record Format Consistency", () => {
   const mockChains: ChainInfo[] = [

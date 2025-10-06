@@ -45,6 +45,7 @@ enum WalletType {
   STATION = "station",
   OKX = "okx",
   INITIA = "initia",
+  CACTUSCOSMOS = "cactuscosmos",
 
   // Embedded & Smart Contract Wallets
   VECTIS = "vectis",

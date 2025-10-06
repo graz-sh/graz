@@ -45,13 +45,10 @@ export default defineConfig(({ watch }) => [
     ...defaultOptions,
 
     // Generate both .d.ts and .d.mts for proper TypeScript module resolution
-    // In watch mode, skip DTS for faster rebuilds
-    dts: watch
-      ? false
-      : {
-          banner: '/// <reference types="../types/global" />',
-          resolve: false, // Faster DTS generation, external types stay external
-        },
+    dts: {
+      banner: '/// <reference types="../types/global" />',
+      resolve: false, // Faster DTS generation, external types stay external
+    },
 
     entry: ["src/index.ts"],
 

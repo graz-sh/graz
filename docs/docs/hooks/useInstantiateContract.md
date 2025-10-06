@@ -4,6 +4,8 @@ Mutation hook to instantiate a CosmWasm smart contract.
 
 **Important**: `senderAddress` is a required parameter that must be explicitly provided.
 
+**Enhanced**: This hook now returns all React Query mutation properties, giving you access to utilities like `reset`, `variables`, `context`, `failureCount`, and more.
+
 ## Usage
 
 ### Basic Example
@@ -149,18 +151,33 @@ Note: `InstantiateResult` is from `@cosmjs/cosmwasm-stargate`
 
 ```tsx
 {
-  error: unknown;
-  isError: boolean;
-  isIdle: boolean;
-  isLoading: boolean;
-  isSuccess: boolean;
-  data?: InstantiateResult; // From @cosmjs/cosmwasm-stargate
+  // Custom mutation functions
   instantiateContract: (args: InstantiateContractMutationArgs) => void;
   instantiateContractAsync: (args: InstantiateContractMutationArgs) => Promise<InstantiateResult>;
-  reset: () => void;
-  status: "error" | "idle" | "loading" | "success";
+
+  // All React Query mutation properties
+  data?: InstantiateResult; // From @cosmjs/cosmwasm-stargate
+  error: unknown;
+  failureCount: number;
+  failureReason: Error | null;
+  isError: boolean;
+  isIdle: boolean;
+  isPending: boolean;
+  isPaused: boolean;
+  isSuccess: boolean;
+  status: "idle" | "pending" | "error" | "success";
+  variables?: InstantiateContractMutationArgs; // Arguments passed to the last mutation call
+  submittedAt: number;
+
+  // Mutation methods
+  reset: () => void; // Reset mutation state
+
+  // Context (from onMutate)
+  context: unknown;
 }
 ```
+
+Note: `isLoading` has been replaced by `isPending` in React Query v5. Both work, but `isPending` is the modern property name.
 
 ### `InstantiateResult`
 

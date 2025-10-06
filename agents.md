@@ -131,9 +131,8 @@ graz/
 │   ├── react/             # Planned: React-specific hooks
 │   └── connectors/        # Planned: Wallet connectors
 ├── example/
-│   ├── next/              # Next.js example
-│   ├── starter/           # Multi-chain starter
-│   └── vite/              # Vite example
+│   ├── vite/              # Vite example
+│   └── playground/        # Playground with multi-chain demos
 └── docs/                  # Docusaurus documentation site
 ```
 
@@ -503,14 +502,11 @@ nvm use 20 && pnpm graz dev
 ```bash
 # IMPORTANT: Always run 'nvm use 20' first!
 
-# Next.js example
-nvm use 20 && pnpm example:next dev
-
 # Vite example
 nvm use 20 && pnpm example:vite dev
 
-# Starter example
-nvm use 20 && pnpm example:starter dev
+# Playground example
+nvm use 20 && pnpm example:playground dev
 ```
 
 ### Documentation

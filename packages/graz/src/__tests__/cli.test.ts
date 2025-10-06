@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
 import { execSync } from "node:child_process";
 import path from "node:path";
+
+import { describe, expect, it } from "vitest";
 
 describe("CLI", () => {
   const cliPath = path.resolve(__dirname, "../../dist/cli.js");

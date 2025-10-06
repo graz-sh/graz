@@ -2,9 +2,10 @@
  * Type tests for ChainIdToRecord utility type
  */
 
-import { describe, it, expectTypeOf } from "vitest";
-import type { ChainIdToRecord } from "../hooks";
 import type { Key } from "@keplr-wallet/types";
+import { describe, expectTypeOf, it } from "vitest";
+
+import type { ChainIdToRecord } from "../hooks";
 
 describe("ChainIdToRecord Type Utility", () => {
   it("should map single chain ID to exact type", () => {

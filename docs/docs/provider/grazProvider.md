@@ -71,7 +71,7 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
 
 ```ts
   {
-    chains?: ChainInfo[];
+    chains?: ChainInfo[]; // Optional: chains can also be added dynamically via useSuggestChain
     chainsConfig?: Record<string, ChainConfig>
     defaultWallet?: WalletType; // default to `WalletType.KEPLR`
     onNotFound?: () => void;
@@ -88,6 +88,12 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
     walletDefaultOptions?: KeplrIntereactionOptions; // Default options for wallet interactions
   }
 ```
+
+:::tip Dynamic Chain Support
+
+While you can configure chains upfront in the `chains` array, you can also add chains dynamically using [`useSuggestChain`](../hooks/useSuggestChain.md) or [`useSuggestChainAndConnect`](../hooks/useSuggestChainAndConnect.md). When you suggest a chain that's not in the provider, it will automatically be added to the internal store, eliminating the need to pre-configure all chains.
+
+:::
 
 ## Types
 

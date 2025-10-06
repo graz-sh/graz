@@ -75,5 +75,6 @@ declare global {
       keplr: KeplrWindow["keplr"];
     };
     initia?: InitiaWallet;
+    cactuslink_cosmos?: KeplrWindow["keplr"];
   }
 }

@@ -1,4 +1,4 @@
-import { vi, beforeEach } from "vitest";
+import { beforeEach, vi } from "vitest";
 
 // Enable store mocking
 vi.mock("../store");

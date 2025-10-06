@@ -1,31 +1,31 @@
 # useBalance
 
-Hook to retrieve specific asset balance from current account or given address. Returns balances in a `Record<chainId, Coin>` format.
+Hook to retrieve a specific asset balance for a specific chain and address using `client.getBalance()`. Returns a single `Coin | undefined`.
 
 ## Usage
 
 ```tsx
-import { useBalance } from "graz";
+import { useBalance, useAccount } from "graz";
 
 function App() {
-  const { data: balances, isLoading, refetch } = useBalance({
-    chainId: ["cosmoshub-4", "osmosis-1"],
-    denom: "uatom",
-    bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
-  });
+  const { data: accounts } = useAccount();
+  const account = accounts?.["cosmoshub-4"];
 
-  const cosmosBalance = balances?.["cosmoshub-4"];
-  const osmosisBalance = balances?.["osmosis-1"];
+  const { data: balance, isLoading, refetch } = useBalance({
+    chainId: "cosmoshub-4",
+    bech32Address: account?.bech32Address || "",
+    denom: "uatom",
+    enabled: Boolean(account?.bech32Address),
+  });
 
   return (
     <div>
       {isLoading ? (
         "Loading..."
       ) : (
-        <>
-          <div>Cosmos Hub: {cosmosBalance?.amount} {cosmosBalance?.denom}</div>
-          <div>Osmosis: {osmosisBalance?.amount} {osmosisBalance?.denom}</div>
-        </>
+        <div>
+          Balance: {balance?.amount} {balance?.denom}
+        </div>
       )}
       <button onClick={() => void refetch()}>Refresh</button>
     </div>
@@ -33,24 +33,60 @@ function App() {
 }
 ```
 
-### Connected Account
+### With Custom Address
+
+```tsx
+import { useBalance } from "graz";
+
+function BalanceViewer() {
+  const { data: balance } = useBalance({
+    chainId: "cosmoshub-4",
+    bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
+    denom: "uatom",
+  });
+
+  return (
+    <div>
+      {balance ? (
+        <span>{balance.amount} ATOM</span>
+      ) : (
+        <span>No balance</span>
+      )}
+    </div>
+  );
+}
+```
+
+### Multiple Chains
+
+To fetch balances for multiple chains, call `useBalance` for each chain:
 
 ```tsx
 import { useBalance, useAccount } from "graz";
 
-function MyBalance() {
-  const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
-  const account = accounts?.["cosmoshub-4"];
+function MultiChainBalance() {
+  const { data: accounts } = useAccount();
 
-  // bech32Address is optional - uses connected account if not provided
-  const { data: balances } = useBalance({
-    chainId: ["cosmoshub-4"],
+  const { data: cosmosBalance } = useBalance({
+    chainId: "cosmoshub-4",
+    bech32Address: accounts?.["cosmoshub-4"]?.bech32Address || "",
     denom: "uatom",
+    enabled: Boolean(accounts?.["cosmoshub-4"]?.bech32Address),
   });
 
-  const balance = balances?.["cosmoshub-4"];
+  const { data: osmosisBalance } = useBalance({
+    chainId: "osmosis-1",
+    bech32Address: accounts?.["osmosis-1"]?.bech32Address || "",
+    denom: "uosmo",
+    enabled: Boolean(accounts?.["osmosis-1"]?.bech32Address),
+  });
 
-  return <div>{balance?.amount} ATOM</div>;
+  return (
+    <div>
+      <div>Cosmos Hub: {cosmosBalance?.amount} ATOM</div>
+      <div>Osmosis: {osmosisBalance?.amount} OSMO</div>
+    </div>
+  );
 }
 ```
 
@@ -58,9 +94,11 @@ function MyBalance() {
 
 ```ts
 {
-  chainId?: string[]; // Array of chain IDs
-  denom: string; // Asset denom to search
-  bech32Address?: string; // Optional address, defaults to connected account
+  chainId: string; // Single chain ID (required)
+  bech32Address: string; // Address to query balance for (required)
+  denom: string; // Asset denom to search (required)
+  enabled?: boolean; // Optional, defaults to true
+  // ... other react-query options
 }
 ```
 
@@ -68,7 +106,7 @@ function MyBalance() {
 
 ```tsx
 {
-  data?: Record<string, Coin>; // Coin from @cosmjs/proto-signing
+  data?: Coin | undefined; // Coin from @cosmjs/proto-signing
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -86,7 +124,7 @@ function MyBalance() {
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Record<string, Coin>, unknown>>;
+  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Coin | undefined, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

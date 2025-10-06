@@ -1,53 +1,87 @@
 # useBalanceStaked
 
-Hook to retrieve staked balance from current account or given address. Returns staked balances in a `Record<chainId, Coin>` format.
+Hook to retrieve staked balance for a specific chain and address. Returns a single `Coin`.
 
 ## Usage
 
 ```tsx
-import { useBalanceStaked } from "graz";
+import { useBalanceStaked, useAccount } from "graz";
 
 function App() {
-  const { data: stakedBalances, isLoading } = useBalanceStaked({
-    chainId: ["cosmoshub-4", "osmosis-1"],
-    bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
+  const { data: accounts } = useAccount();
+  const account = accounts?.["cosmoshub-4"];
+
+  const { data: stakedBalance, isLoading } = useBalanceStaked({
+    chainId: "cosmoshub-4",
+    bech32Address: account?.bech32Address || "",
+    enabled: Boolean(account?.bech32Address),
   });
 
   return (
     <div>
-      <h3>Staked Balances</h3>
+      <h3>Staked Balance</h3>
       {isLoading ? (
         "Loading..."
       ) : (
-        stakedBalances && Object.entries(stakedBalances).map(([chainId, coin]) => (
-          <div key={chainId}>
-            <p>{chainId}: {coin.amount} {coin.denom}</p>
-          </div>
-        ))
+        <p>{stakedBalance?.amount} {stakedBalance?.denom}</p>
       )}
     </div>
   );
 }
 ```
 
-### Connected Account
+### With Custom Address
+
+```tsx
+import { useBalanceStaked } from "graz";
+
+function StakedBalanceViewer() {
+  const { data: stakedBalance } = useBalanceStaked({
+    chainId: "cosmoshub-4",
+    bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
+  });
+
+  return (
+    <div>
+      {stakedBalance ? (
+        <span>{stakedBalance.amount} {stakedBalance.denom}</span>
+      ) : (
+        <span>No staked balance</span>
+      )}
+    </div>
+  );
+}
+```
+
+### Multiple Chains
+
+To fetch staked balances for multiple chains, call `useBalanceStaked` for each chain:
 
 ```tsx
 import { useBalanceStaked, useAccount } from "graz";
 
-function MyStakedBalance() {
-  const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+function MultiChainStakedBalances() {
+  const { data: accounts } = useAccount();
 
-  // bech32Address is optional - uses connected account if not provided
-  const { data: stakedBalances } = useBalanceStaked({
-    chainId: ["cosmoshub-4"],
+  const { data: cosmosStaked } = useBalanceStaked({
+    chainId: "cosmoshub-4",
+    bech32Address: accounts?.["cosmoshub-4"]?.bech32Address || "",
+    enabled: Boolean(accounts?.["cosmoshub-4"]?.bech32Address),
   });
 
-  const staked = stakedBalances?.["cosmoshub-4"];
+  const { data: osmosisStaked } = useBalanceStaked({
+    chainId: "osmosis-1",
+    bech32Address: accounts?.["osmosis-1"]?.bech32Address || "",
+    enabled: Boolean(accounts?.["osmosis-1"]?.bech32Address),
+  });
 
   return (
     <div>
-      Staked: {staked?.amount} {staked?.denom}
+      <h4>Cosmos Hub Staked</h4>
+      {cosmosStaked && <div>{cosmosStaked.amount} {cosmosStaked.denom}</div>}
+
+      <h4>Osmosis Staked</h4>
+      {osmosisStaked && <div>{osmosisStaked.amount} {osmosisStaked.denom}</div>}
     </div>
   );
 }
@@ -57,8 +91,10 @@ function MyStakedBalance() {
 
 ```tsx
 {
-  chainId?: string[]; // Array of chain IDs
-  bech32Address?: string; // Optional address, defaults to connected account
+  chainId: string; // Single chain ID (required)
+  bech32Address: string; // Address to query staked balance for (required)
+  enabled?: boolean; // Optional, defaults to true
+  // ... other react-query options
 }
 ```
 
@@ -66,7 +102,7 @@ function MyStakedBalance() {
 
 ```tsx
 {
-  data?: Record<string, Coin>; // Coin from @cosmjs/proto-signing
+  data?: Coin; // Coin from @cosmjs/proto-signing
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -84,7 +120,7 @@ function MyStakedBalance() {
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Record<string, Coin>, unknown>>;
+  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Coin, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

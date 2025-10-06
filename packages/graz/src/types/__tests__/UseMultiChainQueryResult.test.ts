@@ -2,9 +2,10 @@
  * Type tests for UseMultiChainQueryResult type inference
  */
 
-import { describe, it, expectTypeOf } from "vitest";
-import type { ChainIdToRecord } from "../hooks";
 import type { Key } from "@keplr-wallet/types";
+import { describe, expectTypeOf, it } from "vitest";
+
+import type { ChainIdToRecord } from "../hooks";
 
 describe("UseMultiChainQueryResult Type Inference", () => {
   it("should infer exact types when chainId is const tuple", () => {
@@ -36,9 +37,9 @@ describe("UseMultiChainQueryResult Type Inference", () => {
 
   it("should provide autocomplete-friendly types with const", () => {
     // Simulate hook return type
-    type HookResult<TChainIds extends readonly string[] | undefined> = {
+    interface HookResult<TChainIds extends readonly string[] | undefined> {
       data?: TChainIds extends readonly string[] ? ChainIdToRecord<TChainIds, Key> : Record<string, Key>;
-    };
+    }
 
     // With as const - should have exact keys
     const CHAINS = ["cosmoshub-4", "osmosis-1"] as const;
@@ -60,9 +61,9 @@ describe("UseMultiChainQueryResult Type Inference", () => {
   });
 
   it("should handle undefined chainId gracefully", () => {
-    type HookResult<TChainIds extends readonly string[] | undefined> = {
+    interface HookResult<TChainIds extends readonly string[] | undefined> {
       data?: TChainIds extends readonly string[] ? ChainIdToRecord<TChainIds, Key> : Record<string, Key>;
-    };
+    }
 
     type ResultWithoutChainId = HookResult<undefined>;
 

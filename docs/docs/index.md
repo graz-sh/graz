@@ -26,13 +26,14 @@ import { useAccount, useConnect, useBalance } from "graz";
 function WalletStatus() {
   const { connect } = useConnect();
   const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
-  const { data: balances } = useBalance({
-    chainId: ["cosmoshub-4"],
-    denom: "uatom",
-  });
-
   const account = accounts?.["cosmoshub-4"];
-  const balance = balances?.["cosmoshub-4"];
+
+  const { data: balance } = useBalance({
+    chainId: "cosmoshub-4",
+    bech32Address: account?.bech32Address || "",
+    denom: "uatom",
+    enabled: Boolean(account?.bech32Address),
+  });
 
   return (
     <div>

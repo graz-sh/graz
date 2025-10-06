@@ -49,33 +49,19 @@ pnpm example:vite dev
 
 ---
 
-### Option 2: Next.js Example
+### Option 2: Playground Example (Full Features)
 ```bash
-pnpm example:next dev
-# Open http://localhost:3000
-```
-
-**What to test:**
-- Connect wallet
-- View balances
-- Refresh balances
-- Switch chains (suggest osmosis testnet)
-- Verify all data displays correctly
-
----
-
-### Option 3: Starter Example (Full Features)
-```bash
-pnpm example:starter dev
+pnpm example:playground dev
 # Open http://localhost:3000
 ```
 
 **What to test:**
 - Connect to multiple chains
-- Navigate between pages (Home, Assets, Send Token)
-- View assets with chain IDs
-- Select chain and send tokens
-- Check all balances modal
+- Navigate between pages (Account, Balances, Contracts, Chains)
+- View balances across all connected chains
+- Query and execute smart contracts
+- Manage chains and suggest new ones
+- Verify all multi-chain functionality
 
 ---
 
@@ -136,15 +122,15 @@ useAccount({ chainId: ["cosmoshub-4"] })
 
 ```javascript
 // Test useAccount
-const { data: accounts } = useAccount({ 
-  chainId: ["cosmoshub-4", "osmosis-1"] 
+const { data: accounts } = useAccount({
+  chainId: ["cosmoshub-4", "osmosis-1"]
 });
 console.log(accounts);
 // Expected: { "cosmoshub-4": {...}, "osmosis-1": {...} }
 
 // Test useBalances
-const { data: balances } = useBalances({ 
-  chainId: ["cosmoshub-4"] 
+const { data: balances } = useBalances({
+  chainId: ["cosmoshub-4"]
 });
 console.log(balances);
 // Expected: { "cosmoshub-4": [{ denom: "uatom", amount: "1000" }] }
@@ -162,15 +148,15 @@ console.log(balances);
 
 ```typescript
 // Without
-const { data: accounts1 } = useAccount({ 
-  chainId: ["cosmoshub-4"] 
+const { data: accounts1 } = useAccount({
+  chainId: ["cosmoshub-4"]
 });
 accounts1?.["cosmoshub-4"]  // ✅ Valid
 accounts1?.["any-string"]   // ✅ TypeScript allows (generic Record<string, Key>)
 
 // With
-const { data: accounts2 } = useAccount({ 
-  chainId: ["cosmoshub-4"] 
+const { data: accounts2 } = useAccount({
+  chainId: ["cosmoshub-4"]
 });
 accounts2?.["cosmoshub-4"]  // ✅ Valid and type-safe
 accounts2?.["wrong-chain"]  // ❌ TypeScript error!
@@ -185,11 +171,11 @@ accounts2?.["wrong-chain"]  // ❌ TypeScript error!
 
 ### 3. Balance Queries ✅
 
-#### Test: View Balances (Assets Page)
-**Location:** Starter example → Assets page
+#### Test: View Balances (Balances Page)
+**Location:** Playground example → Balances page
 
 1. Connect to one or more chains
-2. Click "Assets" in navigation
+2. Click "Balances" in navigation
 3. View the balances table
 
 **Expected:**
@@ -206,33 +192,20 @@ accounts2?.["wrong-chain"]  // ❌ TypeScript error!
 
 ---
 
-#### Test: Single Denom Balance
-**Location:** Next.js example
+#### Test: Chain-Specific Balances
+**Location:** Playground example → Balances page
 
-1. Connect wallet
-2. View balance list
-3. Click refresh
+1. Connect wallet to multiple chains
+2. View balances for each chain
+3. Click "Refresh All"
 
 **Expected:**
-- ✅ All denoms display
+- ✅ All denoms display for each chain
 - ✅ Amounts are correct
-- ✅ Refresh updates balances
+- ✅ Refresh updates all balances
 - ✅ Loading state shows during refresh
-
----
-
-#### Test: All Balances Modal (Starter)
-**Location:** Starter example → Chain card → "View all"
-
-1. Connect to a chain
-2. Click "View all" on chain card
-3. View modal
-
-**Expected:**
-- ✅ Modal opens
-- ✅ All balances listed
-- ✅ Amounts formatted correctly
-- ✅ Denoms truncated with tooltips
+- ✅ Main balance highlighted for each chain
+- ✅ IBC denoms are truncated with full denom visible
 
 ---
 
@@ -279,10 +252,10 @@ const { data: clients } = useStargateSigningClient({
 ### 5. Token Sending ✅
 
 #### Test: Send Tokens with Chain Selection
-**Location:** Starter example → Send Token page
+**Location:** Playground example (or Vite example)
 
 1. Connect to multiple chains
-2. Go to "Send Token" page
+2. Use useSendTokens hook
 3. **Select chain** from dropdown
 4. Select coin
 5. Enter recipient address
@@ -306,12 +279,11 @@ const { data: clients } = useStargateSigningClient({
 ---
 
 #### Test: Send with Explicit senderAddress
-**Location:** Send Token Modal (Starter)
+**Location:** Any example with send functionality
 
 1. Connect to a chain
-2. Find chain card
-3. Click "Send Tokens" button
-4. Fill form and send
+2. Use send tokens functionality
+3. Fill form and send
 
 **Expected:**
 - ✅ Modal opens
@@ -336,12 +308,13 @@ sendTokensAsync({
 
 ### 6. Navigation & UI ✅
 
-#### Test: Page Navigation (Starter)
-**Location:** Starter example
+#### Test: Page Navigation (Playground)
+**Location:** Playground example
 
-1. Click "Home" - should show chain cards
-2. Click "Assets" - should show balances table
-3. Click "Send Token" - should show send form
+1. Click "Account" - should show account information
+2. Click "Balances" - should show balances for all chains
+3. Click "Contracts" - should show contract interaction forms
+4. Click "Chains" - should show chain management
 4. Active page button is highlighted green
 
 **Expected:**
@@ -353,13 +326,13 @@ sendTokensAsync({
 ---
 
 #### Test: Chain ID Display
-**Location:** Starter example → Assets page
+**Location:** Playground example → Balances page
 
 **Check:**
 - ✅ Chain ID badges visible
-- ✅ Badge color is purple
+- ✅ Badge displays correctly
 - ✅ Chain ID text is readable
-- ✅ Badges align properly in table
+- ✅ Chain information is clear
 
 ---
 
@@ -526,8 +499,8 @@ account.bech32Address  // works!
 **Fix:**
 ```typescript
 // Use for exact types
-const { data: accounts } = useAccount({ 
-  chainId: ["cosmoshub-4"] 
+const { data: accounts } = useAccount({
+  chainId: ["cosmoshub-4"]
 });
 accounts?.["cosmoshub-4"]  // ✅ Type-safe
 ```
@@ -543,11 +516,11 @@ accounts?.["cosmoshub-4"]  // ✅ Type-safe
 sendTokensAsync({ recipientAddress, amount, fee })
 
 // ✅ New API
-sendTokensAsync({ 
+sendTokensAsync({
   senderAddress: account.bech32Address,  // Required!
-  recipientAddress, 
-  amount, 
-  fee 
+  recipientAddress,
+  amount,
+  fee
 })
 ```
 
@@ -678,16 +651,16 @@ console.log(config.multiChainFetchConcurrency); // Should be 3
 If you only have 5 minutes, test this:
 
 1. **Build:** `pnpm graz build`
-2. **Run:** `pnpm example:starter dev`
+2. **Run:** `pnpm example:playground dev`
 3. **Connect:** Connect wallet to 2+ chains
-4. **Navigate:** Visit Home, Assets, Send Token pages
-5. **Verify:** 
-   - Chain IDs show in Assets ✅
-   - Can select chain in Send Token ✅
-   - Denoms are truncated ✅
+4. **Navigate:** Visit Account, Balances, Contracts, Chains pages
+5. **Verify:**
+   - Account information displays correctly ✅
+   - Balances show for all connected chains ✅
+   - Chain IDs and denoms display properly ✅
    - Navigation works ✅
-6. **Send:** Try sending a small amount
-7. **Check:** Transaction succeeds ✅
+6. **Test:** Try querying a contract or managing chains
+7. **Check:** All multi-chain functionality works ✅
 
 If all pass → Basic functionality works! ✅
 
@@ -713,5 +686,3 @@ If you find issues during testing:
 4. Ask for help with specific reproduction steps
 
 **Happy Testing! 🚀**
-
-

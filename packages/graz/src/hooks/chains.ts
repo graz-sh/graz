@@ -7,7 +7,7 @@ import type { QueryValidatorsResponse } from "cosmjs-types/cosmos/staking/v1beta
 
 import type { ConnectResult } from "../actions/account";
 import type { SuggestChainAndConnectArgs } from "../actions/chains";
-import { clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
+import { addChain, clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
 import { useCheckWallet } from "./wallet";
@@ -36,9 +36,12 @@ export const useActiveChainIds = (): string[] | null => {
  * ```
  */
 export const useActiveChains = (): ChainInfo[] | undefined => {
-  return useGrazSessionStore((x) => x.activeChainIds)
+  const activeChainIds = useGrazSessionStore((x) => x.activeChainIds);
+  const chains = useGrazInternalStore((x) => x.chains);
+
+  return activeChainIds
     ?.map((chainId) => {
-      const chain = useGrazInternalStore.getState().chains?.find((x) => x.chainId === chainId);
+      const chain = chains?.find((x) => x.chainId === chainId);
       if (!chain) return;
       return chain;
     })
@@ -56,23 +59,30 @@ export const useActiveChains = (): ChainInfo[] | undefined => {
  * const chainInfo = useChainInfo({chainId: "cosmoshub-4"});
  * ```
  */
-export const useChainInfo = ({ chainId }: { chainId?: string }) => {
-  return useGrazInternalStore().chains?.find((x) => x.chainId === chainId);
+export const useChainInfo = ({ chainId }: { chainId?: string } = {}) => {
+  return useGrazInternalStore((x) => x.chains)?.find((x) => x.chainId === chainId);
 };
 
 /**
  * graz hook to retrieve ChainInfo objects from GrazProvider with given chainId
  *
- * @param chainId - chainId to search
+ * @param chainId - chainId array to filter. If not provided, returns all chains
  *
  * @example
  * ```ts
  * import { useChainInfos } from "graz";
+ *
+ * // Get specific chains
  * const chainInfos = useChainInfos({chainId: ["cosmoshub-4", "juno-1"]});
+ *
+ * // Get all chains
+ * const allChains = useChainInfos();
  * ```
  */
-export const useChainInfos = ({ chainId }: { chainId?: string[] }) => {
-  return useGrazInternalStore().chains?.filter((x) => chainId?.includes(x.chainId));
+export const useChainInfos = ({ chainId }: { chainId?: string[] } = {}) => {
+  const chains = useGrazInternalStore((x) => x.chains);
+  if (!chainId) return chains;
+  return chains?.filter((x) => chainId.includes(x.chainId));
 };
 
 /**
@@ -165,14 +175,88 @@ export const useRecentChainIds = () => {
  * @see {@link useActiveChains}
  */
 export const useRecentChains = () => {
-  const data = useGrazInternalStore((x) => x.recentChainIds)
+  const recentChainIds = useGrazInternalStore((x) => x.recentChainIds);
+  const chains = useGrazInternalStore((x) => x.chains);
+
+  const data = recentChainIds
     ?.map((chainId) => {
-      const chain = useGrazInternalStore.getState().chains?.find((x) => x.chainId === chainId);
+      const chain = chains?.find((x) => x.chainId === chainId);
       if (!chain) return;
       return chain;
     })
     .filter(Boolean) as ChainInfo[] | undefined;
   return { data, clear: clearRecentChain };
+};
+
+export type UseAddChainArgs = MutationEventArgs<ChainInfo>;
+
+/**
+ * graz mutation hook to add chain to the internal store
+ * without suggesting it to the wallet
+ *
+ * @example
+ * ```ts
+ * import { useAddChain } from "graz";
+ * const { addChain, isLoading, isSuccess, ... } = useAddChain();
+ *
+ * addChain({
+ *    chainInfo: {
+ *      rpc: "https://rpc.cosmoshub.strange.love",
+ *      rest: "https://api.cosmoshub.strange.love",
+ *      chainId: "cosmoshub-4",
+ *      chainName: "Cosmos Hub",
+ *      stakeCurrency: {
+ *        coinDenom: "ATOM",
+ *        coinMinimalDenom: "uatom",
+ *        coinDecimals: 6,
+ *      },
+ *      bip44: {
+ *        coinType: 118,
+ *      },
+ *      bech32Config: {
+ *        bech32PrefixAccAddr: "cosmos",
+ *        bech32PrefixAccPub: "cosmospub",
+ *        bech32PrefixValAddr: "cosmosvaloper",
+ *        bech32PrefixValPub: "cosmosvaloperpub",
+ *        bech32PrefixConsAddr: "cosmosvalcons",
+ *        bech32PrefixConsPub: "cosmosvalconspub",
+ *      },
+ *      currencies: [
+ *        {
+ *          coinDenom: "ATOM",
+ *          coinMinimalDenom: "uatom",
+ *          coinDecimals: 6,
+ *        },
+ *      ],
+ *      feeCurrencies: [
+ *        {
+ *          coinDenom: "ATOM",
+ *          coinMinimalDenom: "uatom",
+ *          coinDecimals: 6,
+ *        },
+ *      ],
+ *    }
+ * });
+ * ```
+ */
+export const useAddChain = ({ onError, onLoading, onSuccess }: UseAddChainArgs = {}) => {
+  const mutationKey = ["USE_ADD_CHAIN", onError, onLoading, onSuccess];
+  const mutation = useMutation({
+    mutationKey,
+    mutationFn: addChain,
+    onError: (err, args) => Promise.resolve(onError?.(err, args.chainInfo)),
+    onMutate: (data) => onLoading?.(data.chainInfo),
+    onSuccess: (chainInfo) => Promise.resolve(onSuccess?.(chainInfo)),
+  });
+
+  return {
+    addChain: mutation.mutate,
+    addChainAsync: mutation.mutateAsync,
+    error: mutation.error,
+    isLoading: mutation.isPending,
+    isSuccess: mutation.isSuccess,
+    status: mutation.status,
+  };
 };
 
 export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;

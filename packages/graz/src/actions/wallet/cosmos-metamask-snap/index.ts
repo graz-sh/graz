@@ -66,7 +66,7 @@ export const getMetamaskSnapCosmos = (): Wallet => {
         return cosmos.signAmino(chainId, signer, signDoc);
       },
       getKey: async (chainId) => {
-        if (typeof metamaskSnapCosmosKeysMap[chainId] !== "undefined") return metamaskSnapCosmosKeysMap[chainId]!;
+        if (typeof metamaskSnapCosmosKeysMap[chainId] !== "undefined") return metamaskSnapCosmosKeysMap[chainId];
 
         return cosmos.getKey(chainId);
       },

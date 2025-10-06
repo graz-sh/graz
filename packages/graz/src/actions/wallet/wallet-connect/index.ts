@@ -1,16 +1,17 @@
 import type { AminoSignResponse } from "@cosmjs/amino";
 import type { AccountData, Algo, DirectSignResponse } from "@cosmjs/proto-signing";
 import type { Keplr } from "@keplr-wallet/types";
+import { WalletConnectModal } from "@walletconnect/modal";
 import { SignClient } from "@walletconnect/sign-client";
 import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import { getSdkError } from "@walletconnect/utils";
 
 import { useGrazInternalStore, useGrazSessionStore } from "../../../store";
-import { Key, type SignAminoParams, type SignDirectParams, type Wallet, WalletType } from "../../../types/wallet";
+import type { Key } from "../../../types/wallet";
+import { type SignAminoParams, type SignDirectParams, type Wallet, WalletType } from "../../../types/wallet";
 import { isAndroid, isIos, isMobile } from "../../../utils/os";
 import { promiseWithTimeout } from "../../../utils/timeout";
 import type { GetWalletConnectParams, WalletConnectSignDirectResponse } from "./types";
-import { WalletConnectModal } from "@walletconnect/modal";
 
 export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
@@ -279,7 +280,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
         (async () => {
           const resultAcccounts = Object.fromEntries(
             await Promise.all(
-              (activeChainIds || chainId)?.map(async (c): Promise<[string, Key]> => [c, await getKey(c)]),
+              (activeChainIds || chainId).map(async (c): Promise<[string, Key]> => [c, await getKey(c)]),
             ),
           );
           useGrazSessionStore.setState({
@@ -305,12 +306,10 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     };
   };
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   const getKey = async (chainId: string): Promise<Key> => {
     const session = getSession([chainId]);
     if (!session?.topic) throw new Error("No wallet connect session");
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const keys: (Key & { chainId: string })[] | undefined =
       session.sessionProperties && JSON.parse(String(session.sessionProperties.keys));
     if (!keys) throw new Error("No wallet connect key");

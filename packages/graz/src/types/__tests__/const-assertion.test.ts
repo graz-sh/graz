@@ -2,7 +2,7 @@
  * Type tests for const assertion behavior
  */
 
-import { describe, it, expectTypeOf } from "vitest";
+import { describe, expectTypeOf, it } from "vitest";
 
 describe("Const Assertion Behavior", () => {
   it("should preserve exact types with as const", () => {

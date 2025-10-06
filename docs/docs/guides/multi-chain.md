@@ -100,23 +100,49 @@ const Connect = () => {
 
 ## Multi-Chain Data Pattern
 
-All query hooks in Graz now consistently return data in a `Record<chainId, T>` format:
+Most query hooks in Graz return data in a `Record<chainId, T>` format for multi-chain support:
 
 ### Hooks with Multi-Chain Support
 
-- [useAccount](/docs/hooks/useAccount)
-- [useBalance](/docs/hooks/useBalance)
-- [useBalances](/docs/hooks/useBalances)
-- [useBalanceStaked](/docs/hooks/useBalanceStaked)
-- [useOfflineSigners](/docs/hooks/useOfflineSigners)
-- [useCosmWasmClient](/docs/hooks/useCosmWasmClient)
-- [useCosmWasmSigningClient](/docs/hooks/useCosmWasmSigningClient)
-- [useStargateClient](/docs/hooks/useStargateClient)
-- [useStargateSigningClient](/docs/hooks/useStargateSigningClient)
+- [useAccount](/docs/hooks/useAccount) - Returns `Record<chainId, Key>`
+- [useOfflineSigners](/docs/hooks/useOfflineSigners) - Returns `Record<chainId, OfflineSigner>`
+- [useCosmWasmClient](/docs/hooks/useCosmWasmClient) - Returns `Record<chainId, CosmWasmClient>`
+- [useCosmWasmSigningClient](/docs/hooks/useCosmWasmSigningClient) - Returns `Record<chainId, SigningCosmWasmClient>`
+- [useStargateClient](/docs/hooks/useStargateClient) - Returns `Record<chainId, StargateClient>`
+- [useStargateSigningClient](/docs/hooks/useStargateSigningClient) - Returns `Record<chainId, SigningStargateClient>`
+
+### Single-Chain Hooks
+
+Some hooks are designed for single-chain queries and require explicit parameters:
+
+- [useBalance](/docs/hooks/useBalance) - Requires `chainId: string`, `bech32Address: string`, `denom: string`
+- [useBalances](/docs/hooks/useBalances) - Requires `chainId: string`, `bech32Address: string`
+- [useBalanceStaked](/docs/hooks/useBalanceStaked) - Requires `chainId: string`, `bech32Address: string`
+
+**For multi-chain balance queries**, call these hooks multiple times:
+
+```tsx
+const cosmosAccount = accounts?.["cosmoshub-4"];
+const osmosisAccount = accounts?.["osmosis-1"];
+
+const { data: cosmosBalance } = useBalance({
+  chainId: "cosmoshub-4",
+  bech32Address: cosmosAccount?.bech32Address || "",
+  denom: "uatom",
+  enabled: Boolean(cosmosAccount?.bech32Address),
+});
+
+const { data: osmosisBalance } = useBalance({
+  chainId: "osmosis-1",
+  bech32Address: osmosisAccount?.bech32Address || "",
+  denom: "uosmo",
+  enabled: Boolean(osmosisAccount?.bech32Address),
+});
+```
 
 ### Understanding the Pattern
 
-All hooks accept a `chainId` parameter as an array of chain IDs:
+Multi-chain hooks accept a `chainId` parameter as an array of chain IDs:
 
 ```ts
 {
@@ -126,7 +152,7 @@ All hooks accept a `chainId` parameter as an array of chain IDs:
 
 **Key behaviors:**
 
-- Hooks always return `Record<chainId, T>` format
+- Multi-chain hooks always return `Record<chainId, T>` format
 - If `chainId` is not provided, hooks use all active chains from the current session
 
 ## Examples
@@ -155,23 +181,22 @@ function SingleChainAccount() {
 ### Multi-Chain Query
 
 ```tsx
-import { useBalanceStaked } from "graz";
+import { useAccount } from "graz";
 
-function MultiChainStakedBalances() {
-  const { data: stakedBalances, isLoading } = useBalanceStaked({
-    bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
+function MultiChainAccounts() {
+  const { data: accounts, isLoading } = useAccount({
     chainId: ["cosmoshub-4", "osmosis-1"],
   });
 
   return (
     <div>
-      <h3>Staked Balances</h3>
+      <h3>Connected Accounts</h3>
       {isLoading ? (
         <p>Loading...</p>
       ) : (
-        stakedBalances && Object.entries(stakedBalances).map(([chainId, coin]) => (
+        accounts && Object.entries(accounts).map(([chainId, account]) => (
           <div key={chainId}>
-            <strong>{chainId}</strong>: {coin.amount} {coin.denom}
+            <strong>{chainId}</strong>: {account.bech32Address}
           </div>
         ))
       )}
@@ -183,22 +208,31 @@ function MultiChainStakedBalances() {
 ### Query All Active Chains
 
 ```tsx
-import { useBalance } from "graz";
+import { useAccount, useBalance } from "graz";
 
 function AllChainsBalances() {
-  // When chainId is not provided, uses all active chains
-  const { data: balances } = useBalance({
-    bech32Address: "cosmos1...",
-    denom: "uatom",
-  });
+  const { data: accounts } = useAccount();
+
+  // Get balances for multiple chains by calling useBalance for each chain
+  const chainIds = ["cosmoshub-4", "osmosis-1", "neutron-1"];
 
   return (
     <div>
-      {balances && Object.entries(balances).map(([chainId, balance]) => (
-        <div key={chainId}>
-          {chainId}: {balance.amount} {balance.denom}
-        </div>
-      ))}
+      {chainIds.map((chainId) => {
+        const account = accounts?.[chainId];
+        const { data: balance } = useBalance({
+          chainId,
+          bech32Address: account?.bech32Address || "",
+          denom: "uatom",
+          enabled: Boolean(account?.bech32Address),
+        });
+
+        return (
+          <div key={chainId}>
+            {chainId}: {balance?.amount} {balance?.denom}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -273,8 +307,10 @@ function PerChainOptions() {
 
 If you're upgrading from an older version of Graz:
 
-- The `multiChain` parameter has been removed - all hooks now consistently return `Record<chainId, T>`
-- `chainId` is now always an array (use `["cosmoshub-4"]` instead of `"cosmoshub-4"`)
+- The `multiChain` parameter has been removed from most hooks
+- Multi-chain hooks (like `useAccount`, `useStargateClient`) consistently return `Record<chainId, T>`
+- `chainId` is an array for multi-chain hooks: use `["cosmoshub-4"]` instead of `"cosmoshub-4"`
+- **NEW**: Balance hooks (`useBalance`, `useBalances`, `useBalanceStaked`) now require single `chainId: string` and `bech32Address: string` parameters
 - Method mutation hooks (like `useSendTokens`) now require explicit `senderAddress` parameter
 
 See the [Migration Guide](/docs/migration-guide) for detailed upgrade instructions.

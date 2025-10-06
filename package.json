@@ -7,14 +7,13 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build --filter=!@project/example-next --filter=!@project/starter --filter=!@project/example-vite",
+    "build": "turbo run build --filter=!@project/example-vite --filter=!@project/example-playground",
     "build-all": "turbo run build",
     "clean": "turbo run clean",
-    "dev": "turbo run dev --filter=!@project/docs",
+    "dev": "pnpm graz build && turbo run dev --filter=!@project/docs",
     "project:docs": "pnpm --dir docs",
-    "example:next": "pnpm --dir example/next",
     "example:vite": "pnpm --dir example/vite",
-    "example:starter": "pnpm --dir example/starter",
+    "example:playground": "pnpm --dir example/playground",
     "graz": "pnpm --dir packages/graz",
     "lint": "turbo run lint",
     "release": "pnpm graz build && changeset publish",

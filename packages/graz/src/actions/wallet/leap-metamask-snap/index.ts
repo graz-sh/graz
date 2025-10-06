@@ -1,3 +1,4 @@
+import type { DirectSignResponse } from "@cosmjs/proto-signing";
 import type { AccountData, Algo, AminoSignResponse, Keplr, StdSignDoc } from "@keplr-wallet/types";
 // eslint-disable-next-line import/no-named-as-default
 import Long from "long";
@@ -6,7 +7,6 @@ import { useGrazInternalStore } from "../../../store";
 import type { Key, KnownKeys, SignAminoParams, SignDirectParams, Wallet } from "../../../types/wallet";
 import type { ChainId } from "../../../utils/multi-chain";
 import type { GetSnapsResponse, Snap } from "./types";
-import { DirectSignResponse } from "@cosmjs/proto-signing";
 
 export interface GetMetamaskSnap {
   id: string;
@@ -123,7 +123,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
         signature: signature.signature,
         signed: {
           ...signature.signed,
-          accountNumber: `${modifiedAccountNumber.toString()}`,
+          accountNumber: modifiedAccountNumber.toString(),
           authInfoBytes: new Uint8Array(Object.values(signature.signed.authInfoBytes)),
           bodyBytes: new Uint8Array(Object.values(signature.signed.bodyBytes)),
         },
@@ -151,8 +151,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
 
     // getKey from @leapwallet/cosmos-snap-provider return type is wrong
     const getKey = async (chainId: string): Promise<Key> => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      if (typeof metamaskSnapLeapKeysMap[chainId] !== "undefined") return metamaskSnapLeapKeysMap[chainId]!;
+      if (typeof metamaskSnapLeapKeysMap[chainId] !== "undefined") return metamaskSnapLeapKeysMap[chainId];
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const res: any = await ethereum.request({
