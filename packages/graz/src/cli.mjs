@@ -195,16 +195,40 @@ const makeExports = (record, { testnet = false } = {}) =>
  * @param {{ filter?: string }} opts
  */
 const makeRecord = async (client, { filter = "" } = {}) => {
-  const paths = filter
-    ? filter.split(",").map((path) => ({ path }))
-    : await client.fetchChains().then((c) => c.chains.map(({ path }) => ({ path })));
+  let paths;
+  if (filter) {
+    paths = filter.split(",").map((path) => ({ path }));
+  } else {
+    try {
+      const chainsResponse = await client.fetchChains();
+      paths = chainsResponse.chains.map(({ path }) => ({ path }));
+    } catch (error) {
+      console.error(`❌\tFailed to fetch chains list: ${error.message}`);
+      return {};
+    }
+  }
 
-  const chains = await pmap(paths, async (c) => client.fetchChain(c.path).then((x) => x.chain), { concurrency: 4 });
+  const chains = await pmap(
+    paths,
+    async (c) => {
+      try {
+        const result = await client.fetchChain(c.path);
+        return result.chain;
+      } catch (error) {
+        console.error(`❌\tFailed to fetch chain "${c.path}": ${error.message}`);
+        return null;
+      }
+    },
+    { concurrency: 4 },
+  );
+
+  // Filter out failed fetches
+  const validChains = chains.filter((chain) => chain !== null);
 
   /** @type {Record<string, import("@keplr-wallet/types").ChainInfo>} */
   const record = {};
 
-  chains.forEach((chain) => {
+  validChains.forEach((chain) => {
     try {
       if (args["--authz"] && !chain.params?.authz) {
         return;
