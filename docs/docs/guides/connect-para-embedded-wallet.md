@@ -2,7 +2,7 @@
 
 Para is a wallet connector that enables seamless integration with Cosmos-based chains in your Graz-powered application. This guide shows how to enable Para support, including the modal for user authentication and wallet selection.
 
-**Note:** Para type definitions are now built into `graz`. You only need to install `@getpara/react-sdk-lite` for the runtime functionality and UI components.
+**Note:** Para type definitions are re-exported by `graz` for convenience. You need to install both `@getpara/react-sdk-lite` (for the SDK) and `@getpara/graz-integration` (for the connector implementation).
 
 ## Prerequisites
 
@@ -16,10 +16,15 @@ Para is a wallet connector that enables seamless integration with Cosmos-based c
 Install the required packages:
 
 ```bash
-npm install graz @getpara/react-sdk-lite @tanstack/react-query
+npm install graz @getpara/react-sdk-lite @getpara/graz-integration @tanstack/react-query
 ```
 
-**Note:** Para types (`ParaGrazConfig`, `ParaWeb`, etc.) are now included in the `graz` package. You no longer need to install `@getpara/graz-connector` or `@getpara/graz-integration` separately for type definitions.
+**Package breakdown:**
+
+- `graz` - Core library with Para type definitions re-exported
+- `@getpara/react-sdk-lite` - Para SDK with UI components and ParaWeb client
+- `@getpara/graz-integration` - Para connector implementation (`ParaGrazConnector`)
+- `@tanstack/react-query` - Required for state management
 
 Add a postinstall script to your `package.json` to stub out unused packages from react-sdk-lite:
 
@@ -61,6 +66,7 @@ In your provider context (e.g., `context/Provider.tsx`):
 
 import { para } from "@/lib/para/client"; // From Step 2
 import { type ParaGrazConfig } from "graz"; // Import Para types from graz
+import { ParaGrazConnector } from "@getpara/graz-integration"; // Import connector from graz-integration
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GrazProvider } from "graz";
 import { cosmoshub } from "graz/chains"; // Example chain; adjust as needed
@@ -70,7 +76,8 @@ const queryClient = new QueryClient();
 
 const paraConfig: ParaGrazConfig = {
   paraWeb: para,
-  modalProps: { appName: "Your App Name" }, // Customize modal appearance. Learn more at https://docs.getpara.com/v2/react/guides/customization/modal
+  connectorClass: ParaGrazConnector, // Required: Pass the connector class
+  modalProps: { appName: "Your App Name" }, // Customize modal appearance
   queryClient, // Share with the internal ParaProvider
 };
 
@@ -150,28 +157,46 @@ export default function Header() {
 
 ## Type Definitions
 
-**Note:** Para type definitions (`ParaGrazConfig`, `ParaWeb`, `ParaWallet`, `ParaGrazConnector`) are now included directly in the `graz` package. You don't need any additional packages for type support.
+Para type definitions are re-exported from `graz` for convenience, while the connector implementation comes from `@getpara/graz-integration`.
 
-Import Para types directly from `graz`:
+**Import types from `graz`:**
 
 ```typescript
-import { type ParaGrazConfig, type ParaWeb, type ParaWallet, type ParaModalProps, type ParaGrazConnector } from "graz";
+import { type ParaGrazConfig, type ParaWeb, type ParaWallet, type ParaModalProps } from "graz";
 ```
+
+**Import connector from `@getpara/graz-integration`:**
+
+```typescript
+import { ParaGrazConnector } from "@getpara/graz-integration";
+```
+
+**Important Notes:**
+
+- `ParaGrazConfig` now requires a `connectorClass` property - you must pass `ParaGrazConnector` explicitly
+- Types like `ParaWeb` are sourced from `@getpara/web-sdk` but re-exported by `graz` for convenience
+- The connector implementation must be provided by you, enabling tree-shaking and reducing bundle size if Para is not used
 
 ## Runtime Dependencies
 
-For the actual Para wallet functionality, you need:
+For Para wallet functionality, you need these packages installed:
 
-- `@getpara/react-sdk-lite` - Para's React SDK with UI components
+- **`@getpara/react-sdk-lite`** - Para's React SDK with UI components and `ParaWeb` client
+- **`@getpara/graz-integration`** - Para connector implementation (`ParaGrazConnector`)
 
-The runtime packages are loaded dynamically when needed, so if you're not using Para wallet, there's no bundle impact.
+The Para connector is explicitly provided via `paraConfig.connectorClass`, so if you don't use Para, these packages won't be included in your bundle.
 
 ## Troubleshooting
 
-- **Module Not Found Errors:** If you see "Cannot find module '@getpara/react-sdk-lite'" and you want to use Para, install it with `npm install @getpara/react-sdk-lite`.
-- **Type Errors:** Para types are now included in `graz`. Simply import them: `import { type ParaGrazConfig } from "graz"`.
-- **Modal Styling Not Appearing:** Ensure `@getpara/react-sdk-lite/styles.css` is imported globally.
-- **Chain Mismatch:** Verify chains in `GrazProvider` match your app's requirements.
-- **Errors:** Check console for Para-specific messages (e.g., auth issues). Visit [developer.getpara.com](https://developer.getpara.com) for API config.
+- **"Para connector class not provided" Error:** Ensure you pass `connectorClass: ParaGrazConnector` in your `paraConfig`. This is now required.
+- **Module Not Found Errors:**
+  - If you see "Cannot find module '@getpara/react-sdk-lite'", install it: `npm install @getpara/react-sdk-lite`
+  - If you see "Cannot find module '@getpara/graz-integration'", install it: `npm install @getpara/graz-integration`
+- **Type Errors:**
+  - Import types from `graz`: `import { type ParaGrazConfig } from "graz"`
+  - Import connector from `@getpara/graz-integration`: `import { ParaGrazConnector } from "@getpara/graz-integration"`
+- **Modal Styling Not Appearing:** Import Para styles globally: `import "@getpara/react-sdk-lite/styles.css"`
+- **Chain Mismatch:** Verify chains in `GrazProvider` match your Para project settings.
+- **Authentication Issues:** Check console for Para-specific messages. Visit [developer.getpara.com](https://developer.getpara.com) for API configuration.
 
 For advanced customization, refer to the Para Docs at [docs.getpara.com](https://docs.getpara.com/v2/react/).

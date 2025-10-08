@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useAddChain } from "graz";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Plus, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import type { ChainInfo } from "@keplr-wallet/types";
 
@@ -150,7 +149,8 @@ export function AddChainForm() {
           Add Custom Chain
         </CardTitle>
         <CardDescription>
-          Add a new Cosmos chain to graz&apos;s internal store. This chain will be available for connection without suggesting it to the wallet.
+          Add a new Cosmos chain to graz&apos;s internal store. This chain will be available for connection without
+          suggesting it to the wallet.
         </CardDescription>
       </CardHeader>
       <CardContent className="max-h-[600px] overflow-y-auto">
@@ -159,28 +159,13 @@ export function AddChainForm() {
           <div className="space-y-2">
             <label className="text-sm font-medium">Quick Fill Examples</label>
             <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => fillExample("osmosis")}
-              >
+              <Button type="button" variant="outline" size="sm" onClick={() => fillExample("osmosis")}>
                 Osmosis
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => fillExample("juno")}
-              >
+              <Button type="button" variant="outline" size="sm" onClick={() => fillExample("juno")}>
                 Juno
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => fillExample("akash")}
-              >
+              <Button type="button" variant="outline" size="sm" onClick={() => fillExample("akash")}>
                 Akash
               </Button>
             </div>
@@ -433,26 +418,18 @@ export function AddChainForm() {
               <p className="font-medium">Note:</p>
               <p className="mt-1">
                 This only adds the chain to graz&apos;s internal store. It does not suggest the chain to your wallet.
-                After adding, you can connect to this chain using the <code className="px-1 py-0.5 bg-blue-100 rounded">useConnect</code> hook.
+                After adding, you can connect to this chain using the{" "}
+                <code className="px-1 py-0.5 bg-blue-100 rounded">useConnect</code> hook.
               </p>
             </div>
           </div>
 
           {/* Submit Button */}
           <div className="flex gap-3">
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="flex-1 md:flex-none"
-            >
+            <Button type="submit" disabled={isLoading} className="flex-1 md:flex-none">
               {isLoading ? "Adding..." : "Add Chain"}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setFormData(defaultFormData)}
-              disabled={isLoading}
-            >
+            <Button type="button" variant="outline" onClick={() => setFormData(defaultFormData)} disabled={isLoading}>
               Clear Form
             </Button>
           </div>

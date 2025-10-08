@@ -72,6 +72,8 @@
     "zustand": "5.0.4"
   },
   "devDependencies": {
+    "@getpara/graz-connector": "2.0.0-alpha.51",
+    "@getpara/web-sdk": "2.0.0-alpha.51",
     "@types/node": "^18.17.15",
     "@types/react": "^18.2.21",
     "@vitest/ui": "^1.0.0",

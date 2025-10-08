@@ -9,4 +9,3 @@ Internalize Para types and improve wallet integration
 - Users can now import Para types directly: `import { type ParaGrazConfig } from "graz"`
 - Fix TypeScript compatibility issues with string methods (replace `replaceAll` with `replace` for ES2020)
 - Update documentation with new Para integration guide
-

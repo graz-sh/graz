@@ -156,7 +156,7 @@ export default function ChainsPage() {
                   <div className="p-2.5 sm:p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                     <p className="text-xs text-blue-900 dark:text-blue-100">
                       <strong>Note:</strong> This uses <code className="font-mono">useSuggestChain</code> which only
-                      suggests the chain to your wallet. You'll need to connect manually afterwards.
+                      suggests the chain to your wallet. You&apos;ll need to connect manually afterwards.
                     </p>
                   </div>
                   <Button

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CodeBlock } from "@/components/code-block";
 import { Wallet, CheckCircle2, XCircle, Zap, Clock, Unlink, ExternalLink } from "lucide-react";
-import { chainIds, chains } from "@/utils/graz";
+import { chainIds } from "@/utils/graz";
 import { WalletType } from "graz";
 import { useState } from "react";
 import { getWalletInfo } from "@/utils/wallet";
@@ -146,7 +146,7 @@ export default function WalletsPage() {
                 <Clock className="h-5 w-5" />
                 <CardTitle>Recent Chains</CardTitle>
               </div>
-              <CardDescription>Chains you've recently connected to</CardDescription>
+              <CardDescription>Chains you&apos;ve recently connected to</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
@@ -172,7 +172,7 @@ export default function WalletsPage() {
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {popularWallets.map(({ type, available }) => {
                 const info = getWalletInfo(type);
-                const isCurrentWallet = walletInfo.walletType === type;
+                const isCurrentWallet = isConnected && walletInfo.walletType === type;
 
                 return (
                   <div

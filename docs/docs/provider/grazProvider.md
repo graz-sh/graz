@@ -84,7 +84,7 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
       allowedIframeParentOrigins: string[]
       autoConnect?: boolean
     }
-    paraConfig?: ParaConfig; // Configuration for Para embedded wallet
+    paraConfig?: ParaGrazConfig; // Configuration for Para embedded wallet (see Para integration guide)
     walletDefaultOptions?: KeplrIntereactionOptions; // Default options for wallet interactions
   }
 ```
@@ -109,3 +109,22 @@ interface ChainConfig {
   };
 }
 ```
+
+### Para Configuration
+
+For Para embedded wallet integration, pass a `paraConfig` object:
+
+```ts
+interface ParaGrazConfig {
+  paraWeb: ParaWeb; // Para SDK client instance
+  connectorClass: typeof ParaGrazConnector; // Required: Connector implementation
+  events?: ParaGrazConnectorEvents; // Optional lifecycle callbacks
+  noModal?: boolean; // Optional: Skip modal UI
+  modalProps?: ParaModalProps; // Optional: Customize modal appearance
+  queryClient?: QueryClient; // Optional: Share QueryClient with Para
+}
+```
+
+**Important:** You must provide `connectorClass` explicitly. Install `@getpara/graz-integration` and pass `ParaGrazConnector`.
+
+See the [Para Integration Guide](../guides/connect-para-embedded-wallet.md) for detailed setup instructions.

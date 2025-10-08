@@ -141,7 +141,7 @@ export function ChainBalances({ chain, account }: ChainBalancesProps) {
                 ) : (
                   <>
                     {chainBalances?.map((balance: Coin) => {
-                      const currency = chain.currencies?.find((c: any) => c.coinMinimalDenom === balance.denom);
+                      const currency = chain.currencies?.find((c) => c.coinMinimalDenom === balance.denom);
                       const decimals = currency?.coinDecimals || 6;
                       const displayDenom = currency?.coinDenom || balance.denom;
                       const humanReadable = (parseInt(balance.amount) / Math.pow(10, decimals)).toFixed(decimals);

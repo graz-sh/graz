@@ -12,7 +12,6 @@ import { CodeBlock } from "@/components/code-block";
 export default function SendTokensPage() {
   const { isConnected, data: accounts } = useAccount();
   const activeChains = useActiveChains();
-  const activeChainIds = activeChains?.map((chain) => chain.chainId) || [];
 
   const { data: signingClients } = useStargateSigningClient();
   const { sendTokens, isPending, isSuccess, isError, error, data, reset } = useSendTokens();

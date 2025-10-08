@@ -4,22 +4,18 @@ import type { ChainInfo, KeplrSignOptions } from "@keplr-wallet/types";
 
 import type { Key, SignDoc, Wallet } from "./wallet";
 
+// Import for local use in this file
+import type { ParaWeb } from "@getpara/web-sdk";
+import type { ParaGrazConfig as ExternalParaGrazConfig } from "@getpara/graz-connector";
+
 /**
- * Para Web SDK client type (compatible with ParaWeb from @getpara/web-sdk)
- * This represents the main Para class for web interactions
+ * Para Web SDK client type
+ * Re-exported from @getpara/web-sdk
  *
- * Note: Users must install @getpara/graz-integration to use Para wallet functionality
- *
- * Note: This interface only defines the minimum required properties.
- * The actual Para class may have additional methods and properties.
+ * Note: Users must install @getpara/web-sdk or @getpara/react-sdk-lite
+ * Note: Users must install @getpara/graz-integration for connector functionality
  */
-export interface ParaWeb {
-  isReady: boolean;
-  isFarcasterMiniApp: boolean;
-  ready(): Promise<void>;
-  isPasskeySupported(): Promise<boolean>;
-  logout(): Promise<void>;
-}
+export type { ParaWeb } from "@getpara/web-sdk";
 
 /**
  * Para wallet entity (compatible with Wallet from @getpara/core-sdk)
@@ -52,15 +48,9 @@ export interface ParaWallet {
 
 /**
  * Event callbacks for Para wallet connector lifecycle events
+ * Extracted from @getpara/graz-connector ParaGrazConfig
  */
-export interface ParaGrazConnectorEvents {
-  /**
-   * Called when chains are successfully enabled in the Para connector
-   * @param chainIds - Array of enabled chain IDs
-   * @param connector - The initialized Para connector instance
-   */
-  onEnabled?: (chainIds: string[], connector: any) => void;
-}
+export type ParaGrazConnectorEvents = NonNullable<ExternalParaGrazConfig["events"]>;
 
 /**
  * Modal props for Para wallet UI
@@ -113,7 +103,7 @@ export interface ParaGrazConfig {
    * Should match the client used in your app's QueryClientProvider
    * Only needed when using @getpara/graz-integration with modal support
    */
-  queryClient?: unknown;
+  queryClient?: import("@tanstack/react-query").QueryClient;
 }
 
 /**

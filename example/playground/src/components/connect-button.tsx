@@ -42,7 +42,7 @@ export const ConnectButton: FC = () => {
 
   const availableWallets = getAvailableWallets();
   const wallets = Object.entries(availableWallets)
-    .filter(([_, isAvailable]) => isAvailable)
+    .filter(([, isAvailable]) => isAvailable)
     .map(([walletType]) => walletType as WalletType);
 
   return (
