@@ -1,6 +1,6 @@
 {
   "name": "@project/example-playground",
-  "version": "0.0.2-alpha.2",
+  "version": "0.1.0",
   "scripts": {
     "postinstall": "npx setup-para",
     "build": "next build",
