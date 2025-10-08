@@ -8,6 +8,6 @@
     "graz": "0.3.7"
   },
   "changesets": [
-    "security-dependencies-update"
+    "para-types-internalization"
   ]
 }

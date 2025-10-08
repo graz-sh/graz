@@ -1,6 +1,6 @@
 {
   "name": "@project/example-playground",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.2-alpha.1",
   "scripts": {
     "build": "next build",
     "dev": "next dev",

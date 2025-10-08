@@ -1,5 +1,12 @@
 # @project/example-vite
 
+## 0.0.15-alpha.1
+
+### Patch Changes
+
+- Updated dependencies
+  - graz@0.4.0-alpha.1
+
 ## 0.0.15-alpha.0
 
 ### Patch Changes
