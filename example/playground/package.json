@@ -2,6 +2,7 @@
   "name": "@project/example-playground",
   "version": "0.0.2-alpha.1",
   "scripts": {
+    "postinstall": "npx setup-para",
     "build": "next build",
     "dev": "next dev",
     "export:docs": "EXPORT_DOCS=true next build && mv out ../../docs/build/examples/playground",

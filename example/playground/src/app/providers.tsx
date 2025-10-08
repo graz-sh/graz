@@ -6,6 +6,7 @@ import { chains } from "@/utils/graz";
 import { useState, useMemo } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import ParaWeb, { Environment } from "@getpara/react-sdk-lite";
+import { ParaGrazConnector } from "@getpara/graz-integration";
 import type { ParaGrazConfig } from "graz";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -26,6 +27,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       para
         ? {
             paraWeb: para,
+            connectorClass: ParaGrazConnector,
             modalProps: { appName: "Graz Playground" },
             queryClient: queryClient,
           }

@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ["graz"],
+  // transpilePackages: ["graz"],
   // Enable static export when building for docs
   output: process.env.EXPORT_DOCS ? "export" : undefined,
   // Set base path for docs deployment

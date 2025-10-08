@@ -26,67 +26,75 @@ npm install graz @getpara/react-sdk-lite @getpara/graz-integration @tanstack/rea
 - `@getpara/graz-integration` - Para connector implementation (`ParaGrazConnector`)
 - `@tanstack/react-query` - Required for state management
 
-Add a postinstall script to your `package.json` to stub out unused packages from react-sdk-lite:
+**Add postinstall script** to your `package.json` to stub out unused packages from react-sdk-lite:
 
 ```json
 {
   "scripts": {
-    "postinstall": "npx setup-para"
+    "postinstall": "npx setup-para",
+    "dev": "next dev",
+    "build": "next build"
   }
 }
 ```
 
-Ensure Graz peer dependencies (e.g., `@cosmjs/*`) are already installed.
+Then run `npm install` (or `pnpm install`) to install dependencies and run the postinstall script.
 
-## Step 2: Create a ParaWeb Client
+## Step 2: Import Para Styles
 
-Create a ParaWeb instance using your API key and environment. Place this in a utility file (e.g., `lib/para/client.ts`):
+Import Para styles in your global CSS file (e.g., `app/globals.css`):
 
-```typescript
-import ParaWeb, { Environment } from "@getpara/react-sdk-lite";
+```css
+@import "@getpara/react-sdk-lite/styles.css";
 
-const API_KEY = process.env.NEXT_PUBLIC_PARA_API_KEY; // Set in .env
-const ENVIRONMENT = (process.env.NEXT_PUBLIC_PARA_ENVIRONMENT as Environment) || Environment.BETA;
-
-if (!API_KEY) {
-  throw new Error("Para API key is required.");
-}
-
-export const para = new ParaWeb(Environment.BETA, API_KEY);
+/* Your other styles... */
 ```
 
 ## Step 3: Configure GrazProvider
 
-Wrap your app with `QueryClientProvider` and `GrazProvider`. Pass a `paraConfig` object to `GrazProvider` with your ParaWeb instance, modal props, and a shared QueryClient.
-
-In your provider context (e.g., `context/Provider.tsx`):
+Set up your provider with Para integration. In your provider file (e.g., `app/providers.tsx`):
 
 ```tsx
 "use client";
 
-import { para } from "@/lib/para/client"; // From Step 2
-import { type ParaGrazConfig } from "graz"; // Import Para types from graz
-import { ParaGrazConnector } from "@getpara/graz-integration"; // Import connector from graz-integration
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { GrazProvider } from "graz";
-import { cosmoshub } from "graz/chains"; // Example chain; adjust as needed
-import { PropsWithChildren } from "react";
+import { GrazProvider, type ParaGrazConfig } from "graz";
+import { ParaGrazConnector } from "@getpara/graz-integration";
+import ParaWeb, { Environment } from "@getpara/react-sdk-lite";
+import { useState, useMemo } from "react";
+import { cosmoshub } from "graz/chains"; // Example chain
 
-const queryClient = new QueryClient();
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
 
-const paraConfig: ParaGrazConfig = {
-  paraWeb: para,
-  connectorClass: ParaGrazConnector, // Required: Pass the connector class
-  modalProps: { appName: "Your App Name" }, // Customize modal appearance
-  queryClient, // Share with the internal ParaProvider
-};
+  // Initialize Para if API key is provided
+  const para = useMemo(() => {
+    const apiKey = process.env.NEXT_PUBLIC_PARA_API_KEY;
+    if (!apiKey) {
+      console.info("Para: No API key provided. Get one at https://developer.getpara.com");
+      return null;
+    }
+    return new ParaWeb(Environment.BETA, apiKey);
+  }, []);
 
-export const Provider: React.FC<PropsWithChildren> = ({ children }) => {
+  const paraConfig: ParaGrazConfig | undefined = useMemo(
+    () =>
+      para
+        ? {
+            paraWeb: para,
+            connectorClass: ParaGrazConnector,
+            modalProps: { appName: "Your App Name" },
+            queryClient: queryClient,
+          }
+        : undefined,
+    [para, queryClient],
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
       <GrazProvider
         grazOptions={{
-          chains: [cosmoshub], // Add your chains
+          chains: [cosmoshub],
           paraConfig,
         }}
       >
@@ -94,27 +102,37 @@ export const Provider: React.FC<PropsWithChildren> = ({ children }) => {
       </GrazProvider>
     </QueryClientProvider>
   );
-};
+}
 ```
 
-Wrap your root layout or app entry with this `Provider` (e.g., in `app/layout.tsx`):
+Then wrap your app with the provider in your root layout (e.g., `app/layout.tsx`):
 
 ```tsx
-import { Provider } from "@/context/Provider";
-// ... other imports
+import { Providers } from "./providers";
+import "./globals.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <Provider>{children}</Provider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
 }
 ```
 
-## Step 4: Connect and Use Para Wallet
+## Step 4: Set Environment Variables
+
+Create a `.env.local` file in your project root:
+
+```env
+NEXT_PUBLIC_PARA_API_KEY=your_api_key_here
+```
+
+Get your API key from [developer.getpara.com](https://developer.getpara.com).
+
+## Step 5: Connect and Use Para Wallet
 
 Use Graz hooks to connect. Para will appear as an option (WalletType.PARA internally). The modal handles login and wallet selection.
 
@@ -188,15 +206,60 @@ The Para connector is explicitly provided via `paraConfig.connectorClass`, so if
 
 ## Troubleshooting
 
-- **"Para connector class not provided" Error:** Ensure you pass `connectorClass: ParaGrazConnector` in your `paraConfig`. This is now required.
-- **Module Not Found Errors:**
-  - If you see "Cannot find module '@getpara/react-sdk-lite'", install it: `npm install @getpara/react-sdk-lite`
-  - If you see "Cannot find module '@getpara/graz-integration'", install it: `npm install @getpara/graz-integration`
-- **Type Errors:**
-  - Import types from `graz`: `import { type ParaGrazConfig } from "graz"`
-  - Import connector from `@getpara/graz-integration`: `import { ParaGrazConnector } from "@getpara/graz-integration"`
-- **Modal Styling Not Appearing:** Import Para styles globally: `import "@getpara/react-sdk-lite/styles.css"`
-- **Chain Mismatch:** Verify chains in `GrazProvider` match your Para project settings.
-- **Authentication Issues:** Check console for Para-specific messages. Visit [developer.getpara.com](https://developer.getpara.com) for API configuration.
+### "Para connector class not provided" Error
+
+Ensure you pass `connectorClass: ParaGrazConnector` in your `paraConfig`. This is now required:
+
+```tsx
+const paraConfig: ParaGrazConfig = {
+  paraWeb: para,
+  connectorClass: ParaGrazConnector, // ✅ Required
+  // ...
+};
+```
+
+### Chunk Loading Errors (Next.js)
+
+If you see errors about loading chunks:
+
+1. Ensure `graz` is in `transpilePackages` in `next.config.js`:
+
+   ```js
+   transpilePackages: ["graz"];
+   ```
+
+2. **Restart your Next.js dev server** after making config changes
+
+3. Clear Next.js cache if issues persist:
+   ```bash
+   rm -rf .next
+   npm run dev
+   ```
+
+### Module Not Found Errors
+
+- `Cannot find module '@getpara/react-sdk-lite'` → Install: `npm install @getpara/react-sdk-lite`
+- `Cannot find module '@getpara/graz-integration'` → Install: `npm install @getpara/graz-integration`
+- Run `npx setup-para` after installing packages
+
+### Type Errors
+
+- Import types from `graz`: `import { type ParaGrazConfig } from "graz"`
+- Import connector from `@getpara/graz-integration`: `import { ParaGrazConnector } from "@getpara/graz-integration"`
+
+### Modal Styling Not Appearing
+
+Import Para styles in your global CSS:
+
+```css
+@import "@getpara/react-sdk-lite/styles.css";
+```
+
+### Other Issues
+
+- **Chain Mismatch:** Verify chains in `GrazProvider` match your Para project settings
+- **API Key Issues:** Check that `NEXT_PUBLIC_PARA_API_KEY` is set in `.env.local`
+- **Authentication Issues:** Check browser console for Para-specific messages
+- **Need Help?** Visit [developer.getpara.com](https://developer.getpara.com) for support
 
 For advanced customization, refer to the Para Docs at [docs.getpara.com](https://docs.getpara.com/v2/react/).
