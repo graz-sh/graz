@@ -1,4 +1,4 @@
-# @project/example-playground
+# @project/docs
 
 ## 0.1.0
 
@@ -36,35 +36,3 @@
   - See the migration guide in documentation for detailed upgrade instructions
   - Para integration now requires importing types from graz package instead of separate packages
   - Multi-chain hooks have improved type safety and consistency
-
-### Patch Changes
-
-- Updated dependencies [f2cb59e]
-  - graz@0.4.0
-
-## 0.0.2-alpha.2
-
-### Patch Changes
-
-- Updated dependencies
-  - graz@0.4.0-alpha.4
-
-## 0.0.2-alpha.1
-
-### Patch Changes
-
-- Updated dependencies
-  - graz@0.4.0-alpha.1
-
-## 0.0.2-alpha.0
-
-### Patch Changes
-
-- Updated dependencies [2d93c6d]
-  - graz@0.4.0-alpha.0
-
-## 0.0.1
-
-### Patch Changes
-
-- Initial release of playground example with Next.js App Router
