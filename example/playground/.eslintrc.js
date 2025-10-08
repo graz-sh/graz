@@ -21,6 +21,7 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
+    "next/core-web-vitals",
   ],
   plugins: ["@typescript-eslint", "react", "react-hooks"],
   settings: {
@@ -29,10 +30,9 @@ module.exports = {
     },
   },
   rules: {
-    "@typescript-eslint/no-non-null-assertion": "warn",
-    "@typescript-eslint/no-explicit-any": "warn",
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
   },
-  ignorePatterns: ["chains/**", "compiled/**", "dist/**", "node_modules/**"],
+  ignorePatterns: ["node_modules", ".next", "out"],
 };
+

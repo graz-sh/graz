@@ -22,15 +22,16 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.2",
-    "@graz-sh/style-guide": "^4.0.1",
-    "eslint": "^8.49.0",
-    "p-map": "^4.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^3.0.3",
-    "tsup": "^7.2.0",
+    "tsup": "^8.3.5",
     "turbo": "^1.10.13",
     "typescript": "^5.4.0"
   },
-  "prettier": "@graz-sh/style-guide/prettier",
   "private": true,
   "license": "MIT",
   "engines": {
@@ -40,14 +41,16 @@
   "pnpm": {
     "overrides": {
       "ses": ">=0.18.7",
-      "trim": ">=0.0.3",
       "axios": ">=0.30.2",
       "next": ">=14.2.15",
       "got": ">=11.8.5",
       "esbuild": ">=0.25.0",
       "webpack-dev-server": ">=5.2.1",
       "vite": ">=5.4.20",
-      "wait-on": ">=7.0.0"
+      "wait-on": ">=7.0.0",
+      "glob": ">=10.0.0",
+      "rimraf": ">=5.0.0",
+      "@cosmjs/crypto": ">=0.32.4"
     }
   }
 }

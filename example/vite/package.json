@@ -10,7 +10,7 @@
     "postinstall": "npx setup-para"
   },
   "dependencies": {
-    "@tanstack/react-query": "5.62.0",
+    "@tanstack/react-query": "5.74.0",
     "@getpara/graz-integration": "2.0.0-alpha.51",
     "@getpara/react-sdk-lite": "2.0.0-alpha.51",
     "graz": "workspace:*",
@@ -18,16 +18,19 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@graz-sh/style-guide": "^4.0.1",
     "@types/node": "^18.17.15",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.4",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "node-stdlib-browser": "^1.2.0",
     "typescript": "^5.4.0",
     "vite": "^4.4.9",
     "vite-plugin-node-stdlib-browser": "^0.2.1"
   },
-  "prettier": "@graz-sh/style-guide/prettier",
   "private": true
 }

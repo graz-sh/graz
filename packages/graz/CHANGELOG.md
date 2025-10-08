@@ -1,5 +1,11 @@
 # graz
 
+## Unreleased
+
+### Minor Changes
+
+- Added wallet metadata to all wallet adapters: Each wallet now includes optional `name`, `website`, and `logo` fields for better UI integration. Access wallet information via `getWallet()` to display wallet names, logos, and official website links in your application.
+
 ## 0.4.0-alpha.0
 
 ### Minor Changes

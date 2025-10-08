@@ -511,3 +511,4 @@ expect(mockLogger.error).toHaveBeenCalledWith(
 - [Debug Module](https://github.com/debug-js/debug) - Namespace-based logging
 - [Sentry](https://docs.sentry.io/) - Error tracking integration
 - [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) - Browser extension integration
+

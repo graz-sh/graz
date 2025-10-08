@@ -19,7 +19,17 @@ A comprehensive example application showcasing Graz's multi-chain wallet integra
 pnpm install
 ```
 
-### 2. Setup Environment Variables
+### 2. Install Peer Dependencies
+
+Graz requires CosmJS packages as peer dependencies. Install them with:
+
+```bash
+pnpm add @cosmjs/amino @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding
+```
+
+> **Note**: If you're using the workspace (monorepo), these might already be available. For standalone projects, make sure to install them explicitly.
+
+### 3. Setup Environment Variables
 
 Copy the example env file and add your API keys:
 
@@ -34,7 +44,7 @@ Edit `.env.local` and add:
 
 > **Note**: Para wallet will work without an API key but with limited functionality. You'll see a console message with instructions.
 
-### 3. Run Development Server
+### 4. Run Development Server
 
 ```bash
 pnpm dev
@@ -45,9 +55,11 @@ Open [http://localhost:3000](http://localhost:3000) to view the playground.
 ## Pages
 
 ### 🏠 Overview
+
 Landing page with feature overview
 
 ### 👛 Wallets
+
 - Detect available wallets in browser
 - Connect to specific wallet types
 - View wallet type detection flags
@@ -55,22 +67,26 @@ Landing page with feature overview
 - Switch between wallets
 
 ### 👤 Account
+
 - View connected accounts per chain
 - See wallet information
 - Disconnect individual chains
 
 ### 💰 Balances
+
 - View all token balances across chains
 - See staked balances
 - Human-readable amounts with proper decimals
 - Refresh all balances at once
 
 ### 📝 Contracts
+
 - Query smart contracts on any chain
 - Execute contract transactions
 - Switch between chains
 
 ### 🔗 Chains
+
 - View all configured chains
 - Connect/disconnect individual chains
 - Suggest new chains to wallet

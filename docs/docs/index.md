@@ -43,9 +43,7 @@ function WalletStatus() {
           <p>Balance: {balance?.amount} ATOM</p>
         </div>
       ) : (
-        <button onClick={() => connect({ chainId: ["cosmoshub-4"] })}>
-          Connect Wallet
-        </button>
+        <button onClick={() => connect({ chainId: ["cosmoshub-4"] })}>Connect Wallet</button>
       )}
     </div>
   );
@@ -126,7 +124,7 @@ function ConnectButton() {
   });
 
   return (
-    <button onClick={() => isConnected ? null : connect({ chainId: ["cosmoshub-4"] })}>
+    <button onClick={() => (isConnected ? null : connect({ chainId: ["cosmoshub-4"] }))}>
       {isConnected ? accounts?.["cosmoshub-4"]?.bech32Address : "Connect"}
     </button>
   );
@@ -142,9 +140,29 @@ function ConnectButton() {
 
 ## Example Applications
 
-- **Multi-Chain Starter** - [Demo](https://graz.sh/examples/starter) • [Code](https://github.com/graz-sh/graz/tree/dev/example/starter/)
-- **Next.js + Chakra UI** - [Demo](https://graz.sh/examples/next) • [Code](https://github.com/graz-sh/graz/tree/dev/example/next/)
-- **Vite** - [Demo](https://graz.sh/examples/vite) • [Code](https://github.com/graz-sh/graz/tree/dev/example/vite/)
+- **Playground (Next.js + Multi-Chain)** - Full-featured demo with multi-chain support and modern UI • [Code](https://github.com/graz-sh/graz/tree/main/example/playground/)
+- **Vite** - Simple Vite app showcasing core functionality • [Code](https://github.com/graz-sh/graz/tree/main/example/vite/)
+
+## Why Developers Love Graz
+
+- **🎯 Simple & Intuitive API** - Get started in minutes with well-designed hooks that follow React best practices
+- **🚀 Production Ready** - Battle-tested in production apps across the Cosmos ecosystem
+- **📖 Excellent Documentation** - Comprehensive guides, examples, and API references to help you build faster
+- **🔧 Developer Experience** - TypeScript support, autocomplete, and helpful error messages make development a breeze
+- **🤝 Active Maintenance** - Regular updates, bug fixes, and new features based on community feedback
+- **🌟 Ecosystem Integration** - Built on proven tools like TanStack Query and Zustand for reliability
+- **⚡️ Performance Focused** - Optimized for speed with smart caching, request deduplication, and minimal re-renders
+- **🔄 Multi-Chain First** - Designed from the ground up to support multi-chain applications seamlessly
+
+## Featured Projects Using Graz
+
+Graz powers some of the most popular applications in the Cosmos ecosystem:
+
+- **[dYdX](https://dydx.trade/)** - Leading decentralized exchange for perpetual trading
+- **[Stargaze](https://www.stargaze.zone/)** - The premier Cosmos NFT marketplace
+- **[Skip Go](https://go.skip.build/)** - Cross-chain swaps and bridging infrastructure
+
+_Want to add your project? [Submit a PR](https://github.com/graz-sh/graz/blob/main/CONTRIBUTING.md) or [open an issue](https://github.com/graz-sh/graz/issues/new)!_
 
 ## Community & Support
 
@@ -155,7 +173,6 @@ function ConnectButton() {
 ## Maintainers
 
 - Nur Fikri ([@codingki](https://github.com/codingki))
-- Joshua Nataniel M ([@joshuanatanielnm](https://github.com/joshuanatanielnm))
 
 ## License
 
