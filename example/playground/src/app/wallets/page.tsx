@@ -217,7 +217,11 @@ export default function WalletsPage() {
                       )}
                     </div>
 
-                    {available && !isCurrentWallet && (
+                    {isCurrentWallet ? (
+                      <Button size="sm" variant="destructive" className="w-full mt-2" onClick={() => disconnect()}>
+                        Disconnect
+                      </Button>
+                    ) : available ? (
                       <Button
                         size="sm"
                         variant="outline"
@@ -227,9 +231,9 @@ export default function WalletsPage() {
                       >
                         {isConnecting && selectedWallet === type ? "Connecting..." : "Connect"}
                       </Button>
+                    ) : (
+                      <p className="text-xs text-muted-foreground mt-2">Install {info.name} extension</p>
                     )}
-
-                    {!available && <p className="text-xs text-muted-foreground mt-2">Install {info.name} extension</p>}
                   </div>
                 );
               })}

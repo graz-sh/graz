@@ -1,6 +1,6 @@
 # useCheckWallet
 
-Hook to check whether given {@link WalletType} or default configured wallet is supported
+Hook to check whether given `WalletType` or default configured wallet is supported
 
 ## Usage
 
@@ -54,7 +54,9 @@ type?: WalletType // you can check specific supported wallet
 
 ### Usage
 
+```tsx
 const { data: isKeplrSupported } = useCheckWallet("keplr");
+```
 
 ## Return Value
 

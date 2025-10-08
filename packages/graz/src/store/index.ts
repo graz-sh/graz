@@ -1,7 +1,3 @@
-import type {
-  ParaGrazConfig as BaseParaGrazConfig,
-  ParaGrazConnector as BaseParaGrazConnector,
-} from "@getpara/graz-connector";
 import type { ChainInfo, Keplr } from "@keplr-wallet/types";
 import type { WalletConnectModalConfig } from "@walletconnect/modal";
 import type { ISignClient, SignClientTypes } from "@walletconnect/types";
@@ -11,6 +7,7 @@ import { createJSONStorage } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
 import type { Dictionary } from "../types/core";
+import type { ParaGrazConfig, ParaGrazConnector } from "../types/para";
 import type { Key } from "../types/wallet";
 import { WalletType } from "../types/wallet";
 
@@ -21,10 +18,6 @@ export interface ChainConfig {
     price: string;
     denom: string;
   };
-}
-
-export interface ParaGrazConfig extends BaseParaGrazConfig {
-  connectorClass?: new (config: ParaGrazConfig, chains?: ChainInfo[] | null) => BaseParaGrazConnector;
 }
 
 export interface WalletConnectStore {
@@ -82,7 +75,7 @@ export interface GrazSessionStore {
   lastPing: number | null;
 
   wcSignClients: Map<WalletType, ISignClient>;
-  paraConnector: BaseParaGrazConnector | null; // Compatible with base or extended classes
+  paraConnector: ParaGrazConnector | null;
 }
 
 export type GrazSessionPersistedStore = Pick<GrazSessionStore, "accounts" | "activeChainIds" | "lastPing" | "status">;

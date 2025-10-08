@@ -71,8 +71,6 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       if (!isMetamask) throw new Error("Metamask is not installed");
 
       if (typeof window.okxwallet !== "undefined") {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         if (window.okxwallet.isOkxWallet) {
           throw new Error("You have OKX Wallet installed. Please disable and reload the page to use Metamask Snap.");
         }
@@ -86,7 +84,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       return true;
     };
 
-    const enable = async (chainId: ChainId) => {
+    const enable = async (_chainId: ChainId) => {
       const installedSnap = await getSnap();
       if (!installedSnap) await requestSnaps();
     };
@@ -207,13 +205,13 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       return res;
     };
 
-    const getOfflineSignerDirect = (chainId: string) => {
-      return {
-        getAccounts: async () => [await getAccount(chainId)],
-        signDirect: (signerAddress: string, signDoc: SignDirectParams["2"]) =>
-          signDirect(chainId, signerAddress, signDoc),
-      };
-    };
+    // const _getOfflineSignerDirect = (chainId: string) => {
+    //   return {
+    //     getAccounts: async () => [await getAccount(chainId)],
+    //     signDirect: (signerAddress: string, signDoc: SignDirectParams["2"]) =>
+    //       signDirect(chainId, signerAddress, signDoc),
+    //   };
+    // };
 
     const getOfflineSignerOnlyAmino = (chainId: string) => {
       return {

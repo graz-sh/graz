@@ -2,15 +2,14 @@
 
 `graz` supports 12+ wallet integrations. Use the `WalletType` enum to specify which wallet to connect.
 
-<details><summary>Where do I need WalletType</summary>
-<p>
+<details>
+<summary>Where do I need WalletType</summary>
 
 - [`useConnect`](../hooks/useConnect.md)
 - [`useCheckWallet`](../hooks/useCheckWallet.md)
 - [`useSuggestChainAndConnect`](../hooks/useSuggestChainAndConnect.md)
 - [`GrazProvider`](../provider/grazProvider.md)
 
-</p>
 </details>
 
 ## Usage
@@ -68,17 +67,21 @@ enum WalletType {
 ## Wallet Categories
 
 ### Browser Extensions
+
 Standard browser extension wallets that inject into the `window` object.
 
 ### Embedded Wallets
+
 - **PARA**: Embedded wallet with authentication via Para
 - **VECTIS**: Smart contract wallet
 - **COSMIFRAME**: Iframe-based integration for embedded contexts
 
 ### Mobile via WalletConnect
+
 Mobile wallet connections using the WalletConnect protocol. Requires WalletConnect configuration in `GrazProvider`.
 
 ### Metamask Snap
+
 Cosmos support through Metamask Snap extensions.
 
 ## See Also

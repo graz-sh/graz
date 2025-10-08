@@ -2,7 +2,7 @@
 
 Para is a wallet connector that enables seamless integration with Cosmos-based chains in your Graz-powered application. This guide shows how to enable Para support, including the modal for user authentication and wallet selection.
 
-**Note:** Use the `@getpara/graz-integration` package for full functionality, including the Para modal. The `@getpara/graz-connector` package is for internal use and lacks modal support.
+**Note:** Para type definitions are now built into `graz`. You only need to install `@getpara/react-sdk-lite` for the runtime functionality and UI components.
 
 ## Prerequisites
 
@@ -16,8 +16,10 @@ Para is a wallet connector that enables seamless integration with Cosmos-based c
 Install the required packages:
 
 ```bash
-npm install @getpara/graz-integration @getpara/react-sdk-lite @tanstack/react-query
+npm install graz @getpara/react-sdk-lite @tanstack/react-query
 ```
+
+**Note:** Para types (`ParaGrazConfig`, `ParaWeb`, etc.) are now included in the `graz` package. You no longer need to install `@getpara/graz-connector` or `@getpara/graz-integration` separately for type definitions.
 
 Add a postinstall script to your `package.json` to stub out unused packages from react-sdk-lite:
 
@@ -29,14 +31,14 @@ Add a postinstall script to your `package.json` to stub out unused packages from
 }
 ```
 
-Ensure Graz and its peer dependencies (e.g., `@cosmjs/*`) are already installed.
+Ensure Graz peer dependencies (e.g., `@cosmjs/*`) are already installed.
 
 ## Step 2: Create a ParaWeb Client
 
 Create a ParaWeb instance using your API key and environment. Place this in a utility file (e.g., `lib/para/client.ts`):
 
 ```typescript
-import { ParaWeb, Environment } from "@getpara/react-sdk-lite";
+import ParaWeb, { Environment } from "@getpara/react-sdk-lite";
 
 const API_KEY = process.env.NEXT_PUBLIC_PARA_API_KEY; // Set in .env
 const ENVIRONMENT = (process.env.NEXT_PUBLIC_PARA_ENVIRONMENT as Environment) || Environment.BETA;
@@ -45,7 +47,7 @@ if (!API_KEY) {
   throw new Error("Para API key is required.");
 }
 
-export const para = new ParaWeb(API_KEY, ENVIRONMENT);
+export const para = new ParaWeb(Environment.BETA, API_KEY);
 ```
 
 ## Step 3: Configure GrazProvider
@@ -58,9 +60,9 @@ In your provider context (e.g., `context/Provider.tsx`):
 "use client";
 
 import { para } from "@/lib/para/client"; // From Step 2
-import { ParaGrazConfig } from "@getpara/graz-integration";
+import { type ParaGrazConfig } from "graz"; // Import Para types from graz
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { GrazProvider } from "graz"; // Note: Use "graz" import path
+import { GrazProvider } from "graz";
 import { cosmoshub } from "graz/chains"; // Example chain; adjust as needed
 import { PropsWithChildren } from "react";
 
@@ -128,7 +130,7 @@ export default function Header() {
   const handleConnect = () => {
     connect({
       chainId: ["cosmoshub-4"],
-      walletType: WalletType.PARA
+      walletType: WalletType.PARA,
     }); // Triggers Para modal if needed
   };
 
@@ -146,84 +148,28 @@ export default function Header() {
 }
 ```
 
-## Bundler Configuration (Optional)
+## Type Definitions
 
-If you're **not** using Para wallet in your application, you may need to configure your bundler to ignore the Para package imports. This prevents build errors when the packages aren't installed.
+**Note:** Para type definitions (`ParaGrazConfig`, `ParaWeb`, `ParaWallet`, `ParaGrazConnector`) are now included directly in the `graz` package. You don't need any additional packages for type support.
 
-### Webpack
+Import Para types directly from `graz`:
 
-Add to your webpack configuration:
-
-```javascript
-module.exports = {
-  resolve: {
-    fallback: {
-      "@getpara/graz-integration": false,
-      "@getpara/graz-connector": false
-    }
-  }
-};
+```typescript
+import { type ParaGrazConfig, type ParaWeb, type ParaWallet, type ParaModalProps, type ParaGrazConnector } from "graz";
 ```
 
-Or use `externals`:
+## Runtime Dependencies
 
-```javascript
-module.exports = {
-  externals: {
-    "@getpara/graz-integration": "commonjs @getpara/graz-integration",
-    "@getpara/graz-connector": "commonjs @getpara/graz-connector"
-  }
-};
-```
+For the actual Para wallet functionality, you need:
 
-### Vite
+- `@getpara/react-sdk-lite` - Para's React SDK with UI components
 
-Add to your `vite.config.js`:
-
-```javascript
-export default {
-  optimizeDeps: {
-    exclude: ["@getpara/graz-integration", "@getpara/graz-connector"]
-  },
-  ssr: {
-    external: ["@getpara/graz-integration", "@getpara/graz-connector"]
-  }
-};
-```
-
-### Next.js
-
-For Next.js apps, if you encounter issues, add to `next.config.js`:
-
-```javascript
-module.exports = {
-  webpack: (config) => {
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      "@getpara/graz-integration": false,
-      "@getpara/graz-connector": false
-    };
-    return config;
-  }
-};
-```
-
-### Rollup
-
-Add to your `rollup.config.js`:
-
-```javascript
-export default {
-  external: ["@getpara/graz-integration", "@getpara/graz-connector"]
-};
-```
-
-**Note:** These configurations are only needed if you're not using Para wallet and want to prevent bundler warnings. If you're using Para, install the packages as described in Step 1.
+The runtime packages are loaded dynamically when needed, so if you're not using Para wallet, there's no bundle impact.
 
 ## Troubleshooting
 
-- **Module Not Found Errors:** If you see "Cannot find module '@getpara/graz-integration'" and you want to use Para, install it with `npm install @getpara/graz-integration @getpara/react-sdk-lite`.
-- **Bundler Warnings Without Para:** Apply the bundler configurations above to silence warnings when not using Para.
+- **Module Not Found Errors:** If you see "Cannot find module '@getpara/react-sdk-lite'" and you want to use Para, install it with `npm install @getpara/react-sdk-lite`.
+- **Type Errors:** Para types are now included in `graz`. Simply import them: `import { type ParaGrazConfig } from "graz"`.
 - **Modal Styling Not Appearing:** Ensure `@getpara/react-sdk-lite/styles.css` is imported globally.
 - **Chain Mismatch:** Verify chains in `GrazProvider` match your app's requirements.
 - **Errors:** Check console for Para-specific messages (e.g., auth issues). Visit [developer.getpara.com](https://developer.getpara.com) for API config.

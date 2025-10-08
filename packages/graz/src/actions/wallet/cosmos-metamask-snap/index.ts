@@ -20,8 +20,6 @@ export const getMetamaskSnapCosmos = (): Wallet => {
       if (!isMetamask) throw new Error("Metamask is not installed");
 
       if (typeof window.okxwallet !== "undefined") {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         if (window.okxwallet.isOkxWallet) {
           throw new Error("You have OKX Wallet installed. Please disable and reload the page to use Metamask Snap.");
         }
@@ -37,7 +35,7 @@ export const getMetamaskSnapCosmos = (): Wallet => {
       return true;
     };
 
-    const enable = async (chainId: ChainId) => {
+    const enable = async (_chainId: ChainId) => {
       const installedSnap = await isSnapInstalled();
       if (!installedSnap) await installSnap();
     };

@@ -36,7 +36,7 @@ Production builds are optimized for output quality:
 Development mode is optimized for speed:
 
 - **Initial build**: ~1 second
-- **Hot-reload rebuilds**: <500ms (nearly instant)
+- **Hot-reload rebuilds**: &lt;500ms (nearly instant)
 - **DTS generation**: Skipped in watch mode for maximum speed
 
 ## Development Experience
@@ -125,6 +125,7 @@ Multi-chain operations are optimized with configurable concurrency:
 ```
 
 Benefits:
+
 - Prevents overwhelming RPC endpoints
 - Balances speed with reliability
 - Configurable per application needs
@@ -151,7 +152,7 @@ The `createMultiChainAsyncFunction` utility uses `p-map` for efficient parallel 
 const { data: account } = useAccount({
   onConnect: (data) => {
     // Only runs on connect, not on every state change
-  }
+  },
 });
 
 // Good: Configure concurrency for your use case
@@ -160,7 +161,7 @@ const { data: account } = useAccount({
     chains: myChains,
     multiChainFetchConcurrency: 5, // Increase if you have fast RPCs
   }}
-/>
+/>;
 ```
 
 ### For Contributors
@@ -219,12 +220,12 @@ Split wallet adapters into separate entry points:
 
 ```tsx
 // Instead of bundling all wallets
-import { getKeplr, getLeap, /* all 12+ wallets */ } from 'graz';
+import { getKeplr, getLeap /* all 12+ wallets */ } from "graz";
 
 // Users could import only what they need
-import { useConnect } from 'graz';
-import { getKeplr } from 'graz/wallets/keplr';
-import { getLeap } from 'graz/wallets/leap';
+import { useConnect } from "graz";
+import { getKeplr } from "graz/wallets/keplr";
+import { getLeap } from "graz/wallets/leap";
 ```
 
 **Expected impact**: 60-70% smaller bundles for most users

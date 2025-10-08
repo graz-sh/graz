@@ -16,11 +16,13 @@ https://docs.keplr.app/api/suggest-chain.html
 When you suggest a chain that is **not provided in `GrazProvider`**, Graz will automatically add it to the internal store after successfully suggesting it to the wallet. These dynamically added chains are **persisted in localStorage**, so they remain available even after page refreshes.
 
 This is particularly useful for:
+
 - Supporting new chains on-the-fly
 - Allowing users to connect to custom/testnet chains
 - Building more flexible multi-chain applications
 
 **Persistence behavior:**
+
 - Dynamically suggested chains are saved to localStorage
 - On page refresh, they're automatically merged with provider chains
 - Provider chains always take precedence over persisted chains
@@ -32,8 +34,8 @@ This is particularly useful for:
 
 You need to populate a full `ChainInfo` record to use `suggest` on `useSuggestChain`
 
-<details><summary>ChainInfo</summary>
-<p>
+<details>
+<summary>ChainInfo</summary>
 
 https://docs.keplr.app/api/suggest-chain.html
 
@@ -80,7 +82,6 @@ interface ChainInfo {
 }
 ```
 
-</p>
 </details>
 
 ```tsx

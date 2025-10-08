@@ -1,12 +1,11 @@
 import "./index.css";
-import "@getpara/react-sdk-lite/styles.css"
+import "@getpara/react-sdk-lite/styles.css";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { GrazProvider } from "graz";
+import { GrazProvider, type ParaGrazConfig } from "graz";
 import { cosmoshub } from "graz/chains";
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import { ParaGrazConfig } from "@getpara/graz-integration";
 
 import App from "./App";
 import ParaWeb, { Environment } from "@getpara/react-sdk-lite";

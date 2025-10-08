@@ -79,9 +79,7 @@
     "jsdom": "^23.0.0",
     "react": "^18.2.0",
     "typescript": "^5.4.0",
-    "vitest": "^1.0.0",
-    "@getpara/graz-connector": ">=2.0.0-alpha.51 <2.0.0-beta",
-    "@getpara/graz-integration": ">=2.0.0-alpha.51 <2.0.0-beta"
+    "vitest": "^1.0.0"
   },
   "keywords": [
     "graz",

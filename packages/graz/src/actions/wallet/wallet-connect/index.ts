@@ -175,7 +175,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     const { wcSignClients, activeChainIds } = useGrazSessionStore.getState();
     const signClient = wcSignClients.get(walletType);
     if (!signClient) throw new Error("enable walletConnect.signClient is not defined");
-    const { walletConnect, chains } = useGrazInternalStore.getState();
+    const { walletConnect } = useGrazInternalStore.getState();
     if (!walletConnect?.options?.projectId) throw new Error("walletConnect.options.projectId is not defined");
 
     const walletConnectModal = new WalletConnectModal({

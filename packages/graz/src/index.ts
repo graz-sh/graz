@@ -25,4 +25,5 @@ export * from "./hooks/wallet";
 export * from "./provider";
 export * from "./provider/events";
 export * from "./types/core";
+export * from "./types/para";
 export * from "./types/wallet";

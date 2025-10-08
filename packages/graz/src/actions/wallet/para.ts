@@ -1,6 +1,5 @@
-import type { ParaGrazConnector } from "@getpara/graz-connector";
-
 import { useGrazInternalStore, useGrazSessionStore } from "../../store";
+import type { ParaGrazConnector } from "../../types/para";
 import type { Key, Wallet } from "../../types/wallet";
 import { WalletType } from "../../types/wallet";
 

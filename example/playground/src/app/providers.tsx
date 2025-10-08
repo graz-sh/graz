@@ -6,7 +6,7 @@ import { chains } from "@/utils/graz";
 import { useState, useMemo } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import ParaWeb, { Environment } from "@getpara/react-sdk-lite";
-import type { ParaGrazConfig } from "@getpara/graz-integration";
+import type { ParaGrazConfig } from "graz";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -21,16 +21,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return new ParaWeb(Environment.BETA, apiKey);
   }, []);
 
-  const paraConfig = useMemo(
+  const paraConfig: ParaGrazConfig | undefined = useMemo(
     () =>
       para
-        ? ({
-            paraWeb: para as any,
+        ? {
+            paraWeb: para,
             modalProps: { appName: "Graz Playground" },
             queryClient: queryClient,
-          } as any)
+          }
         : undefined,
-    [para, queryClient]
+    [para, queryClient],
   );
 
   return (

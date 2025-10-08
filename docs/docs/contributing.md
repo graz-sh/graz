@@ -1,6 +1,6 @@
 # Contributing to graz
 
-Thanks for showing interest to contribute to `graz` <3
+Thanks for showing interest to contribute to `graz` ❤️
 
 The following is a set of guidelines for contributing to graz, which are hosted in the [Graz Organization](https://github.com/graz-sh) on GitHub. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
@@ -85,11 +85,12 @@ The following steps will get you up and running to contribute to `graz`:
 The build system has been optimized for both speed and package size:
 
 - **Production builds**: ~4 seconds (with TypeScript declarations)
-- **Development rebuilds**: <1 second (instant hot-reload)
+- **Development rebuilds**: &lt;1 second (instant hot-reload)
 - **Package size**: ~220 KB (optimized with tree-shaking)
 - **Incremental builds**: Enabled via TypeScript cache
 
 Key optimizations:
+
 - TypeScript incremental compilation for faster rebuilds
 - DTS generation skipped in watch mode for instant feedback
 - Terser minification for smaller production bundles

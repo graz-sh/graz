@@ -1,4 +1,4 @@
-import { getWallet, WalletType } from "graz";
+import { WalletType } from "graz";
 
 export interface WalletInfo {
   name: string;
@@ -11,19 +11,11 @@ export interface WalletInfo {
  * Falls back to wallet type if wallet is not available
  */
 export function getWalletInfo(walletType: WalletType): WalletInfo {
-  try {
-    const wallet = getWallet(walletType);
-    return {
-      name: wallet.name || formatWalletName(walletType),
-      logo: wallet.logo,
-      website: wallet.website,
-    };
-  } catch {
-    // Wallet not available, return fallback info
-    return {
-      name: formatWalletName(walletType),
-    };
-  }
+  // Wallet interface doesn't expose name, logo, website properties
+  // So we just format the wallet type name
+  return {
+    name: formatWalletName(walletType),
+  };
 }
 
 /**
