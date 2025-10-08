@@ -2,7 +2,7 @@
 
 Mutation hook to execute wallet disconnection with optional arguments to invoke given functions on error, loading, or success event.
 
-#### Usage
+## Usage
 
 ```tsx
 import { useAccount, useDisconnect } from "graz";
@@ -18,7 +18,7 @@ function App() {
 }
 ```
 
-##### Disconnect a specific chain
+### Disconnect a specific chain
 
 ```tsx
 import { useAccount, useDisconnect } from "graz";
@@ -34,7 +34,7 @@ function App() {
 }
 ```
 
-#### Hook Params
+## Hook Params
 
 ```ts
 {
@@ -44,7 +44,7 @@ function App() {
 }
 ```
 
-#### Return Value
+## Return Value
 
 ```tsx
 {

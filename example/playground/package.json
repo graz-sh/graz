@@ -1,0 +1,50 @@
+{
+  "name": "@project/example-playground",
+  "version": "0.0.2-alpha.2",
+  "scripts": {
+    "postinstall": "npx setup-para",
+    "build": "next build",
+    "dev": "next dev",
+    "export:docs": "EXPORT_DOCS=true next build && mv out ../../docs/build/examples/playground",
+    "lint": "eslint --fix \"**/*.{ts,tsx}\"",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@getpara/graz-integration": "2.0.0-alpha.51",
+    "@getpara/react-sdk-lite": "2.0.0-alpha.51",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-separator": "^1.0.3",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@tanstack/react-query": "5.74.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "graz": "workspace:*",
+    "lucide-react": "^0.263.1",
+    "next": "^14.2.15",
+    "next-themes": "^0.2.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-syntax-highlighter": "^15.6.6",
+    "tailwind-merge": "^2.2.0",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.17.15",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.15",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0"
+  },
+  "private": true
+}

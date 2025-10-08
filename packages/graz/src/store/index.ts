@@ -1,17 +1,15 @@
 import type { ChainInfo, Keplr } from "@keplr-wallet/types";
-import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import type { WalletConnectModalConfig } from "@walletconnect/modal";
+import type { ISignClient, SignClientTypes } from "@walletconnect/types";
 import { create } from "zustand";
 import type { PersistOptions } from "zustand/middleware";
 import { createJSONStorage } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
 import type { Dictionary } from "../types/core";
-import { Key, WalletType } from "../types/wallet";
-import type {
-  ParaGrazConfig as BaseParaGrazConfig,
-  ParaGrazConnector as BaseParaGrazConnector,
-} from "@getpara/graz-connector";
+import type { ParaGrazConfig, ParaGrazConnector } from "../types/para";
+import type { Key } from "../types/wallet";
+import { WalletType } from "../types/wallet";
 
 export interface ChainConfig {
   path?: string;
@@ -20,10 +18,6 @@ export interface ChainConfig {
     price: string;
     denom: string;
   };
-}
-
-export interface ParaGrazConfig extends BaseParaGrazConfig {
-  connectorClass?: new (config: ParaGrazConfig, chains?: ChainInfo[] | null) => BaseParaGrazConnector;
 }
 
 export interface WalletConnectStore {
@@ -56,7 +50,8 @@ export interface GrazInternalStore {
   chainsConfig: Record<string, ChainConfig> | null;
   iframeOptions: IframeOptions | null;
   /**
-   * Graz will use this number to determine how many concurrent requests to make when using `multiChain` args in hooks.
+   * Graz will use this number to determine how many concurrent requests to make when querying multiple chains.
+   * All hooks now operate on multiple chains by default (returning Record<chainId, T>).
    * Defaults to 3.
    */
   multiChainFetchConcurrency: number;
@@ -80,14 +75,14 @@ export interface GrazSessionStore {
   lastPing: number | null;
 
   wcSignClients: Map<WalletType, ISignClient>;
-  paraConnector: BaseParaGrazConnector | null; // Compatible with base or extended classes
+  paraConnector: ParaGrazConnector | null;
 }
 
 export type GrazSessionPersistedStore = Pick<GrazSessionStore, "accounts" | "activeChainIds" | "lastPing" | "status">;
 
 export type GrazInternalPersistedStore = Pick<
   GrazInternalStore,
-  "recentChainIds" | "_reconnect" | "_reconnectConnector" | "walletType"
+  "recentChainIds" | "_reconnect" | "_reconnectConnector" | "walletType" | "chains"
 >;
 
 export const grazInternalDefaultValues: GrazInternalStore = {
@@ -138,8 +133,9 @@ const persistOptions: PersistOptions<GrazInternalStore, GrazInternalPersistedSto
     _reconnect: x._reconnect,
     _reconnectConnector: x._reconnectConnector,
     walletType: x.walletType,
+    chains: x.chains,
   }),
-  version: 2,
+  version: 3,
 };
 
 export const useGrazSessionStore = create(

@@ -3,7 +3,11 @@
 Provider component which configures various graz side effects.
 Graz uses `@tanstack/react-query`'s features under the hood, hence you need to wrap `GrazProvider` with `QueryClientProvider`.
 
-#### Usage
+:::tip Performance
+Graz is highly optimized with built-in caching, request deduplication, and efficient state management. See the [Performance Guide](/docs/performance) for optimization tips and best practices.
+:::
+
+## Usage
 
 ```tsx
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -61,29 +65,37 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
 }
 ```
 
-#### Params
+## Params
 
 `grazOptions`
 
 ```ts
   {
-    chains?: ChainInfo[];
+    chains?: ChainInfo[]; // Optional: chains can also be added dynamically via useSuggestChain
     chainsConfig?: Record<string, ChainConfig>
     defaultWallet?: WalletType; // default to `WalletType.KEPLR`
     onNotFound?: () => void;
     autoReconnect?: boolean; // Defaults to true, will try to reconnect when initial start(session empty)
     onReconnectFailed?: () => void;
     walletConnect?: WalletConnectStore | null;
-    multiChainFetchConcurrency?: number // when using multi chain hooks it fetch 3 function simultaneously. defaults to 3.
+    multiChainFetchConcurrency?: number // Multi-chain request concurrency limit. Defaults to 3 for optimal performance.
     iframeOptions?: {
       // for integrating using WalletType.COSMIFRAME
       allowedIframeParentOrigins: string[]
       autoConnect?: boolean
     }
+    paraConfig?: ParaGrazConfig; // Configuration for Para embedded wallet (see Para integration guide)
+    walletDefaultOptions?: KeplrIntereactionOptions; // Default options for wallet interactions
   }
 ```
 
-#### Types
+:::tip Dynamic Chain Support
+
+While you can configure chains upfront in the `chains` array, you can also add chains dynamically using [`useSuggestChain`](../hooks/useSuggestChain.md) or [`useSuggestChainAndConnect`](../hooks/useSuggestChainAndConnect.md). When you suggest a chain that's not in the provider, it will automatically be added to the internal store, eliminating the need to pre-configure all chains.
+
+:::
+
+## Types
 
 [`WalletConnectStore`](../types/WalletConnectStore.md)
 
@@ -97,3 +109,22 @@ interface ChainConfig {
   };
 }
 ```
+
+### Para Configuration
+
+For Para embedded wallet integration, pass a `paraConfig` object:
+
+```ts
+interface ParaGrazConfig {
+  paraWeb: ParaWeb; // Para SDK client instance
+  connectorClass: typeof ParaGrazConnector; // Required: Connector implementation
+  events?: ParaGrazConnectorEvents; // Optional lifecycle callbacks
+  noModal?: boolean; // Optional: Skip modal UI
+  modalProps?: ParaModalProps; // Optional: Customize modal appearance
+  queryClient?: QueryClient; // Optional: Share QueryClient with Para
+}
+```
+
+**Important:** You must provide `connectorClass` explicitly. Install `@getpara/graz-integration` and pass `ParaGrazConnector`.
+
+See the [Para Integration Guide](../guides/connect-para-embedded-wallet.md) for detailed setup instructions.

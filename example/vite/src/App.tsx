@@ -6,12 +6,16 @@ import reactLogo from "./assets/react.svg";
 
 // eslint-disable-next-line prefer-arrow-functions/prefer-arrow-functions, react/function-component-definition
 export default function App() {
-  const { data: account, isConnected, isConnecting, isDisconnected, isReconnecting } = useAccount();
+  // NEW API: useAccount returns Record<chainId, Key>
+  const { data: accounts, isConnected, isConnecting, isDisconnected, isReconnecting } = useAccount();
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
 
   const activeChainIds = useActiveChainIds();
-  
+
+  // Extract account from Record (get first available account)
+  const account = accounts && Object.values(accounts)[0];
+
   const availableWallets = getAvailableWallets();
   const wallets = Object.entries(availableWallets)
     .filter(([_, isAvailable]) => isAvailable)
@@ -46,7 +50,7 @@ export default function App() {
           </p>
         ) : null}
         <br />
-        
+
         {isConnected ? (
           <button onClick={() => disconnect()} type="button">
             Disconnect Wallet
@@ -66,7 +70,7 @@ export default function App() {
                 </button>
               </div>
             )}
-            
+
             {otherWallets.length > 0 && (
               <div>
                 <h3>Other Wallets</h3>
@@ -91,11 +95,15 @@ export default function App() {
 }
 
 export const Graz = () => {
-  const { data: account, isConnected, isConnecting, isDisconnected, isReconnecting } = useAccount();
+  // NEW API: useAccount returns Record<chainId, Key>
+  const { data: accounts, isConnected, isConnecting, isDisconnected, isReconnecting } = useAccount();
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
 
   const activeChainIds = useActiveChainIds();
+
+  // Extract account from Record (get first available account)
+  const account = accounts && Object.values(accounts)[0];
 
   const handleButton = () => {
     (isConnected ? disconnect : connect)();

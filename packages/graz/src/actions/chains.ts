@@ -1,7 +1,7 @@
 import type { ChainInfo } from "@keplr-wallet/types";
 
 import { useGrazInternalStore } from "../store";
-import { WalletType } from "../types/wallet";
+import type { WalletType } from "../types/wallet";
 import type { ConnectResult } from "./account";
 import { connect } from "./account";
 import { getWallet } from "./wallet";
@@ -19,12 +19,34 @@ export const getRecentChains = (): ChainInfo[] | null => {
   return recentChains?.map((chainId) => chains!.find((x) => x.chainId === chainId)!) ?? null;
 };
 
-export const getChainInfo = ({ chainId }: { chainId?: string }): ChainInfo | undefined => {
+export const getChainInfo = ({ chainId }: { chainId?: string } = {}): ChainInfo | undefined => {
   return useGrazInternalStore.getState().chains?.find((x) => x.chainId === chainId);
 };
 
-export const getChainInfos = ({ chainId }: { chainId?: string[] }): ChainInfo[] | undefined => {
-  return useGrazInternalStore.getState().chains?.filter((x) => chainId?.includes(x.chainId));
+export const getChainInfos = ({ chainId }: { chainId?: string[] } = {}): ChainInfo[] | undefined => {
+  const chains = useGrazInternalStore.getState().chains;
+  if (!chainId) return chains ?? undefined;
+  return chains?.filter((x) => chainId.includes(x.chainId));
+};
+
+export interface AddChainArgs {
+  chainInfo: ChainInfo;
+}
+
+export const addChain = async ({ chainInfo }: AddChainArgs): Promise<ChainInfo> => {
+  // Add chain to internal store if not already present
+  const { chains } = useGrazInternalStore.getState();
+  const existingChain = chains?.find((x) => x.chainId === chainInfo.chainId);
+
+  if (existingChain) {
+    throw new Error(`Chain with chainId "${chainInfo.chainId}" already exists in the store`);
+  }
+
+  useGrazInternalStore.setState((prev) => ({
+    chains: [...(prev.chains || []), chainInfo],
+  }));
+
+  return chainInfo;
 };
 
 export interface SuggestChainArgs {
@@ -35,6 +57,17 @@ export interface SuggestChainArgs {
 export const suggestChain = async ({ chainInfo, walletType }: SuggestChainArgs): Promise<ChainInfo> => {
   const wallet = getWallet(walletType);
   await wallet.experimentalSuggestChain(chainInfo);
+
+  // Add chain to internal store if not already present
+  const { chains } = useGrazInternalStore.getState();
+  const existingChain = chains?.find((x) => x.chainId === chainInfo.chainId);
+
+  if (!existingChain) {
+    useGrazInternalStore.setState((prev) => ({
+      chains: [...(prev.chains || []), chainInfo],
+    }));
+  }
+
   return chainInfo;
 };
 

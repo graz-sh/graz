@@ -2,7 +2,7 @@
 
 Function to return a `boolean` whether a wallet is available or not
 
-#### Usage
+## Usage
 
 ```tsx
 import { checkWallet, WalletType } from "graz";

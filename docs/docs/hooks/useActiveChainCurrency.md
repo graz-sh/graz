@@ -2,7 +2,7 @@
 
 hook to retrieve specific connected chains currency
 
-#### Usage
+## Usage
 
 ```tsx
 import { useActiveChainCurrency } from "graz";
@@ -12,13 +12,13 @@ function App() {
 }
 ```
 
-#### Hook Params
+## Hook Params
 
 ```ts
 denom: string; //Currency denom to search
 ```
 
-#### Return Value
+## Return Value
 
 ```tsx
 {

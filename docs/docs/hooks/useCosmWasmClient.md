@@ -1,54 +1,67 @@
 # useCosmWasmClient
 
-Hook to retrieve a CosmWasmClient.
+Hook to retrieve a CosmWasmClient. Returns clients in a `Record<chainId, CosmWasmClient>` format.
 
-#### Usage
-
-##### Single Chain
+## Usage
 
 ```tsx
 import { useCosmWasmClient } from "graz";
 
 function App() {
-  const { data: client, isFetching, refetch, ... } = useCosmWasmClient();
-
-  async function getAccountFromClient() {
-    return await client.getAccount("address")
-  }
-}
-```
-
-##### Multi Chain
-
-```tsx
-import { useCosmWasmClient } from "graz";
-
-function App() {
-  const { data: client, isFetching, refetch, ... } = useCosmWasmClient({
-    chainId: ["cosmoshub-4", "sommelier-1"],
-    multiChain: true
+  const { data: clients, isFetching } = useCosmWasmClient({
+    chainId: ["juno-1", "stargaze-1"],
   });
 
-  async function getAccountFromClient() {
-    return await client["cosmoshub-4"].getAccount("address")
+  async function queryContracts() {
+    const junoClient = clients?.["juno-1"];
+    const stargazeClient = clients?.["stargaze-1"];
+
+    if (!junoClient || !stargazeClient) return;
+
+    const junoData = await junoClient.queryContractSmart("juno1...", { query: {} });
+    const stargazeData = await stargazeClient.queryContractSmart("stars1...", { query: {} });
+
+    return { junoData, stargazeData };
   }
+
+  return <div>...</div>;
 }
 ```
 
-#### Hook Params
+### All Active Chains
 
 ```tsx
-<TMultiChain extends boolean>{
-  chainId?: string | string[];
-  multiChain?: TMultiChain; // boolean
+import { useCosmWasmClient } from "graz";
+
+function App() {
+  // Without chainId, uses all active chains
+  const { data: clients } = useCosmWasmClient();
+
+  return (
+    <div>
+      {clients && Object.entries(clients).map(([chainId, client]) => (
+        <div key={chainId}>
+          CosmWasm client ready for {chainId}
+        </div>
+      ))}
+    </div>
+  );
 }
 ```
 
-#### Return Value
+## Hook Params
 
 ```tsx
 {
-  data?: TMultiChain extends true ? Record<string, CosmWasmClient> : CosmWasmClient;
+  chainId?: string[]; // Array of chain IDs, defaults to active chains
+}
+```
+
+## Return Value
+
+```tsx
+{
+  data?: Record<string, CosmWasmClient>; // CosmWasmClient from @cosmjs/cosmwasm-stargate
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -62,12 +75,11 @@ function App() {
   isLoadingError: boolean;
   isPaused: boolean;
   isPlaceholderData: boolean;
-  isPreviousData: boolean;
   isRefetchError: boolean;
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<TMultiChain extends true ? Record<string, CosmWasmClient> : CosmWasmClient;, unknown>>;
+  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Record<string, CosmWasmClient>, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

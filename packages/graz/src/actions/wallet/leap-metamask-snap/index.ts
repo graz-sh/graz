@@ -1,3 +1,4 @@
+import type { DirectSignResponse } from "@cosmjs/proto-signing";
 import type { AccountData, Algo, AminoSignResponse, Keplr, StdSignDoc } from "@keplr-wallet/types";
 // eslint-disable-next-line import/no-named-as-default
 import Long from "long";
@@ -6,7 +7,6 @@ import { useGrazInternalStore } from "../../../store";
 import type { Key, KnownKeys, SignAminoParams, SignDirectParams, Wallet } from "../../../types/wallet";
 import type { ChainId } from "../../../utils/multi-chain";
 import type { GetSnapsResponse, Snap } from "./types";
-import { DirectSignResponse } from "@cosmjs/proto-signing";
 
 export interface GetMetamaskSnap {
   id: string;
@@ -71,8 +71,6 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       if (!isMetamask) throw new Error("Metamask is not installed");
 
       if (typeof window.okxwallet !== "undefined") {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         if (window.okxwallet.isOkxWallet) {
           throw new Error("You have OKX Wallet installed. Please disable and reload the page to use Metamask Snap.");
         }
@@ -86,7 +84,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       return true;
     };
 
-    const enable = async (chainId: ChainId) => {
+    const enable = async (_chainId: ChainId) => {
       const installedSnap = await getSnap();
       if (!installedSnap) await requestSnaps();
     };
@@ -123,7 +121,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
         signature: signature.signature,
         signed: {
           ...signature.signed,
-          accountNumber: `${modifiedAccountNumber.toString()}`,
+          accountNumber: modifiedAccountNumber.toString(),
           authInfoBytes: new Uint8Array(Object.values(signature.signed.authInfoBytes)),
           bodyBytes: new Uint8Array(Object.values(signature.signed.bodyBytes)),
         },
@@ -151,8 +149,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
 
     // getKey from @leapwallet/cosmos-snap-provider return type is wrong
     const getKey = async (chainId: string): Promise<Key> => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      if (typeof metamaskSnapLeapKeysMap[chainId] !== "undefined") return metamaskSnapLeapKeysMap[chainId]!;
+      if (typeof metamaskSnapLeapKeysMap[chainId] !== "undefined") return metamaskSnapLeapKeysMap[chainId];
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const res: any = await ethereum.request({
@@ -208,13 +205,13 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       return res;
     };
 
-    const getOfflineSignerDirect = (chainId: string) => {
-      return {
-        getAccounts: async () => [await getAccount(chainId)],
-        signDirect: (signerAddress: string, signDoc: SignDirectParams["2"]) =>
-          signDirect(chainId, signerAddress, signDoc),
-      };
-    };
+    // const _getOfflineSignerDirect = (chainId: string) => {
+    //   return {
+    //     getAccounts: async () => [await getAccount(chainId)],
+    //     signDirect: (signerAddress: string, signDoc: SignDirectParams["2"]) =>
+    //       signDirect(chainId, signerAddress, signDoc),
+    //   };
+    // };
 
     const getOfflineSignerOnlyAmino = (chainId: string) => {
       return {

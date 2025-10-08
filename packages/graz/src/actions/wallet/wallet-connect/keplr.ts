@@ -22,7 +22,7 @@ export const getWCKeplr = (): Wallet => {
     },
     walletType: WalletType.WC_KEPLR_MOBILE,
     formatNativeUrl: (appUrl, wcUri, os) => {
-      const plainAppUrl = appUrl.replaceAll("/", "").replaceAll(":", "");
+      const plainAppUrl = appUrl.replace(/\//g, "").replace(/:/g, "");
       const encoded = wcUri && encodeURIComponent(wcUri);
       switch (os) {
         case "ios": {

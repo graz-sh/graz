@@ -6,37 +6,61 @@ import { useMemo } from "react";
 
 import { useGrazInternalStore } from "../store";
 import type { QueryConfig, UseMultiChainQueryResult } from "../types/hooks";
-import type { MultiChainHookArgs } from "../utils/multi-chain";
 import { createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi-chain";
 
 /**
  * graz query hook to retrieve a StargateClient.
  *
+ * Note: Returns multi-chain results by default (Record<chainId, StargateClient>).
+ *
  * @example
  * ```ts
  * import { useStargateClient } from "graz";
  *
- * // single chain
- * const { data:client, isFetching, refetch, ... } = useStargateClient();
- * await client.getAccount("address")
+ * // Single chain with precise type inference
+ * const { data: clients } = useStargateClient({ chainId: ["cosmoshub-4"] });
+ * // Type: { data?: { "cosmoshub-4": StargateClient } }
+ * const client = clients?.["cosmoshub-4"];
+ * await client?.getAccount("address");
  *
- * // multi chain
- * const { data:clients, isFetching, refetch, ... } = useStargateClient({multiChain: true, chainId: ["cosmoshub-4", "sommelier-3"]});
- * await clients["cosmoshub-4"].getAccount("address")
+ * // Multiple chains with precise type inference
+ * const { data: clients } = useStargateClient({
+ *   chainId: ["cosmoshub-4", "osmosis-1"]
+ * });
+ * // Type: { data?: { "cosmoshub-4": StargateClient, "osmosis-1": StargateClient } }
+ * await clients?.["cosmoshub-4"]?.getAccount("address"); // ✅ Autocomplete!
  *
+ * // All connected chains
+ * const { data: clients } = useStargateClient();
+ * // Type: { data?: Record<string, StargateClient> }
  * ```
  */
-export const useStargateClient = <TMulti extends MultiChainHookArgs>(
-  args?: TMulti & QueryConfig,
-): UseMultiChainQueryResult<TMulti, StargateClient> => {
-  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
-  const queryKey = useMemo(() => ["USE_STARGATE_CLIENT", chains] as const, [chains]);
+
+// Overload: When chainId is provided with specific type
+export function useStargateClient<const TChainIds extends readonly string[]>(
+  args: {
+    chainId: TChainIds;
+  } & QueryConfig,
+): UseMultiChainQueryResult<TChainIds, StargateClient>;
+
+// Overload: When chainId is not provided
+export function useStargateClient(args?: QueryConfig): UseMultiChainQueryResult<undefined, StargateClient>;
+
+// Implementation
+export function useStargateClient<const TChainIds extends readonly string[] | undefined>(
+  args?: {
+    chainId?: TChainIds;
+  } & QueryConfig,
+): UseMultiChainQueryResult<TChainIds, StargateClient> {
+  const chains = useChainsFromArgs({ chainId: args?.chainId as string[] | undefined });
+  const queryKey = useMemo(() => ["USE_STARGATE_CLIENT", chains], [chains]);
 
   return useQuery({
     queryKey,
-    queryFn: async ({ queryKey: [, _chains] }) => {
-      if (_chains.length < 1) throw new Error("No chains found");
-      const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
+    queryFn: async () => {
+      if (!chains || chains.length < 1) throw new Error("No chains found");
+      // Always use multi-chain function
+      const res = await createMultiChainAsyncFunction(chains, async (_chain) => {
         const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
         const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
         const client = await StargateClient.connect(endpoint);
@@ -47,36 +71,61 @@ export const useStargateClient = <TMulti extends MultiChainHookArgs>(
     enabled: Boolean(chains) && chains.length > 0 && (args?.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
   });
-};
+}
 
 /**
  * graz query hook to retrieve a CosmWasmClient.
+ *
+ * Note: Returns multi-chain results by default (Record<chainId, CosmWasmClient>).
  *
  * @example
  * ```ts
  * import { useCosmWasmClient } from "graz";
  *
- * //single chain
- * const { data:client, isFetching, refetch, ... } = useCosmWasmClient();
- * await client.getAccount("address")
+ * // Single chain with precise type inference
+ * const { data: clients } = useCosmWasmClient({ chainId: ["cosmoshub-4"] });
+ * // Type: { data?: { "cosmoshub-4": CosmWasmClient } }
+ * const client = clients?.["cosmoshub-4"];
+ * await client?.getAccount("address");
  *
- * // multi chain
- * const { data:clients, isFetching, refetch, ... } = useCosmWasmClient({multiChain: true, chainId: ["cosmoshub-4", "sommelier-3"]});
- * await clients["cosmoshub-4"].getAccount("address")
+ * // Multiple chains with precise type inference
+ * const { data: clients } = useCosmWasmClient({
+ *   chainId: ["cosmoshub-4", "osmosis-1"]
+ * });
+ * // Type: { data?: { "cosmoshub-4": CosmWasmClient, "osmosis-1": CosmWasmClient } }
+ * await clients?.["cosmoshub-4"]?.getAccount("address"); // ✅ Autocomplete!
  *
+ * // All connected chains
+ * const { data: clients } = useCosmWasmClient();
+ * // Type: { data?: Record<string, CosmWasmClient> }
  * ```
  */
-export const useCosmWasmClient = <TMulti extends MultiChainHookArgs>(
-  args?: TMulti & QueryConfig,
-): UseMultiChainQueryResult<TMulti, CosmWasmClient> => {
-  const chains = useChainsFromArgs({ chainId: args?.chainId, multiChain: args?.multiChain });
-  const queryKey = useMemo(() => ["USE_COSMWASM_CLIENT", chains] as const, [chains]);
+
+// Overload: When chainId is provided with specific type
+export function useCosmWasmClient<const TChainIds extends readonly string[]>(
+  args: {
+    chainId: TChainIds;
+  } & QueryConfig,
+): UseMultiChainQueryResult<TChainIds, CosmWasmClient>;
+
+// Overload: When chainId is not provided
+export function useCosmWasmClient(args?: QueryConfig): UseMultiChainQueryResult<undefined, CosmWasmClient>;
+
+// Implementation
+export function useCosmWasmClient<const TChainIds extends readonly string[] | undefined>(
+  args?: {
+    chainId?: TChainIds;
+  } & QueryConfig,
+): UseMultiChainQueryResult<TChainIds, CosmWasmClient> {
+  const chains = useChainsFromArgs({ chainId: args?.chainId as string[] | undefined });
+  const queryKey = useMemo(() => ["USE_COSMWASM_CLIENT", chains], [chains]);
 
   return useQuery({
     queryKey,
-    queryFn: async ({ queryKey: [, _chains] }) => {
-      if (_chains.length < 1) throw new Error("No chains found");
-      const res = await createMultiChainAsyncFunction(Boolean(args?.multiChain), _chains, async (_chain) => {
+    queryFn: async () => {
+      if (!chains || chains.length < 1) throw new Error("No chains found");
+      // Always use multi-chain function
+      const res = await createMultiChainAsyncFunction(chains, async (_chain) => {
         const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
         const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
         const client = await CosmWasmClient.connect(endpoint);
@@ -87,4 +136,4 @@ export const useCosmWasmClient = <TMulti extends MultiChainHookArgs>(
     enabled: Boolean(chains) && chains.length > 0 && (args?.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
   });
-};
+}

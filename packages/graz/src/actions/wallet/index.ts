@@ -2,6 +2,7 @@ import { RECONNECT_SESSION_KEY } from "../../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
 import { WALLET_TYPES, WalletType } from "../../types/wallet";
+import { getCactusCosmos } from "./cactus";
 import { getCompass } from "./compass";
 import { getCosmiframe } from "./cosmiframe";
 import { getMetamaskSnapCosmos } from "./cosmos-metamask-snap";
@@ -112,6 +113,9 @@ export const getWallet = (type: WalletType = useGrazInternalStore.getState().wal
       }
       case WalletType.PARA: {
         return getPara();
+      }
+      case WalletType.CACTUSCOSMOS: {
+        return getCactusCosmos();
       }
 
       default: {

@@ -4,6 +4,258 @@ sidebar_position: 3
 
 # Migration Guide
 
+This guide helps you upgrade between major versions of `graz`. Each section covers breaking changes and provides migration examples.
+
+## Latest Version - Unified Multi-Chain API
+
+### Overview
+
+This release simplifies the multi-chain API by making it consistent across all hooks. The changes improve developer experience with a predictable, unified pattern.
+
+### Breaking Changes Summary
+
+| Change | Before | After |
+|--------|--------|-------|
+| Hook `chainId` format | `string` or `string[]` | Always `string[]` |
+| Return type | `T` or `Record<string, T>` | Always `Record<chainId, T>` |
+| `multiChain` parameter | Required boolean flag | Removed (automatic) |
+| Method hooks | Auto `senderAddress` | Explicit `senderAddress` required |
+| Actions | `string \| string[]` | Still accepts both (unchanged) |
+
+### Quick Migration Checklist
+
+- [ ] Change `chainId: "chain-id"` → `chainId: ["chain-id"]`
+- [ ] Remove all `multiChain: true/false` parameters
+- [ ] Extract values from Record: `data?.["chain-id"]`
+- [ ] Add explicit `senderAddress` to mutation hooks
+- [ ] Update TypeScript types if using custom types
+
+### Detailed Migration Examples
+
+## Hook Return Types
+
+All query hooks now return data in a `Record<chainId, T>` format:
+
+```diff
+  import { useAccount } from "graz";
+
+  function Component() {
+-   const { data: account } = useAccount({ chainId: "cosmoshub-4" });
++   const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
++   const account = accounts?.["cosmoshub-4"];
+
+    return <div>{account?.bech32Address}</div>;
+  }
+```
+
+### Removed `multiChain` Parameter
+
+The `multiChain` boolean parameter has been removed from all hooks:
+
+```diff
+  import { useBalance } from "graz";
+
+  function Balances() {
+    const { data: balances } = useBalance({
+-     chainId: ["cosmoshub-4", "osmosis-1"],
+-     multiChain: true,
++     chainId: ["cosmoshub-4", "osmosis-1"],
+      denom: "uatom",
+    });
+
+    // Data is always Record<chainId, Coin> now
+    return (
+      <div>
+        {balances && Object.entries(balances).map(([chainId, balance]) => (
+          <div key={chainId}>
+            {chainId}: {balance.amount}
+          </div>
+        ))}
+      </div>
+    );
+  }
+```
+
+### Array-Only `chainId` in Hooks
+
+All hooks now require `chainId` as an array:
+
+```diff
+  import { useStargateClient } from "graz";
+
+  function Component() {
+-   const { data: client } = useStargateClient({ chainId: "cosmoshub-4" });
++   const { data: clients } = useStargateClient({ chainId: ["cosmoshub-4"] });
++   const client = clients?.["cosmoshub-4"];
+
+    return <div>...</div>;
+  }
+```
+
+### Method Hooks - Explicit `senderAddress`
+
+Method mutation hooks now require explicit `senderAddress` parameter:
+
+## `useSendTokens`
+
+```diff
+  import { useSendTokens, useAccount, useStargateSigningClient } from "graz";
+
+  function SendTokens() {
+-   const { data: account } = useAccount({ chainId: "cosmoshub-4" });
++   const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+-   const { data: signingClient } = useStargateSigningClient({ chainId: "cosmoshub-4" });
++   const { data: signingClients } = useStargateSigningClient({ chainId: ["cosmoshub-4"] });
+    const { sendTokensAsync } = useSendTokens();
+
++   const account = accounts?.["cosmoshub-4"];
++   const signingClient = signingClients?.["cosmoshub-4"];
+
+    const handleSend = async () => {
+      await sendTokensAsync({
+        signingClient,
++       senderAddress: account.bech32Address,
+        recipientAddress: "cosmos1...",
+        amount: [{ denom: "uatom", amount: "1000" }],
+        fee: "auto",
+      });
+    };
+
+    return <button onClick={handleSend}>Send</button>;
+  }
+```
+
+## `useSendIbcTokens`
+
+```diff
+  import { useSendIbcTokens } from "graz";
+
+  function SendIbc() {
+-   const { data: account } = useAccount({ chainId: "cosmoshub-4" });
++   const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+-   const { data: signingClient } = useStargateSigningClient({ chainId: "cosmoshub-4" });
++   const { data: signingClients } = useStargateSigningClient({ chainId: ["cosmoshub-4"] });
+    const { sendIbcTokensAsync } = useSendIbcTokens();
+
++   const account = accounts?.["cosmoshub-4"];
++   const signingClient = signingClients?.["cosmoshub-4"];
+
+    await sendIbcTokensAsync({
+      signingClient,
++     senderAddress: account.bech32Address,
+      recipientAddress: "osmo1...",
+      transferAmount: { denom: "uatom", amount: "1000" },
+      sourcePort: "transfer",
+      sourceChannel: "channel-141",
+      fee: "auto",
+    });
+  }
+```
+
+## `useInstantiateContract`
+
+```diff
+  import { useInstantiateContract } from "graz";
+
+  function Instantiate() {
+-   const { data: account } = useAccount({ chainId: "cosmoshub-4" });
++   const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+-   const { data: signingClient } = useCosmWasmSigningClient({ chainId: "cosmoshub-4" });
++   const { data: signingClients } = useCosmWasmSigningClient({ chainId: ["cosmoshub-4"] });
+    const { instantiateContractAsync } = useInstantiateContract();
+
++   const account = accounts?.["cosmoshub-4"];
++   const signingClient = signingClients?.["cosmoshub-4"];
+
+    await instantiateContractAsync({
+      signingClient,
++     senderAddress: account.bech32Address,
+      msg: { count: 0 },
+      label: "My Contract",
+      fee: "auto",
+    });
+  }
+```
+
+## `useExecuteContract`
+
+```diff
+  import { useExecuteContract } from "graz";
+
+  function Execute() {
+-   const { data: account } = useAccount({ chainId: "cosmoshub-4" });
++   const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+-   const { data: signingClient } = useCosmWasmSigningClient({ chainId: "cosmoshub-4" });
++   const { data: signingClients } = useCosmWasmSigningClient({ chainId: ["cosmoshub-4"] });
+    const { executeContractAsync } = useExecuteContract();
+
++   const account = accounts?.["cosmoshub-4"];
++   const signingClient = signingClients?.["cosmoshub-4"];
+
+    await executeContractAsync({
+      signingClient,
++     senderAddress: account.bech32Address,
+      msg: { increment: {} },
+      fee: "auto",
+    });
+  }
+```
+
+### Actions - Backward Compatible
+
+The `connect()` and `disconnect()` actions maintain backward compatibility and still accept `string | string[]`:
+
+```tsx
+import { connect, disconnect } from "graz";
+
+// Both still work
+await connect({ chainId: "cosmoshub-4" });
+await connect({ chainId: ["cosmoshub-4", "osmosis-1"] });
+
+await disconnect({ chainId: "cosmoshub-4" });
+await disconnect({ chainId: ["cosmoshub-4"] });
+```
+
+### Why These Changes?
+
+The new API provides significant improvements:
+
+#### 1. **Consistency**
+All hooks use the same pattern - no need to remember when to use `multiChain: true`
+
+```tsx
+// Old: Different patterns
+const { data: account } = useAccount({ chainId: "chain-1" });
+const { data: accounts } = useAccount({ chainId: ["chain-1"], multiChain: true });
+
+// New: One pattern
+const { data: accounts } = useAccount({ chainId: ["chain-1"] });
+const account = accounts?.["chain-1"];
+```
+
+#### 2. **Type Safety**
+Predictable types make TypeScript integration seamless
+
+```tsx
+// Always Record<string, T>
+const { data: balances } = useBalance({ chainId: ["cosmoshub-4"] });
+// balances is always Record<string, Coin>
+```
+
+#### 3. **Simplicity**
+Less cognitive load - one parameter (`chainId`) instead of two (`chainId` + `multiChain`)
+
+#### 4. **Flexibility**
+Easy to scale from single to multi-chain without refactoring
+
+```tsx
+// Start with one chain
+const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
+
+// Add more chains later (same code pattern!)
+const { data: accounts } = useAccount({ chainId: ["cosmoshub-4", "osmosis-1"] });
+```
+
 ## 0.3.0 Breaking Changes
 
 Changes:

@@ -1,11 +1,11 @@
-import { OfflineAminoSigner } from "@cosmjs/amino";
-import { DirectSignResponse, OfflineDirectSigner } from "@cosmjs/proto-signing";
+import type { OfflineAminoSigner } from "@cosmjs/amino";
+import type { DirectSignResponse, OfflineDirectSigner } from "@cosmjs/proto-signing";
 import type {
   ChainInfo,
   Keplr,
   KeplrIntereactionOptions,
-  Key as KeplrKey,
   KeplrSignOptions,
+  Key as KeplrKey,
 } from "@keplr-wallet/types";
 
 export enum WalletType {
@@ -33,6 +33,7 @@ export enum WalletType {
   INITIA = "initia",
   OKX = "okx",
   PARA = "para",
+  CACTUSCOSMOS = "cactuscosmos",
 }
 
 export const WALLET_TYPES = [
@@ -54,6 +55,7 @@ export const WALLET_TYPES = [
   WalletType.INITIA,
   WalletType.OKX,
   WalletType.PARA,
+  WalletType.CACTUSCOSMOS,
 ];
 
 export type Wallet = Pick<Keplr, "enable" | "getOfflineSignerOnlyAmino" | "signAmino"> & {

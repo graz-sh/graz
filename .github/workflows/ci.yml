@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - packages/**
+      - .github/workflows/ci.yml
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - packages/**
+      - .github/workflows/ci.yml
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Run CLI tests
+        run: pnpm --filter graz test:cli
+
+      - name: Type check
+        run: pnpm --filter graz type-check
+
+  build-examples:
+    name: Build Examples
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          cache: pnpm
+          node-version: 20
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build graz package
+        run: pnpm --filter graz build
+
+      - name: Generate chain definitions
+        run: pnpm graz cli --generate
+
+      - name: Build all packages
+        run: pnpm build-all

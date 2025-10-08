@@ -1,7 +1,7 @@
 {
   "name": "graz",
   "description": "React hooks for Cosmos",
-  "version": "0.3.7",
+  "version": "0.4.0-alpha.4",
   "author": "Nur Fikri <kikiding.space@gmail.com>",
   "repository": "https://github.com/graz-sh/graz.git",
   "homepage": "https://github.com/graz-sh/graz",
@@ -39,10 +39,15 @@
     "cli": "node dist/cli.js",
     "dev": "tsup --watch",
     "lint": "eslint --fix \"src/**/*.{ts,tsx}\"",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "test": "vitest run",
+    "test:cli": "vitest run src/__tests__/cli.test.ts",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "type-check": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@tanstack/react-query": ">=5.62.0",
+    "@tanstack/react-query": ">=5.0.0",
     "react": ">=17",
     "@cosmjs/amino": ">=0.32.4",
     "@cosmjs/cosmwasm-stargate": ">=0.32.4",
@@ -50,13 +55,17 @@
     "@cosmjs/stargate": ">=0.32.4",
     "@cosmjs/encoding": ">=0.32.4"
   },
+  "peerDependenciesMeta": {
+    "@getpara/graz-integration": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "@initia/initia-registry-types": "0.0.20",
     "@keplr-wallet/types": "0.12.156",
     "@cosmsnap/snapper": "0.2.7",
     "@dao-dao/cosmiframe": "1.0.0",
     "@keplr-wallet/cosmos": "0.12.156",
-    "@metamask/providers": "12.0.0",
     "@vectis/extension-client": "^0.7.2",
     "@walletconnect/sign-client": "2.20.2",
     "@walletconnect/types": "2.20.2",
@@ -64,18 +73,21 @@
     "@walletconnect/modal": "2.7.0",
     "cosmos-directory-client": "0.0.6",
     "long": "4",
-    "starknet": "^6",
+    "p-map": "^4.0.0",
     "zustand": "5.0.4"
   },
   "devDependencies": {
+    "@getpara/graz-connector": "2.0.0-alpha.51",
+    "@getpara/web-sdk": "2.0.0-alpha.51",
     "@types/node": "^18.17.15",
     "@types/react": "^18.2.21",
-    "@types/react-dom": "^18.2.7",
+    "@vitest/ui": "^2.1.9",
     "arg": "^5.0.2",
+    "jsdom": "^23.0.0",
     "react": "^18.2.0",
     "typescript": "^5.4.0",
-    "@getpara/graz-connector": ">=2.0.0-alpha.51 <2.0.0-beta",
-    "@getpara/graz-integration": ">=2.0.0-alpha.51 <2.0.0-beta"
+    "vite": "^5.4.20",
+    "vitest": "^2.1.9"
   },
   "keywords": [
     "graz",

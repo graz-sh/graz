@@ -2,7 +2,23 @@
 
 mutation hook for [Suggesting a chain](useSuggestChain.md) and [connect](./useConnect.md) to a wallet in one hook.
 
-#### Usage
+:::tip Dynamic Chain Addition & Persistence
+
+This hook allows you to suggest and connect to chains that are **not provided in `GrazProvider`**. When you suggest a chain, Graz automatically adds it to the internal store and **persists it to localStorage**, making it available even after page refreshes. This eliminates the need to pre-configure all chains in your provider.
+
+Perfect for:
+- Dynamic chain discovery and connection
+- Supporting custom chains or testnets
+- Building dApps that work with any Cosmos chain
+
+**Persistence behavior:**
+- Suggested chains persist across page refreshes
+- Users can reconnect to suggested chains automatically
+- Provider chains always take precedence over persisted chains
+
+:::
+
+## Usage
 
 ```tsx
 import { Bech32Address } from "@keplr-wallet/cosmos";
@@ -49,7 +65,7 @@ function App() {
 }
 ```
 
-#### Types
+## Types
 
 - `SuggestChainAndConnectArgs`
   ```tsx
@@ -65,7 +81,7 @@ function App() {
   }
   ```
 
-#### Hook Params
+## Hook Params
 
 ```ts
 {
@@ -78,7 +94,7 @@ function App() {
               }) => void}
 ```
 
-#### Types
+## Types
 
 ```ts
 interface SuggestChainAndConnectArgs {
@@ -88,7 +104,7 @@ interface SuggestChainAndConnectArgs {
 }
 ```
 
-#### Return Value
+## Return Value
 
 ```tsx
 {

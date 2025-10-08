@@ -1,8 +1,8 @@
 # useCheckWallet
 
-Hook to check whether given {@link WalletType} or default configured wallet is supported
+Hook to check whether given `WalletType` or default configured wallet is supported
 
-#### Usage
+## Usage
 
 ```tsx
 import { useCheckWallet, WalletType } from "graz";
@@ -11,7 +11,7 @@ const { data: isSupported } = useCheckWallet(WalletType.KEPLR);
 const { data: isKeplrSupported } = useCheckWallet(WalletType.KEPLR);
 ```
 
-#### Enum
+## Enum
 
 - WalletType
   ```ts
@@ -29,7 +29,7 @@ const { data: isKeplrSupported } = useCheckWallet(WalletType.KEPLR);
   }
   ```
 
-#### Types
+## Types
 
 - `WALLET_TYPES`
   ```ts
@@ -46,17 +46,19 @@ const { data: isKeplrSupported } = useCheckWallet(WalletType.KEPLR);
   }
   ```
 
-#### Hook Params
+## Hook Params
 
 ```ts
 type?: WalletType // you can check specific supported wallet
 ```
 
-##### Usage
+### Usage
 
+```tsx
 const { data: isKeplrSupported } = useCheckWallet("keplr");
+```
 
-#### Return Value
+## Return Value
 
 ```tsx
 {

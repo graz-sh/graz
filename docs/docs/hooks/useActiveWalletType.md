@@ -2,7 +2,7 @@
 
 hook to retrieve current active [`WalletType`](../types/walletType.md)
 
-#### Usage
+## Usage
 
 ```tsx
 import { useActiveWalletType } from "graz";
@@ -18,7 +18,7 @@ function App() {
 }
 ```
 
-#### Return Value
+## Return Value
 
 ```tsx
 {

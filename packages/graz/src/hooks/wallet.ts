@@ -48,10 +48,13 @@ export const useActiveWalletType = () => {
 export const useCheckWallet = (type?: WalletType): UseQueryResult<boolean> => {
   const walletType = useGrazInternalStore((x) => type || x.walletType);
 
-  const queryKey = ["USE_CHECK_WALLET", walletType] as const;
+  const queryKey = ["USE_CHECK_WALLET", walletType];
   const query = useQuery({
     queryKey,
-    queryFn: ({ queryKey: [, _type] }) => checkWallet(_type),
+    queryFn: () => {
+      if (!walletType) return false;
+      return checkWallet(walletType);
+    },
   });
 
   return query;

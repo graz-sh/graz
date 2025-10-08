@@ -62,7 +62,7 @@ export const AvailableWallets = () => {
 };
 ```
 
-#### Note:
+## Note:
 
 - if `walletConnect.options.projectId` not provided on `GrazProvider`, `WalletType.WALLETCONNECT` | `WalletType.WC_KEPLR_MOBILE` | `WalletType.WC_LEAP_MOBILE`| `WalletType.WC_COSMOSTATION_MOBILE` will return false
 - `WalletType.WALLETCONNECT` is using `@walletconnect/modal` for the modal, it will only shows the qr code. To connect and have deep linking to wallet mobile apps, use `WalletType.WC_KEPLR_MOBILE` |

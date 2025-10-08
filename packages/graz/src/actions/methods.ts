@@ -87,7 +87,7 @@ export interface InstantiateContractArgs<Message extends Record<string, unknown>
 
 export type InstantiateContractMutationArgs<Message extends Record<string, unknown>> = Omit<
   InstantiateContractArgs<Message>,
-  "codeId" | "senderAddress" | "fee"
+  "codeId" | "fee"
 > & {
   fee?: StdFee | "auto" | number;
 };
@@ -120,7 +120,7 @@ export interface ExecuteContractArgs<Message extends Record<string, unknown>> {
 
 export type ExecuteContractMutationArgs<Message extends Record<string, unknown>> = Omit<
   ExecuteContractArgs<Message>,
-  "contractAddress" | "senderAddress" | "fee" | "funds" | "memo"
+  "contractAddress" | "fee" | "funds" | "memo"
 > & {
   fee?: StdFee | "auto" | number;
   funds?: Coin[];

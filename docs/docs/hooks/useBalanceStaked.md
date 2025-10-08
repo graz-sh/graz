@@ -1,79 +1,108 @@
 # useBalanceStaked
 
-Hook to retrieve list of staked balances from current account or given address
+Hook to retrieve staked balance for a specific chain and address. Returns a single `Coin`.
 
-#### Usage
-
-##### Single chain
+## Usage
 
 ```tsx
-import { useBalanceStaked } from "graz";
+import { useBalanceStaked, useAccount } from "graz";
+
 function App() {
-  const { data: balanceStaked, isLoading } = useBalanceStaked({
-    bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
+  const { data: accounts } = useAccount();
+  const account = accounts?.["cosmoshub-4"];
+
+  const { data: stakedBalance, isLoading } = useBalanceStaked({
+    chainId: "cosmoshub-4",
+    bech32Address: account?.bech32Address || "",
+    enabled: Boolean(account?.bech32Address),
   });
 
   return (
     <div>
-      Balances:
+      <h3>Staked Balance</h3>
       {isLoading ? (
-        "Fetching staked balance..."
+        "Loading..."
       ) : (
-        <p>
-          {balanceStaked?.amount} {balanceStaked?.denom}
-        </p>
+        <p>{stakedBalance?.amount} {stakedBalance?.denom}</p>
       )}
     </div>
   );
 }
 ```
 
-##### Multi chain
-
-`useBalanceStaked` address handles multi chain addresses, so you need only to pass 1 chain address it will automatically convert address in other chain
+### With Custom Address
 
 ```tsx
 import { useBalanceStaked } from "graz";
-function App() {
-  const { data: balanceStaked, isLoading } = useBalanceStaked({
+
+function StakedBalanceViewer() {
+  const { data: stakedBalance } = useBalanceStaked({
+    chainId: "cosmoshub-4",
     bech32Address: "cosmos1g3jjhgkyf36pjhe7u5cw8j9u6cgl8x929ej430",
-    chainId: ["cosmoshub-4", "sommelier-1"],
-    multiChain: true,
   });
 
   return (
     <div>
-      Balances:
-      {isLoading ? (
-        "Fetching staked balance..."
-      ) : balanceStaked && Object.entries(balanceStaked).map([chainId, coin] => {
-          return(
-            <div>
-              <p>{chainId} balance staked : {coin.amount} {coin.denom}</p>
-            </div>
-          );
-        })
-      }
+      {stakedBalance ? (
+        <span>{stakedBalance.amount} {stakedBalance.denom}</span>
+      ) : (
+        <span>No staked balance</span>
+      )}
     </div>
   );
 }
 ```
 
-#### Hook Params
+### Multiple Chains
+
+To fetch staked balances for multiple chains, call `useBalanceStaked` for each chain:
 
 ```tsx
-<TMultiChain extends boolean>{
-  chainId?: string | string[];
-  multiChain?: TMultiChain; // boolean
-  bech32Address?: string // Optional bech32 account address, defaults to connected account address
+import { useBalanceStaked, useAccount } from "graz";
+
+function MultiChainStakedBalances() {
+  const { data: accounts } = useAccount();
+
+  const { data: cosmosStaked } = useBalanceStaked({
+    chainId: "cosmoshub-4",
+    bech32Address: accounts?.["cosmoshub-4"]?.bech32Address || "",
+    enabled: Boolean(accounts?.["cosmoshub-4"]?.bech32Address),
+  });
+
+  const { data: osmosisStaked } = useBalanceStaked({
+    chainId: "osmosis-1",
+    bech32Address: accounts?.["osmosis-1"]?.bech32Address || "",
+    enabled: Boolean(accounts?.["osmosis-1"]?.bech32Address),
+  });
+
+  return (
+    <div>
+      <h4>Cosmos Hub Staked</h4>
+      {cosmosStaked && <div>{cosmosStaked.amount} {cosmosStaked.denom}</div>}
+
+      <h4>Osmosis Staked</h4>
+      {osmosisStaked && <div>{osmosisStaked.amount} {osmosisStaked.denom}</div>}
+    </div>
+  );
 }
 ```
 
-#### Return Value
+## Hook Params
 
 ```tsx
 {
-  data: TMultiChain extends true ? Record<string,  Coin> :  Coin; // from @cosmjs/proto-signing
+  chainId: string; // Single chain ID (required)
+  bech32Address: string; // Address to query staked balance for (required)
+  enabled?: boolean; // Optional, defaults to true
+  // ... other react-query options
+}
+```
+
+## Return Value
+
+```tsx
+{
+  data?: Coin; // Coin from @cosmjs/proto-signing
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -87,12 +116,11 @@ function App() {
   isLoadingError: boolean;
   isPaused: boolean;
   isPlaceholderData: boolean;
-  isPreviousData: boolean;
   isRefetchError: boolean;
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<TMultiChain extends true ? Record<string,  Coin> :  Coin, unknown>>;
+  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Coin, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

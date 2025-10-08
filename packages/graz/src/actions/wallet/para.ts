@@ -1,5 +1,5 @@
 import { useGrazInternalStore, useGrazSessionStore } from "../../store";
-import type { ParaGrazConnector } from "@getpara/graz-connector";
+import type { ParaGrazConnector } from "../../types/para";
 import type { Key, Wallet } from "../../types/wallet";
 import { WalletType } from "../../types/wallet";
 
@@ -16,7 +16,7 @@ export const getPara = (): Wallet => {
 
   const paraConfig = useGrazInternalStore.getState().paraConfig;
 
-  if (!paraConfig || !paraConfig.paraWeb) {
+  if (!paraConfig?.paraWeb) {
     throw new Error("Missing Para config. Provide paraConfig with 'paraWeb' to GrazProvider.");
   }
 
@@ -24,7 +24,7 @@ export const getPara = (): Wallet => {
     if (initPromise) return initPromise;
 
     initPromise = (async (): Promise<ParaGrazConnector> => {
-      let existing = useGrazSessionStore.getState().paraConnector as ParaGrazConnector | null;
+      const existing = useGrazSessionStore.getState().paraConnector;
       if (existing) return existing;
 
       try {
@@ -36,7 +36,9 @@ export const getPara = (): Wallet => {
           if (typeof window === "undefined") {
             throw new Error("Para connector requires client-side execution (SSR is unsupported).");
           }
-          const mod = await import(/* webpackIgnore: true */ /* @vite-ignore */ "@getpara/graz-integration");
+          // Use Function constructor to prevent static analysis by bundlers
+          const dynamicImport = new Function("specifier", "return import(specifier)");
+          const mod = await dynamicImport("@getpara/graz-integration");
           const maybe = (mod as any)?.ParaGrazConnector;
           if (typeof maybe !== "function") {
             throw new Error("Invalid ParaGrazConnector in @getpara/graz-integration. Check the package/export.");

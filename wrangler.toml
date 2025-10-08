@@ -1,0 +1,20 @@
+name = "graz-docs"
+compatibility_date = "2024-10-06"
+
+[build]
+command = "pnpm --filter=docs run build:all"
+cwd = ""
+
+[build.upload]
+format = "directory"
+dir = "docs/build"
+
+# Node.js compatibility
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables for build
+[env.production]
+NODE_VERSION = "20.18.0"
+
+[env.preview]
+NODE_VERSION = "20.18.0"

@@ -1,54 +1,69 @@
 # useStargateSigningClient
 
-Hook to retrieve a SigningStargateClient.
+Hook to retrieve a SigningStargateClient. Returns signing clients in a `Record<chainId, SigningStargateClient | null>` format.
 
-### Usage
-
-##### Single Chain
+## Usage
 
 ```tsx
 import { useStargateSigningClient } from "graz";
 
 function App() {
-  const { data: signingClient, isFetching, refetch, ... } = useStargateSigningClient();
-
-  async function getAccountFromClient() {
-    return await client.getAccount("address")
-  }
-}
-```
-
-##### Multi Chain
-
-```tsx
-import { useStargateClient } from "graz";
-
-function App() {
-  const { data: signingClient, isFetching, refetch, ... } = useStargateSigningClient({
-    chainId: ["cosmoshub-4", "sommelier-1"],
-    multiChain: true
+  const { data: signingClients, isFetching } = useStargateSigningClient({
+    chainId: ["cosmoshub-4", "osmosis-1"],
   });
 
-  async function getAccountFromClient() {
-    return await client["cosmoshub-4"].getAccount("address")
+  async function sendOnMultipleChains() {
+    const cosmosClient = signingClients?.["cosmoshub-4"];
+    const osmosisClient = signingClients?.["osmosis-1"];
+
+    if (!cosmosClient || !osmosisClient) return;
+
+    const cosmosTx = await cosmosClient.sendTokens(...);
+    const osmosisTx = await osmosisClient.sendTokens(...);
+
+    return { cosmosTx, osmosisTx };
   }
+
+  return <div>...</div>;
 }
 ```
 
-#### Hook Params
+### With Per-Chain Options
 
 ```tsx
-<TMultiChain extends boolean>{
-  chainId?: string | string[];
-  multiChain?: TMultiChain; // boolean
+import { useStargateSigningClient } from "graz";
+
+function App() {
+  const { data: signingClients } = useStargateSigningClient({
+    chainId: ["cosmoshub-4", "osmosis-1"],
+    opts: {
+      "cosmoshub-4": {
+        gasPrice: "0.025uatom",
+      },
+      "osmosis-1": {
+        gasPrice: "0.0025uosmo",
+      },
+    },
+  });
+
+  return <div>...</div>;
 }
 ```
 
-#### Return Value
+## Hook Params
 
 ```tsx
 {
-  data?: TMultiChain extends true ? Record<string, SigningStargateClient> : SigningStargateClient;
+  chainId?: string[]; // Array of chain IDs, defaults to active chains
+  opts?: Record<string, StargateClientOptions>; // Per-chain options
+}
+```
+
+## Return Value
+
+```tsx
+{
+  data?: Record<string, SigningStargateClient | null>; // SigningStargateClient from @cosmjs/stargate
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -62,12 +77,11 @@ function App() {
   isLoadingError: boolean;
   isPaused: boolean;
   isPlaceholderData: boolean;
-  isPreviousData: boolean;
   isRefetchError: boolean;
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch:(options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult< TMultiChain extends true ? Record<string, SigningStargateClient> : SigningStargateClient, unknown>>;
+  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Record<string, SigningStargateClient | null>, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';
