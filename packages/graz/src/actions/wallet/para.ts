@@ -36,7 +36,9 @@ export const getPara = (): Wallet => {
           if (typeof window === "undefined") {
             throw new Error("Para connector requires client-side execution (SSR is unsupported).");
           }
-          const mod = await import(/* webpackIgnore: true */ /* @vite-ignore */ "@getpara/graz-integration");
+          // Use Function constructor to prevent static analysis by bundlers
+          const dynamicImport = new Function("specifier", "return import(specifier)");
+          const mod = await dynamicImport("@getpara/graz-integration");
           const maybe = (mod as any)?.ParaGrazConnector;
           if (typeof maybe !== "function") {
             throw new Error("Invalid ParaGrazConnector in @getpara/graz-integration. Check the package/export.");

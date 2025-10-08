@@ -1,5 +1,12 @@
 # @project/example-playground
 
+## 0.0.2-alpha.2
+
+### Patch Changes
+
+- Updated dependencies
+  - graz@0.4.0-alpha.4
+
 ## 0.0.2-alpha.1
 
 ### Patch Changes

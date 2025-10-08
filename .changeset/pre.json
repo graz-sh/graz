@@ -7,7 +7,5 @@
     "@project/example-vite": "0.0.14",
     "graz": "0.3.7"
   },
-  "changesets": [
-    "para-types-internalization"
-  ]
+  "changesets": []
 }

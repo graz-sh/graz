@@ -1,5 +1,15 @@
 # graz
 
+## 0.4.0-alpha.4
+
+### Patch Changes
+
+- Fix Para wallet integration module resolution issue
+
+  Fixed a bundler issue where Next.js and other bundlers would try to resolve `@getpara/graz-integration` at build time, causing "Module not found" errors. The fix uses a more opaque dynamic import approach that prevents static analysis by bundlers while still allowing runtime loading of the Para connector when needed.
+
+  This change also declares `@getpara/graz-integration` as an optional peer dependency for better package manager awareness.
+
 ## 0.4.0-alpha.3
 
 ### Minor Changes
