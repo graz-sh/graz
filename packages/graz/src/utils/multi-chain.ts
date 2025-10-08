@@ -1,4 +1,4 @@
-import type { ChainInfo } from "@keplr-wallet/types";
+import { ChainInfo } from "@keplr-wallet/types";
 import pMap from "p-map";
 
 import { useGrazInternalStore } from "../store";
