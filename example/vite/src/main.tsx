@@ -9,6 +9,7 @@ import * as ReactDOM from "react-dom/client";
 
 import App from "./App";
 import ParaWeb, { Environment } from "@getpara/react-sdk-lite";
+import { ParaGrazConnector } from "@getpara/graz-integration";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const paraConfig: ParaGrazConfig | undefined = para
       paraWeb: para,
       modalProps: { appName: "MyApp" },
       queryClient: queryClient,
+      connectorClass: ParaGrazConnector,
     }
   : undefined;
 
