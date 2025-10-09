@@ -1,12 +1,8 @@
-import type { AminoSignResponse, OfflineAminoSigner, StdSignature, StdSignDoc } from "@cosmjs/amino";
-import type { DirectSignResponse, OfflineDirectSigner } from "@cosmjs/proto-signing";
-import type { ChainInfo, KeplrSignOptions } from "@keplr-wallet/types";
-
-import type { Key, SignDoc, Wallet } from "./wallet";
+import type { ChainInfo } from "@keplr-wallet/types";
 
 // Import for local use in this file
 import type { ParaWeb } from "@getpara/web-sdk";
-import type { ParaGrazConfig as ExternalParaGrazConfig } from "@getpara/graz-connector";
+import type { ParaGrazConfig as ExternalParaGrazConfig, ParaGrazConnector } from "@getpara/graz-connector";
 
 /**
  * Para Web SDK client type
@@ -89,10 +85,10 @@ export interface ParaGrazConfig {
    */
   noModal?: boolean;
   /**
-   * Optional connector class constructor to use instead of default
-   * Allows for custom Para connector implementations
+   * Required connector class constructor
+   * Must be provided to use Para wallet functionality
    */
-  connectorClass?: new (config: ParaGrazConfig, chains?: ChainInfo[] | null) => ParaGrazConnector;
+  connectorClass: new (config: ParaGrazConfig, chains?: ChainInfo[] | null) => ParaGrazConnector;
   /**
    * Props for customizing the Para modal appearance and behavior
    * Only used when using @getpara/graz-integration with modal support
@@ -110,85 +106,3 @@ export interface ParaGrazConfig {
  * Para wallet connector interface
  * Implements the Graz Wallet interface with Para-specific methods
  */
-export interface ParaGrazConnector extends Omit<Wallet, "experimentalSuggestChain"> {
-  /**
-   * Enable connection to one or more chains
-   * @param chainIds - Single chain ID or array of chain IDs
-   */
-  enable(chainIds: string | string[]): Promise<void>;
-
-  /**
-   * Disconnect from Para wallet
-   */
-  disconnect(): Promise<void>;
-
-  /**
-   * Get the Para Web SDK client instance
-   */
-  getParaWebClient(): ParaWeb;
-
-  /**
-   * Get the connector configuration
-   */
-  getConfig(): ParaGrazConfig;
-
-  /**
-   * Get account key for a specific chain
-   * @param chainId - The chain identifier
-   */
-  getKey(chainId: string): Promise<Key>;
-
-  /**
-   * Get offline signer that only supports Amino signing
-   * @param chainId - The chain identifier
-   */
-  getOfflineSignerOnlyAmino(chainId: string): OfflineAminoSigner;
-
-  /**
-   * Get hybrid offline signer supporting both Amino and Direct signing
-   * @param chainId - The chain identifier
-   */
-  getOfflineSigner(chainId: string): OfflineAminoSigner & OfflineDirectSigner;
-
-  /**
-   * Get offline signer, automatically choosing between Amino and Direct
-   * @param chainId - The chain identifier
-   */
-  getOfflineSignerAuto(chainId: string): Promise<OfflineAminoSigner | OfflineDirectSigner>;
-
-  /**
-   * Sign transaction using Amino format
-   * @param chainId - The chain identifier
-   * @param signer - The signer address
-   * @param signDoc - The Amino sign document
-   * @param signOptions - Optional signing options
-   */
-  signAmino(
-    chainId: string,
-    signer: string,
-    signDoc: StdSignDoc,
-    signOptions?: KeplrSignOptions,
-  ): Promise<AminoSignResponse>;
-
-  /**
-   * Sign transaction using Direct/Protobuf format
-   * @param chainId - The chain identifier
-   * @param signer - The signer address
-   * @param signDoc - The Direct sign document
-   * @param signOptions - Optional signing options
-   */
-  signDirect(
-    chainId: string,
-    signer: string,
-    signDoc: SignDoc,
-    signOptions?: KeplrSignOptions,
-  ): Promise<DirectSignResponse>;
-
-  /**
-   * Sign arbitrary data
-   * @param chainId - The chain identifier
-   * @param signer - The signer address
-   * @param data - Data to sign (string or bytes)
-   */
-  signArbitrary(chainId: string, signer: string, data: string | Uint8Array): Promise<StdSignature>;
-}

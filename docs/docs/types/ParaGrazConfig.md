@@ -47,8 +47,13 @@ const paraConfig: ParaGrazConfig = {
 ```
 
 :::tip Why is this required?
-By requiring you to explicitly provide the connector class, Graz can avoid bundling Para dependencies when you're not using Para wallet, resulting in a smaller bundle size.
-:::
+By requiring you to explicitly provide the connector class, Graz can:
+
+- Avoid bundling Para dependencies when you're not using Para wallet (smaller bundle size)
+- Eliminate dynamic import issues and module resolution problems
+- Provide clearer error messages and better debugging experience
+- Enable better tree-shaking and build optimization
+  :::
 
 ### `events` (optional)
 

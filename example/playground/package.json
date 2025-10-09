@@ -10,6 +10,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@getpara/graz-connector": "2.0.0-alpha.51",
     "@getpara/graz-integration": "2.0.0-alpha.51",
     "@getpara/react-sdk-lite": "2.0.0-alpha.51",
     "@radix-ui/react-dialog": "^1.0.5",
