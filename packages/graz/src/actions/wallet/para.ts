@@ -1,5 +1,5 @@
+import type { ParaGrazConnector } from "@getpara/graz-connector";
 import { useGrazInternalStore, useGrazSessionStore } from "../../store";
-import type { ParaGrazConnector } from "../../types/para";
 import type { Key, Wallet } from "../../types/wallet";
 import { WalletType } from "../../types/wallet";
 
@@ -27,47 +27,25 @@ export const getPara = (): Wallet => {
       const existing = useGrazSessionStore.getState().paraConnector;
       if (existing) return existing;
 
+      if (!paraConfig.connectorClass) {
+        throw new Error(
+          "Para connector class not provided. Provide 'connectorClass' in paraConfig to use Para wallet.",
+        );
+      }
+
       try {
-        let ConnectorClass;
-
-        if (paraConfig.connectorClass) {
-          ConnectorClass = paraConfig.connectorClass;
-        } else {
-          if (typeof window === "undefined") {
-            throw new Error("Para connector requires client-side execution (SSR is unsupported).");
-          }
-          // Use Function constructor to prevent static analysis by bundlers
-          const dynamicImport = new Function("specifier", "return import(specifier)");
-          const mod = await dynamicImport("@getpara/graz-integration");
-          const maybe = (mod as any)?.ParaGrazConnector;
-          if (typeof maybe !== "function") {
-            throw new Error("Invalid ParaGrazConnector in @getpara/graz-integration. Check the package/export.");
-          }
-          ConnectorClass = maybe;
-        }
-
         const chains = useGrazInternalStore.getState().chains;
-        const connector = new ConnectorClass(paraConfig, chains) as ParaGrazConnector;
-
-        useGrazSessionStore.setState((prev) => ({ ...prev, paraConnector: connector }));
+        const connector = new paraConfig.connectorClass(paraConfig, chains) as ParaGrazConnector;
         if (!connector) {
           throw new Error("Para connector initialization failed. Check config and dependencies.");
         }
+        useGrazSessionStore.setState((prev) => ({ ...prev, paraConnector: connector }));
+
         return connector;
       } catch (err: any) {
         initPromise = null;
-        const isModuleNotFound =
-          err?.code === "MODULE_NOT_FOUND" ||
-          err?.message?.includes("Cannot find module") ||
-          err?.message?.includes("Failed to resolve");
-
-        if (isModuleNotFound) {
-          throw new Error(
-            "Para integration package not found. Install @getpara/graz-integration to use Para wallet: npm install @getpara/graz-integration",
-          );
-        }
         throw new Error(
-          `Para connector init failed: ${err?.message || "Unknown error"}. Check @getpara/graz-integration and ParaConfig.`,
+          `Para connector init failed: ${err?.message || "Unknown error"}. Check ParaConfig and connectorClass.`,
         );
       }
     })();
@@ -102,13 +80,6 @@ export const getPara = (): Wallet => {
       }));
     } catch (err: any) {
       useGrazSessionStore.setState({ paraConnector: null, status: "disconnected" });
-      const isModuleNotFound = err?.message?.includes("not found") || err?.message?.includes("Cannot find");
-
-      if (isModuleNotFound) {
-        throw new Error(
-          "Para wallet connection failed: Required packages not installed. Install @getpara/graz-integration to enable Para wallet.",
-        );
-      }
       throw new Error(`Para enable failed${err instanceof Error ? `: ${err.message}` : ""}`);
     }
   };

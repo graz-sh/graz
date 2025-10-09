@@ -2,7 +2,7 @@
 
 Para is a wallet connector that enables seamless integration with Cosmos-based chains in your Graz-powered application. This guide shows how to enable Para support, including the modal for user authentication and wallet selection.
 
-**Note:** Para type definitions are re-exported by `graz` for convenience. You need to install both `@getpara/react-sdk-lite` (for the SDK) and `@getpara/graz-integration` (for the connector implementation).
+**Note:** Para type definitions are re-exported by `graz` for convenience. You need to install both `@getpara/react-sdk-lite` (for the SDK) and `@getpara/graz-integration` (for the connector implementation). The `connectorClass` property is **required** in your `ParaGrazConfig`.
 
 ## Prerequisites
 
@@ -191,9 +191,10 @@ import { ParaGrazConnector } from "@getpara/graz-integration";
 
 **Important Notes:**
 
-- `ParaGrazConfig` now requires a `connectorClass` property - you must pass `ParaGrazConnector` explicitly
+- `ParaGrazConfig` **requires** a `connectorClass` property - you must pass `ParaGrazConnector` explicitly
 - Types like `ParaWeb` are sourced from `@getpara/web-sdk` but re-exported by `graz` for convenience
 - The connector implementation must be provided by you, enabling tree-shaking and reducing bundle size if Para is not used
+- This approach eliminates dynamic import issues and provides better error messages
 
 ## Runtime Dependencies
 
@@ -203,6 +204,17 @@ For Para wallet functionality, you need these packages installed:
 - **`@getpara/graz-integration`** - Para connector implementation (`ParaGrazConnector`)
 
 The Para connector is explicitly provided via `paraConfig.connectorClass`, so if you don't use Para, these packages won't be included in your bundle.
+
+## Benefits of the New Approach
+
+The current implementation requires you to explicitly provide the `connectorClass`, which offers several advantages:
+
+- **🚀 Better Performance**: No runtime dynamic imports, faster initialization
+- **🔧 Clearer Errors**: Specific error messages when `connectorClass` is missing
+- **📦 Tree Shaking**: Unused Para packages are automatically excluded from your bundle
+- **🐛 Easier Debugging**: Direct imports are easier to trace and debug
+- **⚡ No Module Resolution Issues**: Eliminates pnpm/Node.js import resolution problems
+- **🎯 Type Safety**: Required `connectorClass` prevents runtime errors
 
 ## Troubleshooting
 
@@ -241,6 +253,8 @@ If you see errors about loading chunks:
 - `Cannot find module '@getpara/react-sdk-lite'` → Install: `npm install @getpara/react-sdk-lite`
 - `Cannot find module '@getpara/graz-integration'` → Install: `npm install @getpara/graz-integration`
 - Run `npx setup-para` after installing packages
+
+**Note:** With the new approach, you no longer need to worry about dynamic import resolution issues that were common with the previous implementation.
 
 ### Type Errors
 
