@@ -19,11 +19,9 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
-    "plugin:react-hooks/recommended",
     "next/core-web-vitals",
   ],
-  plugins: ["@typescript-eslint", "react", "react-hooks"],
+  plugins: ["@typescript-eslint"],
   settings: {
     react: {
       version: "detect",
@@ -33,6 +31,5 @@ module.exports = {
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
   },
-  ignorePatterns: ["node_modules", ".next", "out"],
+  ignorePatterns: ["node_modules", ".next", "out", "next-env.d.ts"],
 };
-
