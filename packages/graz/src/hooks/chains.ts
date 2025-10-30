@@ -10,6 +10,8 @@ import type { SuggestChainAndConnectArgs } from "../actions/chains";
 import { addChain, clearRecentChain, suggestChain, suggestChainAndConnect } from "../actions/chains";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { MutationEventArgs } from "../types/hooks";
+import { LogCategory } from "../types/logger";
+import { getLogger } from "../utils/logger";
 import { useCheckWallet } from "./wallet";
 
 /**
@@ -240,13 +242,28 @@ export type UseAddChainArgs = MutationEventArgs<ChainInfo>;
  * ```
  */
 export const useAddChain = ({ onError, onLoading, onSuccess }: UseAddChainArgs = {}) => {
+  const logger = getLogger();
   const mutationKey = ["USE_ADD_CHAIN", onError, onLoading, onSuccess];
   const mutation = useMutation({
     mutationKey,
     mutationFn: addChain,
-    onError: (err, args) => Promise.resolve(onError?.(err, args.chainInfo)),
+    onError: (err, args) => {
+      logger.error(LogCategory.STORE, "useAddChain mutation failed", {
+        hook: "useAddChain",
+        error: err instanceof Error ? err.message : String(err),
+        chainId: args.chainInfo.chainId,
+      });
+      return Promise.resolve(onError?.(err, args.chainInfo));
+    },
     onMutate: (data) => onLoading?.(data.chainInfo),
-    onSuccess: (chainInfo) => Promise.resolve(onSuccess?.(chainInfo)),
+    onSuccess: (chainInfo) => {
+      logger.info(LogCategory.STORE, "useAddChain mutation successful", {
+        hook: "useAddChain",
+        chainId: chainInfo.chainId,
+        chainName: chainInfo.chainName,
+      });
+      return Promise.resolve(onSuccess?.(chainInfo));
+    },
   });
 
   return {
@@ -278,13 +295,29 @@ export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
  * ```
  */
 export const useSuggestChain = ({ onError, onLoading, onSuccess }: UseSuggestChainArgs = {}) => {
+  const logger = getLogger();
   const mutationKey = ["USE_SUGGEST_CHAIN", onError, onLoading, onSuccess];
   const mutation = useMutation({
     mutationKey,
     mutationFn: suggestChain,
-    onError: (err, args) => Promise.resolve(onError?.(err, args.chainInfo)),
+    onError: (err, args) => {
+      logger.error(LogCategory.WALLET, "useSuggestChain mutation failed", {
+        hook: "useSuggestChain",
+        error: err instanceof Error ? err.message : String(err),
+        chainId: args.chainInfo.chainId,
+        walletType: args.walletType,
+      });
+      return Promise.resolve(onError?.(err, args.chainInfo));
+    },
     onMutate: (data) => onLoading?.(data.chainInfo),
-    onSuccess: (chainInfo) => Promise.resolve(onSuccess?.(chainInfo)),
+    onSuccess: (chainInfo) => {
+      logger.info(LogCategory.WALLET, "useSuggestChain mutation successful", {
+        hook: "useSuggestChain",
+        chainId: chainInfo.chainId,
+        chainName: chainInfo.chainName,
+      });
+      return Promise.resolve(onSuccess?.(chainInfo));
+    },
   });
 
   return {
@@ -330,13 +363,27 @@ export type UseSuggestChainAndConnectArgs = MutationEventArgs<SuggestChainAndCon
  * ```
  */
 export const useSuggestChainAndConnect = ({ onError, onLoading, onSuccess }: UseSuggestChainAndConnectArgs = {}) => {
+  const logger = getLogger();
   const mutationKey = ["USE_SUGGEST_CHAIN_AND_CONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation({
     mutationKey,
     mutationFn: suggestChainAndConnect,
-    onError: (err, args) => Promise.resolve(onError?.(err, args)),
+    onError: (err, args) => {
+      logger.error(LogCategory.WALLET, "useSuggestChainAndConnect mutation failed", {
+        error: err instanceof Error ? err.message : String(err),
+        chainId: args.chainInfo.chainId,
+      });
+      return Promise.resolve(onError?.(err, args));
+    },
     onMutate: (args) => onLoading?.(args),
-    onSuccess: (res) => Promise.resolve(onSuccess?.(res)),
+    onSuccess: (res) => {
+      logger.info(LogCategory.WALLET, "useSuggestChainAndConnect mutation successful", {
+        hook: "useSuggestChainAndConnect",
+        walletType: res.walletType,
+        chainCount: res.chains.length,
+      });
+      return Promise.resolve(onSuccess?.(res));
+    },
   });
   const { data: isSupported } = useCheckWallet();
   return {

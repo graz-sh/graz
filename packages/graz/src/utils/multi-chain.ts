@@ -2,6 +2,8 @@ import { ChainInfo } from "@keplr-wallet/types";
 import pMap from "p-map";
 
 import { useGrazInternalStore } from "../store";
+import { LogCategory } from "../types/logger";
+import { getLogger } from "./logger";
 
 /**
  * ChainId is now always an array of chain IDs.
@@ -41,15 +43,51 @@ export const useChainsFromArgs = ({ chainId }: { chainId?: ChainId }) => {
  *
  * @param chains - Array of ChainInfo objects to execute against
  * @param fn - Async function to execute for each chain
+ * @param caller - Name of the hook or function calling this (for logging)
  * @returns Promise<Record<chainId, T>> - Results mapped by chain ID
  */
 export const createMultiChainAsyncFunction = async <T>(
   chains: ChainInfo[],
   fn: (chain: ChainInfo) => Promise<T>,
+  caller?: string,
 ): Promise<Record<string, T>> => {
+  const logger = getLogger();
   const concurrency = useGrazInternalStore.getState().multiChainFetchConcurrency;
-  const res = await pMap(chains, fn, { concurrency });
-  return Object.fromEntries(res.map((x, i) => [chains[i]!.chainId, x]));
+
+  const logContext = caller ? { hook: caller } : { function: "createMultiChainAsyncFunction" };
+
+  logger.debug(LogCategory.MULTICHAIN, "Starting parallel operations", {
+    ...logContext,
+    chainCount: chains.length,
+    concurrency,
+    chainIds: chains.map((c) => c.chainId),
+  });
+
+  logger.time("multichain-operation");
+
+  try {
+    const res = await pMap(chains, fn, { concurrency });
+    const result = Object.fromEntries(res.map((x, i) => [chains[i]!.chainId, x]));
+
+    logger.timeEnd("multichain-operation");
+    logger.info(LogCategory.MULTICHAIN, "All chains completed", {
+      ...logContext,
+      chainCount: chains.length,
+      chainIds: chains.map((c) => c.chainId),
+      successCount: Object.keys(result).length,
+    });
+
+    return result;
+  } catch (error) {
+    logger.timeEnd("multichain-operation");
+    logger.error(LogCategory.MULTICHAIN, "Multi-chain operation failed", {
+      ...logContext,
+      error: error instanceof Error ? error.message : String(error),
+      chainCount: chains.length,
+      chainIds: chains.map((c) => c.chainId),
+    });
+    throw error;
+  }
 };
 
 /**

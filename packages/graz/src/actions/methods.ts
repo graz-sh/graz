@@ -3,6 +3,9 @@ import type { Coin } from "@cosmjs/proto-signing";
 import type { DeliverTxResponse, SigningStargateClient, StdFee } from "@cosmjs/stargate";
 import type { Height } from "cosmjs-types/ibc/core/client/v1/client";
 
+import { LogCategory } from "../types/logger";
+import { getLogger } from "../utils/logger";
+
 // https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendTokens
 export interface SendTokensArgs {
   signingClient?: SigningStargateClient | SigningCosmWasmClient;
@@ -21,13 +24,41 @@ export const sendTokens = async ({
   fee,
   memo,
 }: SendTokensArgs): Promise<DeliverTxResponse> => {
+  const logger = getLogger();
+
   if (!signingClient) {
     throw new Error("No connected account detected");
   }
   if (!senderAddress) {
     throw new Error("senderAddress is not defined");
   }
-  return signingClient.sendTokens(senderAddress, recipientAddress, amount, fee, memo);
+
+  logger.debug(LogCategory.TRANSACTION, "Signing transaction", {
+    function: "sendTokens",
+    senderAddress,
+    recipientAddress,
+    amount,
+  });
+
+  try {
+    const result = await signingClient.sendTokens(senderAddress, recipientAddress, amount, fee, memo);
+
+    logger.info(LogCategory.TRANSACTION, "Transaction broadcasted", {
+      function: "sendTokens",
+      txHash: result.transactionHash,
+      height: result.height,
+    });
+
+    return result;
+  } catch (error) {
+    logger.error(LogCategory.TRANSACTION, "Transaction failed", {
+      function: "sendTokens",
+      error: error instanceof Error ? error.message : String(error),
+      senderAddress,
+      recipientAddress,
+    });
+    throw error;
+  }
 };
 
 // https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendIbcTokens
@@ -56,23 +87,54 @@ export const sendIbcTokens = async ({
   fee,
   memo,
 }: SendIbcTokensArgs) => {
+  const logger = getLogger();
+
   if (!signingClient) {
     throw new Error("Stargate signing client is not ready");
   }
   if (!senderAddress) {
     throw new Error("senderAddress is not defined");
   }
-  return signingClient.sendIbcTokens(
+
+  logger.debug(LogCategory.TRANSACTION, "Signing IBC transfer", {
+    function: "sendIbcTokens",
     senderAddress,
     recipientAddress,
     transferAmount,
-    sourcePort,
     sourceChannel,
-    timeoutHeight,
-    timeoutTimestamp,
-    fee,
-    memo,
-  );
+    sourcePort,
+  });
+
+  try {
+    const result = await signingClient.sendIbcTokens(
+      senderAddress,
+      recipientAddress,
+      transferAmount,
+      sourcePort,
+      sourceChannel,
+      timeoutHeight,
+      timeoutTimestamp,
+      fee,
+      memo,
+    );
+
+    logger.info(LogCategory.TRANSACTION, "IBC transfer successful", {
+      function: "sendIbcTokens",
+      txHash: result.transactionHash,
+      height: result.height,
+    });
+
+    return result;
+  } catch (error) {
+    logger.error(LogCategory.TRANSACTION, "IBC transfer failed", {
+      function: "sendIbcTokens",
+      error: error instanceof Error ? error.message : String(error),
+      senderAddress,
+      recipientAddress,
+      sourceChannel,
+    });
+    throw error;
+  }
 };
 
 export interface InstantiateContractArgs<Message extends Record<string, unknown>> {
@@ -101,11 +163,38 @@ export const instantiateContract = async <Message extends Record<string, unknown
   label,
   codeId,
 }: InstantiateContractArgs<Message>) => {
+  const logger = getLogger();
+
   if (!signingClient) {
     throw new Error("CosmWasm signing client is not ready");
   }
 
-  return signingClient.instantiate(senderAddress, codeId, msg, label, fee, options);
+  logger.debug(LogCategory.TRANSACTION, "Instantiating contract", {
+    function: "instantiateContract",
+    senderAddress,
+    codeId,
+    label,
+  });
+
+  try {
+    const result = await signingClient.instantiate(senderAddress, codeId, msg, label, fee, options);
+
+    logger.info(LogCategory.TRANSACTION, "Contract instantiated", {
+      function: "instantiateContract",
+      contractAddress: result.contractAddress,
+      txHash: result.transactionHash,
+    });
+
+    return result;
+  } catch (error) {
+    logger.error(LogCategory.TRANSACTION, "Contract instantiation failed", {
+      function: "instantiateContract",
+      error: error instanceof Error ? error.message : String(error),
+      codeId,
+      senderAddress,
+    });
+    throw error;
+  }
 };
 
 export interface ExecuteContractArgs<Message extends Record<string, unknown>> {
@@ -136,11 +225,38 @@ export const executeContract = async <Message extends Record<string, unknown>>({
   funds,
   memo,
 }: ExecuteContractArgs<Message>) => {
+  const logger = getLogger();
+
   if (!signingClient) {
     throw new Error("CosmWasm signing client is not ready");
   }
 
-  return signingClient.execute(senderAddress, contractAddress, msg, fee, memo, funds);
+  logger.debug(LogCategory.TRANSACTION, "Executing contract", {
+    function: "executeContract",
+    senderAddress,
+    contractAddress,
+    msg,
+  });
+
+  try {
+    const result = await signingClient.execute(senderAddress, contractAddress, msg, fee, memo, funds);
+
+    logger.info(LogCategory.TRANSACTION, "Contract execution successful", {
+      function: "executeContract",
+      txHash: result.transactionHash,
+      events: result.events.length,
+    });
+
+    return result;
+  } catch (error) {
+    logger.error(LogCategory.TRANSACTION, "Contract execution failed", {
+      function: "executeContract",
+      error: error instanceof Error ? error.message : String(error),
+      contractAddress,
+      senderAddress,
+    });
+    throw error;
+  }
 };
 
 export const getQuerySmart = async <TData>(
@@ -148,19 +264,52 @@ export const getQuerySmart = async <TData>(
   queryMsg: Record<string, unknown>,
   client?: CosmWasmClient,
 ): Promise<TData> => {
+  const logger = getLogger();
+
   if (!client) {
     throw new Error("CosmWasm client is not ready");
   }
 
-  const result = (await client.queryContractSmart(address, queryMsg)) as TData;
-  return result;
+  logger.debug(LogCategory.QUERY, "Querying smart contract", { function: "getQuerySmart", address, queryMsg });
+
+  try {
+    const result = (await client.queryContractSmart(address, queryMsg)) as TData;
+    logger.debug(LogCategory.QUERY, "Smart query successful", { function: "getQuerySmart", address });
+    return result;
+  } catch (error) {
+    logger.error(LogCategory.QUERY, "Smart query failed", {
+      function: "getQuerySmart",
+      error: error instanceof Error ? error.message : String(error),
+      address,
+    });
+    throw error;
+  }
 };
 
-export const getQueryRaw = (address: string, keyStr: string, client?: CosmWasmClient): Promise<Uint8Array | null> => {
+export const getQueryRaw = async (
+  address: string,
+  keyStr: string,
+  client?: CosmWasmClient,
+): Promise<Uint8Array | null> => {
+  const logger = getLogger();
+
   if (!client) {
     throw new Error("CosmWasm client is not ready");
   }
 
-  const key = new TextEncoder().encode(keyStr);
-  return client.queryContractRaw(address, key);
+  logger.debug(LogCategory.QUERY, "Querying raw contract data", { function: "getQueryRaw", address, key: keyStr });
+
+  try {
+    const key = new TextEncoder().encode(keyStr);
+    const result = await client.queryContractRaw(address, key);
+    logger.debug(LogCategory.QUERY, "Raw query successful", { function: "getQueryRaw", address });
+    return result;
+  } catch (error) {
+    logger.error(LogCategory.QUERY, "Raw query failed", {
+      function: "getQueryRaw",
+      error: error instanceof Error ? error.message : String(error),
+      address,
+    });
+    throw error;
+  }
 };

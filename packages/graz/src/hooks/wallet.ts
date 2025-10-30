@@ -5,6 +5,8 @@ import { useShallow } from "zustand/shallow";
 import { checkWallet } from "../actions/wallet";
 import { useGrazInternalStore } from "../store";
 import { WalletType } from "../types/wallet";
+import { LogCategory } from "../types/logger";
+import { getLogger } from "../utils/logger";
 
 /**
  * graz hook to retrieve current active {@link WalletType}
@@ -52,8 +54,25 @@ export const useCheckWallet = (type?: WalletType): UseQueryResult<boolean> => {
   const query = useQuery({
     queryKey,
     queryFn: () => {
-      if (!walletType) return false;
-      return checkWallet(walletType);
+      const logger = getLogger();
+      logger.debug(LogCategory.WALLET, "Checking wallet availability", {
+        hook: "useCheckWallet",
+        walletType,
+      });
+
+      if (!walletType) {
+        logger.debug(LogCategory.WALLET, "No wallet type provided", { hook: "useCheckWallet" });
+        return false;
+      }
+
+      const isAvailable = checkWallet(walletType);
+      logger.debug(LogCategory.WALLET, "Wallet check completed", {
+        hook: "useCheckWallet",
+        walletType,
+        isAvailable,
+      });
+
+      return isAvailable;
     },
   });
 

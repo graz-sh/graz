@@ -7,6 +7,7 @@ import { createJSONStorage } from "zustand/middleware";
 import { persist, subscribeWithSelector } from "zustand/middleware";
 
 import type { Dictionary } from "../types/core";
+import { LogCategory, type LogLevel } from "../types/logger";
 import type { ParaGrazConfig } from "../types/para";
 import type { Key } from "../types/wallet";
 import { WalletType } from "../types/wallet";
@@ -63,6 +64,14 @@ export interface GrazInternalStore {
    * Interval in milliseconds to ping the wallet.
    */
   pingInterval: number;
+  /**
+   * Logger configuration
+   */
+  loggerConfig: {
+    enabled: boolean;
+    level?: LogLevel | LogLevel[];
+    categories?: (keyof typeof LogCategory)[];
+  } | null;
   _notFoundFn: () => void;
   _reconnect: boolean;
   _reconnectConnector: WalletType | null;
@@ -100,6 +109,7 @@ export const grazInternalDefaultValues: GrazInternalStore = {
   },
   walletDefaultOptions: null,
   pingInterval: 3600000 /* 1 hour */,
+  loggerConfig: null,
   _notFoundFn: () => null,
   _onReconnectFailed: () => null,
   _reconnect: false,

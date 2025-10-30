@@ -9,6 +9,8 @@ import { checkWallet } from "../actions/wallet";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { ChainIdToRecord, MutationEventArgs, QueryConfig, UseMultiChainQueryResult } from "../types/hooks";
 import type { WalletType } from "../types/wallet";
+import { LogCategory } from "../types/logger";
+import { getLogger } from "../utils/logger";
 import type { ChainId } from "../utils/multi-chain";
 import { createMultiChainAsyncFunction, createMultiChainFunction, useChainsFromArgs } from "../utils/multi-chain";
 import { useStargateClient } from "./clients";
@@ -287,13 +289,27 @@ export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, ConnectResult>;
  * @see {@link connect}
  */
 export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArgs = {}) => {
+  const logger = getLogger();
   const mutationKey = ["USE_CONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation({
     mutationKey,
     mutationFn: connect,
-    onError: (err, args) => onError?.(err, args),
+    onError: (err, args) => {
+      logger.error(LogCategory.WALLET, "useConnect mutation failed", {
+        error: err instanceof Error ? err.message : String(err),
+        chainId: args?.chainId,
+      });
+      onError?.(err, args);
+    },
     onMutate: onLoading,
-    onSuccess: (connectResult) => Promise.resolve(onSuccess?.(connectResult)),
+    onSuccess: (connectResult) => {
+      logger.info(LogCategory.WALLET, "useConnect mutation successful", {
+        hook: "useConnect",
+        walletType: connectResult.walletType,
+        chainCount: connectResult.chains.length,
+      });
+      return Promise.resolve(onSuccess?.(connectResult));
+    },
   });
   const { data: isSupported } = useCheckWallet();
   return {
@@ -332,13 +348,23 @@ export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArg
  * @see {@link disconnect}
  */
 export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventArgs = {}) => {
+  const logger = getLogger();
   const mutationKey = ["USE_DISCONNECT", onError, onLoading, onSuccess];
   const mutation = useMutation({
     mutationKey,
     mutationFn: disconnect,
-    onError: (err) => Promise.resolve(onError?.(err, undefined)),
+    onError: (err) => {
+      logger.error(LogCategory.WALLET, "useDisconnect mutation failed", {
+        hook: "useDisconnect",
+        error: err instanceof Error ? err.message : String(err),
+      });
+      return Promise.resolve(onError?.(err, undefined));
+    },
     onMutate: onLoading,
-    onSuccess: () => Promise.resolve(onSuccess?.(undefined)),
+    onSuccess: () => {
+      logger.info(LogCategory.WALLET, "useDisconnect mutation successful", { hook: "useDisconnect" });
+      return Promise.resolve(onSuccess?.(undefined));
+    },
   });
 
   return {
@@ -385,7 +411,7 @@ export function useOfflineSigners<const TChainIds extends readonly string[]>(arg
 }): UseMultiChainQueryResult<TChainIds, OfflineSigners>;
 
 // Overload: When chainId is not provided
-export function useOfflineSigners(args?: {}): UseMultiChainQueryResult<undefined, OfflineSigners>;
+export function useOfflineSigners(args?: Record<string, never>): UseMultiChainQueryResult<undefined, OfflineSigners>;
 
 // Implementation
 export function useOfflineSigners<const TChainIds extends readonly string[] | undefined>(args?: {
@@ -411,13 +437,17 @@ export function useOfflineSigners<const TChainIds extends readonly string[] | un
         throw new Error(`${wallet} is not available`);
       }
       // Always use multi-chain function
-      const res = await createMultiChainAsyncFunction(chains, async (_chain) => {
-        const offlineSigners = await getOfflineSigners({
-          chainId: _chain.chainId,
-          walletType: wallet,
-        });
-        return offlineSigners;
-      });
+      const res = await createMultiChainAsyncFunction(
+        chains,
+        async (_chain) => {
+          const offlineSigners = await getOfflineSigners({
+            chainId: _chain.chainId,
+            walletType: wallet,
+          });
+          return offlineSigners;
+        },
+        "useOfflineSigners",
+      );
       return res;
     },
     enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet) && Boolean(isConnected),

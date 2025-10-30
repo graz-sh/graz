@@ -13,9 +13,6 @@ export function useToast() {
   const [, setToasts] = useState<ToastProps[]>([]);
 
   const toast = useCallback((props: ToastProps) => {
-    // Simple console log for now
-    console.log(`[Toast ${props.variant || "default"}]:`, props.title, props.description);
-
     setToasts((prev) => [...prev, props]);
 
     // Auto dismiss after 3 seconds

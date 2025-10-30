@@ -51,7 +51,8 @@
       "wait-on": ">=7.0.0",
       "glob": ">=10.0.0",
       "rimraf": ">=5.0.0",
-      "@cosmjs/crypto": ">=0.32.4"
+      "@cosmjs/crypto": ">=0.32.4",
+      "@getpara/graz-connector": "2.0.0-alpha.51"
     }
   }
 }

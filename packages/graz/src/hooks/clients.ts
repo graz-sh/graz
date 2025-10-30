@@ -6,6 +6,8 @@ import { useMemo } from "react";
 
 import { useGrazInternalStore } from "../store";
 import type { QueryConfig, UseMultiChainQueryResult } from "../types/hooks";
+import { LogCategory } from "../types/logger";
+import { getLogger } from "../utils/logger";
 import { createMultiChainAsyncFunction, useChainsFromArgs } from "../utils/multi-chain";
 
 /**
@@ -58,15 +60,39 @@ export function useStargateClient<const TChainIds extends readonly string[] | un
   return useQuery({
     queryKey,
     queryFn: async () => {
+      const logger = getLogger();
+      logger.debug(LogCategory.QUERY, "Creating Stargate clients", {
+        hook: "useStargateClient",
+        chainCount: chains?.length || 0,
+        chainIds: chains?.map((c) => c.chainId),
+      });
+
       if (!chains || chains.length < 1) throw new Error("No chains found");
       // Always use multi-chain function
-      const res = await createMultiChainAsyncFunction(chains, async (_chain) => {
-        const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
-        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
-        const client = await StargateClient.connect(endpoint);
-        return client;
-      });
-      return res;
+      try {
+        const res = await createMultiChainAsyncFunction(
+          chains,
+          async (_chain) => {
+            const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
+            const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
+            const client = await StargateClient.connect(endpoint);
+            return client;
+          },
+          "useStargateClient",
+        );
+
+        logger.debug(LogCategory.QUERY, "Stargate clients created successfully", {
+          hook: "useStargateClient",
+          clientCount: Object.keys(res).length,
+        });
+        return res;
+      } catch (error) {
+        logger.error(LogCategory.QUERY, "Failed to create Stargate clients", {
+          hook: "useStargateClient",
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
     },
     enabled: Boolean(chains) && chains.length > 0 && (args?.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
@@ -123,15 +149,39 @@ export function useCosmWasmClient<const TChainIds extends readonly string[] | un
   return useQuery({
     queryKey,
     queryFn: async () => {
+      const logger = getLogger();
+      logger.debug(LogCategory.QUERY, "Creating CosmWasm clients", {
+        hook: "useCosmWasmClient",
+        chainCount: chains?.length || 0,
+        chainIds: chains?.map((c) => c.chainId),
+      });
+
       if (!chains || chains.length < 1) throw new Error("No chains found");
       // Always use multi-chain function
-      const res = await createMultiChainAsyncFunction(chains, async (_chain) => {
-        const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
-        const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
-        const client = await CosmWasmClient.connect(endpoint);
-        return client;
-      });
-      return res;
+      try {
+        const res = await createMultiChainAsyncFunction(
+          chains,
+          async (_chain) => {
+            const chainConfig = useGrazInternalStore.getState().chainsConfig?.[_chain.chainId];
+            const endpoint: HttpEndpoint = { url: _chain.rpc, headers: { ...(chainConfig?.rpcHeaders || {}) } };
+            const client = await CosmWasmClient.connect(endpoint);
+            return client;
+          },
+          "useCosmWasmClient",
+        );
+
+        logger.debug(LogCategory.QUERY, "CosmWasm clients created successfully", {
+          hook: "useCosmWasmClient",
+          clientCount: Object.keys(res).length,
+        });
+        return res;
+      } catch (error) {
+        logger.error(LogCategory.QUERY, "Failed to create CosmWasm clients", {
+          hook: "useCosmWasmClient",
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
     },
     enabled: Boolean(chains) && chains.length > 0 && (args?.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
