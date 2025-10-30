@@ -498,8 +498,9 @@ describe("GrazLogger", () => {
 
       expect(consoleInfoSpy).toHaveBeenCalled();
       const callArgs = consoleInfoSpy.mock.calls[0];
+      expect(callArgs).toBeDefined();
       // Should include context data in the call
-      expect(callArgs.some((arg) => typeof arg === "object")).toBe(true);
+      expect(callArgs?.some((arg) => typeof arg === "object")).toBe(true);
     });
 
     it("should remove function and hook keys from context", () => {
@@ -511,7 +512,8 @@ describe("GrazLogger", () => {
 
       expect(consoleInfoSpy).toHaveBeenCalled();
       const callArgs = consoleInfoSpy.mock.calls[0];
-      const contextArg = callArgs.find((arg) => typeof arg === "object" && arg !== null);
+      expect(callArgs).toBeDefined();
+      const contextArg = callArgs?.find((arg) => typeof arg === "object" && arg !== null);
 
       if (contextArg) {
         expect(contextArg).not.toHaveProperty("function");
@@ -547,7 +549,7 @@ describe("GrazLogger", () => {
         expect.objectContaining({
           category: "wallet",
           message: "Error occurred",
-        })
+        }),
       );
     });
 
@@ -596,7 +598,8 @@ describe("GrazLogger", () => {
 
       expect(consoleDebugSpy).toHaveBeenCalled();
       const callArgs = consoleDebugSpy.mock.calls[0];
-      const message = callArgs[0];
+      expect(callArgs).toBeDefined();
+      const message = callArgs?.[0];
       expect(message).toContain("test-operation");
       expect(message).toContain("ms");
     });
