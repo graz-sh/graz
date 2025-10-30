@@ -188,8 +188,8 @@ importers:
         specifier: ^7.33.0
         version: 7.37.5(eslint@8.57.1)
       eslint-plugin-react-hooks:
-        specifier: ^4.6.0
-        version: 4.6.2(eslint@8.57.1)
+        specifier: ^5.0.0
+        version: 5.2.0(eslint@8.57.1)
       postcss:
         specifier: ^8.4.32
         version: 8.5.6
