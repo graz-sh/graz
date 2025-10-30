@@ -2,7 +2,9 @@ import type { ChainInfo } from "@keplr-wallet/types";
 
 import type { ChainConfig, GrazInternalStore, IframeOptions } from "../store";
 import { useGrazInternalStore } from "../store";
+import { LogCategory, type LogLevel } from "../types/logger";
 import type { WalletType } from "../types/wallet";
+import { configureLogger } from "../utils/logger";
 
 export interface ConfigureGrazArgs {
   defaultWallet?: WalletType;
@@ -28,9 +30,24 @@ export interface ConfigureGrazArgs {
    */
   iframeOptions?: IframeOptions;
   pingInteval?: number;
+  /**
+   * Logger configuration
+   */
+  logger?: {
+    enabled?: boolean;
+    level?: LogLevel | LogLevel[] | undefined;
+    categories?: (keyof typeof LogCategory)[] | undefined;
+  };
 }
 
 export const configureGraz = (args: ConfigureGrazArgs): ConfigureGrazArgs => {
+  // Configure logger - only enable if explicitly provided
+  configureLogger({
+    enabled: args.logger?.enabled ?? false,
+    level: args.logger?.level,
+    categories: args.logger?.categories,
+  });
+
   useGrazInternalStore.setState((prev) => {
     // Merge provider chains with any persisted chains (e.g., from useSuggestChain)
     const persistedChains = prev.chains ?? [];
@@ -61,6 +78,13 @@ export const configureGraz = (args: ConfigureGrazArgs): ConfigureGrazArgs => {
       chainsConfig: args.chainsConfig || prev.chainsConfig,
       multiChainFetchConcurrency: args.multiChainFetchConcurrency || prev.multiChainFetchConcurrency,
       pingInterval: args.pingInteval || prev.pingInterval,
+      loggerConfig: args.logger
+        ? {
+            enabled: args.logger.enabled ?? prev.loggerConfig?.enabled ?? false,
+            level: args.logger.level ?? prev.loggerConfig?.level ?? 1,
+            categories: args.logger.categories ?? prev.loggerConfig?.categories ?? [],
+          }
+        : prev.loggerConfig,
       _notFoundFn: args.onNotFound || prev._notFoundFn,
       _onReconnectFailed: args.onReconnectFailed || prev._onReconnectFailed,
       _reconnect: args.autoReconnect === undefined ? true : args.autoReconnect || prev._reconnect,

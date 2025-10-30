@@ -15,11 +15,20 @@ export interface GrazProviderProps {
  * Graz uses `@tanstack/react-query`'s features under the hood, hence you need to wrap `GrazProvider` with `QueryClientProvider`.
  * @example
  * ```tsx
+ * import { GrazProvider, LogLevel } from "graz";
+ *
  * // example next.js application in _app.tsx
  * export default function CustomApp({ Component, pageProps }: AppProps) {
  *   return (
  *     <QueryClientProvider queryClient={queryClient}>
- *       <GrazProvider grazOptions={grazOptions}>
+ *       <GrazProvider grazOptions={{
+ *         chains: [cosmoshubChainInfo, osmosisChainInfo],
+ *         logger: {
+ *           enabled: true,
+ *           level: LogLevel.DEBUG,
+ *           categories: ['wallet', 'transaction'],
+ *         }
+ *       }}>
  *         <Component {...pageProps} />
  *       </GrazProvider>
  *     </QueryClientProvider>

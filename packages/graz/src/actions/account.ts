@@ -1,11 +1,13 @@
 import type { OfflineDirectSigner } from "@cosmjs/proto-signing";
 import type { ChainInfo, OfflineAminoSigner } from "@keplr-wallet/types";
 
-import { RECONNECT_SESSION_KEY } from "../constant";
+import { LOG_FUNCTIONS, RECONNECT_SESSION_KEY } from "../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Maybe } from "../types/core";
 import type { Key } from "../types/wallet";
 import { WalletType } from "../types/wallet";
+import { LogCategory } from "../types/logger";
+import { getLogger } from "../utils/logger";
 import { checkWallet, getWallet, isLeapDappBrowser, isLeapSnaps, isPara, isWalletConnect } from "./wallet";
 
 /**
@@ -27,10 +29,21 @@ export interface ConnectResult {
 }
 
 export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
+  const logger = getLogger();
+  logger.time("connect");
+  logger.group("Connect Wallet");
+
   try {
     const { recentChainIds: recentChains, chains, walletType } = useGrazInternalStore.getState();
 
     const currentWalletType = args?.walletType || walletType;
+
+    logger.debug(LogCategory.WALLET, "Starting connection", {
+      function: "connect",
+      walletType: currentWalletType,
+      chainId: args?.chainId,
+      timestamp: Date.now(),
+    });
 
     if (isWalletConnect(currentWalletType)) {
       const walletConnectInstance = getWallet(WalletType.WALLETCONNECT);
@@ -43,9 +56,11 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
 
     const isWalletAvailable = checkWallet(currentWalletType);
     if (!isWalletAvailable) {
+      logger.warn(LogCategory.WALLET, "Wallet not available", { function: LOG_FUNCTIONS.CONNECT, walletType: currentWalletType });
       throw new Error(`${currentWalletType} is not available`);
     }
 
+    logger.debug(LogCategory.WALLET, "Wallet adapter retrieved", { function: LOG_FUNCTIONS.CONNECT, walletType: currentWalletType });
     const wallet = getWallet(currentWalletType);
     const chainIds = typeof args?.chainId === "string" ? [args.chainId] : args?.chainId || recentChains;
     if (!chainIds) {
@@ -71,10 +86,13 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
       return { status: "connecting" };
     });
 
-    const { accounts: _account } = useGrazSessionStore.getState();
+    logger.debug(LogCategory.WALLET, "Initializing wallet", { function: LOG_FUNCTIONS.CONNECT });
     await wallet.init?.();
 
+    logger.debug(LogCategory.WALLET, "Enabling chains", { function: LOG_FUNCTIONS.CONNECT, chainIds, chainCount: chainIds.length });
     await wallet.enable(chainIds);
+
+    logger.debug(LogCategory.WALLET, "Fetching accounts", { function: LOG_FUNCTIONS.CONNECT });
 
     if (!isWalletConnect(currentWalletType)) {
       let resultAccounts: Record<string, Key> = {};
@@ -127,22 +145,55 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
 
     const connectedChains = chainIds.map((x) => chains!.find((y) => y.chainId === x)!);
     const _resAcc = useGrazSessionStore.getState().accounts;
+
+    logger.info(LogCategory.WALLET, "Connection successful", {
+      function: LOG_FUNCTIONS.CONNECT,
+      walletType: currentWalletType,
+      chainCount: chainIds.length,
+      chainIds,
+      addresses: _resAcc ? Object.values(_resAcc).map((a) => a.bech32Address) : [],
+    });
+
+    logger.debug(LogCategory.STORE, "Session store updated", { function: LOG_FUNCTIONS.CONNECT, accountCount: Object.keys(_resAcc || {}).length });
+
+    logger.timeEnd("connect");
+    logger.groupEnd();
+
     return { accounts: _resAcc!, walletType: currentWalletType, chains: connectedChains };
   } catch (error) {
-    console.error("connect ", error);
+    logger.error(LogCategory.WALLET, "Connection failed", {
+      function: LOG_FUNCTIONS.CONNECT,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      walletType: args?.walletType,
+      chainId: args?.chainId,
+    });
+
     if (useGrazSessionStore.getState().accounts === null) {
       useGrazSessionStore.setState({ status: "disconnected" });
     }
     if (useGrazSessionStore.getState().accounts && useGrazSessionStore.getState().activeChainIds) {
       useGrazSessionStore.setState({ status: "connected" });
     }
+
+    logger.timeEnd("connect");
+    logger.groupEnd();
+
     throw error;
   }
 };
 
 export const disconnect = (args?: { chainId?: ActionChainId }) => {
-  typeof window !== "undefined" && window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
+  const logger = getLogger();
   const chainId = typeof args?.chainId === "string" ? [args.chainId] : args?.chainId;
+
+  logger.info(LogCategory.WALLET, "Disconnecting", {
+    function: LOG_FUNCTIONS.DISCONNECT,
+    chainId: chainId || "all chains",
+  });
+
+  typeof window !== "undefined" && window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
+
   const disable = () => {
     if (isWalletConnect(useGrazInternalStore.getState().walletType)) {
       const walletConnectInstance = getWallet(WalletType.WALLETCONNECT);
@@ -176,6 +227,7 @@ export const disconnect = (args?: { chainId?: ActionChainId }) => {
         _reconnectConnector: null,
         recentChainIds: null,
       });
+      logger.debug(LogCategory.STORE, "Session cleared - all chains disconnected", { function: LOG_FUNCTIONS.DISCONNECT });
     } else {
       useGrazSessionStore.setState((x) => ({
         activeChainIds: x.activeChainIds?.filter((item) => !chainId.includes(item)),
@@ -184,6 +236,7 @@ export const disconnect = (args?: { chainId?: ActionChainId }) => {
       useGrazInternalStore.setState((x) => ({
         recentChainIds: x.recentChainIds?.filter((item) => !chainId.includes(item)),
       }));
+      logger.debug(LogCategory.STORE, "Partial disconnect - some chains remain connected", { function: LOG_FUNCTIONS.DISCONNECT });
     }
   } else {
     disable();
@@ -193,7 +246,13 @@ export const disconnect = (args?: { chainId?: ActionChainId }) => {
       _reconnectConnector: null,
       recentChainIds: null,
     });
+    logger.debug(LogCategory.STORE, "Session cleared - disconnected from all chains", { function: LOG_FUNCTIONS.DISCONNECT });
   }
+
+  logger.info(LogCategory.WALLET, "Disconnected successfully", {
+    function: LOG_FUNCTIONS.DISCONNECT,
+    chainId: chainId || "all chains",
+  });
 
   return Promise.resolve();
 };
@@ -201,7 +260,15 @@ export const disconnect = (args?: { chainId?: ActionChainId }) => {
 export type ReconnectArgs = Maybe<{ onError?: (error: unknown) => void }>;
 
 export const reconnect = async (args?: ReconnectArgs) => {
+  const logger = getLogger();
   const { recentChainIds: recentChains, _reconnectConnector, _reconnect } = useGrazInternalStore.getState();
+
+  logger.debug(LogCategory.WALLET, "Attempting reconnection", {
+    function: LOG_FUNCTIONS.RECONNECT,
+    recentChains,
+    walletType: _reconnectConnector,
+  });
+
   try {
     const isWalletReady = checkWallet(_reconnectConnector || undefined);
     if (recentChains && isWalletReady && _reconnectConnector) {
@@ -212,9 +279,21 @@ export const reconnect = async (args?: ReconnectArgs) => {
         walletType: _reconnectConnector,
         autoReconnect: _reconnect,
       });
+      logger.info(LogCategory.WALLET, "Reconnection successful", { function: LOG_FUNCTIONS.RECONNECT });
       return key;
+    } else {
+      logger.warn(LogCategory.WALLET, "Reconnection skipped", {
+        function: LOG_FUNCTIONS.RECONNECT,
+        hasRecentChains: Boolean(recentChains),
+        isWalletReady,
+        hasConnector: Boolean(_reconnectConnector),
+      });
     }
   } catch (error) {
+    logger.warn(LogCategory.WALLET, "Reconnection failed", {
+      function: LOG_FUNCTIONS.RECONNECT,
+      error: error instanceof Error ? error.message : String(error),
+    });
     args?.onError?.(error);
     void disconnect();
   }

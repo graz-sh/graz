@@ -48,6 +48,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
               },
             },
+            logger: {
+              enabled: true,
+            },
           }}
         >
           {children}

@@ -4,6 +4,8 @@ import { useEffect } from "react";
 
 import { connect, reconnect } from "../actions/account";
 import { checkWallet, getWallet } from "../actions/wallet";
+import { LogCategory } from "../types/logger";
+import { getLogger } from "../utils/logger";
 import { getCompass } from "../actions/wallet/compass";
 import { getCosmiframe } from "../actions/wallet/cosmiframe";
 import { getCosmostation } from "../actions/wallet/cosmostation";
@@ -24,6 +26,7 @@ import { WalletType } from "../types/wallet";
  * **Note: only use this hook if not using graz's provider component.**
  */
 export const useGrazEvents = () => {
+  const logger = getLogger();
   const isSessionActive =
     typeof window !== "undefined" && window.sessionStorage.getItem(RECONNECT_SESSION_KEY) === "Active";
   const { _reconnect, _onReconnectFailed, _reconnectConnector, iframeOptions, chains, pingInterval } =
@@ -50,7 +53,13 @@ export const useGrazEvents = () => {
           useGrazSessionStore.setState({
             lastPing: Date.now(),
           });
+          logger.debug(LogCategory.EVENT, "Wallet ping successful", { function: "handleFocus" });
         } catch (error) {
+          logger.debug(LogCategory.EVENT, "Wallet ping failed, triggering reconnect", {
+            function: "handleFocus",
+            error: error instanceof Error ? error.message : String(error),
+            walletType: _reconnectConnector,
+          });
           void reconnect({ onError: _onReconnectFailed });
         }
       }
@@ -76,6 +85,7 @@ export const useGrazEvents = () => {
     const cosmiframe = new Cosmiframe(iframeOptions.allowedIframeParentOrigins);
     void cosmiframe.isReady().then((ready) => {
       if (ready) {
+        logger.info(LogCategory.EVENT, "Auto-connecting to iframe wallet", { function: "autoConnectIframe" });
         return connect({
           chainId: chains.map((c) => c.chainId),
           walletType: WalletType.COSMIFRAME,
@@ -91,11 +101,13 @@ export const useGrazEvents = () => {
     if (_reconnectConnector) {
       if (!isReconnectConnectorReady) return;
       if (isSessionActive && Boolean(activeChains)) {
+        logger.info(LogCategory.EVENT, "Reconnection triggered", { function: "reconnectEffect", reason: "session active" });
         void reconnect({
           onError: _onReconnectFailed,
         });
         // only reconnect if session is active and autoReconnect from grazOptions is true
       } else if (!isSessionActive && _reconnect) {
+        logger.info(LogCategory.EVENT, "Reconnection triggered", { function: "reconnectEffect", reason: "auto-reconnect enabled" });
         void reconnect({
           onError: _onReconnectFailed,
         });
@@ -110,6 +122,7 @@ export const useGrazEvents = () => {
       if (!isReconnectConnectorReady) return;
       if (_reconnectConnector === WalletType.COSMOSTATION) {
         getCosmostation().subscription?.(() => {
+          logger.debug(LogCategory.EVENT, "Account changed", { function: "subscription", walletType: WalletType.COSMOSTATION });
           void reconnect({
             onError: _onReconnectFailed,
           });
@@ -117,11 +130,13 @@ export const useGrazEvents = () => {
       }
       if (_reconnectConnector === WalletType.KEPLR) {
         getKeplr().subscription?.(() => {
+          logger.debug(LogCategory.EVENT, "Account changed", { function: "subscription", walletType: WalletType.KEPLR });
           void reconnect({ onError: _onReconnectFailed });
         });
       }
       if (_reconnectConnector === WalletType.LEAP) {
         getLeap().subscription?.(() => {
+          logger.debug(LogCategory.EVENT, "Account changed", { function: "subscription", walletType: WalletType.LEAP });
           void reconnect({ onError: _onReconnectFailed });
         });
       }

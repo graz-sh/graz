@@ -2,6 +2,8 @@ import { RECONNECT_SESSION_KEY } from "../../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
 import { WALLET_TYPES, WalletType } from "../../types/wallet";
+import { LogCategory } from "../../types/logger";
+import { getLogger } from "../../utils/logger";
 import { getCactusCosmos } from "./cactus";
 import { getCompass } from "./compass";
 import { getCosmiframe } from "./cosmiframe";
@@ -58,6 +60,9 @@ export const clearSession = () => {
  * @see {@link getKeplr}
  */
 export const getWallet = (type: WalletType = useGrazInternalStore.getState().walletType): Wallet => {
+  const logger = getLogger();
+  logger.debug(LogCategory.WALLET, "Getting wallet adapter", { function: "getWallet", walletType: type });
+
   const wallet = (() => {
     switch (type) {
       case WalletType.KEPLR: {
@@ -119,6 +124,7 @@ export const getWallet = (type: WalletType = useGrazInternalStore.getState().wal
       }
 
       default: {
+        logger.warn(LogCategory.WALLET, "Unknown wallet type", { function: "getWallet", walletType: type });
         throw new Error("Unknown wallet type");
       }
     }
