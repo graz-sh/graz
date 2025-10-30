@@ -90,7 +90,9 @@ class TestGrazLogger {
       try {
         const error = context?.error instanceof Error ? context.error : new Error(message);
         this.errorReporter.captureException(error, { category, message, ...cleanContext });
-      } catch {}
+      } catch {
+        // Intentionally ignore error reporter failures
+      }
     }
   }
 
