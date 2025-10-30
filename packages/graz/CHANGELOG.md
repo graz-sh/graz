@@ -1,5 +1,12 @@
 # graz
 
+## 0.4.2
+
+### Patch Changes
+
+- d7717cd: Implement comprehensive logging system
+- 02324c2: bump react deps
+
 ## 0.4.1
 
 ### Patch Changes
