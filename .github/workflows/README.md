@@ -23,7 +23,9 @@ Deploys the Docusaurus site from `dev` or manual dispatch using GitHub Pages act
 
 ### Publish (`publish.yml`)
 
-Runs Changesets on `dev` or manual dispatch. The publish command is `pnpm release`.
+Checks release state on `dev` or manual dispatch. Pending changesets create a version PR; unpublished package versions publish with `pnpm release`.
+
+The publish job uses npm Trusted Publishing/OIDC, not npm token secrets. It must target the protected `npm-publish` environment, which is restricted to `dev` and requires maintainer approval.
 
 ## Local Parity
 
@@ -45,4 +47,4 @@ Use `nvm use` instead of `fnm use 24.17.0` in shells that rely on nvm.
 
 - Keep workflow action SHAs paired with readable version comments.
 - Keep root dependency and toolchain files in path filters so lockfile, pnpm, Node, Turbo, and ESLint changes trigger CI.
-- `NPM_TOKEN` is required for publishing. `PERSONAL_TOKEN` is used by the Changesets action to create release pull requests.
+- `PERSONAL_TOKEN` is used by the Changesets action to create release pull requests.
