@@ -3,9 +3,9 @@
   "version": "0.1.2",
   "scripts": {
     "postinstall": "pnpm exec setup-para",
-    "build": "next build --webpack",
-    "dev": "next dev",
-    "export:docs": "EXPORT_DOCS=true next build --webpack && mv out ../../docs/build/examples/playground",
+    "build": "node scripts/sync-para-styles.mjs && next build --webpack",
+    "dev": "node scripts/sync-para-styles.mjs && next dev",
+    "export:docs": "node scripts/sync-para-styles.mjs && EXPORT_DOCS=true next build --webpack && mv out ../../docs/build/examples/playground",
     "lint": "eslint --fix \"**/*.{ts,tsx}\"",
     "start": "next start"
   },
