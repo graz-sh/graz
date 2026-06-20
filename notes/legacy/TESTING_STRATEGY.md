@@ -1221,7 +1221,7 @@ export const createMockWallet = (): Wallet => ({
 
 For scenarios that are difficult to automate, maintain a manual testing checklist.
 
-See [MANUAL_TESTING_GUIDE.md](../MANUAL_TESTING_GUIDE.md) for detailed procedures.
+See [MANUAL_TESTING_GUIDE.md](./MANUAL_TESTING_GUIDE.md) for detailed procedures.
 
 ---
 
@@ -1252,6 +1252,6 @@ test("should handle 20 chains efficiently", async () => {
 
 ## Related Documents
 
-- [MANUAL_TESTING_GUIDE.md](../MANUAL_TESTING_GUIDE.md) - Manual testing procedures
+- [MANUAL_TESTING_GUIDE.md](./MANUAL_TESTING_GUIDE.md) - Manual testing procedures
 - [CODE_REVIEW.md](./CODE_REVIEW.md) - Code review guidelines
 - [IMPROVEMENT_SUMMARY.md](./IMPROVEMENT_SUMMARY.md) - Overall progress
