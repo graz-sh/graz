@@ -27,6 +27,7 @@
     }
   },
   "files": [
+    "chains/index.*",
     "chains/*.stub",
     "dist/*",
     "types/*",
@@ -34,7 +35,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && pnpm cli --generate",
     "clean": "rm -rf dist/*",
     "cli": "node dist/cli.js",
     "dev": "tsup --watch",
@@ -47,13 +48,13 @@
     "type-check": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@tanstack/react-query": ">=5.0.0",
-    "react": ">=17",
     "@cosmjs/amino": ">=0.32.4",
     "@cosmjs/cosmwasm-stargate": ">=0.32.4",
+    "@cosmjs/encoding": ">=0.32.4",
     "@cosmjs/proto-signing": ">=0.32.4",
     "@cosmjs/stargate": ">=0.32.4",
-    "@cosmjs/encoding": ">=0.32.4"
+    "@tanstack/react-query": ">=5.0.0",
+    "react": ">=17"
   },
   "peerDependenciesMeta": {
     "@getpara/graz-integration": {
@@ -61,33 +62,39 @@
     }
   },
   "dependencies": {
-    "@initia/initia-registry-types": "0.0.20",
-    "@keplr-wallet/types": "0.12.156",
     "@cosmsnap/snapper": "0.2.7",
     "@dao-dao/cosmiframe": "1.0.0",
-    "@keplr-wallet/cosmos": "0.12.156",
-    "@vectis/extension-client": "^0.7.2",
-    "@walletconnect/sign-client": "2.20.2",
-    "@walletconnect/types": "2.20.2",
-    "@walletconnect/utils": "2.20.2",
+    "@initia/initia-registry-types": "1.0.13",
+    "@keplr-wallet/cosmos": "0.13.39",
+    "@keplr-wallet/types": "0.13.39",
+    "@vectis/extension-client": "0.7.2",
     "@walletconnect/modal": "2.7.0",
+    "@walletconnect/sign-client": "2.23.9",
+    "@walletconnect/types": "2.23.9",
+    "@walletconnect/utils": "2.23.9",
     "cosmos-directory-client": "0.0.6",
-    "long": "4",
-    "p-map": "^4.0.0",
-    "zustand": "5.0.4"
+    "long": "5.3.2",
+    "p-map": "7.0.4",
+    "zustand": "5.0.14"
   },
   "devDependencies": {
-    "@getpara/graz-connector": "2.0.0-alpha.51",
-    "@getpara/web-sdk": "2.0.0-alpha.51",
-    "@types/node": "^18.17.15",
-    "@types/react": "^19.0.0",
-    "@vitest/ui": "^2.1.9",
-    "arg": "^5.0.2",
-    "jsdom": "^23.0.0",
-    "react": "^19.0.0",
-    "typescript": "^5.4.0",
-    "vite": "^5.4.20",
-    "vitest": "^2.1.9"
+    "@cosmjs/amino": "0.39.0",
+    "@cosmjs/cosmwasm-stargate": "0.38.1",
+    "@cosmjs/encoding": "0.39.0",
+    "@cosmjs/proto-signing": "0.39.0",
+    "@cosmjs/stargate": "0.39.0",
+    "@getpara/graz-connector": "3.3.0",
+    "@getpara/web-sdk": "3.3.0",
+    "@types/node": "26.0.0",
+    "@types/react": "19.2.17",
+    "@vitest/ui": "4.1.9",
+    "arg": "5.0.2",
+    "cosmjs-types": "0.11.0",
+    "jsdom": "29.1.1",
+    "react": "19.2.7",
+    "typescript": "6.0.3",
+    "vite": "7.3.5",
+    "vitest": "4.1.9"
   },
   "keywords": [
     "graz",

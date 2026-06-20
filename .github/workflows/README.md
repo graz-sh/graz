@@ -1,111 +1,48 @@
 # GitHub Actions Workflows
 
-This directory contains GitHub Actions workflows for the Graz project.
+The workflows run on pinned `ubuntu-24.04` runner images and SHA-pinned actions with version comments. Node.js and pnpm are pinned to the project versions: Node `24.17.0`, pnpm `11.8.0`.
 
 ## Workflows
 
-### 🔨 CI (`ci.yml`)
-**Triggers:** Push/PR to `main` or `dev` branches (when packages change)
+### CI (`ci.yml`)
 
-**Jobs:**
-1. **Build & Test** (Matrix: Node 18, 20)
-   - Installs dependencies
-   - Builds packages
-   - Runs unit tests
-   - Runs type checking
+Triggers on pushes and pull requests to `main` or `dev` when package, docs, example, dependency, or toolchain files change.
 
-2. **Build Examples**
-   - Builds all example applications
-   - Ensures examples compile correctly
+Jobs:
 
-3. **Test Coverage**
-   - Runs tests with coverage reporting
-   - Uploads coverage to Codecov (optional)
+- `build-and-test`: frozen install, package/docs build, tests, CLI tests, and `graz` type-check.
+- `build-examples`: frozen install, `graz` build, chain generation, and full workspace build including examples.
 
-### 🧹 Lint (`lint.yml`)
-**Triggers:** Push (when docs/example/packages change)
+### Lint (`lint.yml`)
 
-**Jobs:**
-- Runs ESLint on all TypeScript files
-- Auto-fixes formatting issues
+Triggers on pushes that change source, dependency, toolchain, or lint config files. Runs `pnpm lint` with ESLint 9 flat config.
 
-### 📚 Docs (`docs.yml`)
-**Jobs:**
-- Builds and deploys documentation site
+### Docs (`docs.yml`)
 
-### 📦 Publish (`publish.yml`)
-**Jobs:**
-- Publishes packages to npm
-- Uses changesets for versioning
+Deploys the Docusaurus site from `dev` or manual dispatch using GitHub Pages actions.
 
-## Running Locally
+### Publish (`publish.yml`)
 
-You can test workflows locally using [act](https://github.com/nektos/act):
+Runs Changesets on `dev` or manual dispatch. The publish command is `pnpm release`.
+
+## Local Parity
+
+Run these before trusting workflow changes:
 
 ```bash
-# Install act
-brew install act
-
-# Run CI workflow
-act -j build-and-test
-
-# Run all jobs
-act push
+fnm use 24.17.0
+pnpm install --frozen-lockfile
+pnpm peers check
+pnpm build
+pnpm lint
+pnpm example:vite build
+pnpm example:playground build
 ```
 
-## Workflow Best Practices
+Use `nvm use` instead of `fnm use 24.17.0` in shells that rely on nvm.
 
-### Cache Strategy
-- All workflows use pnpm cache via `actions/setup-node`
-- Use `--frozen-lockfile` to ensure consistent installs
+## Maintenance Notes
 
-### Node Version
-- CI tests on Node 18 and 20
-- Other workflows use `.nvmrc` version
-- Update matrix in `ci.yml` when dropping/adding Node versions
-
-### Performance
-- `build-and-test` runs in parallel across Node versions
-- Examples build runs after tests pass (saves time on failures)
-- Coverage runs independently (doesn't block other jobs)
-
-## Updating Workflows
-
-When making changes:
-
-1. **Test locally** with `act` if possible
-2. **Update this README** if adding new workflows
-3. **Update matrix versions** when Node support changes
-4. **Check dependencies** - ensure actions use latest stable versions
-
-## Secrets & Variables
-
-### Required Secrets
-- `NPM_TOKEN` - For publishing to npm (publish.yml)
-- `CODECOV_TOKEN` - Optional, for coverage reporting (ci.yml)
-
-### Optional Variables
-None currently required.
-
-## Troubleshooting
-
-### Build fails on fork PRs
-- Ensure the fork is up to date with main
-- Check that `pnpm-lock.yaml` is committed
-
-### Tests fail in CI but pass locally
-- Check Node version (use nvm or similar)
-- Clear pnpm cache: `pnpm store prune`
-- Ensure no environment-specific code
-
-### Coverage not uploading
-- Verify `CODECOV_TOKEN` is set (optional)
-- Check coverage directory path in workflow
-- Codecov failures don't fail the CI (fail_ci_if_error: false)
-
-## Related Documentation
-
-- [GitHub Actions Docs](https://docs.github.com/en/actions)
-- [pnpm/action-setup](https://github.com/pnpm/action-setup)
-- [actions/setup-node](https://github.com/actions/setup-node)
-- [Codecov GitHub Action](https://github.com/codecov/codecov-action)
+- Keep workflow action SHAs paired with readable version comments.
+- Keep root dependency and toolchain files in path filters so lockfile, pnpm, Node, Turbo, and ESLint changes trigger CI.
+- `NPM_TOKEN` is required for publishing. `PERSONAL_TOKEN` is used by the Changesets action to create release pull requests.

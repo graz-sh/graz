@@ -18,41 +18,29 @@
     "lint": "turbo run lint",
     "release": "pnpm graz build && changeset publish",
     "test": "turbo run test",
-    "postinstall": "npx setup-para"
+    "postinstall": "pnpm exec setup-para"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.2",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.33.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^3.0.3",
-    "tsup": "^8.3.5",
-    "turbo": "^1.10.13",
-    "typescript": "^5.4.0"
+    "@changesets/cli": "2.31.0",
+    "@eslint/js": "9.39.4",
+    "@next/eslint-plugin-next": "16.2.9",
+    "@typescript-eslint/eslint-plugin": "8.61.1",
+    "@typescript-eslint/parser": "8.61.1",
+    "cosmjs-types": "0.11.0",
+    "eslint": "9.39.4",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "16.4.0",
+    "prettier": "3.8.4",
+    "tsup": "8.5.1",
+    "turbo": "2.9.18",
+    "typescript": "6.0.3"
   },
   "private": true,
   "license": "MIT",
+  "packageManager": "pnpm@11.8.0",
   "engines": {
-    "node": ">=20.18.0",
-    "pnpm": ">=8.0.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "ses": ">=0.18.7",
-      "axios": ">=0.30.2",
-      "next": ">=14.2.15",
-      "got": ">=11.8.5",
-      "esbuild": ">=0.25.0",
-      "webpack-dev-server": ">=5.2.1",
-      "vite": ">=5.4.20",
-      "graz>vite": "5.4.11",
-      "wait-on": ">=7.0.0",
-      "glob": ">=10.0.0",
-      "rimraf": ">=5.0.0",
-      "@cosmjs/crypto": ">=0.32.4",
-      "@getpara/graz-connector": "2.0.0-alpha.51"
-    }
+    "node": "24.17.0",
+    "pnpm": "11.8.0"
   }
 }
