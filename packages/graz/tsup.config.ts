@@ -70,7 +70,6 @@ export default defineConfig(({ watch }) => [
       /^@initia\/.*/,
       "zustand",
       "long",
-      "p-map",
       "cosmos-directory-client",
     ],
 

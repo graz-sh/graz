@@ -452,7 +452,7 @@ export function useOfflineSigners<const TChainIds extends readonly string[] | un
     },
     enabled: Boolean(chains) && chains.length > 0 && Boolean(wallet) && Boolean(isConnected),
     refetchOnWindowFocus: false,
-  });
+  }) as UseMultiChainQueryResult<TChainIds, OfflineSigners>;
 }
 
 /**
@@ -478,7 +478,7 @@ export function useOfflineSigners<const TChainIds extends readonly string[] | un
  */
 export const useBalanceStaked = (
   args: { bech32Address: string; chainId: string } & QueryConfig,
-): UseQueryResult<Coin, unknown> => {
+): UseQueryResult<Coin | null, unknown> => {
   const chains = useChainsFromArgs({ chainId: [args.chainId] });
   const chain = chains[0];
 

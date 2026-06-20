@@ -96,7 +96,7 @@ export function useStargateClient<const TChainIds extends readonly string[] | un
     },
     enabled: Boolean(chains) && chains.length > 0 && (args?.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
-  });
+  }) as UseMultiChainQueryResult<TChainIds, StargateClient>;
 }
 
 /**
@@ -185,5 +185,5 @@ export function useCosmWasmClient<const TChainIds extends readonly string[] | un
     },
     enabled: Boolean(chains) && chains.length > 0 && (args?.enabled !== undefined ? Boolean(args.enabled) : true),
     refetchOnWindowFocus: false,
-  });
+  }) as UseMultiChainQueryResult<TChainIds, CosmWasmClient>;
 }

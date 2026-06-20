@@ -315,11 +315,11 @@ export const useQuerySmart = <TData, TError>(args?: {
 }): UseQueryResult<TData, TError> => {
   const { data: clients } = useCosmWasmClient();
   const client = clients && Object.values(clients)[0];
-  const query: UseQueryResult<TData, TError> = useQuery({
+  const query: UseQueryResult<TData, TError> = useQuery<TData, TError>({
     queryKey: ["USE_QUERY_SMART", args?.address, args?.queryMsg, client],
-    queryFn: ({ queryKey: [, _address] }) => {
+    queryFn: () => {
       if (!args?.address || !args.queryMsg) throw new Error("address or queryMsg undefined");
-      return getQuerySmart(args.address, args.queryMsg, client);
+      return getQuerySmart<TData>(args.address, args.queryMsg, client);
     },
     enabled: Boolean(args?.address) && Boolean(args?.queryMsg) && Boolean(client),
   });

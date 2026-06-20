@@ -1,5 +1,6 @@
+import type { OfflineAminoSigner } from "@cosmjs/amino";
 import type { OfflineDirectSigner } from "@cosmjs/proto-signing";
-import type { ChainInfo, OfflineAminoSigner } from "@keplr-wallet/types";
+import type { ChainInfo } from "@keplr-wallet/types";
 
 import { LOG_FUNCTIONS, RECONNECT_SESSION_KEY } from "../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";

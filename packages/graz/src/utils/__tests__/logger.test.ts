@@ -502,7 +502,7 @@ describe("GrazLogger", () => {
       const callArgs = consoleInfoSpy.mock.calls[0];
       expect(callArgs).toBeDefined();
       // Should include context data in the call
-      expect(callArgs?.some((arg) => typeof arg === "object")).toBe(true);
+      expect(callArgs?.some((arg: unknown) => typeof arg === "object")).toBe(true);
     });
 
     it("should remove function and hook keys from context", () => {
@@ -515,7 +515,7 @@ describe("GrazLogger", () => {
       expect(consoleInfoSpy).toHaveBeenCalled();
       const callArgs = consoleInfoSpy.mock.calls[0];
       expect(callArgs).toBeDefined();
-      const contextArg = callArgs?.find((arg) => typeof arg === "object" && arg !== null);
+      const contextArg = callArgs?.find((arg: unknown) => typeof arg === "object" && arg !== null);
 
       if (contextArg) {
         expect(contextArg).not.toHaveProperty("function");
