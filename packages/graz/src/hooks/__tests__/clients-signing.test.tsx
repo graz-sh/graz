@@ -203,6 +203,36 @@ describe("client hooks", () => {
     rendered.unmount();
   });
 
+  it("does not run signing client queries while the wallet is disconnected", async () => {
+    const { wrapper } = createQueryWrapper();
+    const chain = makeChainInfo();
+    useGrazInternalStore.setState({
+      _reconnectConnector: WalletType.KEPLR,
+      chains: [chain],
+      walletType: WalletType.KEPLR,
+    });
+    useGrazSessionStore.setState({
+      activeChainIds: [chain.chainId],
+      status: "disconnected",
+    });
+
+    const rendered = renderHook(
+      () => ({
+        cosmwasm: useCosmWasmSigningClient({ chainId: [chain.chainId] }),
+        stargate: useStargateSigningClient({ chainId: [chain.chainId] }),
+      }),
+      { wrapper },
+    );
+
+    expect(rendered.result.cosmwasm.fetchStatus).toBe("idle");
+    expect(rendered.result.stargate.fetchStatus).toBe("idle");
+    expect(rendered.result.cosmwasm.data).toBeUndefined();
+    expect(rendered.result.stargate.data).toBeUndefined();
+    expect(signingCosmWasmConnect).not.toHaveBeenCalled();
+    expect(signingStargateConnect).not.toHaveBeenCalled();
+    rendered.unmount();
+  });
+
   it("returns null for inactive chains and uses the default auto signer", async () => {
     const { wrapper } = createQueryWrapper();
     const cosmoshub = makeChainInfo();
