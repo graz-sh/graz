@@ -1,4 +1,5 @@
 import type { Coin } from "@cosmjs/proto-signing";
+import type { StargateClient } from "@cosmjs/stargate";
 import type { Key } from "@keplr-wallet/types";
 import { useMutation, useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
@@ -37,6 +38,15 @@ export interface UseAccountResult<TChainIds extends readonly string[] | undefine
   status: string;
   walletType?: WalletType;
 }
+
+type UseBalancesArgs = {
+  bech32Address: string | undefined;
+  chainId: string | undefined;
+} & QueryConfig;
+
+type UseBalanceArgs = UseBalancesArgs & {
+  denom: string | undefined;
+};
 
 /**
  * graz query hook to retrieve account data with optional arguments to invoke
@@ -160,17 +170,21 @@ export function useAccount<const TChainIds extends readonly string[] | undefined
  * ```
  */
 export const useBalances = (
-  args: { bech32Address: string; chainId: string } & QueryConfig,
+  args: UseBalancesArgs,
 ): UseQueryResult<Coin[], unknown> => {
-  const chains = useChainsFromArgs({ chainId: [args.chainId] });
-  const chain = chains[0];
+  const chains = useGrazInternalStore((x) => x.chains);
+  const chain = args.chainId ? chains?.find((x) => x.chainId === args.chainId) : undefined;
+  const queryEnabled =
+    Boolean(args.chainId) &&
+    Boolean(args.bech32Address) &&
+    (args.enabled === undefined ? true : args.enabled);
 
   const { data: clients } = useStargateClient({
-    chainId: [args.chainId] as readonly string[],
-    enabled: args.enabled === undefined ? true : args.enabled,
+    chainId: args.chainId ? [args.chainId] : [],
+    enabled: queryEnabled,
   });
 
-  const client = clients?.[args.chainId];
+  const client = args.chainId ? (clients as Record<string, StargateClient> | undefined)?.[args.chainId] : undefined;
 
   const queryKey = useMemo(
     () => ["USE_ALL_BALANCES", client, args.chainId, args.bech32Address],
@@ -180,6 +194,9 @@ export const useBalances = (
   return useQuery({
     queryKey,
     queryFn: async () => {
+      if (!args.chainId || !args.bech32Address) {
+        throw new Error("chainId or bech32Address undefined");
+      }
       if (!client) {
         throw new Error(`Client is not ready for ${args.chainId}`);
       }
@@ -189,7 +206,7 @@ export const useBalances = (
       const balances = await client.getAllBalances(args.bech32Address);
       return balances as Coin[];
     },
-    enabled: Boolean(client) && Boolean(chain) && (args.enabled === undefined ? true : args.enabled),
+    enabled: Boolean(client) && Boolean(chain) && queryEnabled,
     refetchOnMount: false,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
@@ -216,17 +233,22 @@ export const useBalances = (
  * ```
  */
 export const useBalance = (
-  args: { bech32Address: string; chainId: string; denom: string } & QueryConfig,
+  args: UseBalanceArgs,
 ): UseQueryResult<Coin | undefined, unknown> => {
-  const chains = useChainsFromArgs({ chainId: [args.chainId] });
-  const chain = chains[0];
+  const chains = useGrazInternalStore((x) => x.chains);
+  const chain = args.chainId ? chains?.find((x) => x.chainId === args.chainId) : undefined;
+  const queryEnabled =
+    Boolean(args.chainId) &&
+    Boolean(args.bech32Address) &&
+    Boolean(args.denom) &&
+    (args.enabled === undefined ? true : args.enabled);
 
   const { data: clients } = useStargateClient({
-    chainId: [args.chainId] as readonly string[],
-    enabled: args.enabled === undefined ? true : args.enabled,
+    chainId: args.chainId ? [args.chainId] : [],
+    enabled: queryEnabled,
   });
 
-  const client = clients?.[args.chainId];
+  const client = args.chainId ? (clients as Record<string, StargateClient> | undefined)?.[args.chainId] : undefined;
 
   const queryKey = useMemo(
     () => ["USE_BALANCE", client, args.chainId, args.bech32Address, args.denom],
@@ -236,6 +258,9 @@ export const useBalance = (
   return useQuery<Coin | null, unknown, Coin | undefined>({
     queryKey,
     queryFn: async () => {
+      if (!args.chainId || !args.bech32Address || !args.denom) {
+        throw new Error("chainId, bech32Address, or denom undefined");
+      }
       if (!client) {
         throw new Error(`Client is not ready for ${args.chainId}`);
       }
@@ -246,7 +271,7 @@ export const useBalance = (
       return balance.amount === "0" ? null : balance;
     },
     select: (balance) => balance ?? undefined,
-    enabled: Boolean(client) && Boolean(chain) && (args.enabled === undefined ? true : args.enabled),
+    enabled: Boolean(client) && Boolean(chain) && queryEnabled,
     refetchOnMount: false,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
@@ -478,17 +503,21 @@ export function useOfflineSigners<const TChainIds extends readonly string[] | un
  * ```
  */
 export const useBalanceStaked = (
-  args: { bech32Address: string; chainId: string } & QueryConfig,
+  args: UseBalancesArgs,
 ): UseQueryResult<Coin | null, unknown> => {
-  const chains = useChainsFromArgs({ chainId: [args.chainId] });
-  const chain = chains[0];
+  const chains = useGrazInternalStore((x) => x.chains);
+  const chain = args.chainId ? chains?.find((x) => x.chainId === args.chainId) : undefined;
+  const queryEnabled =
+    Boolean(args.chainId) &&
+    Boolean(args.bech32Address) &&
+    (args.enabled === undefined ? true : args.enabled);
 
   const { data: clients } = useStargateClient({
-    chainId: [args.chainId] as readonly string[],
-    enabled: args.enabled === undefined ? true : args.enabled,
+    chainId: args.chainId ? [args.chainId] : [],
+    enabled: queryEnabled,
   });
 
-  const client = clients?.[args.chainId];
+  const client = args.chainId ? (clients as Record<string, StargateClient> | undefined)?.[args.chainId] : undefined;
 
   const queryKey = useMemo(
     () => ["USE_BALANCE_STAKED", client, args.chainId, args.bech32Address],
@@ -498,6 +527,9 @@ export const useBalanceStaked = (
   return useQuery({
     queryKey,
     queryFn: async () => {
+      if (!args.chainId || !args.bech32Address) {
+        throw new Error("chainId or bech32Address undefined");
+      }
       if (!client) {
         throw new Error(`Client is not ready for ${args.chainId}`);
       }
@@ -507,7 +539,7 @@ export const useBalanceStaked = (
       const balance = await client.getBalanceStaked(args.bech32Address);
       return balance;
     },
-    enabled: Boolean(client) && Boolean(chain) && (args.enabled === undefined ? true : args.enabled),
+    enabled: Boolean(client) && Boolean(chain) && queryEnabled,
     refetchOnMount: false,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
