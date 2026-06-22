@@ -1,5 +1,12 @@
 # graz
 
+## 0.4.3
+
+### Patch Changes
+
+- 1e7078a: Modernize the published package without changing the public API: bundle `p-map` into the CJS/ESM outputs so the package imports correctly in CJS consumers, preserve the existing generated-chain publish policy, and upgrade runtime dependencies (`@keplr-wallet/*` 0.13, `@walletconnect/*` 2.23, `zustand` 5.0.14, `long` 5) with CosmJS 0.39 compatibility.
+- d417391: Update documentation to match the current API and tooling: fix the `QueryClientProvider` prop and multi-chain `useAccount` usage in the root README quick start, add the missing `@cosmjs/amino` peer dependency and `Cactus` wallet to the supported list, and refresh example/docs READMEs (Next.js 16, Docusaurus 3 with pnpm, corrected env setup, and legacy notes links).
+
 ## 0.4.2
 
 ### Patch Changes

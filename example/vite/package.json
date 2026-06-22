@@ -1,6 +1,6 @@
 {
   "name": "@project/example-vite",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "scripts": {
     "build": "tsc && vite build",
