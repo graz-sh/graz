@@ -122,6 +122,35 @@ describe("MetaMask Snap adapters", () => {
     expect(cosmosSnapClient.deleteChain).toHaveBeenCalledWith(chain.chainId);
   });
 
+  it("selects MetaMask for the Cosmos Snap adapter when another wallet owns window.ethereum", async () => {
+    const phantom = {
+      isPhantom: true,
+      request: vi.fn(async ({ method }: EthereumRequest) => {
+        if (method === "web3_clientVersion") return "Phantom/v1.0.0";
+        return undefined;
+      }),
+    };
+    const metamask = {
+      isMetaMask: true,
+      request: vi.fn(async ({ method }: EthereumRequest) => {
+        if (method === "web3_clientVersion") return "MetaMask/v11.0.0";
+        return undefined;
+      }),
+    };
+    setWindowValue("ethereum", {
+      ...phantom,
+      providers: [phantom, metamask],
+    });
+    isSnapInstalled.mockResolvedValue(true);
+
+    const wallet = getMetamaskSnapCosmos();
+
+    await expect(wallet.init?.()).resolves.toBe(true);
+    expect(window.ethereum).toBe(metamask);
+    expect(metamask.request).toHaveBeenCalledWith({ method: "web3_clientVersion" });
+    expect(phantom.request).not.toHaveBeenCalled();
+  });
+
   it("initializes and delegates the Leap MetaMask Snap adapter", async () => {
     const chain = makeChainInfo();
     const requests: EthereumRequest[] = [];
@@ -217,5 +246,41 @@ describe("MetaMask Snap adapters", () => {
     });
     await expect(wallet.experimentalSuggestChain(chain)).resolves.toBeUndefined();
     expect(requests.some((request) => request.params?.request?.method === "suggestChain")).toBe(true);
+  });
+
+  it("selects MetaMask for the Leap Snap adapter when another wallet owns window.ethereum", async () => {
+    const requests: EthereumRequest[] = [];
+    const phantom = {
+      isPhantom: true,
+      request: vi.fn(async ({ method }: EthereumRequest) => {
+        if (method === "web3_clientVersion") return "Phantom/v1.0.0";
+        return undefined;
+      }),
+    };
+    const metamask = {
+      isMetaMask: true,
+      request: vi.fn(async (request: EthereumRequest) => {
+        requests.push(request);
+        if (request.method === "web3_clientVersion") return "MetaMask/v11.0.0";
+        if (request.method === "wallet_getSnaps") return {};
+        if (request.method === "wallet_requestSnaps") return null;
+        return undefined;
+      }),
+    };
+    setWindowValue("ethereum", {
+      ...phantom,
+      providers: [phantom, metamask],
+    });
+
+    const wallet = getMetamaskSnap({ id: "npm:@leapwallet/metamask-cosmos-snap" });
+
+    await expect(wallet.init?.()).resolves.toBe(true);
+    expect(window.ethereum).toBe(metamask);
+    expect(requests.map((request) => request.method)).toEqual([
+      "web3_clientVersion",
+      "wallet_getSnaps",
+      "wallet_requestSnaps",
+    ]);
+    expect(phantom.request).not.toHaveBeenCalled();
   });
 });
