@@ -13,7 +13,7 @@ import { isAndroid, isIos, isMobile } from "../../../utils/os";
 import { promiseWithTimeout } from "../../../utils/timeout";
 import type { GetWalletConnectParams, WalletConnectSignDirectResponse } from "./types";
 
-type WalletConnectStoredKey = Key & { chainId?: string; pubKey: Key["pubKey"] | string };
+type WalletConnectStoredKey = Omit<Key, "pubKey"> & { chainId?: string; pubKey: Key["pubKey"] | string };
 
 export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
@@ -134,6 +134,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     return keys;
   };
 
+  const getWalletConnectChainId = (chainId?: string) => chainId?.split(":")[1] || chainId;
+
   const requestAccounts = async (
     signClient: ISignClient,
     topic: string,
@@ -156,7 +158,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
         return accounts.map((account) => ({
           ...account,
-          chainId: account.chainId || chainId,
+          chainId: getWalletConnectChainId(account.chainId) || chainId,
         })) as WalletConnectStoredKey[];
       }),
     );
@@ -169,8 +171,11 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     session: { sessionProperties?: Record<string, string>; topic?: string },
     chainIds: string[],
   ): Promise<WalletConnectStoredKey[]> => {
-    const keys = parseSessionKeys(session.sessionProperties);
-    if (keys) return keys;
+    const keys = parseSessionKeys(session.sessionProperties)?.map((key) => ({
+      ...key,
+      chainId: getWalletConnectChainId(key.chainId),
+    }));
+    if (keys?.some((key) => key.chainId && chainIds.includes(key.chainId))) return keys;
     if (!session.topic) throw new Error("No wallet connect session");
 
     return requestAccounts(signClient, session.topic, chainIds);
@@ -291,7 +296,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
                   isNanoLedger: x.isNanoLedger,
                   isKeystone: x.isKeystone,
                   name: x.name,
-                  pubKey: x.pubKey,
+                  pubKey: Buffer.from(String(x.pubKey), encoding),
                 };
               });
               useGrazSessionStore.setState((prev) => ({
