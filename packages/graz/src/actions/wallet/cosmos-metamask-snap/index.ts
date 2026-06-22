@@ -20,7 +20,7 @@ export const getMetamaskSnapCosmos = (): Wallet => {
       if (!isMetamask) throw new Error("Metamask is not installed");
 
       if (typeof window.okxwallet !== "undefined") {
-        if (window.okxwallet.isOkxWallet) {
+        if ("isOkxWallet" in window.okxwallet && window.okxwallet.isOkxWallet) {
           throw new Error("You have OKX Wallet installed. Please disable and reload the page to use Metamask Snap.");
         }
       }
@@ -73,8 +73,7 @@ export const getMetamaskSnapCosmos = (): Wallet => {
         return cosmos.getOfflineSignerOnlyAmino(chainId);
       },
       signDirect: async (chainId, signer, signDoc) => {
-        // @ts-expect-error - signDoc is not the same as SignDoc
-        return cosmos.signDirect(chainId, signer, signDoc);
+        return cosmos.signDirect(chainId, signer, signDoc as Parameters<typeof cosmos.signDirect>[2]);
       },
       signArbitrary: async (chainId, signer, data) => {
         return cosmos.signArbitrary(chainId, signer, data);

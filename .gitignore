@@ -11,6 +11,7 @@ tsconfig.tsbuildinfo
 *.tsbuildinfo
 .tsbuildinfo
 coverage/
+example/playground/public/para-styles.css
 
 # allowed directories/files
 !.gitkeep

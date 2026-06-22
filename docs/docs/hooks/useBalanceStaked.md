@@ -1,6 +1,6 @@
 # useBalanceStaked
 
-Hook to retrieve staked balance for a specific chain and address. Returns a single `Coin`.
+Hook to retrieve staked balance for a specific chain and address. Returns a single `Coin`, or `null` when the address has no staked balance.
 
 ## Usage
 
@@ -102,7 +102,7 @@ function MultiChainStakedBalances() {
 
 ```tsx
 {
-  data?: Coin; // Coin from @cosmjs/proto-signing
+  data?: Coin | null; // Coin from @cosmjs/proto-signing, or null when there is no staked balance
   dataUpdatedAt: number;
   error: TError | null;
   errorUpdatedAt: number;
@@ -120,7 +120,7 @@ function MultiChainStakedBalances() {
   isRefetching: boolean;
   isStale: boolean;
   isSuccess: boolean;
-  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Coin, unknown>>;
+  refetch: (options?: RefetchOptions & RefetchQueryFilters) => Promise<QueryObserverResult<Coin | null, unknown>>;
   remove: () => void;
   status: 'loading' | 'error' | 'success';
   fetchStatus: 'fetching' | 'paused' | 'idle';

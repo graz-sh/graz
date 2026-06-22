@@ -35,6 +35,9 @@ const defaultOptions: Options = {
   // Skip node_modules bundling
   skipNodeModulesBundle: true,
 
+  // Bundle pure ESM helpers that are used by the published CJS entry points.
+  noExternal: ["p-map"],
+
   // Preserve module directives
   // keepNames: true,
 };
@@ -70,7 +73,6 @@ export default defineConfig(({ watch }) => [
       /^@initia\/.*/,
       "zustand",
       "long",
-      "p-map",
       "cosmos-directory-client",
     ],
 

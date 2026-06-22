@@ -124,7 +124,7 @@ export function useStargateSigningClient<const TChainIds extends readonly string
           const signingClient = await SigningStargateClient.connectWithSigner(
             endpoint,
             offlineSigner,
-            args?.opts?.[_chain.chainId],
+            args?.opts?.[_chain.chainId] as SigningStargateClientOptions | undefined,
           );
           return signingClient;
         }, "useStargateSigningClient");
@@ -150,7 +150,7 @@ export function useStargateSigningClient<const TChainIds extends readonly string
       (args?.enabled !== undefined ? Boolean(args.enabled) : true) &&
       Boolean(isConnected),
     refetchOnWindowFocus: false,
-  });
+  }) as UseMultiChainQueryResult<TChainIds, SigningStargateClient | null>;
 }
 
 /**
@@ -260,7 +260,7 @@ export function useCosmWasmSigningClient<const TChainIds extends readonly string
           // Always use per-chain opts
           const signingClient = await SigningCosmWasmClient.connectWithSigner(endpoint, offlineSigner, {
             gasPrice,
-            ...(args?.opts?.[_chain.chainId] || {}),
+            ...((args?.opts?.[_chain.chainId] as SigningCosmWasmClientOptions | undefined) || {}),
           });
           return signingClient;
         }, "useCosmWasmSigningClient");
@@ -286,5 +286,5 @@ export function useCosmWasmSigningClient<const TChainIds extends readonly string
       (args?.enabled !== undefined ? Boolean(args.enabled) : true) &&
       Boolean(isConnected),
     refetchOnWindowFocus: false,
-  });
+  }) as UseMultiChainQueryResult<TChainIds, SigningCosmWasmClient | null>;
 }

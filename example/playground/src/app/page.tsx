@@ -13,7 +13,6 @@ import {
   DollarSign,
   User,
   ExternalLink,
-  Github,
   BookOpen,
   Zap,
   Shield,
@@ -180,7 +179,7 @@ export default function HomePage() {
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
             >
-              <Github className="h-4 w-4" />
+              <Code2 className="h-4 w-4" />
               GitHub
             </a>
             <a

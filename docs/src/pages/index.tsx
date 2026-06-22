@@ -14,13 +14,13 @@ const HomepageHeader: FC = () => {
       <div className="container">
         <img alt="graz logo" className={styles.heroImage} src="img/logo.png" />
         <div className={clsx("hero__subtitle", styles.badge)}>
-          <a href="https://www.npmjs.com/package/graz" rel="noopener" target="_blank">
+          <a href="https://www.npmjs.com/package/graz" rel="noopener noreferrer" target="_blank">
             <img alt="versions badge" src="https://badgen.net/npm/v/graz" />
           </a>
-          <a href="https://www.npmjs.com/package/graz" rel="noopener" target="_blank">
+          <a href="https://www.npmjs.com/package/graz" rel="noopener noreferrer" target="_blank">
             <img alt="downloads badge" src="https://badgen.net/npm/dt/graz" />
           </a>
-          <a href="https://github.com/graz-sh/graz" rel="noopener" target="_blank">
+          <a href="https://github.com/graz-sh/graz" rel="noopener noreferrer" target="_blank">
             <img alt="stars badge" src="https://badgen.net/github/stars/graz-sh/graz" />
           </a>
         </div>

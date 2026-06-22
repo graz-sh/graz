@@ -1,6 +1,5 @@
 import type { DirectSignResponse } from "@cosmjs/proto-signing";
 import type { AccountData, Algo, AminoSignResponse, Keplr, StdSignDoc } from "@keplr-wallet/types";
-// eslint-disable-next-line import/no-named-as-default
 import Long from "long";
 
 import { useGrazInternalStore } from "../../../store";
@@ -71,7 +70,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       if (!isMetamask) throw new Error("Metamask is not installed");
 
       if (typeof window.okxwallet !== "undefined") {
-        if (window.okxwallet.isOkxWallet) {
+        if ("isOkxWallet" in window.okxwallet && window.okxwallet.isOkxWallet) {
           throw new Error("You have OKX Wallet installed. Please disable and reload the page to use Metamask Snap.");
         }
       }
@@ -168,9 +167,9 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+       
       (res as Key).pubKey = Uint8Array.from(Object.values(res.pubkey));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+       
       delete res.pubkey;
 
       // Cache the key for future use
@@ -229,7 +228,7 @@ export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
       };
     };
 
-    // eslint-disable-next-line @typescript-eslint/require-await
+     
     const getOfflineSignerAuto = async (chainId: string) => {
       return getOfflineSignerOnlyAmino(chainId);
     };

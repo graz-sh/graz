@@ -71,7 +71,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       const wcSignClient = wcSignClients.get(walletType);
       if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
       const allSession = wcSignClient.session.getAll();
-      const lastSession = allSession.at(-1);
+      const lastSession = allSession[allSession.length - 1];
       if (!lastSession) return;
 
       const isValid = lastSession.expiry * 1000 > Date.now() + 1000;
@@ -139,7 +139,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   const subscription: (reconnect: () => void) => () => void = (reconnect) => {
     const { wcSignClients } = useGrazSessionStore.getState();
     const wcSignClient = wcSignClients.get(walletType);
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
+     
     if (!wcSignClient) return () => {};
 
     const sessionEventListener = (args: SignClientTypes.EventArguments["session_event"]) => {
@@ -149,7 +149,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
         _accounts &&
         !Object.values(_accounts)
           .map((x) => x.bech32Address)
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+           
           .includes(args.params.event.data[0])
       ) {
         const chainId = args.params.chainId.split(":")[1];

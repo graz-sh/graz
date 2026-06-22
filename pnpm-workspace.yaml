@@ -2,3 +2,61 @@ packages:
   - "docs/"
   - "example/*"
   - "packages/*"
+
+publicHoistPattern:
+  - "*"
+preferWorkspacePackages: true
+publishBranch: dev
+saveExact: true
+useNodeVersion: 24.17.0
+
+allowBuilds:
+  bufferutil: true
+  core-js: true
+  es5-ext: true
+  esbuild: true
+  keccak: true
+  protobufjs: true
+  sharp: true
+  tiny-secp256k1: true
+  unrs-resolver: true
+  utf-8-validate: true
+
+peerDependencyRules:
+  allowedVersions:
+    "@safe-global/types-kit": ">=3.0.0 <4.0.0"
+    "@solana/sysvars": ">=2.1.0 <6.0.0"
+    cosmjs-types: ">=0.9.0 <0.12.0"
+    typescript: ">=5.0.0 <7.0.0"
+    utf-8-validate: ">=5.0.2 <7.0.0"
+
+overrides:
+  ses: 1.14.0
+  abitype: 1.2.4
+  axios: 1.13.2
+  next: 16.2.9
+  got: 14.6.5
+  esbuild: 0.27.2
+  webpack-dev-server: 5.2.2
+  vite: 7.3.5
+  graz>vite: 7.3.5
+  wait-on: 9.0.3
+  glob: 13.0.0
+  rimraf: 6.1.2
+  starknet: 8.9.2
+  use-sync-external-store: 1.6.0
+  viem: 2.52.2
+  "@getpara/aa-cdp>viem": 2.52.2
+  "@getpara/react-core>viem": 2.52.2
+  "@getpara/react-sdk-lite>viem": 2.52.2
+  "@getpara/viem-v2-integration>viem": 2.52.2
+  "permissionless>viem": 2.52.2
+  "@cosmjs/amino": 0.39.0
+  "@cosmjs/crypto": 0.39.0
+  "@cosmjs/encoding": 0.39.0
+  "@cosmjs/math": 0.39.0
+  "@cosmjs/proto-signing": 0.39.0
+  "@cosmjs/stargate": 0.39.0
+  "@cosmjs/tendermint-rpc": 0.39.0
+  "@cosmjs/utils": 0.39.0
+  "@getpara/graz-connector": 3.3.0

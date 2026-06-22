@@ -146,7 +146,6 @@ export const isLeapSnaps = (type: WalletType): boolean => {
 };
 
 export const isLeapDappBrowser = (): boolean => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return Boolean(navigator?.userAgent) && /LeapCosmos/i.test(navigator.userAgent);
 };
 

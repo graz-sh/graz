@@ -3,7 +3,6 @@ import type { BondStatusString } from "@cosmjs/stargate/build/modules/staking/qu
 import type { AppCurrency, ChainInfo } from "@keplr-wallet/types";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { QueryValidatorsResponse } from "cosmjs-types/cosmos/staking/v1beta1/query";
 
 import type { ConnectResult } from "../actions/account";
 import type { SuggestChainAndConnectArgs } from "../actions/chains";
@@ -13,6 +12,8 @@ import type { MutationEventArgs } from "../types/hooks";
 import { LogCategory } from "../types/logger";
 import { getLogger } from "../utils/logger";
 import { useCheckWallet } from "./wallet";
+
+type QueryValidatorsResponse = Awaited<ReturnType<StakingExtension["staking"]["validators"]>>;
 
 /**
  * graz hook to retrieve connected account's active chainIds

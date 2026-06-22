@@ -1,10 +1,14 @@
 import type { CosmWasmClient, InstantiateOptions, SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import type { Coin } from "@cosmjs/proto-signing";
 import type { DeliverTxResponse, SigningStargateClient, StdFee } from "@cosmjs/stargate";
-import type { Height } from "cosmjs-types/ibc/core/client/v1/client";
 
 import { LogCategory } from "../types/logger";
 import { getLogger } from "../utils/logger";
+
+export interface Height {
+  revisionNumber: bigint;
+  revisionHeight: bigint;
+}
 
 // https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#sendTokens
 export interface SendTokensArgs {

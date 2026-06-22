@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Home, Wallet, Coins, Send, FileCode, Network, Link2, Github, BookOpen, Twitter, User } from "lucide-react";
+import { Home, Wallet, Coins, Send, FileCode, Network, Link2, Code2, BookOpen, User } from "lucide-react";
 
 const navigation = [
   { name: "Overview", href: "/", icon: Home },
@@ -52,7 +52,7 @@ export function Sidebar() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            <Github className="h-4 w-4" />
+            <Code2 className="h-4 w-4" />
             <span>GitHub</span>
           </a>
           <a
@@ -70,7 +70,7 @@ export function Sidebar() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            <Twitter className="h-4 w-4" />
+            <Send className="h-4 w-4" />
             <span>Twitter</span>
           </a>
         </div>

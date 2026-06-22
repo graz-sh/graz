@@ -35,4 +35,4 @@ When making significant changes to Graz, consider:
 - [Main README](../README.md) - Project overview and getting started
 - [Contributing Guide](../CONTRIBUTING.md) - How to contribute to Graz
 - [Agents Guide](../agents.md) - Context for AI agents working on the codebase
-- [Manual Testing Guide](../MANUAL_TESTING_GUIDE.md) - Manual testing procedures
+- [Manual Testing Guide](./MANUAL_TESTING_GUIDE.md) - Manual testing procedures

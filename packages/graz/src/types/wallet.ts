@@ -14,17 +14,17 @@ export enum WalletType {
   VECTIS = "vectis",
   COSMOSTATION = "cosmostation",
   WALLETCONNECT = "walletconnect",
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+   
   WC_KEPLR_MOBILE = "wc_keplr_mobile",
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+   
   WC_LEAP_MOBILE = "wc_leap_mobile",
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+   
   WC_COSMOSTATION_MOBILE = "wc_cosmostation_mobile",
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+   
   WC_CLOT_MOBILE = "wc_clot_mobile",
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+   
   METAMASK_SNAP_LEAP = "metamask_snap_leap",
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+   
   METAMASK_SNAP_COSMOS = "metamask_snap_cosmos",
   STATION = "station",
   XDEFI = "xdefi",
@@ -58,11 +58,12 @@ export const WALLET_TYPES = [
   WalletType.CACTUSCOSMOS,
 ];
 
-export type Wallet = Pick<Keplr, "enable" | "getOfflineSignerOnlyAmino" | "signAmino"> & {
+export type Wallet = Pick<Keplr, "enable" | "signAmino"> & {
   experimentalSuggestChain: (chainInfo: Omit<ChainInfo, "nodeProvider">) => Promise<void>;
   signArbitrary?: Keplr["signArbitrary"];
   signDirect: (...args: SignDirectParams) => Promise<DirectSignResponse>;
   getOfflineSigner: (chainId: string, signOptions?: KeplrSignOptions) => OfflineAminoSigner & OfflineDirectSigner;
+  getOfflineSignerOnlyAmino: (chainId: string, signOptions?: KeplrSignOptions) => OfflineAminoSigner;
   getOfflineSignerAuto: (
     chainId: string,
     signOptions?: KeplrSignOptions,

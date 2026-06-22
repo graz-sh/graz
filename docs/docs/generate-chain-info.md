@@ -4,11 +4,16 @@ sidebar_position: 5
 
 # Generate ChainInfo
 
-With `graz generate` you can generate mainnet and testnet chain `ChainInfo` directly from https://cosmos.directory
+`graz` ships with pre-generated mainnet and testnet `ChainInfo` definitions, so you can import them from `graz/chains` right after installing — no extra step required.
+
+Use the `graz` CLI only when you want to **regenerate or customize** the chain definitions, for example to pin specific chains or pick the best available endpoints. It pulls the latest data from https://cosmos.directory:
 
 ```shell
+# using npx
+npx graz --generate
+
 # using yarn
-yarn graz generate
+yarn graz --generate
 ```
 
 ## Options:
@@ -29,23 +34,23 @@ yarn graz generate
 
 ```
 
-## Add it to your project
+## Keep chains up to date (optional)
 
-in your package.json add it to in your install or postInstall scripts
+The bundled definitions are a snapshot from when the installed `graz` version was published. If you want to refresh them on every install, add the generate step to your `postinstall` script:
 
 ```ts
 {
   // ...
   "scripts": {
-    "install": "graz generate -g"
+    "postinstall": "graz --generate"
   }
   // ...
 }
 ```
 
-## Import generated chains
+## Import chains
 
-After you generate `ChainInfo` you can use it in you project
+You can import the bundled (or regenerated) `ChainInfo` directly in your project:
 
 ```ts
 import { axelar, cosmoshub, sommelier } from "graz/chains";
