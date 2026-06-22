@@ -9,6 +9,7 @@ on:
       - docs/**
       - eslint.config.mjs
       - example/**
+      - integration/**
       - package.json
       - packages/**
       - pnpm-lock.yaml
