@@ -20,7 +20,8 @@ const makeWalletConnectKey = (chainId: string, overrides: Partial<Key> = {}) => 
   ...overrides,
 });
 
-const makeSignClient = (chainId: string) => {
+const makeSignClient = (chainId: string, options: { includeSessionProperties?: boolean } = {}) => {
+  const includeSessionProperties = options.includeSessionProperties ?? true;
   const listeners = new Map<string, Set<(args?: unknown) => void>>();
   const session = {
     expiry: Math.floor(Date.now() / 1000) + 60,
@@ -29,9 +30,13 @@ const makeSignClient = (chainId: string) => {
         chains: [`cosmos:${chainId}`],
       },
     },
-    sessionProperties: {
-      keys: JSON.stringify([makeWalletConnectKey(chainId)]),
-    },
+    ...(includeSessionProperties
+      ? {
+          sessionProperties: {
+            keys: JSON.stringify([makeWalletConnectKey(chainId)]),
+          },
+        }
+      : {}),
     topic: "topic-1",
   };
   let sessions = [session];
@@ -66,6 +71,9 @@ const makeSignClient = (chainId: string) => {
       }),
     },
     request: vi.fn(async ({ request }: { request: { method: string } }) => {
+      if (request.method === "cosmos_getAccounts") {
+        return [makeWalletConnectKey(chainId)];
+      }
       if (request.method === "cosmos_signDirect") {
         return {
           signature: {
@@ -226,6 +234,37 @@ describe("WalletConnect adapter", () => {
       _reconnect: false,
       _reconnectConnector: null,
       recentChainIds: null,
+    });
+  });
+
+  it("requests accounts for existing sessions without session properties", async () => {
+    const chainId = "cosmoshub-4";
+    const signClient = makeSignClient(chainId, { includeSessionProperties: false });
+    const wcSignClients = new Map();
+    wcSignClients.set(WalletType.WALLETCONNECT, signClient);
+    useGrazInternalStore.setState({
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    useGrazSessionStore.setState({
+      wcSignClients,
+    });
+
+    const wallet = getWalletConnect();
+
+    await expect(wallet.getKey(chainId)).resolves.toMatchObject({
+      bech32Address: `${chainId}1address`,
+    });
+    expect(signClient.request).toHaveBeenCalledWith({
+      chainId: `cosmos:${chainId}`,
+      request: {
+        method: "cosmos_getAccounts",
+        params: {},
+      },
+      topic: "topic-1",
     });
   });
 });
