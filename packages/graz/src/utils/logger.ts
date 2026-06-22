@@ -1,12 +1,20 @@
 import type { ErrorReporter, Logger, LoggerOptions, LogLevel } from "../types/logger";
 import { LogCategory, LogLevel as LogLevelEnum } from "../types/logger";
 
+const normalizeCategory = (category: keyof typeof LogCategory | LogCategory): LogCategory => {
+  return LogCategory[category as keyof typeof LogCategory] ?? (category as LogCategory);
+};
+
+const normalizeCategories = (categories?: readonly (keyof typeof LogCategory)[]): Set<LogCategory> => {
+  return new Set((categories ?? []).map(normalizeCategory));
+};
+
 /**
  * GrazLogger implementation
  */
 class GrazLogger implements Logger {
   private level: LogLevel | LogLevel[] | undefined;
-  private categories: Set<string>;
+  private categories: Set<LogCategory>;
   private enabled: boolean;
   private timers: Map<string, number>;
   private errorReporter?: ErrorReporter;
@@ -96,7 +104,7 @@ class GrazLogger implements Logger {
 
     // If level not specified, default to undefined (log all levels)
     this.level = options?.level;
-    this.categories = new Set(options?.categories ?? []);
+    this.categories = normalizeCategories(options?.categories);
     // Only enable if explicitly set or if global debug flag is on
     this.enabled = options?.enabled ?? isDebugEnabled ?? false;
     this.timers = new Map();
@@ -280,7 +288,7 @@ class GrazLogger implements Logger {
   }
 
   setCategories(categories: (keyof typeof LogCategory)[] | undefined): void {
-    this.categories = new Set(categories ?? []);
+    this.categories = normalizeCategories(categories);
   }
 
   enable(): void {
