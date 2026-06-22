@@ -11,6 +11,9 @@ tsconfig.tsbuildinfo
 *.tsbuildinfo
 .tsbuildinfo
 coverage/
+integration/playwright/dist/
+integration/playwright/playwright-report/
+integration/playwright/test-results/
 example/playground/public/para-styles.css
 
 # allowed directories/files
