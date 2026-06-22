@@ -21,6 +21,18 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
           options: {
             projectId: "YOUR_WALLETCONNECT_PROJECT_ID",
           },
+          walletConnectModal: {
+            mobileWallets: [
+              {
+                id: "leap-mobile",
+                name: "Leap Mobile",
+                links: {
+                  native: "leapcosmos://",
+                  universal: "https://leapwallet.io",
+                },
+              },
+            ],
+          },
         },
       }}
     >
@@ -32,7 +44,7 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
 
 `projectId` is required to interact with WalletConnect
 
-For advance configuration see [`WalletConnectStore`](./types/WalletConnectStore.md)
+For advanced configuration, including custom mobile or desktop wallets for deep links, see [`WalletConnectStore`](./types/WalletConnectStore.md)
 
 ### Usage
 

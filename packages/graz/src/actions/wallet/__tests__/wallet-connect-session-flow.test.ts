@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const walletConnectModalMock = vi.hoisted(() => {
   const instances: Array<{
     closeModal: ReturnType<typeof vi.fn>;
+    config: unknown;
     openModal: ReturnType<typeof vi.fn>;
     subscribeModal: ReturnType<typeof vi.fn>;
   }> = [];
@@ -13,9 +14,10 @@ const walletConnectModalMock = vi.hoisted(() => {
 });
 
 vi.mock("@walletconnect/modal", () => ({
-  WalletConnectModal: vi.fn(function WalletConnectModal() {
+  WalletConnectModal: vi.fn(function WalletConnectModal(config: unknown) {
     const instance = {
       closeModal: vi.fn(),
+      config,
       openModal: vi.fn().mockResolvedValue(undefined),
       subscribeModal: vi.fn(),
     };
@@ -106,6 +108,68 @@ describe("WalletConnect first-session flow", () => {
       [osmosis.chainId]: {
         bech32Address: osmosis.bech32Address,
       },
+    });
+  });
+
+  it("passes custom mobile and desktop wallet lists to the WalletConnect modal", async () => {
+    const chainId = "cosmoshub-4";
+    const approval = vi.fn().mockResolvedValue({
+      sessionProperties: {
+        keys: JSON.stringify([makeWalletConnectKey(chainId)]),
+      },
+    });
+    const signClient = {
+      connect: vi.fn().mockResolvedValue({
+        approval,
+        uri: "wc:topic",
+      }),
+      session: {
+        getAll: vi.fn(() => []),
+      },
+    };
+    const mobileWallets = [
+      {
+        id: "leap-mobile",
+        name: "Leap Mobile",
+        links: {
+          native: "leapcosmos://",
+          universal: "https://leapwallet.io",
+        },
+      },
+    ];
+    const desktopWallets = [
+      {
+        id: "keplr-desktop",
+        name: "Keplr Desktop",
+        links: {
+          native: "keplrwallet://",
+          universal: "https://keplr.app",
+        },
+      },
+    ];
+    useGrazInternalStore.setState({
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+        walletConnectModal: {
+          desktopWallets,
+          mobileWallets,
+        },
+      },
+    });
+    useGrazSessionStore.setState({
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    const wallet = getWalletConnect();
+
+    await expect(wallet.enable([chainId])).resolves.toBeUndefined();
+
+    expect(walletConnectModalMock.instances[0]?.config).toMatchObject({
+      desktopWallets,
+      mobileWallets,
+      projectId: "project-id",
     });
   });
 

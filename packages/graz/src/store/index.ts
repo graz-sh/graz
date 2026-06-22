@@ -25,7 +25,7 @@ export interface WalletConnectStore {
   options: SignClientTypes.Options | null;
   walletConnectModal?: Pick<
     WalletConnectModalConfig,
-    "themeVariables" | "themeMode" | "privacyPolicyUrl" | "termsOfServiceUrl"
+    "themeVariables" | "themeMode" | "privacyPolicyUrl" | "termsOfServiceUrl" | "mobileWallets" | "desktopWallets"
   > | null;
 }
 
