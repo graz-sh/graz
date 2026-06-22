@@ -1,5 +1,11 @@
 # graz
 
+## 0.5.0
+
+### Minor Changes
+
+- 8296c48: Add automated library coverage and browser integration testing for Graz, including Vitest coverage across core actions, hooks, providers, wallet adapters, and utilities plus a Playwright harness with an injected Keplr-compatible wallet for connection, signer, and client flows.
+
 ## 0.4.3
 
 ### Patch Changes

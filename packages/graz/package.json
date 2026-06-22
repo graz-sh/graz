@@ -1,7 +1,7 @@
 {
   "name": "graz",
   "description": "React hooks for Cosmos",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "author": "Nur Fikri <kikiding.space@gmail.com>",
   "repository": "https://github.com/graz-sh/graz.git",
   "homepage": "https://github.com/graz-sh/graz",
