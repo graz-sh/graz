@@ -21,13 +21,7 @@ export interface UseAccountArgs {
   onDisconnect?: () => void;
 }
 
-/**
- * Return type for useAccount hook with type inference based on chainId parameter.
- */
-export interface UseAccountResult<TChainIds extends readonly string[] | undefined> {
-  data?: TChainIds extends readonly string[]
-    ? ChainIdToRecord<TChainIds, Key | undefined>
-    : Record<string, Key | undefined>;
+interface UseAccountResultBase {
   isConnected: boolean;
   isConnecting: boolean;
   isDisconnected: boolean;
@@ -36,6 +30,22 @@ export interface UseAccountResult<TChainIds extends readonly string[] | undefine
   reconnect: (args?: ReconnectArgs) => Promise<ConnectResult | undefined>;
   status: string;
   walletType?: WalletType;
+}
+
+/**
+ * Return type for useAccount hook with type inference based on chainId parameter.
+ */
+export interface UseAccountResult<TChainIds extends readonly string[] | undefined> extends UseAccountResultBase {
+  data?: TChainIds extends readonly string[]
+    ? ChainIdToRecord<TChainIds, Key | undefined>
+    : Record<string, Key | undefined>;
+}
+
+/**
+ * Return type for useAccount hook when a single chainId string is provided.
+ */
+export interface UseAccountResultSingle extends UseAccountResultBase {
+  data?: Key;
 }
 
 /**
@@ -48,7 +58,12 @@ export interface UseAccountResult<TChainIds extends readonly string[] | undefine
  * ```tsx
  * import { useAccount } from "graz";
  *
- * // Single chain with precise type inference
+ * // Single chain (string) returns a single account directly
+ * const { data: account } = useAccount({ chainId: "cosmoshub-4" });
+ * // Type: { data?: Key }
+ * account?.bech32Address; // ✅ No record indexing needed!
+ *
+ * // Single chain as array returns a keyed record
  * const { data: accounts } = useAccount({ chainId: ["cosmoshub-4"] });
  * // Type: { data?: { "cosmoshub-4": Key } }
  * const account = accounts?.["cosmoshub-4"];
@@ -75,7 +90,10 @@ export interface UseAccountResult<TChainIds extends readonly string[] | undefine
  * ```
  */
 
-// Overload: When chainId is provided with specific type
+// Overload: When chainId is a single string (returns a single account)
+export function useAccount(args: UseAccountArgs & { chainId: string }): UseAccountResultSingle;
+
+// Overload: When chainId is provided as an array with specific type
 export function useAccount<const TChainIds extends readonly string[]>(
   args: UseAccountArgs & { chainId: TChainIds },
 ): UseAccountResult<TChainIds>;
@@ -85,12 +103,18 @@ export function useAccount(args?: UseAccountArgs): UseAccountResult<undefined>;
 
 // Implementation
 export function useAccount<const TChainIds extends readonly string[] | undefined>(
-  args?: UseAccountArgs & { chainId?: TChainIds },
-): UseAccountResult<TChainIds> {
+  args?: UseAccountArgs & { chainId?: TChainIds | string },
+): UseAccountResult<TChainIds> | UseAccountResultSingle {
   const walletType = useGrazInternalStore((x) => x.walletType);
   const activeChainIds = useGrazSessionStore((x) => x.activeChainIds);
+  const isSingleChain = typeof args?.chainId === "string";
+  const chainIdArg = args?.chainId
+    ? Array.isArray(args.chainId)
+      ? args.chainId
+      : [args.chainId as string]
+    : activeChainIds || undefined;
   const activeChains = useChainsFromArgs({
-    chainId: (args?.chainId ? args.chainId : activeChainIds || undefined) as string[] | undefined,
+    chainId: chainIdArg as string[] | undefined,
   });
   const _account = useGrazSessionStore((x) => x.accounts);
   const status = useGrazSessionStore((x) => x.status);
@@ -129,8 +153,10 @@ export function useAccount<const TChainIds extends readonly string[] | undefined
       : undefined;
   }, [_account, activeChains]);
 
+  const data = isSingleChain ? account?.[args?.chainId as string] : account;
+
   return {
-    data: account as UseAccountResult<TChainIds>["data"],
+    data: data as UseAccountResult<TChainIds>["data"],
     isConnected: status === "connected",
     isConnecting: status === "connecting",
     isDisconnected: status === "disconnected",
