@@ -57,7 +57,7 @@ const boolText = (value: unknown) => (value ? "true" : "false");
 const Harness = () => {
   const chainInfo = useMemo(() => getE2EChainInfo(), []);
   const chainConfig = useMemo(() => getE2EConfig(), []);
-  const chainIds = useMemo(() => [chainInfo.chainId] as const, [chainInfo.chainId]);
+  const chainIds = useMemo(() => [chainInfo.chainId], [chainInfo.chainId]);
   const { data: isKeplrSupported } = useCheckWallet(WalletType.KEPLR);
   const account = useAccount({ chainId: chainIds });
   const activeChainIds = useActiveChainIds();
@@ -108,7 +108,7 @@ const Harness = () => {
 
   const connectWallet = async () => {
     await connect.connectAsync({
-      chainId: [chainInfo.chainId],
+      chainId: chainIds,
       walletType: WalletType.KEPLR,
       autoReconnect: true,
     });

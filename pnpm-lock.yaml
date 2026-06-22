@@ -369,6 +369,9 @@ importers:
       '@cosmjs/amino':
         specifier: 0.39.0
         version: 0.39.0
+      '@cosmjs/encoding':
+        specifier: 0.39.0
+        version: 0.39.0
       '@cosmjs/proto-signing':
         specifier: 0.39.0
         version: 0.39.0

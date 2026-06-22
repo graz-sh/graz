@@ -11,9 +11,15 @@ const readConfig = (): GrazE2EConfig => {
     throw new Error("GRAZ_E2E_WALLET_MNEMONIC is required in CI");
   }
 
-  const rpcHeaders = process.env.GRAZ_E2E_RPC_HEADERS_JSON
-    ? (JSON.parse(process.env.GRAZ_E2E_RPC_HEADERS_JSON) as Record<string, string>)
-    : undefined;
+  let rpcHeaders: Record<string, string> | undefined;
+  if (process.env.GRAZ_E2E_RPC_HEADERS_JSON) {
+    try {
+      rpcHeaders = JSON.parse(process.env.GRAZ_E2E_RPC_HEADERS_JSON) as Record<string, string>;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to parse GRAZ_E2E_RPC_HEADERS_JSON as a JSON object: ${message}`);
+    }
+  }
 
   return {
     mnemonic,

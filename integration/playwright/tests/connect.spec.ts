@@ -20,7 +20,7 @@ test.describe("Graz wallet connection", () => {
     await expect(page.getByTestId("wallet-calls")).toContainText(`enable:${grazConfig.chain.chainId}`);
 
     const address = await page.getByTestId("account-address").innerText();
-    expect(address).toMatch(new RegExp(`^${grazConfig.chain.bech32Prefix}1`));
+    expect(address.startsWith(`${grazConfig.chain.bech32Prefix}1`)).toBe(true);
     if (grazConfig.chain.expectedAddress) {
       expect(address).toBe(grazConfig.chain.expectedAddress);
     }

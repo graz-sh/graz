@@ -43,9 +43,9 @@ Environment variables:
 - `GRAZ_E2E_DENOM`
 - `GRAZ_E2E_DISPLAY_DENOM`
 - `GRAZ_E2E_GAS_PRICE`
-- `GRAZ_E2E_EXPECTED_ADDRESS`
-- `GRAZ_E2E_ENABLE_TX`
-- `GRAZ_E2E_RECIPIENT_ADDRESS`
+- `GRAZ_E2E_EXPECTED_ADDRESS` (optional)
+- `GRAZ_E2E_ENABLE_TX` (optional, defaults to disabled)
+- `GRAZ_E2E_RECIPIENT_ADDRESS` (optional, required only when tx tests are enabled)
 
 Setup pattern:
 
@@ -69,6 +69,7 @@ gh variable set GRAZ_E2E_DENOM --repo "$REPO" --env "$ENV" --body "uatom"
 gh variable set GRAZ_E2E_DISPLAY_DENOM --repo "$REPO" --env "$ENV" --body "ATOM"
 gh variable set GRAZ_E2E_GAS_PRICE --repo "$REPO" --env "$ENV" --body "0.025"
 gh variable set GRAZ_E2E_ENABLE_TX --repo "$REPO" --env "$ENV" --body "0"
+# Optional: set GRAZ_E2E_EXPECTED_ADDRESS and GRAZ_E2E_RECIPIENT_ADDRESS when needed.
 ```
 
 ### Publish (`publish.yml`)

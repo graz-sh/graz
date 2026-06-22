@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const getWalletConnectMock = vi.hoisted(() => vi.fn((params: unknown) => params));
 
@@ -41,6 +41,10 @@ describe("WalletConnect mobile wrappers", () => {
         },
       },
     });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("guards project id and mobile user agents before creating wrappers", () => {

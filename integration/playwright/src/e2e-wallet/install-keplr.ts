@@ -1,5 +1,6 @@
 import { Secp256k1HdWallet } from "@cosmjs/amino";
 import type { OfflineAminoSigner, StdSignDoc } from "@cosmjs/amino";
+import { fromBech32 } from "@cosmjs/encoding";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import type { DirectSignResponse, OfflineDirectSigner } from "@cosmjs/proto-signing";
 import type { ChainInfo, Keplr, KeplrSignOptions, Key } from "@keplr-wallet/types";
@@ -37,7 +38,7 @@ const mergeSigner = (
 export const installTestKeplrWallet = (config: GrazE2EConfig): void => {
   const mnemonic = config.mnemonic;
   if (!mnemonic) {
-    return;
+    throw new Error("GRAZ_E2E_WALLET_MNEMONIC is required to install the test Keplr wallet");
   }
 
   const chains = new Map<string, GrazE2EChainConfig>([[config.chain.chainId, config.chain]]);
@@ -77,7 +78,7 @@ export const installTestKeplrWallet = (config: GrazE2EConfig): void => {
       name: "Graz E2E Wallet",
       algo: account.algo,
       pubKey: account.pubkey,
-      address: account.pubkey,
+      address: fromBech32(account.address).data,
       bech32Address: account.address,
       ethereumHexAddress: "",
       isNanoLedger: false,
