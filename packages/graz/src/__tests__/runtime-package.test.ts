@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const packageRoot = path.resolve(__dirname, "../..");
 const pnpmBin = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
@@ -13,6 +13,13 @@ const runNode = (code: string) =>
   });
 
 describe("published package runtime shape", () => {
+  beforeAll(() => {
+    execFileSync(pnpmBin, ["build"], {
+      cwd: packageRoot,
+      encoding: "utf-8",
+    });
+  }, 120_000);
+
   it("loads the CJS entry and keeps key root exports available", () => {
     const output = runNode(`
       const graz = require("./dist/index.js");
