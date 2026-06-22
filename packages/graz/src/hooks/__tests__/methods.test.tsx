@@ -15,6 +15,7 @@ import {
   useQuerySmart,
   useSendIbcTokens,
   useSendTokens,
+  useSignAndBroadcast,
 } from "../methods";
 
 const txResponse = {
@@ -30,6 +31,37 @@ const txResponse = {
 };
 
 describe("method hooks", () => {
+  it("wraps signAndBroadcast mutations and forwards success callbacks", async () => {
+    const { wrapper } = createQueryWrapper();
+    const signAndBroadcastSuccess = vi.fn();
+    const signingClient = {
+      signAndBroadcast: vi.fn().mockResolvedValue(txResponse),
+    };
+    const messages = [{ typeUrl: "/cosmos.bank.v1beta1.MsgSend", value: {} }];
+
+    const rendered = renderHook(() => useSignAndBroadcast({ onSuccess: signAndBroadcastSuccess }), { wrapper });
+
+    await act(async () => {
+      await rendered.result.signAndBroadcastAsync({
+        fee: "auto",
+        memo: "memo",
+        messages,
+        senderAddress: "cosmos1sender",
+        signingClient: signingClient as never,
+      });
+    });
+
+    expect(signingClient.signAndBroadcast).toHaveBeenCalledWith(
+      "cosmos1sender",
+      messages,
+      "auto",
+      "memo",
+      undefined,
+    );
+    expect(signAndBroadcastSuccess).toHaveBeenCalledWith(txResponse);
+    rendered.unmount();
+  });
+
   it("wraps token transfer mutations and forwards success callbacks", async () => {
     const { wrapper } = createQueryWrapper();
     const sendTokensSuccess = vi.fn();

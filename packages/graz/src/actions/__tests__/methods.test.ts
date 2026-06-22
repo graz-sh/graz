@@ -7,6 +7,7 @@ import {
   instantiateContract,
   sendIbcTokens,
   sendTokens,
+  signAndBroadcast,
 } from "../methods";
 
 const txResponse = {
@@ -22,6 +23,59 @@ const txResponse = {
 };
 
 describe("transaction and query methods", () => {
+  it("guards signAndBroadcast inputs and delegates to the signing client", async () => {
+    await expect(
+      signAndBroadcast({
+        fee: "auto",
+        messages: [],
+      }),
+    ).rejects.toThrow("Stargate signing client is not ready");
+
+    const signingClient = {
+      signAndBroadcast: vi.fn().mockResolvedValue(txResponse),
+    };
+    const messages = [{ typeUrl: "/cosmos.bank.v1beta1.MsgSend", value: {} }];
+
+    await expect(
+      signAndBroadcast({
+        fee: "auto",
+        memo: "memo",
+        messages,
+        senderAddress: "cosmos1sender",
+        signingClient: signingClient as never,
+        timeoutHeight: 123n,
+      }),
+    ).resolves.toBe(txResponse);
+
+    expect(signingClient.signAndBroadcast).toHaveBeenCalledWith(
+      "cosmos1sender",
+      messages,
+      "auto",
+      "memo",
+      123n,
+    );
+
+    await expect(
+      signAndBroadcast({
+        fee: "auto",
+        messages,
+        senderAddress: "",
+        signingClient: signingClient as never,
+      }),
+    ).rejects.toThrow("senderAddress is not defined");
+
+    const error = new Error("broadcast failed");
+    signingClient.signAndBroadcast.mockRejectedValueOnce(error);
+    await expect(
+      signAndBroadcast({
+        fee: "auto",
+        messages,
+        senderAddress: "cosmos1sender",
+        signingClient: signingClient as never,
+      }),
+    ).rejects.toBe(error);
+  });
+
   it("guards sendTokens inputs and delegates to the signing client", async () => {
     await expect(
       sendTokens({
