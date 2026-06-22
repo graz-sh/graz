@@ -27,7 +27,6 @@
     }
   },
   "files": [
-    "chains/index.*",
     "chains/*.stub",
     "dist/*",
     "types/*",
@@ -35,7 +34,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsup && pnpm cli --generate",
+    "build": "tsup",
     "clean": "rm -rf dist/*",
     "cli": "node dist/cli.js",
     "dev": "tsup --watch",
