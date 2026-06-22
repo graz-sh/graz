@@ -1,4 +1,5 @@
 import type { ExecuteResult, InstantiateResult } from "@cosmjs/cosmwasm-stargate";
+import type { StdSignature } from "@cosmjs/amino";
 import type { DeliverTxResponse } from "@cosmjs/stargate";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -7,7 +8,9 @@ import type {
   ExecuteContractMutationArgs,
   InstantiateContractMutationArgs,
   SendIbcTokensArgs,
+  SignArbitraryArgs,
   SendTokensArgs,
+  VerifyArbitraryArgs,
 } from "../actions/methods";
 import {
   executeContract,
@@ -15,12 +18,64 @@ import {
   getQuerySmart,
   instantiateContract,
   sendIbcTokens,
+  signArbitrary,
   sendTokens,
+  verifyArbitrary,
 } from "../actions/methods";
 import type { MutationEventArgs } from "../types/hooks";
 import { LogCategory } from "../types/logger";
 import { getLogger } from "../utils/logger";
 import { useCosmWasmClient } from "./clients";
+
+/**
+ * graz mutation hook to sign arbitrary data using the active wallet.
+ *
+ * @see {@link signArbitrary}
+ */
+export const useSignArbitrary = ({
+  onError,
+  onLoading,
+  onSuccess,
+}: MutationEventArgs<SignArbitraryArgs, StdSignature> = {}) => {
+  const { mutate, mutateAsync, ...mutation } = useMutation({
+    mutationKey: ["USE_SIGN_ARBITRARY", onError, onLoading, onSuccess],
+    mutationFn: signArbitrary,
+    onError: (err, data) => Promise.resolve(onError?.(err, data)),
+    onMutate: onLoading,
+    onSuccess: (signature) => Promise.resolve(onSuccess?.(signature)),
+  });
+
+  return {
+    ...mutation,
+    signArbitrary: mutate,
+    signArbitraryAsync: mutateAsync,
+  };
+};
+
+/**
+ * graz mutation hook to verify arbitrary data using the active wallet.
+ *
+ * @see {@link verifyArbitrary}
+ */
+export const useVerifyArbitrary = ({
+  onError,
+  onLoading,
+  onSuccess,
+}: MutationEventArgs<VerifyArbitraryArgs, boolean> = {}) => {
+  const { mutate, mutateAsync, ...mutation } = useMutation({
+    mutationKey: ["USE_VERIFY_ARBITRARY", onError, onLoading, onSuccess],
+    mutationFn: verifyArbitrary,
+    onError: (err, data) => Promise.resolve(onError?.(err, data)),
+    onMutate: onLoading,
+    onSuccess: (verified) => Promise.resolve(onSuccess?.(verified)),
+  });
+
+  return {
+    ...mutation,
+    verifyArbitrary: mutate,
+    verifyArbitraryAsync: mutateAsync,
+  };
+};
 
 /**
  * graz mutation hook to send tokens.

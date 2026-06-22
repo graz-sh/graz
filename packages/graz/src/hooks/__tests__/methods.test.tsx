@@ -15,7 +15,10 @@ import {
   useQuerySmart,
   useSendIbcTokens,
   useSendTokens,
+  useSignArbitrary,
+  useVerifyArbitrary,
 } from "../methods";
+import { WalletType } from "../../types/wallet";
 
 const txResponse = {
   code: 0,
@@ -30,6 +33,54 @@ const txResponse = {
 };
 
 describe("method hooks", () => {
+  it("wraps arbitrary message signing and verification mutations", async () => {
+    const { wrapper } = createQueryWrapper();
+    const signature = {
+      pub_key: { type: "tendermint/PubKeySecp256k1", value: "pubkey" },
+      signature: "signature",
+    };
+    const wallet = {
+      signArbitrary: vi.fn().mockResolvedValue(signature),
+      verifyArbitrary: vi.fn().mockResolvedValue(true),
+    };
+    const signSuccess = vi.fn();
+    const verifySuccess = vi.fn();
+    Object.defineProperty(window, "keplr", {
+      configurable: true,
+      value: wallet,
+    });
+
+    const rendered = renderHook(
+      () => ({
+        sign: useSignArbitrary({ onSuccess: signSuccess }),
+        verify: useVerifyArbitrary({ onSuccess: verifySuccess }),
+      }),
+      { wrapper },
+    );
+
+    await act(async () => {
+      await rendered.result.sign.signArbitraryAsync({
+        chainId: "cosmoshub-4",
+        data: "hello",
+        signerAddress: "cosmos1sender",
+        walletType: WalletType.KEPLR,
+      });
+      await rendered.result.verify.verifyArbitraryAsync({
+        chainId: "cosmoshub-4",
+        data: "hello",
+        signature,
+        signerAddress: "cosmos1sender",
+        walletType: WalletType.KEPLR,
+      });
+    });
+
+    expect(wallet.signArbitrary).toHaveBeenCalledWith("cosmoshub-4", "cosmos1sender", "hello");
+    expect(wallet.verifyArbitrary).toHaveBeenCalledWith("cosmoshub-4", "cosmos1sender", "hello", signature);
+    expect(signSuccess).toHaveBeenCalledWith(signature);
+    expect(verifySuccess).toHaveBeenCalledWith(true);
+    rendered.unmount();
+  });
+
   it("wraps token transfer mutations and forwards success callbacks", async () => {
     const { wrapper } = createQueryWrapper();
     const sendTokensSuccess = vi.fn();
