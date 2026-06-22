@@ -55,8 +55,8 @@ function BroadcastMessages() {
 
 ```ts
 {
-  signingClient: SigningStargateClient;
-  senderAddress: string;
+  signingClient?: SigningStargateClient;
+  senderAddress?: string;
   messages: readonly EncodeObject[];
   fee: number | StdFee | "auto";
   memo?: string;

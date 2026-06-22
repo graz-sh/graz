@@ -36,13 +36,13 @@ export const useSignAndBroadcast = ({
 }: MutationEventArgs<SignAndBroadcastArgs, DeliverTxResponse> = {}) => {
   const logger = getLogger();
   const { mutate, mutateAsync, ...mutation } = useMutation({
-    mutationKey: ["USE_SIGN_AND_BROADCAST", onError, onLoading, onSuccess],
+    mutationKey: ["USE_SIGN_AND_BROADCAST"],
     mutationFn: signAndBroadcast,
     onError: (err, data) => {
       logger.error(LogCategory.TRANSACTION, "useSignAndBroadcast mutation failed", {
         hook: "useSignAndBroadcast",
         error: err instanceof Error ? err.message : String(err),
-        messageCount: data.messages.length,
+        messageCount: data?.messages?.length ?? 0,
       });
       return Promise.resolve(onError?.(err, data));
     },
