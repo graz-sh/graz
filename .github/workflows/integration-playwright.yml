@@ -6,7 +6,19 @@ on:
     - cron: "17 3 * * *"
   push:
     branches:
-      - main
+      - dev
+    paths:
+      - .github/workflows/integration-playwright.yml
+      - .node-version
+      - .nvmrc
+      - integration/**
+      - package.json
+      - packages/**
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - turbo.json
+  pull_request:
+    branches:
       - dev
     paths:
       - .github/workflows/integration-playwright.yml

@@ -2,6 +2,7 @@
 
 ## Invariants
 
+- `dev` is the integration/default branch. Target PRs, workflow branches, and release automation at `dev`; do not introduce `main` triggers unless explicitly requested.
 - Public API starts at `packages/graz/src/index.ts`; preserve existing action, hook, provider, wallet, type, and `graz/chains` exports.
 - `pnpm graz cli --generate` creates ignored `packages/graz/chains/index.{js,mjs,ts}` for local/example use.
 - Published files intentionally include only `chains/*.stub`, not generated `chains/index.*`; do not change this without explicit maintainer direction.

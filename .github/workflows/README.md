@@ -6,7 +6,7 @@ The workflows run on pinned `ubuntu-24.04` runner images and SHA-pinned actions 
 
 ### CI (`ci.yml`)
 
-Triggers on pushes and pull requests to `main` or `dev` when package, docs, example, dependency, or toolchain files change.
+Triggers on pushes and pull requests to `dev` when package, docs, example, dependency, or toolchain files change.
 
 Jobs:
 
@@ -23,7 +23,7 @@ Deploys the Docusaurus site from `dev` or manual dispatch using GitHub Pages act
 
 ### Playwright Integration (`integration-playwright.yml`)
 
-Runs a purpose-built browser integration harness for `graz` on trusted `main`/`dev` pushes, nightly schedule, or manual dispatch. It uses the protected `graz-integration` environment and a Keplr-compatible test wallet injected by Playwright.
+Runs a purpose-built browser integration harness for `graz` on `dev` pushes, PRs targeting `dev`, nightly schedule, or manual dispatch. It uses the protected `graz-integration` environment and a Keplr-compatible test wallet injected by Playwright.
 
 Required environment secret:
 
