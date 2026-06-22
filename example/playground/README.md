@@ -31,13 +31,7 @@ pnpm add @cosmjs/amino @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/s
 
 ### 3. Setup Environment Variables
 
-Copy the example env file and add your API keys:
-
-```bash
-cp .env.local.example .env.local
-```
-
-Edit `.env.local` and add:
+Create a `.env.local` file in this directory and add your API keys:
 
 - **WalletConnect Project ID** (Required for WalletConnect): Get one at [cloud.walletconnect.com](https://cloud.walletconnect.com)
 - **Para API Key** (Optional): Get one at [developer.getpara.com](https://developer.getpara.com)
@@ -121,7 +115,7 @@ WalletConnect enables mobile wallet connections via QR code:
 
 ## Technology Stack
 
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 16 (App Router)
 - **Styling**: Tailwind CSS + shadcn/ui
 - **State Management**: TanStack Query (React Query)
 - **Wallet Integration**: Graz

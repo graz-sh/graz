@@ -1,8 +1,10 @@
+import type { StdSignature } from "@cosmjs/amino";
 import type { ChainInfo } from "@keplr-wallet/types";
+import type { QueryClient } from "@tanstack/react-query";
 
-// Import for local use in this file
 import type { ParaWeb } from "@getpara/web-sdk";
-import type { ParaGrazConfig as ExternalParaGrazConfig, ParaGrazConnector } from "@getpara/graz-connector";
+
+import type { Wallet } from "./wallet";
 
 /**
  * Para Web SDK client type
@@ -44,9 +46,10 @@ export interface ParaWallet {
 
 /**
  * Event callbacks for Para wallet connector lifecycle events
- * Extracted from @getpara/graz-connector ParaGrazConfig
  */
-export type ParaGrazConnectorEvents = NonNullable<ExternalParaGrazConfig["events"]>;
+export interface ParaGrazConnectorEvents {
+  onEnabled?: (chainIds: string[], connector: ParaGrazConnector) => void;
+}
 
 /**
  * Modal props for Para wallet UI
@@ -99,10 +102,28 @@ export interface ParaGrazConfig {
    * Should match the client used in your app's QueryClientProvider
    * Only needed when using @getpara/graz-integration with modal support
    */
-  queryClient?: import("@tanstack/react-query").QueryClient;
+  queryClient?: QueryClient;
 }
 
 /**
  * Para wallet connector interface
- * Implements the Graz Wallet interface with Para-specific methods
+ *
+ * Structural contract for the connector instance provided by
+ * @getpara/graz-integration. Defined here so graz's published types stay
+ * self-contained and do not pin a specific @getpara/graz-connector install.
  */
+export interface ParaGrazConnector
+  extends Pick<
+    Wallet,
+    | "enable"
+    | "getKey"
+    | "getOfflineSigner"
+    | "getOfflineSignerOnlyAmino"
+    | "getOfflineSignerAuto"
+    | "signAmino"
+    | "signDirect"
+  > {
+  disconnect: () => Promise<void>;
+  getParaWebClient: () => ParaWeb;
+  signArbitrary: (chainId: string, signer: string, data: string | Uint8Array) => Promise<StdSignature>;
+}

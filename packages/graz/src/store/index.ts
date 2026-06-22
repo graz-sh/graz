@@ -8,10 +8,9 @@ import { persist, subscribeWithSelector } from "zustand/middleware";
 
 import type { Dictionary } from "../types/core";
 import { LogCategory, type LogLevel } from "../types/logger";
-import type { ParaGrazConfig } from "../types/para";
+import type { ParaGrazConfig, ParaGrazConnector } from "../types/para";
 import type { Key } from "../types/wallet";
 import { WalletType } from "../types/wallet";
-import type { ParaGrazConnector } from "@getpara/graz-connector";
 
 export interface ChainConfig {
   path?: string;

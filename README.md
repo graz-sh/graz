@@ -11,7 +11,7 @@
 ## Features
 
 - 🪝 20+ hooks for interfacing with wallets, clients, signers, etc. (connecting, view balances, send tokens, etc.)
-- 💳 Multiple wallet supports (Keplr, Leap, Cosmostation, Vectis, Station, XDefi, Metamask Snap, WalletConnect, Compass, Initia, OKX, Para)
+- 💳 Multiple wallet supports (Keplr, Leap, Cosmostation, Vectis, Station, XDefi, Metamask Snap, WalletConnect, Compass, Initia, OKX, Para, Cactus)
 - ⚙️ Generate mainnet & testnet `ChainInfo`
 - 📚 Built-in caching, request deduplication, and all the good stuff from [`@tanstack/react-query`](https://tanstack.com/query) and [`zustand`](https://github.com/pmndrs/zustand)
 - 🔄 Auto refresh on wallet and network change
@@ -41,17 +41,17 @@ pnpm add graz
 
 ### Install peer dependencies
 
-To avoid version missmatch we dcided to make these packages as peer dependencies
+To avoid version mismatch we decided to make these packages peer dependencies
 
 ```shell
 # using npm
-npm install @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding
+npm install @cosmjs/amino @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding
 
 # using yarn
-yarn add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding
+yarn add @cosmjs/amino @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding
 
 # using pnpm
-pnpm add @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding
+pnpm add @cosmjs/amino @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding
 ```
 
 ## Quick start
@@ -61,18 +61,13 @@ Wrap your React app with `<QueryClientProvider />` and `<GrazProvider />`, and u
 ```jsx
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GrazProvider } from "graz";
+import { cosmoshub } from "graz/chains";
 
 const queryClient = new QueryClient();
 
-const cosmoshub: ChainInfo = {
-  chainId: "cosmoshub-4",
-  chainName: "Cosmos Hub",
-  //... rest of cosmoshub ChainInfo
-}
-
 function App() {
   return (
-    <QueryClientProvider queryClient={queryClient}>
+    <QueryClientProvider client={queryClient}>
       <GrazProvider grazOptions={{
         chains: [cosmoshub]
       }}>
@@ -84,15 +79,19 @@ function App() {
 ```
 
 ```jsx
-import { mainnetChains, useAccount, useConnect, useDisconnect } from "graz";
+import { useAccount, useConnect, useDisconnect } from "graz";
+import { cosmoshub } from "graz/chains";
 
 function Wallet() {
   const { connect, status } = useConnect();
-  const { data: account, isConnected } = useAccount();
+  // useAccount returns a Record keyed by chain id: Record<chainId, Key>
+  const { data: accounts, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
 
+  const account = accounts?.[cosmoshub.chainId];
+
   function handleConnect() {
-    return isConnected ? disconnect() : connect();
+    return isConnected ? disconnect() : connect({ chainId: cosmoshub.chainId });
   }
 
   return (

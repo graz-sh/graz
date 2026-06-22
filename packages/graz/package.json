@@ -81,7 +81,6 @@
     "@cosmjs/encoding": "0.39.0",
     "@cosmjs/proto-signing": "0.39.0",
     "@cosmjs/stargate": "0.39.0",
-    "@getpara/graz-connector": "3.3.0",
     "@getpara/web-sdk": "3.3.0",
     "@types/node": "26.0.0",
     "@types/react": "19.2.17",

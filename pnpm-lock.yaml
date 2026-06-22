@@ -418,9 +418,6 @@ importers:
       '@cosmjs/stargate':
         specifier: 0.39.0
         version: 0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      '@getpara/graz-connector':
-        specifier: 3.3.0
-        version: 3.3.0(@cosmjs/amino@0.39.0)(@cosmjs/encoding@0.39.0)(@cosmjs/proto-signing@0.39.0)(@cosmjs/stargate@0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@cosmjs/tendermint-rpc@0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@keplr-wallet/types@0.13.39(starknet@8.9.2))(cosmjs-types@0.11.0)(graz@0.4.2(@cosmjs/amino@0.39.0)(@cosmjs/cosmwasm-stargate@0.38.1(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@cosmjs/encoding@0.39.0)(@cosmjs/proto-signing@0.39.0)(@cosmjs/stargate@0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@tanstack/react-query@5.101.0(react@19.2.7))(@types/react@19.2.17)(bufferutil@4.1.0)(immer@9.0.21)(react@19.2.7)(starknet@8.9.2)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.7))(utf-8-validate@5.0.10)(zod@4.4.3))
       '@getpara/web-sdk':
         specifier: 3.3.0
         version: 3.3.0
@@ -2684,9 +2681,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@initia/initia-registry-types@0.0.20':
-    resolution: {integrity: sha512-tzHtJoFaltpFAQv3/c/vd49/RBxa1DS2gHN448U8FY3jZ20np4TXciCHDieNO0xIVW7oWfXk/kyW7l7OMLzK9w==}
-
   '@initia/initia-registry-types@1.0.13':
     resolution: {integrity: sha512-J6dB0Dv2n3wt2ARsMAmiOrxsE0sCG4jzqXzVts4VqaAk5SsPdvfMFpLEAuBIdB2ubTMLLbjlSy7e1WRjctnfag==}
 
@@ -2849,22 +2843,11 @@ packages:
     peerDependencies:
       tslib: '2'
 
-  '@keplr-wallet/common@0.12.156':
-    resolution: {integrity: sha512-E9OyrFI9OiTkCUX2QK2ZMsTMYcbPAPLOpZ9Bl/1cLoOMjlgrPAGYsHm8pmWt2ydnWJS10a4ckOmlxE5HgcOK1A==}
-
   '@keplr-wallet/common@0.13.39':
     resolution: {integrity: sha512-39dsPTp7rZJkmuHTMimFa3u0Nug2R1rp9d6DweK0hDSFIPuORhYMAuqimHW6B1pNv1OskhwgLw07JHC242yO0A==}
 
-  '@keplr-wallet/cosmos@0.12.156':
-    resolution: {integrity: sha512-ru+PDOiJaC6Lke7cWVG1A/bOzoNXAHmWyt8S+1WF3lt0ZKwCe+rb+HGkfhHCji2WA8Dt4cU8GGN/nPXfoY0b6Q==}
-
   '@keplr-wallet/cosmos@0.13.39':
     resolution: {integrity: sha512-b3EbXjpioilPEwQm2xt2zyrV9MSuTjtEvygBhSzbm8Klw/oFnWOe84ZFiksgm8FtG8EKr1tKkRHEpjcgU6KHsA==}
-
-  '@keplr-wallet/crypto@0.12.156':
-    resolution: {integrity: sha512-pIm9CkFQH4s9J8YunluGJvsh6KeE7HappeHM5BzKXyzuDO/gDtOQizclev9hGcfJxNu6ejlYXLK7kTmWpsHR0Q==}
-    peerDependencies:
-      starknet: 8.9.2
 
   '@keplr-wallet/crypto@0.13.39':
     resolution: {integrity: sha512-9th9yKYAgzjOHGoJ8iQ6wJChWMdO4gwyhs9Vw7yFLCOabQdF5Kt3wU56aQBfddbyp7xswW1DEI6wMcZnzNhlPQ==}
@@ -2875,14 +2858,8 @@ packages:
   '@keplr-wallet/proto-types@0.12.12':
     resolution: {integrity: sha512-iAqqNlJpxu/8j+SwOXEH2ymM4W0anfxn+eNeWuqz2c/0JxGTWeLURioxQmCtewtllfHdDHHcoQ7/S+NmXiaEgQ==}
 
-  '@keplr-wallet/proto-types@0.12.156':
-    resolution: {integrity: sha512-jxFgL1PZQldmr54gm1bFCs4FXujpyu8BhogytEc9WTCJdH4uqkNOCvEfkDvR65LRUZwp6MIGobFGYDVmfK16hA==}
-
   '@keplr-wallet/proto-types@0.13.39':
     resolution: {integrity: sha512-OlmAmxOYoQN4dbDKrfw2cfiYDytn4Gby65+SqxjzKHmMfY6ySfCUmZ1IHyipV8W160sI3ekZF3/D2wRAvLNmow==}
-
-  '@keplr-wallet/simple-fetch@0.12.156':
-    resolution: {integrity: sha512-FPgpxEBjG6xRbMM0IwHSmYy22lU+QJ3VzmKTM8237p3v9Vj/HBSZUCYFhq2E1+hwdxd+XLtA6UipB7SBQNswrw==}
 
   '@keplr-wallet/simple-fetch@0.13.39':
     resolution: {integrity: sha512-/PcYc1rDrJ3FWdfIYBSmoM7ot4j8yonK6JUSqmlmUp1s65n8lfoc8vzhzG4Mzt7K8HTIV4HqiU5h63EHHdgAyA==}
@@ -2890,18 +2867,10 @@ packages:
   '@keplr-wallet/types@0.12.12':
     resolution: {integrity: sha512-fo6b8j9EXnJukGvZorifJWEm1BPIrvaTLuu5PqaU5k1ANDasm/FL1NaUuaTBVvhRjINtvVXqYpW/rVUinA9MBA==}
 
-  '@keplr-wallet/types@0.12.156':
-    resolution: {integrity: sha512-Z/Lf6VEsl/Am3birKE8ZEVZj/x5YGSoTdFMDtq/EfcB+hcJ/ogoiZTVEBweAig/2zcu7MsZvFTVMEXu5+y3e4A==}
-    peerDependencies:
-      starknet: 8.9.2
-
   '@keplr-wallet/types@0.13.39':
     resolution: {integrity: sha512-rq6r5zi/42Cxq4QRpsxx5mQ7aMky9xOOD6LjalK3JFl675nVz6mkamVMgkZNhWtOZBE2sMBcT3Yo8WXGehIR4A==}
     peerDependencies:
       starknet: 8.9.2
-
-  '@keplr-wallet/unit@0.12.156':
-    resolution: {integrity: sha512-GGMOFsGCTv36ZWEBt8ONgYw64zYRsYmaV4ZccNHGo8NGWwQwB6OhcVYpwvjbZdB4K9tsQNJQEv16qsSpurDBGQ==}
 
   '@keplr-wallet/unit@0.13.39':
     resolution: {integrity: sha512-J8LWVP2q39R0B95xEOkweYFkt94roAL8M66WKuzSO8auhp7LIr4g3l1Q4Taail+oeZGqTN0yl3GTEzg2yKfqzg==}
@@ -5769,10 +5738,6 @@ packages:
       typescript:
         optional: true
 
-  '@walletconnect/core@2.20.2':
-    resolution: {integrity: sha512-48XnarxQQrpJ0KZJOjit56DxuzfVRYUdL8XVMvUh/ZNUiX2FB5w6YuljUUeTLfYOf04Et6qhVGEUkmX3W+9/8w==}
-    engines: {node: '>=18'}
-
   '@walletconnect/core@2.21.0':
     resolution: {integrity: sha512-o6R7Ua4myxR8aRUAJ1z3gT9nM+jd2B2mfamu6arzy1Cc6vi10fIwFWb6vg3bC8xJ6o9H3n/cN5TOW3aA9Y1XVw==}
     engines: {node: '>=18'}
@@ -5850,10 +5815,6 @@ packages:
   '@walletconnect/safe-json@1.0.2':
     resolution: {integrity: sha512-Ogb7I27kZ3LPC3ibn8ldyUr5544t3/STow9+lzz7Sfo808YD7SBWk7SAsdBFlYgP2zDRy2hS3sKRcuSRM0OTmA==}
 
-  '@walletconnect/sign-client@2.20.2':
-    resolution: {integrity: sha512-KyeDToypZ1OjCbij4Jx0cAg46bMwZ6zCKt0HzCkqENcex3Zchs7xBp9r8GtfEMGw+PUnXwqrhzmLBH0x/43oIQ==}
-    deprecated: 'Reliability and performance improvements. See: https://github.com/WalletConnect/walletconnect-monorepo/releases'
-
   '@walletconnect/sign-client@2.21.0':
     resolution: {integrity: sha512-z7h+PeLa5Au2R591d/8ZlziE0stJvdzP9jNFzFolf2RG/OiXulgFKum8PrIyXy+Rg2q95U9nRVUF9fWcn78yBA==}
     deprecated: 'Reliability and performance improvements. See: https://github.com/WalletConnect/walletconnect-monorepo/releases'
@@ -5871,9 +5832,6 @@ packages:
 
   '@walletconnect/time@1.0.2':
     resolution: {integrity: sha512-uzdd9woDcJ1AaBZRhqy5rNC9laqWGErfc4dxA9a87mPdKOgWMD85mcFo9dIYIts/Jwocfwn07EC6EzclKubk/g==}
-
-  '@walletconnect/types@2.20.2':
-    resolution: {integrity: sha512-XPPbJM/mGU05i6jUxhC3yI/YvhSF6TYJQ5SXTWM53lVe6hs6ukvlEhPctu9ZBTGwGFhwPXIjtK/eWx+v4WY5iw==}
 
   '@walletconnect/types@2.21.0':
     resolution: {integrity: sha512-ll+9upzqt95ZBWcfkOszXZkfnpbJJ2CmxMfGgE5GmhdxxxCcO5bGhXkI+x8OpiS555RJ/v/sXJYMSOLkmu4fFw==}
@@ -5898,9 +5856,6 @@ packages:
   '@walletconnect/universal-provider@2.21.8':
     resolution: {integrity: sha512-Nc1Z6VXnya152yucNDPnlTkrhG289tCUfcjiWqDmwNYzFSfdT5oJQHlnffQXlvoks90kn5Ru8Rnwag2CH1YOVQ==}
     deprecated: 'Reliability and performance improvements. See: https://github.com/WalletConnect/walletconnect-monorepo/releases'
-
-  '@walletconnect/utils@2.20.2':
-    resolution: {integrity: sha512-2uRUDvpYSIJFYcr1WIuiFy6CEszLF030o6W8aDMkGk9/MfAZYEJQHMJcjWyaNMPHLJT0POR5lPaqkYOpuyPIQQ==}
 
   '@walletconnect/utils@2.21.0':
     resolution: {integrity: sha512-zfHLiUoBrQ8rP57HTPXW7rQMnYxYI4gT9yTACxVW6LhIFROTF6/ytm5SKNoIvi4a5nX5dfXG4D9XwQUCu8Ilig==}
@@ -8133,22 +8088,6 @@ packages:
   gray-matter@4.0.3:
     resolution: {integrity: sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q==}
     engines: {node: '>=6.0'}
-
-  graz@0.4.2:
-    resolution: {integrity: sha512-xwlFGx/v7syuCdyoBorARQmQu5Ix+H7gh88zIFc7azirzJnJmON89EVqCfRnnhajD1Zo0xPbIGoVxBZK0VflFQ==}
-    hasBin: true
-    peerDependencies:
-      '@cosmjs/amino': 0.39.0
-      '@cosmjs/cosmwasm-stargate': '>=0.32.4'
-      '@cosmjs/encoding': 0.39.0
-      '@cosmjs/proto-signing': 0.39.0
-      '@cosmjs/stargate': 0.39.0
-      '@getpara/graz-integration': '*'
-      '@tanstack/react-query': '>=5.0.0'
-      react: '>=17'
-    peerDependenciesMeta:
-      '@getpara/graz-integration':
-        optional: true
 
   gzip-size@6.0.0:
     resolution: {integrity: sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==}
@@ -12752,24 +12691,6 @@ packages:
       use-sync-external-store:
         optional: true
 
-  zustand@5.0.4:
-    resolution: {integrity: sha512-39VFTN5InDtMd28ZhjLyuTnlytDr9HfwO512Ai4I8ZABCoyAj4F1+sr7sD1jP/+p7k77Iko0Pb5NhgBFDCX0kQ==}
-    engines: {node: '>=12.20.0'}
-    peerDependencies:
-      '@types/react': '>=18.0.0'
-      immer: '>=9.0.6'
-      react: '>=18.0.0'
-      use-sync-external-store: 1.6.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      immer:
-        optional: true
-      react:
-        optional: true
-      use-sync-external-store:
-        optional: true
-
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
@@ -16656,23 +16577,6 @@ snapshots:
       - debug
       - supports-color
 
-  '@getpara/graz-connector@3.3.0(@cosmjs/amino@0.39.0)(@cosmjs/encoding@0.39.0)(@cosmjs/proto-signing@0.39.0)(@cosmjs/stargate@0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@cosmjs/tendermint-rpc@0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@keplr-wallet/types@0.13.39(starknet@8.9.2))(cosmjs-types@0.11.0)(graz@0.4.2(@cosmjs/amino@0.39.0)(@cosmjs/cosmwasm-stargate@0.38.1(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@cosmjs/encoding@0.39.0)(@cosmjs/proto-signing@0.39.0)(@cosmjs/stargate@0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@tanstack/react-query@5.101.0(react@19.2.7))(@types/react@19.2.17)(bufferutil@4.1.0)(immer@9.0.21)(react@19.2.7)(starknet@8.9.2)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.7))(utf-8-validate@5.0.10)(zod@4.4.3))':
-    dependencies:
-      '@cosmjs/amino': 0.39.0
-      '@cosmjs/encoding': 0.39.0
-      '@cosmjs/proto-signing': 0.39.0
-      '@cosmjs/stargate': 0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      '@cosmjs/tendermint-rpc': 0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      '@getpara/cosmjs-v0-integration': 3.3.0(@cosmjs/amino@0.39.0)(@cosmjs/encoding@0.39.0)(@cosmjs/proto-signing@0.39.0)(@cosmjs/stargate@0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
-      '@getpara/web-sdk': 3.3.0
-      '@keplr-wallet/types': 0.13.39(starknet@8.9.2)
-      cosmjs-types: 0.11.0
-      graz: 0.4.2(@cosmjs/amino@0.39.0)(@cosmjs/cosmwasm-stargate@0.38.1(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@cosmjs/encoding@0.39.0)(@cosmjs/proto-signing@0.39.0)(@cosmjs/stargate@0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@tanstack/react-query@5.101.0(react@19.2.7))(@types/react@19.2.17)(bufferutil@4.1.0)(immer@9.0.21)(react@19.2.7)(starknet@8.9.2)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.7))(utf-8-validate@5.0.10)(zod@4.4.3)
-    transitivePeerDependencies:
-      - '@farcaster/miniapp-sdk'
-      - debug
-      - supports-color
-
   '@getpara/graz-connector@3.3.0(@cosmjs/amino@0.39.0)(@cosmjs/encoding@0.39.0)(@cosmjs/proto-signing@0.39.0)(@cosmjs/stargate@0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@cosmjs/tendermint-rpc@0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@keplr-wallet/types@0.13.39(starknet@8.9.2))(cosmjs-types@0.11.0)(graz@packages+graz)':
     dependencies:
       '@cosmjs/amino': 0.39.0
@@ -17152,10 +17056,6 @@ snapshots:
   '@img/sharp-win32-x64@0.34.5':
     optional: true
 
-  '@initia/initia-registry-types@0.0.20':
-    dependencies:
-      zod: 3.25.76
-
   '@initia/initia-registry-types@1.0.13':
     dependencies:
       zod: 3.25.76
@@ -17333,15 +17233,6 @@ snapshots:
       '@jsonjoy.com/codegen': 17.67.0(tslib@2.8.1)
       tslib: 2.8.1
 
-  '@keplr-wallet/common@0.12.156(starknet@8.9.2)':
-    dependencies:
-      '@keplr-wallet/crypto': 0.12.156(starknet@8.9.2)
-      '@keplr-wallet/types': 0.12.156(starknet@8.9.2)
-      buffer: 6.0.3
-      delay: 4.4.1
-    transitivePeerDependencies:
-      - starknet
-
   '@keplr-wallet/common@0.13.39(bitcoinjs-lib@6.1.7)(starknet@8.9.2)':
     dependencies:
       '@keplr-wallet/crypto': 0.13.39(bitcoinjs-lib@6.1.7)(starknet@8.9.2)
@@ -17351,22 +17242,6 @@ snapshots:
       p-queue: 6.6.2
     transitivePeerDependencies:
       - bitcoinjs-lib
-      - starknet
-
-  '@keplr-wallet/cosmos@0.12.156(starknet@8.9.2)':
-    dependencies:
-      '@ethersproject/address': 5.8.0
-      '@keplr-wallet/common': 0.12.156(starknet@8.9.2)
-      '@keplr-wallet/crypto': 0.12.156(starknet@8.9.2)
-      '@keplr-wallet/proto-types': 0.12.156
-      '@keplr-wallet/simple-fetch': 0.12.156
-      '@keplr-wallet/types': 0.12.156(starknet@8.9.2)
-      '@keplr-wallet/unit': 0.12.156(starknet@8.9.2)
-      bech32: 1.1.4
-      buffer: 6.0.3
-      long: 4.0.0
-      protobufjs: 6.11.6
-    transitivePeerDependencies:
       - starknet
 
   '@keplr-wallet/cosmos@0.13.39(bitcoinjs-lib@6.1.7)(starknet@8.9.2)':
@@ -17387,16 +17262,6 @@ snapshots:
       - bitcoinjs-lib
       - starknet
 
-  '@keplr-wallet/crypto@0.12.156(starknet@8.9.2)':
-    dependencies:
-      '@noble/curves': 1.9.7
-      '@noble/hashes': 1.8.0
-      bip32: 2.0.6
-      bip39: 3.1.0
-      bs58check: 2.1.2
-      buffer: 6.0.3
-      starknet: 8.9.2
-
   '@keplr-wallet/crypto@0.13.39(bitcoinjs-lib@6.1.7)(starknet@8.9.2)':
     dependencies:
       '@noble/curves': 1.9.7
@@ -17414,17 +17279,10 @@ snapshots:
       long: 4.0.0
       protobufjs: 6.11.6
 
-  '@keplr-wallet/proto-types@0.12.156':
-    dependencies:
-      long: 4.0.0
-      protobufjs: 6.11.6
-
   '@keplr-wallet/proto-types@0.13.39':
     dependencies:
       long: 4.0.0
       protobufjs: 6.11.6
-
-  '@keplr-wallet/simple-fetch@0.12.156': {}
 
   '@keplr-wallet/simple-fetch@0.13.39': {}
 
@@ -17432,23 +17290,10 @@ snapshots:
     dependencies:
       long: 4.0.0
 
-  '@keplr-wallet/types@0.12.156(starknet@8.9.2)':
-    dependencies:
-      long: 4.0.0
-      starknet: 8.9.2
-
   '@keplr-wallet/types@0.13.39(starknet@8.9.2)':
     dependencies:
       long: 4.0.0
       starknet: 8.9.2
-
-  '@keplr-wallet/unit@0.12.156(starknet@8.9.2)':
-    dependencies:
-      '@keplr-wallet/types': 0.12.156(starknet@8.9.2)
-      big-integer: 1.6.52
-      utility-types: 3.11.0
-    transitivePeerDependencies:
-      - starknet
 
   '@keplr-wallet/unit@0.13.39(starknet@8.9.2)':
     dependencies:
@@ -21938,50 +21783,6 @@ snapshots:
       - react
       - use-sync-external-store
 
-  '@walletconnect/core@2.20.2(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@4.4.3)':
-    dependencies:
-      '@walletconnect/heartbeat': 1.2.2
-      '@walletconnect/jsonrpc-provider': 1.0.14
-      '@walletconnect/jsonrpc-types': 1.0.4
-      '@walletconnect/jsonrpc-utils': 1.0.8
-      '@walletconnect/jsonrpc-ws-connection': 1.0.16(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      '@walletconnect/keyvaluestorage': 1.1.1
-      '@walletconnect/logger': 2.1.2
-      '@walletconnect/relay-api': 1.0.11
-      '@walletconnect/relay-auth': 1.1.0
-      '@walletconnect/safe-json': 1.0.2
-      '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.20.2
-      '@walletconnect/utils': 2.20.2(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@4.4.3)
-      '@walletconnect/window-getters': 1.0.1
-      es-toolkit: 1.33.0
-      events: 3.3.0
-      uint8arrays: 3.1.0
-    transitivePeerDependencies:
-      - '@azure/app-configuration'
-      - '@azure/cosmos'
-      - '@azure/data-tables'
-      - '@azure/identity'
-      - '@azure/keyvault-secrets'
-      - '@azure/storage-blob'
-      - '@capacitor/preferences'
-      - '@deno/kv'
-      - '@netlify/blobs'
-      - '@planetscale/database'
-      - '@react-native-async-storage/async-storage'
-      - '@upstash/redis'
-      - '@vercel/blob'
-      - '@vercel/functions'
-      - '@vercel/kv'
-      - aws4fetch
-      - bufferutil
-      - db0
-      - ioredis
-      - typescript
-      - uploadthing
-      - utf-8-validate
-      - zod
-
   '@walletconnect/core@2.21.0(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
       '@walletconnect/heartbeat': 1.2.2
@@ -22641,42 +22442,6 @@ snapshots:
     dependencies:
       tslib: 1.14.1
 
-  '@walletconnect/sign-client@2.20.2(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@4.4.3)':
-    dependencies:
-      '@walletconnect/core': 2.20.2(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@4.4.3)
-      '@walletconnect/events': 1.0.1
-      '@walletconnect/heartbeat': 1.2.2
-      '@walletconnect/jsonrpc-utils': 1.0.8
-      '@walletconnect/logger': 2.1.2
-      '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.20.2
-      '@walletconnect/utils': 2.20.2(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@4.4.3)
-      events: 3.3.0
-    transitivePeerDependencies:
-      - '@azure/app-configuration'
-      - '@azure/cosmos'
-      - '@azure/data-tables'
-      - '@azure/identity'
-      - '@azure/keyvault-secrets'
-      - '@azure/storage-blob'
-      - '@capacitor/preferences'
-      - '@deno/kv'
-      - '@netlify/blobs'
-      - '@planetscale/database'
-      - '@react-native-async-storage/async-storage'
-      - '@upstash/redis'
-      - '@vercel/blob'
-      - '@vercel/functions'
-      - '@vercel/kv'
-      - aws4fetch
-      - bufferutil
-      - db0
-      - ioredis
-      - typescript
-      - uploadthing
-      - utf-8-validate
-      - zod
-
   '@walletconnect/sign-client@2.21.0(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
       '@walletconnect/core': 2.21.0(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@3.25.76)
@@ -23006,35 +22771,6 @@ snapshots:
   '@walletconnect/time@1.0.2':
     dependencies:
       tslib: 1.14.1
-
-  '@walletconnect/types@2.20.2':
-    dependencies:
-      '@walletconnect/events': 1.0.1
-      '@walletconnect/heartbeat': 1.2.2
-      '@walletconnect/jsonrpc-types': 1.0.4
-      '@walletconnect/keyvaluestorage': 1.1.1
-      '@walletconnect/logger': 2.1.2
-      events: 3.3.0
-    transitivePeerDependencies:
-      - '@azure/app-configuration'
-      - '@azure/cosmos'
-      - '@azure/data-tables'
-      - '@azure/identity'
-      - '@azure/keyvault-secrets'
-      - '@azure/storage-blob'
-      - '@capacitor/preferences'
-      - '@deno/kv'
-      - '@netlify/blobs'
-      - '@planetscale/database'
-      - '@react-native-async-storage/async-storage'
-      - '@upstash/redis'
-      - '@vercel/blob'
-      - '@vercel/functions'
-      - '@vercel/kv'
-      - aws4fetch
-      - db0
-      - ioredis
-      - uploadthing
 
   '@walletconnect/types@2.21.0':
     dependencies:
@@ -23468,50 +23204,6 @@ snapshots:
       - bufferutil
       - db0
       - encoding
-      - ioredis
-      - typescript
-      - uploadthing
-      - utf-8-validate
-      - zod
-
-  '@walletconnect/utils@2.20.2(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@4.4.3)':
-    dependencies:
-      '@noble/ciphers': 1.2.1
-      '@noble/curves': 1.8.1
-      '@noble/hashes': 1.7.1
-      '@walletconnect/jsonrpc-utils': 1.0.8
-      '@walletconnect/keyvaluestorage': 1.1.1
-      '@walletconnect/relay-api': 1.0.11
-      '@walletconnect/relay-auth': 1.1.0
-      '@walletconnect/safe-json': 1.0.2
-      '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.20.2
-      '@walletconnect/window-getters': 1.0.1
-      '@walletconnect/window-metadata': 1.0.1
-      bs58: 6.0.0
-      detect-browser: 5.3.0
-      query-string: 7.1.3
-      uint8arrays: 3.1.0
-      viem: 2.52.2(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@4.4.3)
-    transitivePeerDependencies:
-      - '@azure/app-configuration'
-      - '@azure/cosmos'
-      - '@azure/data-tables'
-      - '@azure/identity'
-      - '@azure/keyvault-secrets'
-      - '@azure/storage-blob'
-      - '@capacitor/preferences'
-      - '@deno/kv'
-      - '@netlify/blobs'
-      - '@planetscale/database'
-      - '@react-native-async-storage/async-storage'
-      - '@upstash/redis'
-      - '@vercel/blob'
-      - '@vercel/functions'
-      - '@vercel/kv'
-      - aws4fetch
-      - bufferutil
-      - db0
       - ioredis
       - typescript
       - uploadthing
@@ -26707,59 +26399,6 @@ snapshots:
       kind-of: 6.0.3
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
-
-  graz@0.4.2(@cosmjs/amino@0.39.0)(@cosmjs/cosmwasm-stargate@0.38.1(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@cosmjs/encoding@0.39.0)(@cosmjs/proto-signing@0.39.0)(@cosmjs/stargate@0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@tanstack/react-query@5.101.0(react@19.2.7))(@types/react@19.2.17)(bufferutil@4.1.0)(immer@9.0.21)(react@19.2.7)(starknet@8.9.2)(typescript@6.0.3)(use-sync-external-store@1.6.0(react@19.2.7))(utf-8-validate@5.0.10)(zod@4.4.3):
-    dependencies:
-      '@cosmjs/amino': 0.39.0
-      '@cosmjs/cosmwasm-stargate': 0.38.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      '@cosmjs/encoding': 0.39.0
-      '@cosmjs/proto-signing': 0.39.0
-      '@cosmjs/stargate': 0.39.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      '@cosmsnap/snapper': 0.2.7
-      '@dao-dao/cosmiframe': 1.0.0(@cosmjs/amino@0.39.0)(@cosmjs/proto-signing@0.39.0)
-      '@initia/initia-registry-types': 0.0.20
-      '@keplr-wallet/cosmos': 0.12.156(starknet@8.9.2)
-      '@keplr-wallet/types': 0.12.156(starknet@8.9.2)
-      '@tanstack/react-query': 5.101.0(react@19.2.7)
-      '@vectis/extension-client': 0.7.2
-      '@walletconnect/modal': 2.7.0(@types/react@19.2.17)(react@19.2.7)
-      '@walletconnect/sign-client': 2.20.2(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@4.4.3)
-      '@walletconnect/types': 2.20.2
-      '@walletconnect/utils': 2.20.2(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@4.4.3)
-      cosmos-directory-client: 0.0.6
-      long: 4.0.0
-      p-map: 4.0.0
-      react: 19.2.7
-      zustand: 5.0.4(@types/react@19.2.17)(immer@9.0.21)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
-    transitivePeerDependencies:
-      - '@azure/app-configuration'
-      - '@azure/cosmos'
-      - '@azure/data-tables'
-      - '@azure/identity'
-      - '@azure/keyvault-secrets'
-      - '@azure/storage-blob'
-      - '@capacitor/preferences'
-      - '@deno/kv'
-      - '@netlify/blobs'
-      - '@planetscale/database'
-      - '@react-native-async-storage/async-storage'
-      - '@types/react'
-      - '@upstash/redis'
-      - '@vercel/blob'
-      - '@vercel/functions'
-      - '@vercel/kv'
-      - aws4fetch
-      - bufferutil
-      - db0
-      - encoding
-      - immer
-      - ioredis
-      - starknet
-      - typescript
-      - uploadthing
-      - use-sync-external-store
-      - utf-8-validate
-      - zod
 
   gzip-size@6.0.0:
     dependencies:
@@ -32646,13 +32285,6 @@ snapshots:
       use-sync-external-store: 1.6.0(react@19.2.7)
 
   zustand@5.0.3(@types/react@19.2.17)(immer@9.0.21)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7)):
-    optionalDependencies:
-      '@types/react': 19.2.17
-      immer: 9.0.21
-      react: 19.2.7
-      use-sync-external-store: 1.6.0(react@19.2.7)
-
-  zustand@5.0.4(@types/react@19.2.17)(immer@9.0.21)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7)):
     optionalDependencies:
       '@types/react': 19.2.17
       immer: 9.0.21
