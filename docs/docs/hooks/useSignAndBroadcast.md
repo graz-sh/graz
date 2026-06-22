@@ -64,6 +64,8 @@ function BroadcastMessages() {
 }
 ```
 
+`signingClient` and `senderAddress` are optional so the hook can be initialized before wallet connection data is ready. The action still requires them at runtime and throws if either value is missing.
+
 ## Return Value
 
 ```ts
