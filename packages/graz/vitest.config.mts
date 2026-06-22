@@ -7,17 +7,25 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./src/__tests__/setup.ts"],
     pool: "forks",
-    // Temporarily exclude multi-chain tests due to Vitest 2.x bug with @keplr-wallet/types
-    // See: https://github.com/vitest-dev/vitest/issues/...
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov"],
+      reportsDirectory: "./coverage",
+      all: true,
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/**/*.d.ts",
+        "src/**/__tests__/**",
+        "src/**/__mocks__/**",
+        "src/cli.mjs",
+      ],
+    },
     exclude: [
       "**/node_modules/**",
       "**/dist/**",
       "**/cypress/**",
       "**/.{idea,git,cache,output,temp}/**",
       "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
-      "**/createMultiChainAsyncFunction.test.ts",
-      "**/createMultiChainFunction.test.ts",
-      "**/multi-chain-consistency.test.ts",
     ],
   },
   resolve: {

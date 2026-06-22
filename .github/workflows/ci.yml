@@ -3,7 +3,6 @@ name: CI
 on:
   push:
     branches:
-      - main
       - dev
     paths:
       - .github/workflows/ci.yml
@@ -12,6 +11,7 @@ on:
       - docs/**
       - eslint.config.mjs
       - example/**
+      - integration/**
       - package.json
       - packages/**
       - pnpm-lock.yaml
@@ -19,7 +19,6 @@ on:
       - turbo.json
   pull_request:
     branches:
-      - main
       - dev
     paths:
       - .github/workflows/ci.yml
@@ -28,6 +27,7 @@ on:
       - docs/**
       - eslint.config.mjs
       - example/**
+      - integration/**
       - package.json
       - packages/**
       - pnpm-lock.yaml

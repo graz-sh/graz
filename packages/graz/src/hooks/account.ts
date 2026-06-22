@@ -233,7 +233,7 @@ export const useBalance = (
     [args.bech32Address, args.chainId, args.denom, client],
   );
 
-  return useQuery({
+  return useQuery<Coin | null, unknown, Coin | undefined>({
     queryKey,
     queryFn: async () => {
       if (!client) {
@@ -243,8 +243,9 @@ export const useBalance = (
         throw new Error(`Bech32Config is missing for ${args.chainId}`);
       }
       const balance = await client.getBalance(args.bech32Address, args.denom);
-      return balance.amount === "0" ? undefined : balance;
+      return balance.amount === "0" ? null : balance;
     },
+    select: (balance) => balance ?? undefined,
     enabled: Boolean(client) && Boolean(chain) && (args.enabled === undefined ? true : args.enabled),
     refetchOnMount: false,
     refetchOnReconnect: true,

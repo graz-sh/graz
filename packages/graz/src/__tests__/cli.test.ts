@@ -4,7 +4,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 describe("CLI", () => {
-  const cliPath = path.resolve(__dirname, "../../dist/cli.js");
+  const cliPath = path.resolve(__dirname, "../cli.mjs");
 
   it("should display help message with --help flag", () => {
     const output = execSync(`node ${cliPath} --help`, { encoding: "utf-8" });

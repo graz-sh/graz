@@ -1,6 +1,7 @@
 packages:
   - "docs/"
   - "example/*"
+  - "integration/*"
   - "packages/*"
 
 publicHoistPattern:
