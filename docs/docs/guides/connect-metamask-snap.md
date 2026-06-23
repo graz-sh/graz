@@ -12,8 +12,8 @@ Graz exposes two MetaMask Snap wallet types:
 
 | Wallet type | Use when |
 | --- | --- |
-| `WalletType.METAMASK_SNAP_LEAP` | You want to use the Leap Cosmos Snap integration. |
-| `WalletType.METAMASK_SNAP_COSMOS` | You want to use the Cosmos Snap integration. |
+| `WalletType.METAMASK_SNAP_LEAP` | Your app should connect through Leap's Cosmos Snap integration. |
+| `WalletType.METAMASK_SNAP_COSMOS` | Use the standard Cosmos Snap integration instead of the Leap-managed Snap. |
 
 Both options require MetaMask in the user's browser. On first use, MetaMask may ask the user to install or approve the selected Snap.
 
