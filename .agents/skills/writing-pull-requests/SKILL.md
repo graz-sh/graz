@@ -2,7 +2,7 @@
 
 ## Branch & Title
 
-```
+```text
 <type>/<description>          # feat/prefix-storage-key, chore/bump-versions
 <scope>/<description>         # codex/modernize-baseline
 <type>(<scope>)/<description> # feat(wallet)/add-ethereum-sign-type
