@@ -42,6 +42,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           grazOptions={{
             chains,
             autoReconnect: true,
+            prefixStorageKey: "playground",
             paraConfig,
             walletConnect: {
               options: {
