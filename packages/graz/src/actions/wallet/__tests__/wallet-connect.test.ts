@@ -76,8 +76,10 @@ const makeSignClient = (
     },
     request: vi.fn(async ({ chainId: requestChainId, request }: { chainId?: string; request: { method: string } }) => {
       if (request.method === "cosmos_getAccounts") {
-        const requestedChainId = requestChainId?.split(":")[1] || chainId;
-        return [makeWalletConnectKey(requestedChainId)];
+        if (requestChainId !== `cosmos:${chainId}`) {
+          throw new Error(`Expected cosmos_getAccounts for cosmos:${chainId}, received ${requestChainId}`);
+        }
+        return [makeWalletConnectKey(chainId)];
       }
       if (request.method === "cosmos_signDirect") {
         return {
