@@ -11,6 +11,15 @@
 - Public signer contracts use CosmJS signer types. Do not leak wallet-specific signer aliases unless already exposed.
 - Do not add deep `cosmjs-types` imports to public declarations.
 
+## Development
+
+- `pnpm install` runs `setup-para` postinstall (installs Para SDK native bindings; can fail if build tools missing).
+- `pnpm build` uses turbo and filters out example apps. Use `pnpm build-all` to include them.
+- `pnpm dev` = `pnpm graz build && turbo run dev --filter=!@project/docs` (builds graz first).
+- `pnpm graz <cmd>` shorthand for `pnpm --dir packages/graz <cmd>`; likewise `pnpm example:vite`, `pnpm example:playground`.
+- `GrazProvider` must be nested inside `QueryClientProvider` from `@tanstack/react-query`.
+- For graz library usage reference, use `docs/static/SKILL.md` (not `.agents/`). This file is for public-facing integration patterns, not repo development.
+
 ## Verification
 
 - `pnpm install --frozen-lockfile && pnpm peers check`
@@ -18,6 +27,18 @@
 - `pnpm build && pnpm lint`
 - `pnpm graz cli --generate && pnpm example:vite build && pnpm example:playground build`
 - `pnpm --dir packages/graz pack --dry-run`
+
+## Integration / E2E
+
+- `pnpm integration:test` runs Playwright in `integration/playwright/`.
+- Local default mnemonic (outside CI): `"test test test test test test test test test test test junk"`.
+- CI skips tx tests via `--grep-invert @tx`; enable locally with `GRAZ_E2E_ENABLE_TX=1`.
+- Copy `integration/playwright/.env.example` to `.env` and set `GRAZ_E2E_WALLET_MNEMONIC`.
+
+## Release
+
+- Changesets-based. `pnpm release` = `pnpm graz build && changeset publish`.
+- CI publishing uses npm OIDC/trusted publishing (no npm token) against the `npm-publish` environment.
 
 ## Current Pins
 
