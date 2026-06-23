@@ -67,6 +67,12 @@ const config = {
             position: "left",
           },
           {
+            type: "doc",
+            docId: "agents/skill-file",
+            position: "left",
+            label: "Skill",
+          },
+          {
             href: "https://github.com/graz-sh/graz",
             label: "GitHub",
             position: "right",
