@@ -581,7 +581,7 @@ keplrConnector.id; // 'keplr'
 
 ## Related Documents
 
-- [IMPROVEMENT_DESIGN.md](./IMPROVEMENT_DESIGN.md) - Feature proposals
+- [PROPOSALS.md](./PROPOSALS.md) - Feature proposals (migrated to [GitHub Issues](https://github.com/graz-sh/graz/issues?q=label%3Aenhancement+label%3ARFC))
 - [IMPROVEMENT_SUMMARY.md](./IMPROVEMENT_SUMMARY.md) - Overall progress
 - [TESTING_STRATEGY.md](./TESTING_STRATEGY.md) - Testing approach
 - [PERFORMANCE_IMPROVEMENTS.md](./PERFORMANCE_IMPROVEMENTS.md) - Performance work
