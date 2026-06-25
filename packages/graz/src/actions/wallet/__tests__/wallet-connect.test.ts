@@ -20,7 +20,12 @@ const makeWalletConnectKey = (chainId: string, overrides: Partial<Key> = {}) => 
   ...overrides,
 });
 
-const makeSignClient = (chainId: string) => {
+const makeSignClient = (
+  chainId: string,
+  options: { includeSessionProperties?: boolean; sessionPropertiesChainId?: string } = {},
+) => {
+  const includeSessionProperties = options.includeSessionProperties ?? true;
+  const sessionPropertiesChainId = options.sessionPropertiesChainId ?? chainId;
   const listeners = new Map<string, Set<(args?: unknown) => void>>();
   const session = {
     expiry: Math.floor(Date.now() / 1000) + 60,
@@ -29,9 +34,13 @@ const makeSignClient = (chainId: string) => {
         chains: [`cosmos:${chainId}`],
       },
     },
-    sessionProperties: {
-      keys: JSON.stringify([makeWalletConnectKey(chainId)]),
-    },
+    ...(includeSessionProperties
+      ? {
+          sessionProperties: {
+            keys: JSON.stringify([makeWalletConnectKey(sessionPropertiesChainId)]),
+          },
+        }
+      : {}),
     topic: "topic-1",
   };
   let sessions = [session];
@@ -65,7 +74,13 @@ const makeSignClient = (chainId: string) => {
         listeners.set(event, eventListeners);
       }),
     },
-    request: vi.fn(async ({ request }: { request: { method: string } }) => {
+    request: vi.fn(async ({ chainId: requestChainId, request }: { chainId?: string; request: { method: string } }) => {
+      if (request.method === "cosmos_getAccounts") {
+        if (requestChainId !== `cosmos:${chainId}`) {
+          throw new Error(`Expected cosmos_getAccounts for cosmos:${chainId}, received ${requestChainId}`);
+        }
+        return [makeWalletConnectKey(chainId)];
+      }
       if (request.method === "cosmos_signDirect") {
         return {
           signature: {
@@ -226,6 +241,68 @@ describe("WalletConnect adapter", () => {
       _reconnect: false,
       _reconnectConnector: null,
       recentChainIds: null,
+    });
+  });
+
+  it("requests accounts for existing sessions without session properties", async () => {
+    const chainId = "cosmoshub-4";
+    const signClient = makeSignClient(chainId, { includeSessionProperties: false });
+    const wcSignClients = new Map();
+    wcSignClients.set(WalletType.WALLETCONNECT, signClient);
+    useGrazInternalStore.setState({
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    useGrazSessionStore.setState({
+      wcSignClients,
+    });
+
+    const wallet = getWalletConnect();
+
+    await expect(wallet.getKey(chainId)).resolves.toMatchObject({
+      bech32Address: `${chainId}1address`,
+    });
+    expect(signClient.request).toHaveBeenCalledWith({
+      chainId: `cosmos:${chainId}`,
+      request: {
+        method: "cosmos_getAccounts",
+        params: {},
+      },
+      topic: "topic-1",
+    });
+  });
+
+  it("requests accounts when stored session properties do not include the requested chain", async () => {
+    const chainId = "cosmoshub-4";
+    const signClient = makeSignClient(chainId, { sessionPropertiesChainId: "osmosis-1" });
+    const wcSignClients = new Map();
+    wcSignClients.set(WalletType.WALLETCONNECT, signClient);
+    useGrazInternalStore.setState({
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    useGrazSessionStore.setState({
+      wcSignClients,
+    });
+
+    const wallet = getWalletConnect();
+
+    await expect(wallet.getKey(chainId)).resolves.toMatchObject({
+      bech32Address: `${chainId}1address`,
+    });
+    expect(signClient.request).toHaveBeenCalledWith({
+      chainId: `cosmos:${chainId}`,
+      request: {
+        method: "cosmos_getAccounts",
+        params: {},
+      },
+      topic: "topic-1",
     });
   });
 });

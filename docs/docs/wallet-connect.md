@@ -24,11 +24,11 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
           walletConnectModal: {
             mobileWallets: [
               {
-                id: "leap-mobile",
-                name: "Leap Mobile",
+                id: "keplr-mobile",
+                name: "Keplr Mobile",
                 links: {
-                  native: "leapcosmos://",
-                  universal: "https://leapwallet.io",
+                  native: "keplrwallet://",
+                  universal: "https://keplr.app",
                 },
               },
             ],

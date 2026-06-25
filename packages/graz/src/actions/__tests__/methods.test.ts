@@ -6,8 +6,13 @@ import {
   getQuerySmart,
   instantiateContract,
   sendIbcTokens,
+  signArbitrary,
+  signAndBroadcast,
   sendTokens,
+  verifyArbitrary,
 } from "../methods";
+import { useGrazInternalStore } from "../../store";
+import { WalletType } from "../../types/wallet";
 
 const txResponse = {
   code: 0,
@@ -22,6 +27,124 @@ const txResponse = {
 };
 
 describe("transaction and query methods", () => {
+  it("guards signAndBroadcast inputs and delegates to the signing client", async () => {
+    await expect(
+      signAndBroadcast({
+        fee: "auto",
+        messages: [],
+      }),
+    ).rejects.toThrow("Stargate signing client is not ready");
+
+    const signingClient = {
+      signAndBroadcast: vi.fn().mockResolvedValue(txResponse),
+    };
+    const messages = [{ typeUrl: "/cosmos.bank.v1beta1.MsgSend", value: {} }];
+
+    await expect(
+      signAndBroadcast({
+        fee: "auto",
+        memo: "memo",
+        messages,
+        senderAddress: "cosmos1sender",
+        signingClient: signingClient as never,
+        timeoutHeight: 123n,
+      }),
+    ).resolves.toBe(txResponse);
+
+    expect(signingClient.signAndBroadcast).toHaveBeenCalledWith(
+      "cosmos1sender",
+      messages,
+      "auto",
+      "memo",
+      123n,
+    );
+
+    await expect(
+      signAndBroadcast({
+        fee: "auto",
+        messages,
+        senderAddress: "",
+        signingClient: signingClient as never,
+      }),
+    ).rejects.toThrow("senderAddress is not defined");
+
+    const error = new Error("broadcast failed");
+    signingClient.signAndBroadcast.mockRejectedValueOnce(error);
+    await expect(
+      signAndBroadcast({
+        fee: "auto",
+        messages,
+        senderAddress: "cosmos1sender",
+        signingClient: signingClient as never,
+      }),
+    ).rejects.toBe(error);
+  });
+
+  it("delegates arbitrary message signing and verification to the selected wallet", async () => {
+    const signature = {
+      pub_key: { type: "tendermint/PubKeySecp256k1", value: "pubkey" },
+      signature: "signature",
+    };
+    const wallet = {
+      signArbitrary: vi.fn().mockResolvedValue(signature),
+      verifyArbitrary: vi.fn().mockResolvedValue(true),
+    };
+    Object.defineProperty(window, "keplr", {
+      configurable: true,
+      value: wallet,
+    });
+
+    await expect(
+      signArbitrary({
+        chainId: "cosmoshub-4",
+        data: "hello",
+        signerAddress: "cosmos1sender",
+        walletType: WalletType.KEPLR,
+      }),
+    ).resolves.toBe(signature);
+
+    await expect(
+      verifyArbitrary({
+        chainId: "cosmoshub-4",
+        data: "hello",
+        signature,
+        signerAddress: "cosmos1sender",
+        walletType: WalletType.KEPLR,
+      }),
+    ).resolves.toBe(true);
+
+    expect(wallet.signArbitrary).toHaveBeenCalledWith("cosmoshub-4", "cosmos1sender", "hello");
+    expect(wallet.verifyArbitrary).toHaveBeenCalledWith("cosmoshub-4", "cosmos1sender", "hello", signature);
+  });
+
+  it("uses the configured wallet type for arbitrary signing and reports unsupported wallets", async () => {
+    useGrazInternalStore.setState({ walletType: WalletType.KEPLR });
+    Object.defineProperty(window, "keplr", {
+      configurable: true,
+      value: {},
+    });
+
+    await expect(
+      signArbitrary({
+        chainId: "cosmoshub-4",
+        data: "hello",
+        signerAddress: "cosmos1sender",
+      }),
+    ).rejects.toThrow("keplr does not support signArbitrary");
+
+    await expect(
+      verifyArbitrary({
+        chainId: "cosmoshub-4",
+        data: "hello",
+        signature: {
+          pub_key: { type: "tendermint/PubKeySecp256k1", value: "pubkey" },
+          signature: "signature",
+        },
+        signerAddress: "cosmos1sender",
+      }),
+    ).rejects.toThrow("keplr does not support verifyArbitrary");
+  });
+
   it("guards sendTokens inputs and delegates to the signing client", async () => {
     await expect(
       sendTokens({

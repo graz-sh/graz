@@ -115,6 +115,9 @@ export const grazInternalDefaultValues: GrazInternalStore = {
   _reconnectConnector: null,
 };
 
+export const GRAZ_INTERNAL_STORAGE_KEY = "graz-internal";
+export const GRAZ_SESSION_STORAGE_KEY = "graz-session";
+
 export const grazSessionDefaultValues: GrazSessionStore = {
   accounts: null,
   activeChainIds: null,
@@ -125,7 +128,7 @@ export const grazSessionDefaultValues: GrazSessionStore = {
 };
 
 const sessionOptions: PersistOptions<GrazSessionStore, GrazSessionPersistedStore> = {
-  name: "graz-session",
+  name: GRAZ_SESSION_STORAGE_KEY,
   version: 2,
   partialize: (x) => ({
     accounts: x.accounts,
@@ -137,7 +140,7 @@ const sessionOptions: PersistOptions<GrazSessionStore, GrazSessionPersistedStore
 };
 
 const persistOptions: PersistOptions<GrazInternalStore, GrazInternalPersistedStore> = {
-  name: "graz-internal",
+  name: GRAZ_INTERNAL_STORAGE_KEY,
   partialize: (x) => ({
     recentChainIds: x.recentChainIds,
     _reconnect: x._reconnect,

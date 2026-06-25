@@ -98,4 +98,4 @@ Use `nvm use` instead of `fnm use 24.17.0` in shells that rely on nvm.
 
 - Keep workflow action SHAs paired with readable version comments.
 - Keep root dependency and toolchain files in path filters so lockfile, pnpm, Node, Turbo, and ESLint changes trigger CI.
-- `PERSONAL_TOKEN` is used by the Changesets action to create release pull requests.
+- `CHANGESETS_APP_CLIENT_ID` and `CHANGESETS_APP_PRIVATE_KEY` are used to mint a GitHub App token for Changesets release pull requests.
