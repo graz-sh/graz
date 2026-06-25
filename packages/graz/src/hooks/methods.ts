@@ -9,6 +9,7 @@ import type {
   InstantiateContractMutationArgs,
   SendIbcTokensArgs,
   SignArbitraryArgs,
+  SignAndBroadcastArgs,
   SendTokensArgs,
   VerifyArbitraryArgs,
 } from "../actions/methods";
@@ -19,6 +20,7 @@ import {
   instantiateContract,
   sendIbcTokens,
   signArbitrary,
+  signAndBroadcast,
   sendTokens,
   verifyArbitrary,
 } from "../actions/methods";
@@ -74,6 +76,45 @@ export const useVerifyArbitrary = ({
     ...mutation,
     verifyArbitrary: mutate,
     verifyArbitraryAsync: mutateAsync,
+  };
+};
+
+/**
+ * graz mutation hook to sign and broadcast arbitrary encoded messages.
+ *
+ * @see {@link signAndBroadcast}
+ */
+export const useSignAndBroadcast = ({
+  onError,
+  onLoading,
+  onSuccess,
+}: MutationEventArgs<SignAndBroadcastArgs, DeliverTxResponse> = {}) => {
+  const logger = getLogger();
+  const { mutate, mutateAsync, ...mutation } = useMutation({
+    mutationKey: ["USE_SIGN_AND_BROADCAST"],
+    mutationFn: signAndBroadcast,
+    onError: (err, data) => {
+      logger.error(LogCategory.TRANSACTION, "useSignAndBroadcast mutation failed", {
+        hook: "useSignAndBroadcast",
+        error: err instanceof Error ? err.message : String(err),
+        messageCount: data?.messages?.length ?? 0,
+      });
+      return Promise.resolve(onError?.(err, data));
+    },
+    onMutate: onLoading,
+    onSuccess: (txResponse) => {
+      logger.info(LogCategory.TRANSACTION, "useSignAndBroadcast mutation successful", {
+        hook: "useSignAndBroadcast",
+        txHash: txResponse.transactionHash,
+      });
+      return Promise.resolve(onSuccess?.(txResponse));
+    },
+  });
+
+  return {
+    ...mutation,
+    signAndBroadcast: mutate,
+    signAndBroadcastAsync: mutateAsync,
   };
 };
 

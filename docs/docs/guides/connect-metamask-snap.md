@@ -160,4 +160,3 @@ export function ConnectTestnet() {
 - If another extension also injects `window.ethereum`, keep MetaMask enabled and retry. Graz selects the MetaMask provider when multiple Ethereum providers are present.
 - If the Snap install prompt does not appear, check MetaMask's Snap settings and remove any rejected or partially installed Snap entry before retrying.
 - If chain suggestion fails, verify that the chain has complete `ChainInfo`, including `bech32Config`, `stakeCurrency`, `currencies`, and `feeCurrencies`.
-
