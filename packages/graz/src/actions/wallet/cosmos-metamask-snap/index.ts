@@ -3,11 +3,12 @@ import { CosmosSnap, installSnap, isSnapInstalled } from "@cosmsnap/snapper";
 import { useGrazInternalStore } from "../../../store";
 import type { KnownKeys, Wallet } from "../../../types/wallet";
 import type { ChainId } from "../../../utils/multi-chain";
+import { selectMetamaskProvider } from "../metamask";
 
 const metamaskSnapCosmosKeysMap: KnownKeys = {};
 
 export const getMetamaskSnapCosmos = (): Wallet => {
-  const ethereum = window.ethereum;
+  const ethereum = selectMetamaskProvider();
   let cosmos = window.cosmos;
   if (ethereum) {
     const init = async () => {

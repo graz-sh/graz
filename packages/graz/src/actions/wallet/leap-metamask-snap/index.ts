@@ -5,6 +5,7 @@ import Long from "long";
 import { useGrazInternalStore } from "../../../store";
 import type { Key, KnownKeys, SignAminoParams, SignDirectParams, Wallet } from "../../../types/wallet";
 import type { ChainId } from "../../../utils/multi-chain";
+import { selectMetamaskProvider } from "../metamask";
 import type { GetSnapsResponse, Snap } from "./types";
 
 export interface GetMetamaskSnap {
@@ -32,7 +33,7 @@ const metamaskSnapLeapKeysMap: KnownKeys = {};
  *
  */
 export const getMetamaskSnap = (params?: GetMetamaskSnap): Wallet => {
-  const ethereum = window.ethereum;
+  const ethereum = selectMetamaskProvider();
 
   if (ethereum && params) {
     const getSnaps = async (): Promise<GetSnapsResponse> => {
