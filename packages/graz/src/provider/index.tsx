@@ -20,7 +20,7 @@ export interface GrazProviderProps {
  * // example next.js application in _app.tsx
  * export default function CustomApp({ Component, pageProps }: AppProps) {
  *   return (
- *     <QueryClientProvider queryClient={queryClient}>
+ *     <QueryClientProvider client={queryClient}>
  *       <GrazProvider grazOptions={{
  *         chains: [cosmoshubChainInfo, osmosisChainInfo],
  *         logger: {

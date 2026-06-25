@@ -1,6 +1,8 @@
 import { beforeEach, vi } from "vitest";
 
 import {
+  GRAZ_INTERNAL_STORAGE_KEY,
+  GRAZ_SESSION_STORAGE_KEY,
   grazInternalDefaultValues,
   grazSessionDefaultValues,
   useGrazInternalStore,
@@ -31,6 +33,8 @@ if (!window.matchMedia) {
 // Reset mocks before each test
 beforeEach(() => {
   vi.clearAllMocks();
+  useGrazInternalStore.persist.setOptions({ name: GRAZ_INTERNAL_STORAGE_KEY });
+  useGrazSessionStore.persist.setOptions({ name: GRAZ_SESSION_STORAGE_KEY });
   window.localStorage.clear();
   window.sessionStorage.clear();
   useGrazInternalStore.setState({ ...grazInternalDefaultValues }, true);

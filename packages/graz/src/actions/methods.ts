@@ -1,14 +1,66 @@
 import type { CosmWasmClient, InstantiateOptions, SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import type { StdSignature } from "@cosmjs/amino";
 import type { Coin, EncodeObject } from "@cosmjs/proto-signing";
 import type { DeliverTxResponse, SigningStargateClient, StdFee } from "@cosmjs/stargate";
 
+import { useGrazInternalStore } from "../store";
 import { LogCategory } from "../types/logger";
+import type { WalletType } from "../types/wallet";
 import { getLogger } from "../utils/logger";
+import { getWallet } from "./wallet";
 
 export interface Height {
   revisionNumber: bigint;
   revisionHeight: bigint;
 }
+
+export interface SignArbitraryArgs {
+  walletType?: WalletType;
+  chainId: string;
+  signerAddress: string;
+  data: string | Uint8Array;
+}
+
+export interface VerifyArbitraryArgs extends SignArbitraryArgs {
+  signature: StdSignature;
+}
+
+/**
+ * Sign arbitrary data using the active wallet's ADR-36-compatible signing API.
+ */
+export const signArbitrary = async ({
+  walletType = useGrazInternalStore.getState().walletType,
+  chainId,
+  signerAddress,
+  data,
+}: SignArbitraryArgs): Promise<StdSignature> => {
+  const wallet = getWallet(walletType);
+
+  if (!wallet.signArbitrary) {
+    throw new Error(`${walletType} does not support signArbitrary`);
+  }
+
+  return wallet.signArbitrary(chainId, signerAddress, data);
+};
+
+/**
+ * Verify arbitrary data using the active wallet's ADR-36-compatible verification API.
+ */
+export const verifyArbitrary = async ({
+  walletType = useGrazInternalStore.getState().walletType,
+  chainId,
+  signerAddress,
+  data,
+  signature,
+}: VerifyArbitraryArgs): Promise<boolean> => {
+  const wallet = getWallet(walletType);
+
+  if (!wallet.verifyArbitrary) {
+    throw new Error(`${walletType} does not support verifyArbitrary`);
+  }
+
+  return wallet.verifyArbitrary(chainId, signerAddress, data, signature);
+};
 
 // https://cosmos.github.io/cosmjs/latest/stargate/classes/SigningStargateClient.html#signAndBroadcast
 export interface SignAndBroadcastArgs {

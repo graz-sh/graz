@@ -1,4 +1,4 @@
-# useActiveChains
+# useChainInfo
 
 hook to retrieve `ChainInfo` object from `GrazProvider` with given `chainId`
 
