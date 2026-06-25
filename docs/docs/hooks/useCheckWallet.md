@@ -22,8 +22,16 @@ const { data: isKeplrSupported } = useCheckWallet(WalletType.KEPLR);
     WALLETCONNECT = "walletconnect",
     WC_KEPLR_MOBILE = "wc_keplr_mobile",
     WC_COSMOSTATION_MOBILE = "wc_cosmostation_mobile",
+    WC_CLOT_MOBILE = "wc_clot_mobile",
     METAMASK_SNAP_COSMOS = "metamask_snap_cosmos",
+    STATION = "station",
+    XDEFI = "xdefi",
     COSMIFRAME = "cosmiframe",
+    COMPASS = "compass",
+    INITIA = "initia",
+    OKX = "okx",
+    PARA = "para",
+    CACTUSCOSMOS = "cactuscosmos",
   }
   ```
 
@@ -31,15 +39,24 @@ const { data: isKeplrSupported } = useCheckWallet(WalletType.KEPLR);
 
 - `WALLET_TYPES`
   ```ts
-  {
+  [
     WalletType.KEPLR,
     WalletType.VECTIS,
+    WalletType.COSMOSTATION,
     WalletType.WALLETCONNECT,
     WalletType.WC_KEPLR_MOBILE,
     WalletType.WC_COSMOSTATION_MOBILE,
+    WalletType.WC_CLOT_MOBILE,
+    WalletType.STATION,
+    WalletType.XDEFI,
     WalletType.METAMASK_SNAP_COSMOS,
     WalletType.COSMIFRAME,
-  }
+    WalletType.COMPASS,
+    WalletType.INITIA,
+    WalletType.OKX,
+    WalletType.PARA,
+    WalletType.CACTUSCOSMOS,
+  ]
   ```
 
 ## Hook Params

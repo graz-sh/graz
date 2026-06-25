@@ -107,7 +107,11 @@ export default function WalletsPage() {
                 <div className="p-3 rounded-lg bg-muted/50">
                   <p className="text-xs text-muted-foreground mb-1">Mobile</p>
                   <p className="font-mono text-sm font-medium">
-                    {walletInfo.isKeplrMobile || walletInfo.isCosmostationMobile ? "Yes" : "No"}
+                    {walletInfo.isKeplrMobile ||
+                    walletInfo.isCosmostationMobile ||
+                    walletInfo.walletType === WalletType.WC_CLOT_MOBILE
+                      ? "Yes"
+                      : "No"}
                   </p>
                 </div>
               </div>
