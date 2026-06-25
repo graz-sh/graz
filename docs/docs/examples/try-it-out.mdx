@@ -66,14 +66,26 @@ function WalletExample() {
   });
 
   const account = accounts?.[chainId];
-  const { data: balance, isLoading: isBalanceLoading } = useBalance({
+  const {
+    data: balance,
+    error: balanceError,
+    isError: isBalanceError,
+    isLoading: isBalanceLoading,
+  } = useBalance({
     chainId,
     bech32Address: account?.bech32Address ?? "",
     denom: "uatom",
     enabled: Boolean(account?.bech32Address),
   });
 
-  const atomBalance = balance ? Number(balance.amount) / 1_000_000 : 0;
+  const atomBalance = balance ? Number(balance.amount) / 1_000_000 : undefined;
+  const balanceStatus = isBalanceLoading
+    ? "Loading..."
+    : isBalanceError
+      ? (balanceError?.message ?? "Unable to load balance")
+      : atomBalance === undefined
+        ? "No ATOM balance found"
+        : `${atomBalance.toFixed(6)} ATOM`;
 
   return (
     <main style={{ maxWidth: 640, margin: "4rem auto", fontFamily: "sans-serif" }}>
@@ -86,7 +98,7 @@ function WalletExample() {
             <strong>Address:</strong> {account.bech32Address}
           </p>
           <p>
-            <strong>Balance:</strong> {isBalanceLoading ? "Loading..." : `${atomBalance.toFixed(6)} ATOM`}
+            <strong>Balance:</strong> {balanceStatus}
           </p>
           <button disabled={isDisconnecting} onClick={() => disconnect()}>
             Disconnect
@@ -138,5 +150,5 @@ export default function App() {
 ## Try more flows
 
 - Use [Getting Started](../getting-started) for the step-by-step setup guide.
-- Use [WalletConnect](../wallet-connect) when you need QR or mobile wallet connections.
-- Use the [Playground example](https://graz.sh/examples/playground) for multi-chain connections, balances, contracts, clients, and token sends.
+- Open [WalletConnect](../wallet-connect) when you need QR or mobile wallet connections.
+- Explore the [Playground example](https://graz.sh/examples/playground) for multi-chain connections, balances, contracts, clients, and token sends.
