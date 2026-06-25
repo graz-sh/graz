@@ -30,15 +30,24 @@ peerDependencyRules:
     cosmjs-types: ">=0.9.0 <0.12.0"
     typescript: ">=5.0.0 <7.0.0"
     utf-8-validate: ">=5.0.2 <7.0.0"
+    ws: ">=7.5.11 <9.0.0"
 
 overrides:
   ses: 1.14.0
   abitype: 1.2.4
-  axios: 1.13.2
+  "@opentelemetry/core": 2.8.0
+  axios: 1.16.0
+  "bn.js@4": 4.12.3
   next: 16.2.9
   got: 14.6.5
   esbuild: 0.27.2
-  webpack-dev-server: 5.2.2
+  js-cookie: 3.0.7
+  "js-yaml@4": 4.2.0
+  postcss: 8.5.15
+  protobufjs: 7.6.3
+  serialize-javascript: 7.0.5
+  uuid: 11.1.1
+  webpack-dev-server: 5.2.5
   vite: 7.3.5
   graz>vite: 7.3.5
   wait-on: 9.0.3
@@ -47,6 +56,8 @@ overrides:
   starknet: 8.9.2
   use-sync-external-store: 1.6.0
   viem: 2.52.2
+  "ws@8": 8.21.0
+  yaml: 2.9.0
   "@getpara/aa-cdp>viem": 2.52.2
   "@getpara/react-core>viem": 2.52.2
   "@getpara/react-sdk-lite>viem": 2.52.2
