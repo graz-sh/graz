@@ -50,6 +50,8 @@ const makeWalletConnectKey = (chainId: string): WalletConnectStoredKey => ({
   pubKey: Buffer.from(new Uint8Array([4, 5, 6])).toString("base64"),
 });
 
+const getWalletConnectChainId = (chainId: string) => chainId.split(":")[1] || chainId;
+
 describe("WalletConnect first-session flow", () => {
   beforeEach(() => {
     walletConnectModalMock.instances.length = 0;
@@ -105,6 +107,44 @@ describe("WalletConnect first-session flow", () => {
       },
       [osmosis.chainId]: {
         bech32Address: osmosis.bech32Address,
+      },
+    });
+  });
+
+  it("requests accounts when an approved session does not include session properties", async () => {
+    const chainId = "cosmoshub-4";
+    const approval = vi.fn().mockResolvedValue({
+      topic: "topic-1",
+    });
+    const signClient = {
+      connect: vi.fn().mockResolvedValue({
+        approval,
+        uri: "wc:topic",
+      }),
+      request: vi.fn(({ chainId: requestChainId }) => [makeWalletConnectKey(getWalletConnectChainId(requestChainId))]),
+      session: {
+        getAll: vi.fn(() => []),
+      },
+    };
+    useGrazSessionStore.setState({
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    const wallet = getWalletConnect();
+
+    await expect(wallet.enable([chainId])).resolves.toBeUndefined();
+
+    expect(signClient.request).toHaveBeenCalledWith({
+      chainId: `cosmos:${chainId}`,
+      request: {
+        method: "cosmos_getAccounts",
+        params: {},
+      },
+      topic: "topic-1",
+    });
+    expect(useGrazSessionStore.getState().accounts).toMatchObject({
+      [chainId]: {
+        bech32Address: `${chainId}1address`,
       },
     });
   });
