@@ -11,8 +11,6 @@ import { getMetamaskSnapCosmos } from "./cosmos-metamask-snap";
 import { getCosmostation } from "./cosmostation";
 import { getInitia } from "./initia";
 import { getKeplr } from "./keplr";
-import { getLeap } from "./leap";
-import { getMetamaskSnapLeap } from "./leap-metamask-snap/leap";
 import { getOkx } from "./okx";
 import { getPara } from "./para";
 import { getStation } from "./station";
@@ -21,7 +19,6 @@ import { getWalletConnect } from "./wallet-connect";
 import { getWCClot } from "./wallet-connect/clot";
 import { getWCCosmostation } from "./wallet-connect/cosmostation";
 import { getWCKeplr } from "./wallet-connect/keplr";
-import { getWCLeap } from "./wallet-connect/leap";
 import { getXDefi } from "./xdefi";
 
 /**
@@ -68,9 +65,6 @@ export const getWallet = (type: WalletType = useGrazInternalStore.getState().wal
       case WalletType.KEPLR: {
         return getKeplr();
       }
-      case WalletType.LEAP: {
-        return getLeap();
-      }
       case WalletType.COSMOSTATION: {
         return getCosmostation();
       }
@@ -83,17 +77,11 @@ export const getWallet = (type: WalletType = useGrazInternalStore.getState().wal
       case WalletType.WC_KEPLR_MOBILE: {
         return getWCKeplr();
       }
-      case WalletType.WC_LEAP_MOBILE: {
-        return getWCLeap();
-      }
       case WalletType.WC_COSMOSTATION_MOBILE: {
         return getWCCosmostation();
       }
       case WalletType.WC_CLOT_MOBILE: {
         return getWCClot();
-      }
-      case WalletType.METAMASK_SNAP_LEAP: {
-        return getMetamaskSnapLeap();
       }
       case WalletType.METAMASK_SNAP_COSMOS: {
         return getMetamaskSnapCosmos();
@@ -141,19 +129,10 @@ export const getAvailableWallets = (): Record<WalletType, boolean> => {
   return Object.fromEntries(WALLET_TYPES.map((type) => [type, checkWallet(type)])) as Record<WalletType, boolean>;
 };
 
-export const isLeapSnaps = (type: WalletType): boolean => {
-  return type === WalletType.METAMASK_SNAP_LEAP;
-};
-
-export const isLeapDappBrowser = (): boolean => {
-  return Boolean(navigator?.userAgent) && /LeapCosmos/i.test(navigator.userAgent);
-};
-
 export const isWalletConnect = (type: WalletType): boolean => {
   return (
     type === WalletType.WALLETCONNECT ||
     type === WalletType.WC_KEPLR_MOBILE ||
-    type === WalletType.WC_LEAP_MOBILE ||
     type === WalletType.WC_COSMOSTATION_MOBILE
   );
 };

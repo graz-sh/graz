@@ -27,10 +27,9 @@ function App() {
   isCosmostationMobile: boolean;
   isKeplr: boolean;
   isKeplrMobile: boolean;
-  isLeap: boolean;
   isVectis: boolean;
-  isLeapMobile: boolean;
   isWalletConnect: boolean;
-  isMetamaskSnapLeap: boolean;
+  isStation: boolean;
+  isCosmiframe: boolean;
 }
 ```

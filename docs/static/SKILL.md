@@ -170,15 +170,15 @@ const atomAddress = accounts?.["cosmoshub-4"]?.bech32Address;
 ```ts
 // Reactive hook
 const { data: isKeplrAvailable } = useCheckWallet(WalletType.KEPLR);
-const { data: isLeapAvailable } = useCheckWallet(WalletType.LEAP);
+const { data: isCosmostationAvailable } = useCheckWallet(WalletType.COSMOSTATION);
 
 // Imperative
 const available = getAvailableWallets();  // Record<WalletType, boolean>
 const supported = checkWallet();          // Default wallet
-const leapSupported = checkWallet(WalletType.LEAP);
+const cosmostationSupported = checkWallet(WalletType.COSMOSTATION);
 
 // Active wallet info
-const { walletType, isKeplr, isLeap, isCosmostation, isWalletConnect } = useActiveWalletType();
+const { walletType, isKeplr, isCosmostation, isWalletConnect } = useActiveWalletType();
 ```
 
 ### Disconnect
@@ -411,13 +411,12 @@ import { LOG_CATEGORIES, LOG_FUNCTIONS, LOG_HOOKS, LogLevel, LogCategory } from 
 import { WalletType, Key, Wallet, OfflineSigners, ConnectResult, UseMultiChainQueryResult, ChainConfig } from "graz";
 
 // WalletType — enum for all supported wallets
-WalletType.KEPLR, WalletType.LEAP, WalletType.COSMOSTATION,
+WalletType.KEPLR, WalletType.COSMOSTATION,
 WalletType.VECTIS, WalletType.WALLETCONNECT, WalletType.OKX,
 WalletType.PARA, WalletType.INITIA, WalletType.CACTUSCOSMOS,
 WalletType.COMPASS, WalletType.STATION, WalletType.XDEFI,
-WalletType.COSMIFRAME, WalletType.METAMASK_SNAP_LEAP,
-WalletType.METAMASK_SNAP_COSMOS,
-WalletType.WC_KEPLR_MOBILE, WalletType.WC_LEAP_MOBILE,
+WalletType.COSMIFRAME, WalletType.METAMASK_SNAP_COSMOS,
+WalletType.WC_KEPLR_MOBILE,
 WalletType.WC_COSMOSTATION_MOBILE, WalletType.WC_CLOT_MOBILE
 
 // Key — wallet account key

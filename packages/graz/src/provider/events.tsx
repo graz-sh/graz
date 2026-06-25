@@ -10,7 +10,6 @@ import { getCompass } from "../actions/wallet/compass";
 import { getCosmiframe } from "../actions/wallet/cosmiframe";
 import { getCosmostation } from "../actions/wallet/cosmostation";
 import { getKeplr } from "../actions/wallet/keplr";
-import { getLeap } from "../actions/wallet/leap";
 import { getOkx } from "../actions/wallet/okx";
 import { getStation } from "../actions/wallet/station";
 import { getVectis } from "../actions/wallet/vectis";
@@ -21,7 +20,7 @@ import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import { WalletType } from "../types/wallet";
 
 /**
- * Graz custom hook to track `keplr_keystorechange`, `leap_keystorechange`, `accountChanged` event and reconnect state
+ * Graz custom hook to track `keplr_keystorechange`, `accountChanged` event and reconnect state
  *
  * **Note: only use this hook if not using graz's provider component.**
  */
@@ -131,12 +130,6 @@ export const useGrazEvents = () => {
       if (_reconnectConnector === WalletType.KEPLR) {
         getKeplr().subscription?.(() => {
           logger.debug(LogCategory.EVENT, "Account changed", { function: "subscription", walletType: WalletType.KEPLR });
-          void reconnect({ onError: _onReconnectFailed });
-        });
-      }
-      if (_reconnectConnector === WalletType.LEAP) {
-        getLeap().subscription?.(() => {
-          logger.debug(LogCategory.EVENT, "Account changed", { function: "subscription", walletType: WalletType.LEAP });
           void reconnect({ onError: _onReconnectFailed });
         });
       }

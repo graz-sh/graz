@@ -8,14 +8,13 @@ Graz supports Cosmos accounts in MetaMask through Snap integrations. Use this gu
 
 ## Supported Snap wallet types
 
-Graz exposes two MetaMask Snap wallet types:
+Graz exposes the MetaMask Snap wallet type for Cosmos:
 
 | Wallet type | Use when |
 | --- | --- |
-| `WalletType.METAMASK_SNAP_LEAP` | Your app should connect through Leap's Cosmos Snap integration. |
-| `WalletType.METAMASK_SNAP_COSMOS` | Use the standard Cosmos Snap integration instead of the Leap-managed Snap. |
+| `WalletType.METAMASK_SNAP_COSMOS` | Use the standard Cosmos Snap integration for MetaMask. |
 
-Both options require MetaMask in the user's browser. On first use, MetaMask may ask the user to install or approve the selected Snap.
+This option requires MetaMask in the user's browser. On first use, MetaMask may ask the user to install or approve the selected Snap.
 
 ## Provider setup
 
@@ -34,7 +33,7 @@ export function App() {
       <GrazProvider
         grazOptions={{
           chains: [cosmoshub],
-          defaultWallet: WalletType.METAMASK_SNAP_LEAP,
+          defaultWallet: WalletType.METAMASK_SNAP_COSMOS,
         }}
       >
         <Wallet />
@@ -52,7 +51,7 @@ Use `useCheckWallet` to hide the action when MetaMask is not available, then con
 import { useAccount, useCheckWallet, useConnect, useDisconnect, WalletType } from "graz";
 import { cosmoshub } from "graz/chains";
 
-const walletType = WalletType.METAMASK_SNAP_LEAP;
+const walletType = WalletType.METAMASK_SNAP_COSMOS;
 const chainId = cosmoshub.chainId;
 
 export function Wallet() {
@@ -90,11 +89,6 @@ export function Wallet() {
 }
 ```
 
-To use the Cosmos Snap integration instead, change the wallet type:
-
-```ts
-const walletType = WalletType.METAMASK_SNAP_COSMOS;
-```
 
 ## Suggest and connect to a custom chain
 
@@ -104,7 +98,7 @@ If the target chain is not configured in `GrazProvider`, use `useSuggestChainAnd
 import { Bech32Address } from "@keplr-wallet/cosmos";
 import { useSuggestChainAndConnect, WalletType } from "graz";
 
-const walletType = WalletType.METAMASK_SNAP_LEAP;
+const walletType = WalletType.METAMASK_SNAP_COSMOS;
 
 const testnetChain = {
   chainId: "osmo-test-4",
@@ -156,7 +150,7 @@ export function ConnectTestnet() {
 
 ## Troubleshooting
 
-- If `useCheckWallet(WalletType.METAMASK_SNAP_LEAP)` returns `false`, confirm MetaMask is installed and enabled in the browser.
+- If `useCheckWallet(WalletType.METAMASK_SNAP_COSMOS)` returns `false`, confirm MetaMask is installed and enabled in the browser.
 - If another extension also injects `window.ethereum`, keep MetaMask enabled and retry. Graz selects the MetaMask provider when multiple Ethereum providers are present.
 - If the Snap install prompt does not appear, check MetaMask's Snap settings and remove any rejected or partially installed Snap entry before retrying.
 - If chain suggestion fails, verify that the chain has complete `ChainInfo`, including `bech32Config`, `stakeCurrency`, `currencies`, and `feeCurrencies`.

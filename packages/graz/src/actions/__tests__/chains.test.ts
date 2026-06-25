@@ -94,10 +94,10 @@ describe("chain actions", () => {
       suggestChainAndConnect({
         autoReconnect: true,
         chainInfo,
-        walletType: WalletType.LEAP,
+        walletType: WalletType.COSMOSTATION,
       }),
     ).resolves.toMatchObject({
-      walletType: WalletType.LEAP,
+      walletType: WalletType.COSMOSTATION,
     });
   });
 });

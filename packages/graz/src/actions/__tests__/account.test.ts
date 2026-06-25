@@ -46,7 +46,7 @@ const setWindowValue = (key: string, value: unknown) => {
 
 describe("account actions", () => {
   beforeEach(() => {
-    for (const key of ["keplr", "leap"]) {
+    for (const key of ["keplr", "cosmostation"]) {
       Reflect.deleteProperty(window, key);
     }
   });
@@ -90,7 +90,7 @@ describe("account actions", () => {
     expect(window.sessionStorage.getItem(RECONNECT_SESSION_KEY)).toBe("Active");
   });
 
-  it("uses Leap dapp-browser batched key lookup for multi-chain connections", async () => {
+  it("connects to multiple chains and stores all accounts", async () => {
     const cosmoshub = makeChainInfo();
     const osmosis = makeChainInfo("osmosis-1");
     const accounts = {
@@ -98,17 +98,16 @@ describe("account actions", () => {
       [osmosis.chainId]: makeKey(osmosis.chainId),
     };
     const wallet = makeWallet(accounts);
-    setWindowValue("leap", wallet);
-    vi.spyOn(window.navigator, "userAgent", "get").mockReturnValue("LeapCosmos");
+    setWindowValue("keplr", wallet);
     useGrazInternalStore.setState({ chains: [cosmoshub, osmosis] });
 
     await connect({
       chainId: [cosmoshub.chainId, osmosis.chainId],
-      walletType: WalletType.LEAP,
+      walletType: WalletType.KEPLR,
     });
 
-    expect(wallet.getKeys).toHaveBeenCalledWith([cosmoshub.chainId, osmosis.chainId]);
-    expect(wallet.getKey).not.toHaveBeenCalled();
+    expect(wallet.getKey).toHaveBeenCalledWith(cosmoshub.chainId);
+    expect(wallet.getKey).toHaveBeenCalledWith(osmosis.chainId);
     expect(useGrazSessionStore.getState().accounts).toEqual(accounts);
     expect(useGrazSessionStore.getState().activeChainIds).toEqual([cosmoshub.chainId, osmosis.chainId]);
   });

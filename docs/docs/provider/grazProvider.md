@@ -52,7 +52,7 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
               },
             },
           },
-          defaultWallet: WalletType.LEAP,
+          defaultWallet: WalletType.KEPLR,
           onNotFound,
           multiChainFetchConcurrency: 6,
           // ...
