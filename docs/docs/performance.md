@@ -199,7 +199,7 @@ pnpm graz dev
 
 ## Version History
 
-### v0.3.7 - Build Optimizations
+### v0.4.0 - Build Optimizations
 
 Major performance improvements:
 
@@ -208,7 +208,7 @@ Major performance improvements:
 - **72% smaller package** (800 KB → 220 KB)
 - **43% smaller TypeScript declarations** (87 KB → 49 KB)
 
-See the [changelog](./change-log.md#version-037-build-optimizations) for details.
+See the [changelog](./change-log.md#version-040-unified-multi-chain-api--performance) for details.
 
 ## Future Optimizations
 

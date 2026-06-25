@@ -214,4 +214,4 @@ const chainInfo: ChainInfo = {
 ## See Also
 
 - [Chain Information Guide](/docs/guides/multi-chain)
-- [Adding Custom Chains](/docs/getting-started#custom-chains)
+- [Adding Custom Chains](/docs/getting-started#step-2-configure-chain-information)
