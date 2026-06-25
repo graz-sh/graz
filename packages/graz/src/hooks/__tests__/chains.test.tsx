@@ -80,6 +80,23 @@ describe("chain hooks", () => {
     rendered.unmount();
   });
 
+  it("keeps active chain currency query idle while denom is undefined", async () => {
+    const { wrapper } = createQueryWrapper();
+    const cosmoshub = makeChainInfo();
+    useGrazInternalStore.setState({ chains: [cosmoshub] });
+    useGrazSessionStore.setState({ activeChainIds: [cosmoshub.chainId] });
+
+    const rendered = renderHook(
+      () => useActiveChainCurrency({ denom: undefined }),
+      { wrapper },
+    );
+    await flushReact();
+
+    expect(rendered.result.data).toBeUndefined();
+    expect(rendered.result.fetchStatus).toBe("idle");
+    rendered.unmount();
+  });
+
   it("queries staking validators when a query client is provided", async () => {
     const { wrapper } = createQueryWrapper();
     const validatorsResponse = {
