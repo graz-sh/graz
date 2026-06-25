@@ -1,0 +1,154 @@
+---
+sidebar_position: 1
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Try it out
+
+Use this example when you want the smallest useful Graz app: one provider setup, one wallet connection, and one balance query against Cosmos Hub.
+
+## Create a React app
+
+Start from Vite's React TypeScript template, then install Graz and its peer dependencies.
+
+<Tabs>
+<TabItem value="npm" label="npm">
+
+```shell
+npm create vite@latest graz-try-it-out -- --template react-ts
+cd graz-try-it-out
+npm install graz @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding @tanstack/react-query
+npm run dev
+```
+
+</TabItem>
+<TabItem value="yarn" label="yarn">
+
+```shell
+yarn create vite graz-try-it-out --template react-ts
+cd graz-try-it-out
+yarn add graz @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding @tanstack/react-query
+yarn dev
+```
+
+</TabItem>
+<TabItem value="pnpm" label="pnpm">
+
+```shell
+pnpm create vite graz-try-it-out --template react-ts
+cd graz-try-it-out
+pnpm add graz @cosmjs/cosmwasm-stargate @cosmjs/proto-signing @cosmjs/stargate @cosmjs/encoding @tanstack/react-query
+pnpm dev
+```
+
+</TabItem>
+</Tabs>
+
+## Add Graz providers
+
+Replace the generated `src/App.tsx` with this example. Install Keplr, Leap, or another supported Cosmos wallet before clicking **Connect wallet**.
+
+```tsx title="src/App.tsx"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GrazProvider, WalletType, useAccount, useBalance, useConnect, useDisconnect } from "graz";
+import { cosmoshub } from "graz/chains";
+
+const queryClient = new QueryClient();
+const chainId = "cosmoshub-4";
+
+function WalletExample() {
+  const { connect, isLoading: isConnecting, status } = useConnect();
+  const { disconnect, isLoading: isDisconnecting } = useDisconnect();
+  const { data: accounts, isConnected } = useAccount({
+    chainId: [chainId] as const,
+  });
+
+  const account = accounts?.[chainId];
+  const {
+    data: balance,
+    error: balanceError,
+    isError: isBalanceError,
+    isLoading: isBalanceLoading,
+  } = useBalance({
+    chainId,
+    bech32Address: account?.bech32Address ?? "",
+    denom: "uatom",
+    enabled: Boolean(account?.bech32Address),
+  });
+
+  const atomBalance = balance ? Number(balance.amount) / 1_000_000 : undefined;
+  const balanceStatus = isBalanceLoading
+    ? "Loading..."
+    : isBalanceError
+      ? (balanceError?.message ?? "Unable to load balance")
+      : atomBalance === undefined
+        ? "No ATOM balance found"
+        : `${atomBalance.toFixed(6)} ATOM`;
+
+  return (
+    <main style={{ maxWidth: 640, margin: "4rem auto", fontFamily: "sans-serif" }}>
+      <h1>Graz wallet example</h1>
+      <p>Connect a Cosmos wallet and read your ATOM balance.</p>
+
+      {account ? (
+        <section>
+          <p>
+            <strong>Address:</strong> {account.bech32Address}
+          </p>
+          <p>
+            <strong>Balance:</strong> {balanceStatus}
+          </p>
+          <button disabled={isDisconnecting} onClick={() => disconnect()}>
+            Disconnect
+          </button>
+        </section>
+      ) : (
+        <section>
+          <p>Status: {status}</p>
+          <button
+            disabled={isConnecting}
+            onClick={() =>
+              connect({
+                chainId: [chainId],
+                walletType: WalletType.KEPLR,
+              })
+            }
+          >
+            Connect wallet
+          </button>
+        </section>
+      )}
+
+      {!isConnected && (
+        <p>
+          Change <code>WalletType.KEPLR</code> to <code>WalletType.LEAP</code> or another supported wallet if you prefer
+          a different connector.
+        </p>
+      )}
+    </main>
+  );
+}
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <GrazProvider
+        grazOptions={{
+          chains: [cosmoshub],
+          defaultWallet: WalletType.KEPLR,
+        }}
+      >
+        <WalletExample />
+      </GrazProvider>
+    </QueryClientProvider>
+  );
+}
+```
+
+## Try more flows
+
+- Use [Getting Started](../getting-started) for the step-by-step setup guide.
+- Open [WalletConnect](../wallet-connect) when you need QR or mobile wallet connections.
+- Explore the [Playground example](https://graz.sh/examples/playground) for multi-chain connections, balances, contracts, clients, and token sends.

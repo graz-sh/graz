@@ -4,6 +4,10 @@ sidebar_position: 5
 
 # Examples
 
+## Try it out
+
+Start with the [Try it out](./try-it-out) page for a small React example that configures Graz, connects a Cosmos wallet, and queries an ATOM balance.
+
 ## Playground (Next.js)
 
 A comprehensive example application showcasing Graz's multi-chain wallet integration capabilities.
