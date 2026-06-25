@@ -24,9 +24,9 @@ export const getCompass = (): Wallet => {
         clearSession();
         reconnect();
       };
-      window.addEventListener("compass_keystorechange", listener);
+      window.addEventListener("keplr_keystorechange", listener);
       return () => {
-        window.removeEventListener("compass_keystorechange", listener);
+        window.removeEventListener("keplr_keystorechange", listener);
       };
     };
     const setDefaultOptions = (options: KeplrIntereactionOptions) => {
