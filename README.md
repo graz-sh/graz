@@ -136,6 +136,7 @@ You can read more about available hooks and exports on [Documentation Site](http
 ## Maintainers
 
 - Nur Fikri/Kiki ([@codingki](https://github.com/codingki))
+- Griko Nibras ([@grikomsn](https://github.com/grikomsn))
 
 ## License
 

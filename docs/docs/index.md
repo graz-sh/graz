@@ -173,6 +173,7 @@ _Want to add your project? [Submit a PR](https://github.com/graz-sh/graz/blob/ma
 ## Maintainers
 
 - Nur Fikri ([@codingki](https://github.com/codingki))
+- Griko Nibras ([@grikomsn](https://github.com/grikomsn))
 
 ## License
 
