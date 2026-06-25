@@ -40,6 +40,7 @@ import { makeChainInfo } from "../../__tests__/fixtures";
 import { createQueryWrapper, renderHook } from "../../__tests__/react";
 import { useGrazInternalStore, useGrazSessionStore } from "../../store";
 import { WalletType, type Key } from "../../types/wallet";
+import { useOfflineSigners } from "../account";
 import { useCosmWasmClient, useStargateClient } from "../clients";
 import { useCosmWasmSigningClient, useStargateSigningClient } from "../signingClients";
 
@@ -200,6 +201,70 @@ describe("client hooks", () => {
         gasPrice,
       },
     );
+    rendered.unmount();
+  });
+
+  it("does not run signing client queries while the wallet is disconnected", async () => {
+    const { wrapper } = createQueryWrapper();
+    const chain = makeChainInfo();
+    useGrazInternalStore.setState({
+      _reconnectConnector: WalletType.KEPLR,
+      chains: [chain],
+      walletType: WalletType.KEPLR,
+    });
+    useGrazSessionStore.setState({
+      activeChainIds: [chain.chainId],
+      status: "disconnected",
+    });
+
+    const rendered = renderHook(
+      () => ({
+        cosmwasm: useCosmWasmSigningClient({ chainId: [chain.chainId] }),
+        stargate: useStargateSigningClient({ chainId: [chain.chainId] }),
+      }),
+      { wrapper },
+    );
+
+    expect(rendered.result.cosmwasm.fetchStatus).toBe("idle");
+    expect(rendered.result.stargate.fetchStatus).toBe("idle");
+    expect(rendered.result.cosmwasm.data).toBeUndefined();
+    expect(rendered.result.stargate.data).toBeUndefined();
+    expect(signingCosmWasmConnect).not.toHaveBeenCalled();
+    expect(signingStargateConnect).not.toHaveBeenCalled();
+    rendered.unmount();
+  });
+
+  it("does not run offline signers query while the wallet is disconnected", async () => {
+    const { wrapper } = createQueryWrapper();
+    const chain = makeChainInfo();
+    const wallet = {
+      enable: vi.fn(),
+      experimentalSuggestChain: vi.fn(),
+      getKey: vi.fn(),
+      getOfflineSigner: vi.fn(),
+      getOfflineSignerAuto: vi.fn(),
+      getOfflineSignerOnlyAmino: vi.fn(),
+      signAmino: vi.fn(),
+      signDirect: vi.fn(),
+    };
+    setWindowValue("keplr", wallet);
+    useGrazInternalStore.setState({
+      _reconnectConnector: WalletType.KEPLR,
+      chains: [chain],
+      walletType: WalletType.KEPLR,
+    });
+    useGrazSessionStore.setState({
+      activeChainIds: [chain.chainId],
+      status: "disconnected",
+    });
+
+    const rendered = renderHook(() => useOfflineSigners({ chainId: [chain.chainId] }), { wrapper });
+
+    expect(rendered.result.fetchStatus).toBe("idle");
+    expect(rendered.result.data).toBeUndefined();
+    expect(wallet.getOfflineSigner).not.toHaveBeenCalled();
+    expect(wallet.getOfflineSignerAuto).not.toHaveBeenCalled();
+    expect(wallet.getOfflineSignerOnlyAmino).not.toHaveBeenCalled();
     rendered.unmount();
   });
 
