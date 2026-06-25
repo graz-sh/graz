@@ -15,8 +15,6 @@ import { clearSession } from ".";
  *   console.error(error.message);
  * }
  * ```
- *
- * @see https://docs.leapwallet.io/cosmos/for-dapps-connect-to-leap/add-leap-to-existing-keplr-integration
  */
 export const getCompass = (): Wallet => {
   if (typeof window.compass !== "undefined") {
@@ -26,9 +24,9 @@ export const getCompass = (): Wallet => {
         clearSession();
         reconnect();
       };
-      window.addEventListener("leap_keystorechange", listener);
+      window.addEventListener("compass_keystorechange", listener);
       return () => {
-        window.removeEventListener("leap_keystorechange", listener);
+        window.removeEventListener("compass_keystorechange", listener);
       };
     };
     const setDefaultOptions = (options: KeplrIntereactionOptions) => {
@@ -42,5 +40,5 @@ export const getCompass = (): Wallet => {
   }
 
   useGrazInternalStore.getState()._notFoundFn();
-  throw new Error("window.leap is not defined");
+  throw new Error("window.compass is not defined");
 };

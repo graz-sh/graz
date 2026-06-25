@@ -23,7 +23,6 @@ export default function WalletsPage() {
 
   // Check availability for popular wallets
   const { data: isKeplrAvailable } = useCheckWallet(WalletType.KEPLR);
-  const { data: isLeapAvailable } = useCheckWallet(WalletType.LEAP);
   const { data: isCosmostationAvailable } = useCheckWallet(WalletType.COSMOSTATION);
   const { data: isCompassAvailable } = useCheckWallet(WalletType.COMPASS);
   const { data: isOkxAvailable } = useCheckWallet(WalletType.OKX);
@@ -33,7 +32,6 @@ export default function WalletsPage() {
 
   const popularWallets = [
     { type: WalletType.KEPLR, available: isKeplrAvailable },
-    { type: WalletType.LEAP, available: isLeapAvailable },
     { type: WalletType.COSMOSTATION, available: isCosmostationAvailable },
     { type: WalletType.COMPASS, available: isCompassAvailable },
     { type: WalletType.OKX, available: isOkxAvailable },
@@ -109,9 +107,7 @@ export default function WalletsPage() {
                 <div className="p-3 rounded-lg bg-muted/50">
                   <p className="text-xs text-muted-foreground mb-1">Mobile</p>
                   <p className="font-mono text-sm font-medium">
-                    {walletInfo.isKeplrMobile || walletInfo.isLeapMobile || walletInfo.isCosmostationMobile
-                      ? "Yes"
-                      : "No"}
+                    {walletInfo.isKeplrMobile || walletInfo.isCosmostationMobile ? "Yes" : "No"}
                   </p>
                 </div>
               </div>
@@ -255,11 +251,11 @@ import { WalletType } from "graz";
 const walletInfo = useActiveWalletType();
 console.log(walletInfo.walletType); // "keplr"
 console.log(walletInfo.isKeplr); // true
-console.log(walletInfo.isLeap); // false
+console.log(walletInfo.isCosmostation); // false
 
 // Check if specific wallet is available
 const { data: isKeplrAvailable } = useCheckWallet(WalletType.KEPLR);
-const { data: isLeapAvailable } = useCheckWallet(WalletType.LEAP);
+const { data: isCosmostationAvailable } = useCheckWallet(WalletType.COSMOSTATION);
 
 // Get recent chains
 const recentChains = useRecentChains();
@@ -268,7 +264,7 @@ const recentChains = useRecentChains();
 const { connect } = useConnect();
 connect({
   chainId: ["cosmoshub-4"],
-  walletType: WalletType.LEAP
+  walletType: WalletType.KEPLR
 });`}
             />
           </CardContent>

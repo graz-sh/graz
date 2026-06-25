@@ -18,7 +18,7 @@ describe("configureGraz", () => {
     const result = configureGraz({
       autoReconnect: false,
       chains: [chain],
-      defaultWallet: WalletType.LEAP,
+      defaultWallet: WalletType.COSMOSTATION,
       logger: {
         enabled: true,
         level: LogLevel.DEBUG,
@@ -31,7 +31,7 @@ describe("configureGraz", () => {
     expect(result.chains).toEqual([chain]);
     expect(useGrazInternalStore.getState()).toMatchObject({
       chains: [chain],
-      walletType: WalletType.LEAP,
+      walletType: WalletType.COSMOSTATION,
       multiChainFetchConcurrency: 7,
       pingInterval: 1234,
       _reconnect: false,
@@ -66,9 +66,9 @@ describe("configureGraz", () => {
         state: {
           chains: [persisted],
           recentChainIds: [persisted.chainId],
-          walletType: WalletType.LEAP,
+          walletType: WalletType.COSMOSTATION,
           _reconnect: true,
-          _reconnectConnector: WalletType.LEAP,
+          _reconnectConnector: WalletType.COSMOSTATION,
         },
         version: 3,
       }),
@@ -103,9 +103,9 @@ describe("configureGraz", () => {
     expect(useGrazInternalStore.getState()).toMatchObject({
       chains: [provider, persisted],
       recentChainIds: [persisted.chainId],
-      walletType: WalletType.LEAP,
+      walletType: WalletType.COSMOSTATION,
       _reconnect: true,
-      _reconnectConnector: WalletType.LEAP,
+      _reconnectConnector: WalletType.COSMOSTATION,
     });
     expect(useGrazSessionStore.getState()).toMatchObject({
       activeChainIds: [persisted.chainId],
@@ -123,9 +123,9 @@ describe("configureGraz", () => {
         state: {
           chains: [makeChainInfo("osmosis-1")],
           recentChainIds: ["osmosis-1"],
-          walletType: WalletType.LEAP,
+          walletType: WalletType.COSMOSTATION,
           _reconnect: true,
-          _reconnectConnector: WalletType.LEAP,
+          _reconnectConnector: WalletType.COSMOSTATION,
         },
         version: 3,
       }),

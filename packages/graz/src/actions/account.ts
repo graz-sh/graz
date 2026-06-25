@@ -9,7 +9,7 @@ import type { Key } from "../types/wallet";
 import { WalletType } from "../types/wallet";
 import { LogCategory } from "../types/logger";
 import { getLogger } from "../utils/logger";
-import { checkWallet, getWallet, isLeapDappBrowser, isLeapSnaps, isPara, isWalletConnect } from "./wallet";
+import { checkWallet, getWallet, isPara, isWalletConnect } from "./wallet";
 
 /**
  * Chain ID type for actions - supports both string and string[] for backward compatibility.
@@ -96,28 +96,11 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     logger.debug(LogCategory.WALLET, "Fetching accounts", { function: LOG_FUNCTIONS.CONNECT });
 
     if (!isWalletConnect(currentWalletType)) {
-      let resultAccounts: Record<string, Key> = {};
-      if (isLeapSnaps(currentWalletType)) {
-        const accounts: Record<string, Key> = {};
-        for await (const chainId of chainIds) {
-          accounts[chainId] = await wallet.getKey(chainId);
-        }
-        resultAccounts = accounts;
-      } else if (isLeapDappBrowser() && wallet.getKeys) {
-        const allAccounts = await wallet.getKeys(chainIds);
-        chainIds.forEach((chainId, index) => {
-          const account = allAccounts[index];
-          if (account) {
-            resultAccounts[chainId] = account;
-          }
-        });
-      } else {
-        resultAccounts = Object.fromEntries(
-          await Promise.all(
-            chainIds.map(async (chainId): Promise<[string, Key]> => [chainId, await wallet.getKey(chainId)]),
-          ),
-        );
-      }
+      const resultAccounts: Record<string, Key> = Object.fromEntries(
+        await Promise.all(
+          chainIds.map(async (chainId): Promise<[string, Key]> => [chainId, await wallet.getKey(chainId)]),
+        ),
+      );
       useGrazSessionStore.setState((prev) => ({
         accounts: { ...(prev.accounts || {}), ...resultAccounts },
       }));

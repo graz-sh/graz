@@ -17,14 +17,12 @@ const { data: isKeplrSupported } = useCheckWallet(WalletType.KEPLR);
   ```ts
   {
     KEPLR = "keplr",
-    LEAP = "leap",
     VECTIS = "vectis",
     COSMOSTATION = "cosmostation",
     WALLETCONNECT = "walletconnect",
     WC_KEPLR_MOBILE = "wc_keplr_mobile",
-    WC_LEAP_MOBILE = "wc_leap_mobile",
     WC_COSMOSTATION_MOBILE = "wc_cosmostation_mobile",
-    METAMASK_SNAP_LEAP = "metamask_snap_leap",
+    METAMASK_SNAP_COSMOS = "metamask_snap_cosmos",
     COSMIFRAME = "cosmiframe",
   }
   ```
@@ -35,13 +33,11 @@ const { data: isKeplrSupported } = useCheckWallet(WalletType.KEPLR);
   ```ts
   {
     WalletType.KEPLR,
-    WalletType.LEAP,
-    WalletTyoe.VECTIS,
-    WalletTyoe.WALLETCONNECT,
-    WalletTyoe.WC_KEPLR_MOBILE,
-    WalletTyoe.WC_LEAP_MOBILE,
-    WalletTyoe.WC_COSMOSTATION_MOBILE,
-    WalletTyoe.METAMASK_SNAP_LEAP,
+    WalletType.VECTIS,
+    WalletType.WALLETCONNECT,
+    WalletType.WC_KEPLR_MOBILE,
+    WalletType.WC_COSMOSTATION_MOBILE,
+    WalletType.METAMASK_SNAP_COSMOS,
     WalletType.COSMIFRAME,
   }
   ```

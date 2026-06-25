@@ -56,7 +56,7 @@ describe("provider components and events", () => {
         grazOptions={{
           autoReconnect: false,
           chains: [chain],
-          defaultWallet: WalletType.LEAP,
+          defaultWallet: WalletType.COSMOSTATION,
         }}
       >
         <span data-testid="ready">ready</span>
@@ -69,7 +69,7 @@ describe("provider components and events", () => {
     expect(useGrazInternalStore.getState()).toMatchObject({
       _reconnect: false,
       chains: [chain],
-      walletType: WalletType.LEAP,
+      walletType: WalletType.COSMOSTATION,
     });
     rendered.unmount();
   });

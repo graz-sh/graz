@@ -6,7 +6,6 @@ import { getWalletConnect } from "../wallet-connect";
 import { getWCClot } from "../wallet-connect/clot";
 import { getWCCosmostation } from "../wallet-connect/cosmostation";
 import { getWCKeplr } from "../wallet-connect/keplr";
-import { getWCLeap } from "../wallet-connect/leap";
 
 const makeWalletConnectKey = (chainId: string, overrides: Partial<Key> = {}) => ({
   address: [1, 2, 3],
@@ -131,7 +130,6 @@ describe("WalletConnect adapter", () => {
     vi.spyOn(window.navigator, "userAgent", "get").mockReturnValue("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0)");
 
     expect(getWCKeplr()).toMatchObject({ init: expect.any(Function) });
-    expect(getWCLeap()).toMatchObject({ init: expect.any(Function) });
     expect(getWCCosmostation()).toMatchObject({ init: expect.any(Function) });
     expect(getWCClot()).toMatchObject({ init: expect.any(Function) });
   });

@@ -51,7 +51,6 @@ type StationChainInfoResponse = {
 
 declare global {
   interface Window extends KeplrWindow, VectisWindow {
-    leap?: KeplrWindow["keplr"];
     compass?: KeplrWindow["keplr"];
     cosmostation?: {
       cosmos: {

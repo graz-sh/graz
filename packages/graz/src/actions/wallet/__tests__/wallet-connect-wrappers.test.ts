@@ -11,7 +11,6 @@ import { WalletType } from "../../../types/wallet";
 import { getWCClot } from "../wallet-connect/clot";
 import { getWCCosmostation } from "../wallet-connect/cosmostation";
 import { getWCKeplr } from "../wallet-connect/keplr";
-import { getWCLeap } from "../wallet-connect/leap";
 
 type CapturedWalletConnectParams = {
   appUrl: {
@@ -61,7 +60,6 @@ describe("WalletConnect mobile wrappers", () => {
     });
     setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)");
 
-    expect(() => getWCLeap()).toThrow("WalletConnect Leap mobile is only supported in mobile");
     expect(getWalletConnectMock).not.toHaveBeenCalled();
   });
 
@@ -89,25 +87,11 @@ describe("WalletConnect mobile wrappers", () => {
     );
   });
 
-  it("formats Leap, Cosmostation, and Clot mobile deep links", () => {
+  it("formats Cosmostation and Clot mobile deep links", () => {
     setUserAgent("Mozilla/5.0 (Linux; Android 14)");
 
-    const leap = getParams(getWCLeap());
     const cosmostation = getParams(getWCCosmostation());
     const clot = getParams(getWCClot());
-
-    expect(leap).toMatchObject({
-      encoding: "base64",
-      walletType: WalletType.WC_LEAP_MOBILE,
-    });
-    expect(leap.formatNativeUrl(leap.appUrl.mobile.ios, "wc:topic", "ios")).toBe("leapcosmos://wcV2?wc%3Atopic");
-    expect(leap.formatNativeUrl(leap.appUrl.mobile.android, undefined, "android")).toBe(
-      "intent://wcV2#Intent;package=io.leapwallet.cosmos;scheme=leapwallet;end;",
-    );
-    expect(leap.formatNativeUrl(leap.appUrl.mobile.android, "wc:topic", "android")).toBe(
-      "intent://wcV2?wc%3Atopic#Intent;package=io.leapwallet.cosmos;scheme=leapwallet;end;",
-    );
-    expect(leap.formatNativeUrl("leapcosmos://", "wc:topic", "other")).toBe("leapcosmos://wc?uri=wc%3Atopic");
 
     expect(cosmostation).toMatchObject({
       encoding: "hex",

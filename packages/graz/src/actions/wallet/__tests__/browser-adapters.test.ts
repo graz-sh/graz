@@ -7,7 +7,6 @@ import { getCactusCosmos } from "../cactus";
 import { getCompass } from "../compass";
 import { getCosmostation } from "../cosmostation";
 import { getKeplr } from "../keplr";
-import { getLeap } from "../leap";
 import { getOkx } from "../okx";
 import { getXDefi } from "../xdefi";
 
@@ -32,7 +31,7 @@ const setWindowValue = (key: string, value: unknown) => {
 
 describe("browser wallet adapters", () => {
   beforeEach(() => {
-    for (const key of ["cactuslink_cosmos", "compass", "cosmostation", "keplr", "leap", "okxwallet", "xfi"]) {
+    for (const key of ["cactuslink_cosmos", "compass", "cosmostation", "keplr", "okxwallet", "xfi"]) {
       Reflect.deleteProperty(window, key);
     }
   });
@@ -67,10 +66,10 @@ describe("browser wallet adapters", () => {
     setWindowValue("keplr", makeWallet());
 
     expect(checkWallet(WalletType.KEPLR)).toBe(true);
-    expect(checkWallet(WalletType.LEAP)).toBe(false);
+    expect(checkWallet(WalletType.COSMOSTATION)).toBe(false);
     expect(getAvailableWallets()).toMatchObject({
       [WalletType.KEPLR]: true,
-      [WalletType.LEAP]: false,
+      [WalletType.COSMOSTATION]: false,
     });
   });
 
@@ -82,20 +81,17 @@ describe("browser wallet adapters", () => {
     expect(onNotFound).toHaveBeenCalledTimes(1);
   });
 
-  it.each([
-    ["leap", getLeap, "leap_keystorechange"],
-    ["compass", getCompass, "leap_keystorechange"],
-  ])("wraps %s extension subscriptions", (windowKey, getter, eventName) => {
+  it("wraps compass extension subscriptions", () => {
     const wallet = makeWallet();
-    setWindowValue(windowKey, wallet);
+    setWindowValue("compass", wallet);
     const reconnect = vi.fn();
 
-    const cleanup = getter().subscription?.(reconnect);
-    window.dispatchEvent(new Event(eventName));
+    const cleanup = getCompass().subscription?.(reconnect);
+    window.dispatchEvent(new Event("compass_keystorechange"));
 
     expect(reconnect).toHaveBeenCalledTimes(1);
     cleanup?.();
-    window.dispatchEvent(new Event(eventName));
+    window.dispatchEvent(new Event("compass_keystorechange"));
     expect(reconnect).toHaveBeenCalledTimes(1);
   });
 

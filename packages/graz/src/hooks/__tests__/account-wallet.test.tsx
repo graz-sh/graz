@@ -69,7 +69,7 @@ describe("account and wallet hooks", () => {
 
     expect(rendered.result.activeWallet).toMatchObject({
       isKeplr: true,
-      isLeap: false,
+      isCosmostation: false,
       walletType: WalletType.KEPLR,
     });
     await vi.waitFor(() => {

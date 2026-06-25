@@ -63,9 +63,6 @@ export const AvailableWallets = () => {
       {wallets.wc_keplr_mobile && (
         <button onClick={() => connect({ walletType: WalletType.WC_KEPLR_MOBILE })}>Keplr Mobile</button>
       )}
-      {wallets.wc_leap_mobile && (
-        <button onClick={() => connect({ walletType: WalletType.WC_LEAP_MOBILE })}>Leap Mobile</button>
-      )}
       {wallets.wc_cosmostation_mobile && (
         <button onClick={() => connect({ walletType: WalletType.WC_COSMOSTATION_MOBILE })}>Cosmostation Mobile</button>
       )}
@@ -76,10 +73,6 @@ export const AvailableWallets = () => {
 
 ## Note:
 
-- if `walletConnect.options.projectId` not provided on `GrazProvider`, `WalletType.WALLETCONNECT` | `WalletType.WC_KEPLR_MOBILE` | `WalletType.WC_LEAP_MOBILE`| `WalletType.WC_COSMOSTATION_MOBILE` will return false
-- `WalletType.WALLETCONNECT` is using `@walletconnect/modal` for the modal, it will only shows the qr code. To connect and have deep linking to wallet mobile apps, use `WalletType.WC_KEPLR_MOBILE` |
-  `WalletType.WC_LEAP_MOBILE`|
-  `WalletType.WC_COSMOSTATION_MOBILE`
-- `WalletType.WC_KEPLR_MOBILE` |
-  `WalletType.WC_LEAP_MOBILE`|
-  `WalletType.WC_COSMOSTATION_MOBILE` | `WalletType.WC_CLOT_MOBILE` only returns true on mobile, `WalletType.WALLETCONNECT` will shows on anywhere
+- if `walletConnect.options.projectId` not provided on `GrazProvider`, `WalletType.WALLETCONNECT` | `WalletType.WC_KEPLR_MOBILE` | `WalletType.WC_COSMOSTATION_MOBILE` will return false
+- `WalletType.WALLETCONNECT` is using `@walletconnect/modal` for the modal, it will only shows the qr code. To connect and have deep linking to wallet mobile apps, use `WalletType.WC_KEPLR_MOBILE` | `WalletType.WC_COSMOSTATION_MOBILE`
+- `WalletType.WC_KEPLR_MOBILE` | `WalletType.WC_COSMOSTATION_MOBILE` | `WalletType.WC_CLOT_MOBILE` only returns true on mobile, `WalletType.WALLETCONNECT` will shows on anywhere

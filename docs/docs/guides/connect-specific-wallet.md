@@ -42,7 +42,7 @@ Here is our list of supported wallets: [WalletType](../types/walletType.md).
 import { WalletType } from "graz";
 const Connect = () => {
   const { connect } = useConnect();
-  return <button onClick={() => connect({ chainId: ["cosmoshub-4"], walletType: WalletType.LEAP })}>Connect</button>;
+  return <button onClick={() => connect({ chainId: ["cosmoshub-4"], walletType: WalletType.KEPLR })}>Connect</button>;
 };
 ```
 
