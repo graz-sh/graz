@@ -106,7 +106,7 @@ jobs:
         id: changesets
         uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
   publish:
     name: Publish to npm
