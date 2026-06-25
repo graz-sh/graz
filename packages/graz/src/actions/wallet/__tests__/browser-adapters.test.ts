@@ -87,11 +87,11 @@ describe("browser wallet adapters", () => {
     const reconnect = vi.fn();
 
     const cleanup = getCompass().subscription?.(reconnect);
-    window.dispatchEvent(new Event("keplr_keystorechange"));
+    window.dispatchEvent(new Event("leap_keystorechange"));
 
     expect(reconnect).toHaveBeenCalledTimes(1);
     cleanup?.();
-    window.dispatchEvent(new Event("keplr_keystorechange"));
+    window.dispatchEvent(new Event("leap_keystorechange"));
     expect(reconnect).toHaveBeenCalledTimes(1);
   });
 
