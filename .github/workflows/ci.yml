@@ -8,7 +8,6 @@ on:
       - .github/workflows/ci.yml
       - .node-version
       - .nvmrc
-      - docs/**
       - eslint.config.mjs
       - example/**
       - integration/**
@@ -24,7 +23,6 @@ on:
       - .github/workflows/ci.yml
       - .node-version
       - .nvmrc
-      - docs/**
       - eslint.config.mjs
       - example/**
       - integration/**

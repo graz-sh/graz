@@ -6,7 +6,6 @@ on:
       - .github/workflows/lint.yml
       - .node-version
       - .nvmrc
-      - docs/**
       - eslint.config.mjs
       - example/**
       - integration/**

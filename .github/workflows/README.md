@@ -6,7 +6,7 @@ The workflows run on pinned `ubuntu-24.04` runner images and SHA-pinned actions 
 
 ### CI (`ci.yml`)
 
-Triggers on pushes and pull requests to `dev` when package, docs, example, dependency, or toolchain files change.
+Triggers on pushes and pull requests to `dev` when package, example, integration, dependency, or toolchain files change. Docs-only changes are handled by the docs workflow instead of running package CI.
 
 Jobs:
 
@@ -15,11 +15,11 @@ Jobs:
 
 ### Lint (`lint.yml`)
 
-Triggers on pushes that change source, dependency, toolchain, or lint config files. Runs `pnpm lint` with ESLint 9 flat config.
+Triggers on pushes that change package, example, integration, dependency, toolchain, or lint config files. Runs `pnpm lint` with ESLint 9 flat config.
 
 ### Docs (`docs.yml`)
 
-Deploys the Docusaurus site from `dev` or manual dispatch using GitHub Pages actions.
+Deploys the Docusaurus site from `dev` or manual dispatch using GitHub Pages actions. It runs when docs, dependency, package, or docs workflow files change.
 
 ### Playwright Integration (`integration-playwright.yml`)
 
