@@ -15,6 +15,7 @@ type Wallet = Pick<
   | "signAmino"
 > & {
   signArbitrary?: Keplr["signArbitrary"];
+  verifyArbitrary?: Keplr["verifyArbitrary"];
   subscription?: (reconnect: () => void) => () => void;
   init?: () => Promise<unknown>;
   disable?: (chainIds?: string | undefined) => Promise<void>;
