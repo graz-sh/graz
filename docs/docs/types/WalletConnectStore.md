@@ -10,6 +10,22 @@ interface WalletConnectStore {
     ...SignClientTypes.Options
   } | null;
   walletConnectModal?: {
+    mobileWallets?: {
+      id: string;
+      name: string;
+      links: {
+        native: string;
+        universal?: string;
+      };
+    }[];
+    desktopWallets?: {
+      id: string;
+      name: string;
+      links: {
+        native: string;
+        universal?: string;
+      };
+    }[];
     themeMode?: 'dark' | 'light'
     privacyPolicyUrl?: string
     termsOfServiceUrl?: string
