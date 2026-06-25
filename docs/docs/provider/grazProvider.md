@@ -34,7 +34,7 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
   };
 
   return (
-    <QueryClientProvider queryClient={queryClient}>
+    <QueryClientProvider client={queryClient}>
       <GrazProvider
         grazOptions={{
           chains: [cosmoshub, sommelier],

@@ -61,6 +61,7 @@ export const WALLET_TYPES = [
 export type Wallet = Pick<Keplr, "enable" | "signAmino"> & {
   experimentalSuggestChain: (chainInfo: Omit<ChainInfo, "nodeProvider">) => Promise<void>;
   signArbitrary?: Keplr["signArbitrary"];
+  verifyArbitrary?: Keplr["verifyArbitrary"];
   signDirect: (...args: SignDirectParams) => Promise<DirectSignResponse>;
   getOfflineSigner: (chainId: string, signOptions?: KeplrSignOptions) => OfflineAminoSigner & OfflineDirectSigner;
   getOfflineSignerOnlyAmino: (chainId: string, signOptions?: KeplrSignOptions) => OfflineAminoSigner;

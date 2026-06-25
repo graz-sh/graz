@@ -99,13 +99,22 @@ export const useChainInfos = ({ chainId }: { chainId?: string[] } = {}) => {
  * const { data: currency, ... } = useActiveChainCurrency({denom: "juno"});
  * ```
  */
-export const useActiveChainCurrency = ({ denom }: { denom: string }): UseQueryResult<AppCurrency | undefined> => {
+export const useActiveChainCurrency = ({
+  denom,
+}: {
+  denom: string | undefined;
+}): UseQueryResult<AppCurrency | undefined> => {
   const chains = useActiveChains();
   const queryKey = ["USE_ACTIVE_CHAIN_CURRENCY", denom];
-  const query = useQuery({
+  const query = useQuery<AppCurrency | null, Error, AppCurrency | undefined>({
     queryKey,
-    queryFn: ({ queryKey: [, _denom] }) =>
-      chains?.find((c) => c.currencies.find((x) => x.coinMinimalDenom === _denom))?.currencies.find((x) => x),
+    queryFn: () => {
+      if (!denom) throw new Error("denom undefined");
+      if (!chains) throw new Error("No active chains found");
+      return chains.flatMap((chain) => chain.currencies).find((currency) => currency.coinMinimalDenom === denom) ?? null;
+    },
+    select: (currency) => currency ?? undefined,
+    enabled: Boolean(denom) && Boolean(chains?.length),
   });
   return query;
 };

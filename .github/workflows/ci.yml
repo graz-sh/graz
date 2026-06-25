@@ -34,6 +34,9 @@ on:
       - pnpm-workspace.yaml
       - turbo.json
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     name: Build & Test

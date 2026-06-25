@@ -1,7 +1,12 @@
 import type { ChainInfo } from "@keplr-wallet/types";
 
 import type { ChainConfig, GrazInternalStore, IframeOptions } from "../store";
-import { useGrazInternalStore } from "../store";
+import {
+  GRAZ_INTERNAL_STORAGE_KEY,
+  GRAZ_SESSION_STORAGE_KEY,
+  useGrazInternalStore,
+  useGrazSessionStore,
+} from "../store";
 import { LogCategory, type LogLevel } from "../types/logger";
 import type { WalletType } from "../types/wallet";
 import { configureLogger } from "../utils/logger";
@@ -29,6 +34,10 @@ export interface ConfigureGrazArgs {
    * Options to enable iframe wallet connection.
    */
   iframeOptions?: IframeOptions;
+  /**
+   * Prefix persisted Graz storage keys, useful when multiple Graz apps share one origin.
+   */
+  prefixStorageKey?: string;
   pingInteval?: number;
   /**
    * Logger configuration
@@ -40,7 +49,25 @@ export interface ConfigureGrazArgs {
   };
 }
 
+const prefixedStorageKey = (key: string, prefix?: string) => (prefix ? `${prefix}-${key}` : key);
+
+const configurePersistedStorageKeys = (prefixStorageKey?: string) => {
+  useGrazInternalStore.persist.setOptions({
+    name: prefixedStorageKey(GRAZ_INTERNAL_STORAGE_KEY, prefixStorageKey),
+  });
+  useGrazSessionStore.persist.setOptions({
+    name: prefixedStorageKey(GRAZ_SESSION_STORAGE_KEY, prefixStorageKey),
+  });
+
+  if (typeof window !== "undefined") {
+    useGrazInternalStore.persist.rehydrate();
+    useGrazSessionStore.persist.rehydrate();
+  }
+};
+
 export const configureGraz = (args: ConfigureGrazArgs): ConfigureGrazArgs => {
+  configurePersistedStorageKeys(args.prefixStorageKey);
+
   // Configure logger - only enable if explicitly provided
   configureLogger({
     enabled: args.logger?.enabled ?? false,

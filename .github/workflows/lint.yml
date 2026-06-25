@@ -16,6 +16,9 @@ on:
       - pnpm-workspace.yaml
       - turbo.json
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
