@@ -4,6 +4,16 @@ on:
   push:
     branches:
       - dev
+    paths:
+      - .github/workflows/docs.yml
+      - .node-version
+      - .nvmrc
+      - docs/**
+      - package.json
+      - packages/**
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - turbo.json
   workflow_dispatch:
 
 permissions:
