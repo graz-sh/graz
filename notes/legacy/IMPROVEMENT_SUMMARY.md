@@ -291,7 +291,7 @@ To suggest an improvement:
 
 ## Related Documents
 
-- [IMPROVEMENT_DESIGN.md](./IMPROVEMENT_DESIGN.md) - Detailed design proposals
+- [GitHub Issues (enhancement + RFC)](https://github.com/graz-sh/graz/issues?q=label%3Aenhancement+label%3ARFC) - Feature proposals (migrated from IMPROVEMENT_DESIGN.md)
 - [REFACTORING_GUIDE.md](./REFACTORING_GUIDE.md) - Modularization plan
 - [TESTING_STRATEGY.md](./TESTING_STRATEGY.md) - Testing approach
 - [PERFORMANCE_IMPROVEMENTS.md](./PERFORMANCE_IMPROVEMENTS.md) - Performance work
