@@ -1,5 +1,36 @@
 # graz
 
+## 0.5.0
+
+### Minor Changes
+
+- 71ca316: Remove Leap wallet and Leap MetaMask Snap support. This removes `WalletType.LEAP`, `WalletType.WC_LEAP_MOBILE`, and `WalletType.METAMASK_SNAP_LEAP` from the library. Users should migrate to other supported wallets.
+
+  **Breaking changes:**
+  - `WalletType.LEAP` removed
+  - `WalletType.WC_LEAP_MOBILE` removed
+  - `WalletType.METAMASK_SNAP_LEAP` removed
+  - `getLeap()` export removed
+  - `getWCLeap()` export removed
+  - `getMetamaskSnapLeap()` export removed
+  - `isLeapSnaps()` helper removed
+  - `isLeapDappBrowser()` helper removed
+  - `window.leap` type declaration removed
+  - `useActiveWalletType()` no longer returns `isLeap`, `isLeapMobile`, or `isMetamaskSnapLeap` flags
+
+- 4e13ffe: Add a `prefixStorageKey` provider option for isolating Graz's persisted local and session storage keys by app.
+
+### Patch Changes
+
+- 0f61458: Select the MetaMask provider for Snap wallets when another extension controls window.ethereum.
+- e005f5a: Support query hooks with required argument values that may be undefined while inputs are still loading.
+- f28a44c: Add arbitrary message signing and verification actions and hooks.
+- 7694b17: Fix QueryClientProvider examples to use the current `client` prop.
+- 24b217e: Add signAndBroadcast action and mutation hook for encoded messages.
+- d817b27: Add regression coverage for disabled signing-client queries while disconnected.
+- 3538f40: Fall back to WalletConnect account requests when sessions omit stored key properties.
+- d3eead8: Expose WalletConnect modal mobile and desktop wallet list configuration.
+
 ## 0.4.3
 
 ### Patch Changes
