@@ -94,11 +94,12 @@ Red tests:
   is cleared;
 - the payload contains the wallet type, previously active chain IDs, and
   `reason: "user"`;
-- partial disconnect emits one chain-change event with correct removed and
-  remaining chain IDs;
+- partial disconnect emits one active-chains-change event with the remaining
+  `activeChainIds`;
 - partial disconnect does not emit full disconnect while another chain remains;
-- disconnecting the final chain emits disconnect once, not both a misleading
-  chain event and a disconnect unless that dual behavior is explicitly chosen;
+- disconnecting the final chain emits disconnect once, not both an
+  active-chains event and a disconnect unless that dual behavior is explicitly
+  chosen;
 - calling disconnect when already disconnected emits nothing.
 
 Minimal green: snapshot relevant pre-action state, commit existing mutations,
@@ -113,7 +114,8 @@ Target:
 Red tests:
 
 - initial connect emits no account-change event;
-- adding a chain to an existing session emits a chain-change event;
+- adding a chain to an existing session emits an active-chains-change event
+  with the complete connected `activeChainIds` set;
 - reconnect with the same addresses emits no account-change event;
 - reconnect with a changed address emits one account-change event containing
   `previousAccounts`, `accounts`, and `changedChainIds`;
@@ -188,8 +190,8 @@ Red tests:
 Then cover WalletConnect separately:
 
 - `accountsChanged` reconciles the affected chain and emits account change;
-- `chainChanged` has an explicitly selected meaning, or is ignored with a
-  documented reason for Cosmos multi-chain sessions;
+- native `chainChanged` is ignored because an EVM-style active-network switch
+  does not map to Graz's Cosmos multi-chain connection set;
 - `session_delete` emits disconnect with `reason: "wallet"`;
 - `session_expire` emits disconnect with `reason: "session-expired"`;
 - every `events.on` has a matching `events.off`.
@@ -229,7 +231,8 @@ Red tests:
 - runtime package exports `subscribeWalletEvents` and `useWalletEvents`;
 - event payload types are available from `graz`;
 - `accounts` remains `Record<string, Key>`;
-- chain payloads use arrays/diffs and do not collapse to a singular chain;
+- active-chains payloads expose `activeChainIds` and do not collapse to a
+  singular active chain;
 - public declarations do not add deep `cosmjs-types` imports;
 - existing action, hook, provider, wallet, type, and `graz/chains` exports remain.
 
@@ -294,7 +297,8 @@ pnpm integration:test
 - [ ] No listener survives unmount or connector change.
 - [ ] Account switch never reports a false disconnect.
 - [ ] Events are emitted after committed state.
-- [ ] Multi-chain payload semantics are tested.
+- [ ] `onActiveChainsChange` reports the complete connected `activeChainIds`
+      set.
 - [ ] Full and partial disconnect behavior is distinct.
 - [ ] WalletConnect deletion and expiry are covered.
 - [ ] `onBalanceChange` is deferred or backed by a separately approved design.

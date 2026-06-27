@@ -14,7 +14,8 @@ Implement a smaller first version than the issue sketch:
    unsubscribe function.
 2. Add a React `useWalletEvents()` hook that owns its subscription and cleanup;
    the hook should not require callers to invoke an unsubscribe function.
-3. Support account, connected-chain-set, and disconnect events in v1.
+3. Support account, `onActiveChainsChange`, and disconnect events in v1. The
+   active-chains payload contains the complete connected `activeChainIds` set.
 4. Defer `onBalanceChange`. A balance change is chain state, not a wallet event,
    and none of Graz's wallet adapters emits it.
 5. Normalize adapter events before exposing them. Do not build the public API by
@@ -26,7 +27,8 @@ implementations.
 
 ## What the proposal currently says
 
-The issue proposes one hook with four callbacks:
+The issue proposes one hook with four callbacks. This is the original sketch,
+not the recommended v1 API:
 
 ```ts
 const unsubscribe = useWalletEvents({
@@ -48,6 +50,12 @@ git show 3196c98^:notes/legacy/IMPROVEMENT_DESIGN.md
 The issue and legacy note define the goal, but not event semantics, payloads,
 ordering, multi-chain behavior, or the boundary between native wallet events
 and Graz state changes.
+
+In particular, `onChainChange(chainId)` borrows an EVM-style active-network
+switch concept that does not fit Graz's Cosmos model. A Graz session connects
+to a set of chains simultaneously. The meaningful state is
+`GrazSessionStore.activeChainIds`, so v1 should report changes to that connected
+set rather than claim that the wallet switched to one chain.
 
 ## Existing behavior in Graz
 
@@ -162,11 +170,9 @@ export interface AccountChangeEvent extends WalletEventContext {
   changedChainIds: string[];
 }
 
-export interface ChainChangeEvent extends WalletEventContext {
-  chainIds: string[];
-  previousChainIds: string[];
-  addedChainIds: string[];
-  removedChainIds: string[];
+export interface ActiveChainsChangeEvent extends WalletEventContext {
+  activeChainIds: string[];
+  previousActiveChainIds: string[];
 }
 
 export interface DisconnectEvent extends WalletEventContext {
@@ -176,7 +182,7 @@ export interface DisconnectEvent extends WalletEventContext {
 
 export interface WalletEventHandlers {
   onAccountChange?: (event: AccountChangeEvent) => void;
-  onChainChange?: (event: ChainChangeEvent) => void;
+  onActiveChainsChange?: (event: ActiveChainsChangeEvent) => void;
   onDisconnect?: (event: DisconnectEvent) => void;
 }
 
@@ -196,8 +202,8 @@ useWalletEvents({
   onAccountChange(event) {
     console.log(event.changedChainIds, event.accounts);
   },
-  onChainChange(event) {
-    console.log(event.addedChainIds, event.removedChainIds);
+  onActiveChainsChange(event) {
+    console.log(event.activeChainIds);
   },
   onDisconnect(event) {
     console.log(event.reason);
@@ -211,14 +217,18 @@ imperative unsubscribe is needed outside React, use
 
 ### Event rules
 
-- Do not emit account or chain events for initial hydration/subscription.
+- Do not emit account or active-chains events for initial
+  hydration/subscription.
 - Initial connect is a connect operation, not an account change.
 - Emit account change only after a successful wallet reconciliation and after
   the store contains the new accounts.
 - Compare account identity per chain. For v1, `bech32Address` is the identity;
   display-name-only changes do not count.
-- Treat `activeChainIds` as a set. Reordering alone is not a chain change.
-- Emit chain change for successful additions and partial disconnects.
+- Treat `activeChainIds` as a set. Reordering alone is not a connected-chain-set
+  change.
+- Emit active-chains change for successful additions and partial disconnects.
+- Do not expose an EVM-style singular active chain or forward a wallet-native
+  `chainChanged` event as though it had that meaning in Cosmos.
 - Emit disconnect once when the final active chain is removed, a wallet session
   is deleted/expired, or reconnect failure clears the session.
 - An account-switch reconnect must not emit disconnect.
@@ -260,11 +270,11 @@ ready to migrate every adapter in the same change.
 
 ## Decisions needed before implementation
 
-1. Is `onDisconnect` full-session only? Recommended: yes; use chain change for
-   partial disconnect.
+1. Is `onDisconnect` full-session only? Recommended: yes; use
+   `onActiveChainsChange` for partial disconnect.
 2. Should an account event fire once with a multi-chain diff or once per chain?
    Recommended: once with `changedChainIds`.
-3. Does initial connect count as account/chain change? Recommended: no.
+3. Does initial connect count as account/active-chains change? Recommended: no.
 4. Is `onBalanceChange` removed from v1? Recommended: yes, with a follow-up RFC.
 5. Should reconnect failure report only disconnect or also an error event?
    Recommended: disconnect with `reason: "reconnect-failed"` for v1.
