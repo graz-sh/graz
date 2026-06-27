@@ -11,7 +11,7 @@ export * from "./actions/configure";
 export { subscribeWalletEvents } from "./actions/events";
 export * from "./actions/methods";
 export * from "./actions/wallet";
-export { LOG_CATEGORIES, LOG_FUNCTIONS } from "./constant";
+export { LOG_CATEGORIES, LOG_FUNCTIONS, LOG_HOOKS } from "./constant";
 export * from "./types/logger";
 export * from "./utils/logger";
 export * from "./actions/wallet/cactus";

@@ -240,9 +240,9 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
     const walletConnectModal = new WalletConnectModal({
       projectId: walletConnect.options.projectId,
+      ...walletConnect.walletConnectModal,
       enableExplorer: false,
       explorerRecommendedWalletIds: "NONE",
-      ...walletConnect.walletConnectModal,
     });
     const lastSession = checkSession(chainId);
     if (!lastSession) {

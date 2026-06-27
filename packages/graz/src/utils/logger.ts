@@ -164,7 +164,11 @@ class GrazLogger implements Logger {
     if (!this.log(LogLevelEnum.ERROR, "error", category, message, context)) return;
     const reporter = this.errorReporter || (typeof window !== "undefined" && window.grazErrorReporter);
     if (reporter) {
-      reporter.captureException(new Error(message), { category, context });
+      try {
+        reporter.captureException(new Error(message), { category, message, context });
+      } catch {
+        // Never let telemetry failures break application code.
+      }
     }
   }
 

@@ -49,14 +49,14 @@ export const useSignArbitrary = ({
         error: err instanceof Error ? err.message : String(err),
         chainId: data.chainId,
       });
-      onError?.(err, data);
+      return onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (signature) => {
       logger.info(LogCategory.TRANSACTION, "useSignArbitrary mutation successful", {
         hook: "useSignArbitrary",
       });
-      onSuccess?.(signature);
+      return onSuccess?.(signature);
     },
   });
 
@@ -87,7 +87,7 @@ export const useVerifyArbitrary = ({
         error: err instanceof Error ? err.message : String(err),
         chainId: data.chainId,
       });
-      onError?.(err, data);
+      return onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (verified) => {
@@ -95,7 +95,7 @@ export const useVerifyArbitrary = ({
         hook: "useVerifyArbitrary",
         verified,
       });
-      onSuccess?.(verified);
+      return onSuccess?.(verified);
     },
   });
 
@@ -126,7 +126,7 @@ export const useSignAndBroadcast = ({
         error: err instanceof Error ? err.message : String(err),
         messageCount: data?.messages?.length ?? 0,
       });
-      onError?.(err, data);
+      return onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (txResponse) => {
@@ -134,7 +134,7 @@ export const useSignAndBroadcast = ({
         hook: "useSignAndBroadcast",
         txHash: txResponse.transactionHash,
       });
-      onSuccess?.(txResponse);
+      return onSuccess?.(txResponse);
     },
   });
 
@@ -187,7 +187,7 @@ export const useSendTokens = ({
         error: err instanceof Error ? err.message : String(err),
         recipientAddress: data.recipientAddress,
       });
-      onError?.(err, data);
+      return onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (txResponse) => {
@@ -195,7 +195,7 @@ export const useSendTokens = ({
         hook: "useSendTokens",
         txHash: txResponse.transactionHash,
       });
-      onSuccess?.(txResponse);
+      return onSuccess?.(txResponse);
     },
   });
 
@@ -244,7 +244,7 @@ export const useSendIbcTokens = ({
         error: err instanceof Error ? err.message : String(err),
         sourceChannel: data.sourceChannel,
       });
-      onError?.(err, data);
+      return onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (txResponse) => {
@@ -252,7 +252,7 @@ export const useSendIbcTokens = ({
         hook: "useSendIbcTokens",
         txHash: txResponse.transactionHash,
       });
-      onSuccess?.(txResponse);
+      return onSuccess?.(txResponse);
     },
   });
 
@@ -319,7 +319,7 @@ export const useInstantiateContract = <Message extends Record<string, unknown>>(
         error: err instanceof Error ? err.message : String(err),
         codeId,
       });
-      onError?.(err, data);
+      return onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (instantiateResult) => {
@@ -328,7 +328,7 @@ export const useInstantiateContract = <Message extends Record<string, unknown>>(
         contractAddress: instantiateResult.contractAddress,
         txHash: instantiateResult.transactionHash,
       });
-      onSuccess?.(instantiateResult);
+      return onSuccess?.(instantiateResult);
     },
   });
 
@@ -404,7 +404,7 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
         error: err instanceof Error ? err.message : String(err),
         contractAddress,
       });
-      onError?.(err, data);
+      return onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (executeResult) => {
@@ -413,7 +413,7 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
         txHash: executeResult.transactionHash,
         contractAddress,
       });
-      onSuccess?.(executeResult);
+      return onSuccess?.(executeResult);
     },
   });
 

@@ -236,7 +236,7 @@ const makeRecord = async (client, { filter = "" } = {}) => {
     }
   }
 
-  const chains = await pmap(
+  const chains = await pMap(
     paths,
     async (c) => {
       try {

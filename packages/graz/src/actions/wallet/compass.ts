@@ -14,7 +14,7 @@ import { createKeplrLikeWallet, throwWalletNotFound } from "./keplr-like";
  * ```
  */
 export const getCompass = (): Wallet => {
-  if (typeof window.compass !== "undefined")
+  if (typeof window !== "undefined" && typeof window.compass !== "undefined")
     return createKeplrLikeWallet(window.compass, "leap_keystorechange");
   return throwWalletNotFound("window.compass is not defined");
 };

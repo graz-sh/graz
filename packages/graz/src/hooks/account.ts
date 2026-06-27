@@ -325,7 +325,7 @@ export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArg
         error: err instanceof Error ? err.message : String(err),
         chainId: args?.chainId,
       });
-      onError?.(err, args);
+      return onError?.(err, args);
     },
     onMutate: onLoading,
     onSuccess: (connectResult) => {
@@ -334,7 +334,7 @@ export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArg
         walletType: connectResult.walletType,
         chainCount: connectResult.chains.length,
       });
-      onSuccess?.(connectResult);
+      return onSuccess?.(connectResult);
     },
   });
   const { data: isSupported } = useCheckWallet();
@@ -384,12 +384,12 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
         hook: "useDisconnect",
         error: err instanceof Error ? err.message : String(err),
       });
-      onError?.(err, undefined);
+      return onError?.(err, undefined);
     },
     onMutate: onLoading,
     onSuccess: () => {
       logger.info(LogCategory.WALLET, "useDisconnect mutation successful", { hook: "useDisconnect" });
-      onSuccess?.(undefined);
+      return onSuccess?.(undefined);
     },
   });
 

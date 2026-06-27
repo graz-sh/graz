@@ -263,7 +263,7 @@ export const useAddChain = ({ onError, onLoading, onSuccess }: UseAddChainArgs =
         error: err instanceof Error ? err.message : String(err),
         chainId: args.chainInfo.chainId,
       });
-      onError?.(err, args.chainInfo);
+      return onError?.(err, args.chainInfo);
     },
     onMutate: (data) => onLoading?.(data.chainInfo),
     onSuccess: (chainInfo) => {
@@ -272,7 +272,7 @@ export const useAddChain = ({ onError, onLoading, onSuccess }: UseAddChainArgs =
         chainId: chainInfo.chainId,
         chainName: chainInfo.chainName,
       });
-      onSuccess?.(chainInfo);
+      return onSuccess?.(chainInfo);
     },
   });
 
@@ -317,7 +317,7 @@ export const useSuggestChain = ({ onError, onLoading, onSuccess }: UseSuggestCha
         chainId: args.chainInfo.chainId,
         walletType: args.walletType,
       });
-      onError?.(err, args.chainInfo);
+      return onError?.(err, args.chainInfo);
     },
     onMutate: (data) => onLoading?.(data.chainInfo),
     onSuccess: (chainInfo) => {
@@ -326,7 +326,7 @@ export const useSuggestChain = ({ onError, onLoading, onSuccess }: UseSuggestCha
         chainId: chainInfo.chainId,
         chainName: chainInfo.chainName,
       });
-      onSuccess?.(chainInfo);
+      return onSuccess?.(chainInfo);
     },
   });
 
@@ -383,7 +383,7 @@ export const useSuggestChainAndConnect = ({ onError, onLoading, onSuccess }: Use
         error: err instanceof Error ? err.message : String(err),
         chainId: args.chainInfo.chainId,
       });
-      onError?.(err, args);
+      return onError?.(err, args);
     },
     onMutate: (args) => onLoading?.(args),
     onSuccess: (res) => {
@@ -392,7 +392,7 @@ export const useSuggestChainAndConnect = ({ onError, onLoading, onSuccess }: Use
         walletType: res.walletType,
         chainCount: res.chains.length,
       });
-      onSuccess?.(res);
+      return onSuccess?.(res);
     },
   });
   const { data: isSupported } = useCheckWallet();

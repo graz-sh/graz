@@ -14,7 +14,6 @@ import { getMetamaskSnapCosmos } from "./cosmos-metamask-snap";
 import { getCosmostation } from "./cosmostation";
 import { getInitia } from "./initia";
 import { getKeplr } from "./keplr";
-import { selectMetamaskProvider } from "./metamask";
 import { getOkx } from "./okx";
 import { getPara } from "./para";
 import { getStation } from "./station";
@@ -43,7 +42,8 @@ const walletPresence: Record<WalletType, () => boolean> = {
     const pid = useGrazInternalStore.getState().walletConnect?.options?.projectId;
     return isMobile() && Boolean(pid?.trim());
   },
-  [WalletType.METAMASK_SNAP_COSMOS]: () => Boolean(selectMetamaskProvider()),
+  [WalletType.METAMASK_SNAP_COSMOS]: () =>
+    typeof window !== "undefined" && Boolean((window.ethereum as { isMetaMask?: boolean } | undefined)?.isMetaMask),
   [WalletType.STATION]: () => typeof window.station?.keplr !== "undefined",
   [WalletType.XDEFI]: () => typeof window.xfi?.keplr !== "undefined",
   [WalletType.COSMIFRAME]: () => {

@@ -16,7 +16,7 @@ import { createKeplrLikeWallet, throwWalletNotFound } from "./keplr-like";
  * @see https://docs.keplr.app
  */
 export const getKeplr = (): Wallet => {
-  if (typeof window.keplr !== "undefined")
+  if (typeof window !== "undefined" && typeof window.keplr !== "undefined")
     return createKeplrLikeWallet(window.keplr, "keplr_keystorechange");
   return throwWalletNotFound("window.keplr is not defined");
 };
