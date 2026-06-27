@@ -1,7 +1,6 @@
-import type { KeplrIntereactionOptions } from "@keplr-wallet/types";
-
-import { useGrazInternalStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
+import { createKeplrLikeWallet, throwWalletNotFound } from "./keplr-like";
+
 /**
  * Function to return okxwallet object (which is {@link Wallet}) and throws and error if it does not exist on `window`.
  *
@@ -17,26 +16,10 @@ import type { Wallet } from "../../types/wallet";
  * @see https://www.okx.com/web3/build/docs/sdks/chains/cosmos/provider
  */
 export const getOkx = (): Wallet => {
-  if (typeof window.okxwallet?.keplr !== "undefined") {
-    const okxWallet = window.okxwallet.keplr;
-    const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      const listener = () => reconnect();
-      window.okxwallet?.on("accountsChanged", listener);
-      return () => {
-        window.okxwallet?.removeListener("accountsChanged", listener);
-      };
-    };
-
-    const setDefaultOptions = (options: KeplrIntereactionOptions) => {
-      okxWallet.defaultOptions = options;
-    };
-    const res = Object.assign(okxWallet, {
-      subscription,
-      setDefaultOptions,
+  if (typeof window.okxwallet?.keplr !== "undefined")
+    return createKeplrLikeWallet(window.okxwallet.keplr, "accountsChanged", {
+      on: (event, listener) => window.okxwallet?.on(event, listener),
+      off: (event, listener) => window.okxwallet?.removeListener(event, listener),
     });
-    return res as unknown as Wallet;
-  }
-
-  useGrazInternalStore.getState()._notFoundFn();
-  throw new Error("window.okxwallet.keplr is not defined");
+  return throwWalletNotFound("window.okxwallet.keplr is not defined");
 };

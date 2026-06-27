@@ -32,6 +32,7 @@ const getParams = (wallet: unknown): CapturedWalletConnectParams => wallet as Ca
 
 describe("WalletConnect mobile wrappers", () => {
   beforeEach(() => {
+    getWalletConnectMock.mockImplementation((params: unknown) => params);
     getWalletConnectMock.mockClear();
     useGrazInternalStore.setState({
       walletConnect: {

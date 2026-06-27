@@ -9,18 +9,28 @@ import {
 } from "@cosmjs/amino";
 import type { OfflineDirectSigner, OfflineSigner } from "@cosmjs/proto-signing";
 import type { DeliverTxResponse } from "@cosmjs/stargate";
-import type { Chain } from "@initia/initia-registry-types";
 import type { ChainInfo } from "@keplr-wallet/types";
 
 import { useGrazInternalStore } from "../../store";
 import type { SignAminoParams, SignDirectParams, Wallet } from "../../types/wallet";
+
+interface InitiaRegistryChain {
+  chain_id?: string;
+  chain_name?: string;
+  bech32_prefix?: string;
+  bech32_config?: unknown;
+  slip44?: number;
+  logo_URIs?: { png?: string };
+  fees?: { fee_tokens: { denom?: string; amount?: string; low_gas_price?: number; average_gas_price?: number; high_gas_price?: number }[] };
+  apis?: { rpc?: { address?: string }[]; rest?: { address?: string }[] };
+}
 
 export interface InitiaWallet {
   getVersion: () => Promise<string>;
   getAddress: (chainId?: string) => Promise<string>;
   getOfflineSigner: (chainId: string) => OfflineDirectSigner;
   getOfflineSignerOnlyAmino: (chainId: string) => OfflineAminoSigner;
-  requestAddInitiaLayer: (chain: Partial<Chain>) => Promise<void>;
+  requestAddInitiaLayer: (chain: InitiaRegistryChain) => Promise<void>;
   signAndBroadcastSync: (chainId: string, txBody: Uint8Array, gas: number) => Promise<string>;
   signAndBroadcastBlock: (chainId: string, txBody: Uint8Array, gas: number) => Promise<DeliverTxResponse>;
   signArbitrary: (data: string | Uint8Array) => Promise<string>;

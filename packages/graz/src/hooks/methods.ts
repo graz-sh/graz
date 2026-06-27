@@ -39,12 +39,25 @@ export const useSignArbitrary = ({
   onLoading,
   onSuccess,
 }: MutationEventArgs<SignArbitraryArgs, StdSignature> = {}) => {
+  const logger = getLogger();
   const { mutate, mutateAsync, ...mutation } = useMutation({
-    mutationKey: ["USE_SIGN_ARBITRARY", onError, onLoading, onSuccess],
+    mutationKey: ["USE_SIGN_ARBITRARY"],
     mutationFn: signArbitrary,
-    onError: (err, data) => Promise.resolve(onError?.(err, data)),
+    onError: (err, data) => {
+      logger.error(LogCategory.TRANSACTION, "useSignArbitrary mutation failed", {
+        hook: "useSignArbitrary",
+        error: err instanceof Error ? err.message : String(err),
+        chainId: data.chainId,
+      });
+      onError?.(err, data);
+    },
     onMutate: onLoading,
-    onSuccess: (signature) => Promise.resolve(onSuccess?.(signature)),
+    onSuccess: (signature) => {
+      logger.info(LogCategory.TRANSACTION, "useSignArbitrary mutation successful", {
+        hook: "useSignArbitrary",
+      });
+      onSuccess?.(signature);
+    },
   });
 
   return {
@@ -64,12 +77,26 @@ export const useVerifyArbitrary = ({
   onLoading,
   onSuccess,
 }: MutationEventArgs<VerifyArbitraryArgs, boolean> = {}) => {
+  const logger = getLogger();
   const { mutate, mutateAsync, ...mutation } = useMutation({
-    mutationKey: ["USE_VERIFY_ARBITRARY", onError, onLoading, onSuccess],
+    mutationKey: ["USE_VERIFY_ARBITRARY"],
     mutationFn: verifyArbitrary,
-    onError: (err, data) => Promise.resolve(onError?.(err, data)),
+    onError: (err, data) => {
+      logger.error(LogCategory.TRANSACTION, "useVerifyArbitrary mutation failed", {
+        hook: "useVerifyArbitrary",
+        error: err instanceof Error ? err.message : String(err),
+        chainId: data.chainId,
+      });
+      onError?.(err, data);
+    },
     onMutate: onLoading,
-    onSuccess: (verified) => Promise.resolve(onSuccess?.(verified)),
+    onSuccess: (verified) => {
+      logger.info(LogCategory.TRANSACTION, "useVerifyArbitrary mutation successful", {
+        hook: "useVerifyArbitrary",
+        verified,
+      });
+      onSuccess?.(verified);
+    },
   });
 
   return {
@@ -99,7 +126,7 @@ export const useSignAndBroadcast = ({
         error: err instanceof Error ? err.message : String(err),
         messageCount: data?.messages?.length ?? 0,
       });
-      return Promise.resolve(onError?.(err, data));
+      onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (txResponse) => {
@@ -107,7 +134,7 @@ export const useSignAndBroadcast = ({
         hook: "useSignAndBroadcast",
         txHash: txResponse.transactionHash,
       });
-      return Promise.resolve(onSuccess?.(txResponse));
+      onSuccess?.(txResponse);
     },
   });
 
@@ -152,7 +179,7 @@ export const useSendTokens = ({
 }: MutationEventArgs<SendTokensArgs, DeliverTxResponse> = {}) => {
   const logger = getLogger();
   const { mutate, mutateAsync, ...mutation } = useMutation({
-    mutationKey: ["USE_SEND_TOKENS", onError, onLoading, onSuccess],
+    mutationKey: ["USE_SEND_TOKENS"],
     mutationFn: sendTokens,
     onError: (err, data) => {
       logger.error(LogCategory.TRANSACTION, "useSendTokens mutation failed", {
@@ -160,7 +187,7 @@ export const useSendTokens = ({
         error: err instanceof Error ? err.message : String(err),
         recipientAddress: data.recipientAddress,
       });
-      return Promise.resolve(onError?.(err, data));
+      onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (txResponse) => {
@@ -168,7 +195,7 @@ export const useSendTokens = ({
         hook: "useSendTokens",
         txHash: txResponse.transactionHash,
       });
-      return Promise.resolve(onSuccess?.(txResponse));
+      onSuccess?.(txResponse);
     },
   });
 
@@ -210,14 +237,14 @@ export const useSendIbcTokens = ({
 }: MutationEventArgs<SendIbcTokensArgs, DeliverTxResponse> = {}) => {
   const logger = getLogger();
   const { mutate, mutateAsync, ...mutation } = useMutation({
-    mutationKey: ["USE_SEND_IBC_TOKENS", onError, onLoading, onSuccess],
+    mutationKey: ["USE_SEND_IBC_TOKENS"],
     mutationFn: sendIbcTokens,
     onError: (err, data) => {
       logger.error(LogCategory.TRANSACTION, "useSendIbcTokens mutation failed", {
         error: err instanceof Error ? err.message : String(err),
         sourceChannel: data.sourceChannel,
       });
-      return Promise.resolve(onError?.(err, data));
+      onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (txResponse) => {
@@ -225,7 +252,7 @@ export const useSendIbcTokens = ({
         hook: "useSendIbcTokens",
         txHash: txResponse.transactionHash,
       });
-      return Promise.resolve(onSuccess?.(txResponse));
+      onSuccess?.(txResponse);
     },
   });
 
@@ -285,14 +312,14 @@ export const useInstantiateContract = <Message extends Record<string, unknown>>(
   };
 
   const { mutate, mutateAsync, ...mutation } = useMutation({
-    mutationKey: ["USE_INSTANTIATE_CONTRACT", onError, onLoading, onSuccess, codeId],
+    mutationKey: ["USE_INSTANTIATE_CONTRACT", codeId],
     mutationFn,
     onError: (err, data) => {
       logger.error(LogCategory.TRANSACTION, "useInstantiateContract mutation failed", {
         error: err instanceof Error ? err.message : String(err),
         codeId,
       });
-      return Promise.resolve(onError?.(err, data));
+      onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (instantiateResult) => {
@@ -301,7 +328,7 @@ export const useInstantiateContract = <Message extends Record<string, unknown>>(
         contractAddress: instantiateResult.contractAddress,
         txHash: instantiateResult.transactionHash,
       });
-      return Promise.resolve(onSuccess?.(instantiateResult));
+      onSuccess?.(instantiateResult);
     },
   });
 
@@ -369,7 +396,7 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
   };
 
   const { mutate, mutateAsync, ...mutation } = useMutation({
-    mutationKey: ["USE_EXECUTE_CONTRACT", onError, onLoading, onSuccess, contractAddress],
+    mutationKey: ["USE_EXECUTE_CONTRACT", contractAddress],
     mutationFn,
     onError: (err, data) => {
       logger.error(LogCategory.TRANSACTION, "useExecuteContract mutation failed", {
@@ -377,7 +404,7 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
         error: err instanceof Error ? err.message : String(err),
         contractAddress,
       });
-      return Promise.resolve(onError?.(err, data));
+      onError?.(err, data);
     },
     onMutate: onLoading,
     onSuccess: (executeResult) => {
@@ -386,7 +413,7 @@ export const useExecuteContract = <Message extends Record<string, unknown>>({
         txHash: executeResult.transactionHash,
         contractAddress,
       });
-      return Promise.resolve(onSuccess?.(executeResult));
+      onSuccess?.(executeResult);
     },
   });
 

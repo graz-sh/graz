@@ -139,90 +139,49 @@ class GrazLogger implements Logger {
     ] as [string, ...string[]];
   }
 
-  error(category: LogCategory, message: string, context?: Record<string, unknown>): void {
-    if (!this.shouldLog(LogLevelEnum.ERROR, category)) return;
-
+  private log(
+    levelEnum: LogLevel,
+    levelName: "error" | "warn" | "info" | "debug" | "trace",
+    category: LogCategory,
+    message: string,
+    context?: Record<string, unknown>,
+  ): boolean {
+    if (!this.shouldLog(levelEnum, category)) return false;
     const functionName = (context?.function || context?.hook) as string | undefined;
-    const [format, ...styles] = this.formatLog("error", category, message, functionName);
-
-    // Remove function/hook from context since it's now in the log format
+    const [format, ...styles] = this.formatLog(levelName, category, message, functionName);
     const cleanContext = context ? { ...context } : undefined;
     if (cleanContext) {
       delete cleanContext.function;
       delete cleanContext.hook;
     }
+    const args: unknown[] = [format, ...styles];
+    if (Object.keys(cleanContext || {}).length > 0) args.push(cleanContext);
+    (console[levelName] as (...args: unknown[]) => void)(...args);
+    return true;
+  }
 
-    console.error(format, ...styles, Object.keys(cleanContext || {}).length > 0 ? cleanContext : "");
-
-    // Send to error tracking if available
+  error(category: LogCategory, message: string, context?: Record<string, unknown>): void {
+    if (!this.log(LogLevelEnum.ERROR, "error", category, message, context)) return;
     const reporter = this.errorReporter || (typeof window !== "undefined" && window.grazErrorReporter);
     if (reporter) {
-      const error = new Error(message);
-      reporter.captureException(error, {
-        category,
-        context,
-      });
+      reporter.captureException(new Error(message), { category, context });
     }
   }
 
   warn(category: LogCategory, message: string, context?: Record<string, unknown>): void {
-    if (!this.shouldLog(LogLevelEnum.WARN, category)) return;
-    const functionName = (context?.function || context?.hook) as string | undefined;
-    const [format, ...styles] = this.formatLog("warn", category, message, functionName);
-
-    // Remove function/hook from context since it's now in the log format
-    const cleanContext = context ? { ...context } : undefined;
-    if (cleanContext) {
-      delete cleanContext.function;
-      delete cleanContext.hook;
-    }
-
-    console.warn(format, ...styles, Object.keys(cleanContext || {}).length > 0 ? cleanContext : "");
+    this.log(LogLevelEnum.WARN, "warn", category, message, context);
   }
 
   info(category: LogCategory, message: string, context?: Record<string, unknown>): void {
-    if (!this.shouldLog(LogLevelEnum.INFO, category)) return;
-    const functionName = (context?.function || context?.hook) as string | undefined;
-    const [format, ...styles] = this.formatLog("info", category, message, functionName);
-
-    // Remove function/hook from context since it's now in the log format
-    const cleanContext = context ? { ...context } : undefined;
-    if (cleanContext) {
-      delete cleanContext.function;
-      delete cleanContext.hook;
-    }
-
-    console.info(format, ...styles, Object.keys(cleanContext || {}).length > 0 ? cleanContext : "");
+    this.log(LogLevelEnum.INFO, "info", category, message, context);
   }
 
   debug(category: LogCategory, message: string, context?: Record<string, unknown>): void {
-    if (!this.shouldLog(LogLevelEnum.DEBUG, category)) return;
-    const functionName = (context?.function || context?.hook) as string | undefined;
-    const [format, ...styles] = this.formatLog("debug", category, message, functionName);
-
-    // Remove function/hook from context since it's now in the log format
-    const cleanContext = context ? { ...context } : undefined;
-    if (cleanContext) {
-      delete cleanContext.function;
-      delete cleanContext.hook;
-    }
-
-    console.debug(format, ...styles, Object.keys(cleanContext || {}).length > 0 ? cleanContext : "");
+    this.log(LogLevelEnum.DEBUG, "debug", category, message, context);
   }
 
   trace(category: LogCategory, message: string, context?: Record<string, unknown>): void {
-    if (!this.shouldLog(LogLevelEnum.TRACE, category)) return;
-    const functionName = (context?.function || context?.hook) as string | undefined;
-    const [format, ...styles] = this.formatLog("trace", category, message, functionName);
-
-    // Remove function/hook from context since it's now in the log format
-    const cleanContext = context ? { ...context } : undefined;
-    if (cleanContext) {
-      delete cleanContext.function;
-      delete cleanContext.hook;
-    }
-
-    console.trace(format, ...styles, Object.keys(cleanContext || {}).length > 0 ? cleanContext : "");
+    this.log(LogLevelEnum.TRACE, "trace", category, message, context);
   }
 
   time(label: string): void {
