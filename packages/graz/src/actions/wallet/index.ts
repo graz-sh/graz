@@ -133,7 +133,8 @@ export const isWalletConnect = (type: WalletType): boolean => {
   return (
     type === WalletType.WALLETCONNECT ||
     type === WalletType.WC_KEPLR_MOBILE ||
-    type === WalletType.WC_COSMOSTATION_MOBILE
+    type === WalletType.WC_COSMOSTATION_MOBILE ||
+    type === WalletType.WC_CLOT_MOBILE
   );
 };
 

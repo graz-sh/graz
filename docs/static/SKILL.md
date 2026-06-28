@@ -194,6 +194,51 @@ import { clearSession } from "graz";
 clearSession();                            // Reset session + clear storage
 ```
 
+### Wallet Events
+
+Use `useWalletEvents` to react to committed wallet state changes. The hook owns
+its subscription and automatically cleans it up when the component unmounts.
+
+```tsx
+import { useWalletEvents } from "graz";
+
+function WalletEventObserver() {
+  useWalletEvents({
+    onAccountChange: ({ accounts, previousAccounts, changedChainIds, walletType }) => {
+      console.log({ accounts, previousAccounts, changedChainIds, walletType });
+    },
+    onActiveChainsChange: ({ activeChainIds, previousActiveChainIds, walletType }) => {
+      console.log({ activeChainIds, previousActiveChainIds, walletType });
+    },
+    onDisconnect: ({ chainIds, reason, walletType }) => {
+      console.log({ chainIds, reason, walletType });
+    },
+  });
+
+  return null;
+}
+```
+
+`onActiveChainsChange` reports the complete set of connected
+`activeChainIds`. It does not represent an EVM-style switch to one active
+chain. Initial connection does not emit account or active-chain events.
+
+For non-React consumers, subscribe imperatively and retain the cleanup
+function:
+
+```ts
+import { subscribeWalletEvents } from "graz";
+
+const unsubscribe = subscribeWalletEvents({
+  onDisconnect: ({ reason }) => console.log(reason),
+});
+
+unsubscribe();
+```
+
+Balance changes are not wallet events. Use `useBalance` or `useBalances` and an
+explicit refetch strategy when balance monitoring is required.
+
 ## Offline Signers
 
 ```ts
@@ -452,6 +497,7 @@ interface MutationEventArgs<T = unknown, S = T> {
 | Connect wallet | `useConnect()` → `connect()` |
 | Disconnect | `useDisconnect()` → `disconnect()` |
 | Account state | `useAccount({ chainId })` |
+| Wallet events | `useWalletEvents(handlers)`, `subscribeWalletEvents(handlers)` |
 | Check wallet availability | `useCheckWallet(type)`, `getAvailableWallets()` |
 | Active wallet info | `useActiveWalletType()` |
 | Offline signers | `useOfflineSigners({ chainId })` |

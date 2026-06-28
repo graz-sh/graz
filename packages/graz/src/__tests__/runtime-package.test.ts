@@ -23,29 +23,47 @@ describe("published package runtime shape", () => {
   it("loads the CJS entry and keeps key root exports available", () => {
     const output = runNode(`
       const graz = require("./dist/index.js");
-      const keys = ["connect", "disconnect", "useAccount", "useConnect", "WalletType"];
+      const keys = [
+        "connect",
+        "disconnect",
+        "subscribeWalletEvents",
+        "useAccount",
+        "useConnect",
+        "useWalletEvents",
+        "WalletType",
+      ];
       for (const key of keys) {
         if (!(key in graz)) throw new Error("Missing export: " + key);
       }
+      if ("disconnectWithReason" in graz) throw new Error("Internal disconnect helper was exported");
       console.log(keys.map((key) => typeof graz[key]).join(","));
     `);
 
-    expect(output.trim()).toBe("function,function,function,function,object");
+    expect(output.trim()).toBe("function,function,function,function,function,function,object");
   });
 
   it("loads the ESM entry and keeps key root exports available", () => {
     const output = runNode(`
       (async () => {
         const graz = await import("./dist/index.mjs");
-        const keys = ["connect", "disconnect", "useAccount", "useConnect", "WalletType"];
+        const keys = [
+          "connect",
+          "disconnect",
+          "subscribeWalletEvents",
+          "useAccount",
+          "useConnect",
+          "useWalletEvents",
+          "WalletType",
+        ];
         for (const key of keys) {
           if (!(key in graz)) throw new Error("Missing export: " + key);
         }
+        if ("disconnectWithReason" in graz) throw new Error("Internal disconnect helper was exported");
         console.log(keys.map((key) => typeof graz[key]).join(","));
       })();
     `);
 
-    expect(output.trim()).toBe("function,function,function,function,object");
+    expect(output.trim()).toBe("function,function,function,function,function,function,object");
   });
 
   it("does not publish generated chain indexes", () => {

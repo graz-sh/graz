@@ -14,7 +14,6 @@ import type { ChainInfo } from "@keplr-wallet/types";
 
 import { useGrazInternalStore } from "../../store";
 import type { SignAminoParams, SignDirectParams, Wallet } from "../../types/wallet";
-import { clearSession } from ".";
 
 export interface InitiaWallet {
   getVersion: () => Promise<string>;
@@ -180,10 +179,7 @@ export const getInitia = (): Wallet => {
     };
 
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      const listener = () => {
-        clearSession();
-        reconnect();
-      };
+      const listener = () => reconnect();
       window.addEventListener("initia_keystorechange", listener);
       return () => {
         window.removeEventListener("initia_keystorechange", listener);

@@ -3,7 +3,6 @@ import type { ChainInfo, KeplrSignOptions, StdSignDoc } from "@keplr-wallet/type
 
 import { useGrazInternalStore } from "../../store";
 import type { Key, SignDoc, Wallet } from "../../types/wallet";
-import { clearSession } from ".";
 
 interface ChainInfoResponse {
   chainId: string;
@@ -75,10 +74,7 @@ export const getStation = (): Wallet => {
     const station = window.station.keplr;
 
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      const listener = () => {
-        clearSession();
-        reconnect();
-      };
+      const listener = () => reconnect();
       window.addEventListener("station_wallet_change", listener);
       return () => {
         window.removeEventListener("station_wallet_change", listener);

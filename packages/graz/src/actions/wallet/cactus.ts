@@ -3,7 +3,6 @@ import type { Keplr } from "@keplr-wallet/types";
 
 import { useGrazInternalStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
-import { clearSession } from ".";
 
 export type CactusCosmosWallet = Pick<
   Keplr,
@@ -14,10 +13,7 @@ export const getCactusCosmos = (): Wallet => {
   if (typeof window.cactuslink_cosmos !== "undefined") {
     const cactusCosmos = window.cactuslink_cosmos;
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      const listener = () => {
-        clearSession();
-        reconnect();
-      };
+      const listener = () => reconnect();
       window.addEventListener("accountsChanged", listener);
       return () => {
         window.removeEventListener("accountsChanged", listener);

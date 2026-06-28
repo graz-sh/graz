@@ -5,11 +5,13 @@ import type { ChainInfo } from "@keplr-wallet/types";
 import { LOG_FUNCTIONS, RECONNECT_SESSION_KEY } from "../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../store";
 import type { Maybe } from "../types/core";
+import type { DisconnectReason } from "../types/events";
 import type { Key } from "../types/wallet";
 import { WalletType } from "../types/wallet";
 import { LogCategory } from "../types/logger";
 import { getLogger } from "../utils/logger";
 import { checkWallet, getWallet, isPara, isWalletConnect } from "./wallet";
+import { emitWalletEvent } from "./events";
 
 /**
  * Chain ID type for actions - supports both string and string[] for backward compatibility.
@@ -29,10 +31,61 @@ export interface ConnectResult {
   chains: ChainInfo[];
 }
 
+const haveSameChainIds = (first: readonly string[], second: readonly string[]) => {
+  return first.length === second.length && first.every((chainId) => second.includes(chainId));
+};
+
+const emitConnectedSessionChanges = ({
+  previousAccounts,
+  previousActiveChainIds,
+  walletType,
+}: {
+  previousAccounts: Record<string, Key> | null;
+  previousActiveChainIds: string[];
+  walletType: WalletType;
+}) => {
+  const currentSession = useGrazSessionStore.getState();
+  const accounts = currentSession.accounts;
+  const activeChainIds = [...(currentSession.activeChainIds || [])];
+
+  if (!haveSameChainIds(previousActiveChainIds, activeChainIds)) {
+    emitWalletEvent({
+      payload: {
+        activeChainIds,
+        previousActiveChainIds,
+        walletType,
+      },
+      type: "activeChainsChange",
+    });
+  }
+
+  if (!previousAccounts || !accounts) return;
+  const changedChainIds = previousActiveChainIds.filter((chainId) => {
+    const previousAccount = previousAccounts[chainId];
+    const account = accounts[chainId];
+    return account !== undefined && previousAccount?.bech32Address !== account.bech32Address;
+  });
+  if (changedChainIds.length === 0) return;
+
+  emitWalletEvent({
+    payload: {
+      accounts: { ...accounts },
+      changedChainIds,
+      previousAccounts,
+      walletType,
+    },
+    type: "accountChange",
+  });
+};
+
 export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   const logger = getLogger();
   logger.time("connect");
   logger.group("Connect Wallet");
+  const previousSession = useGrazSessionStore.getState();
+  const previousAccounts = previousSession.accounts ? { ...previousSession.accounts } : null;
+  const previousActiveChainIds = [...(previousSession.activeChainIds || [])];
+  const wasConnected = previousSession.status === "connected";
 
   try {
     const { recentChainIds: recentChains, chains, walletType } = useGrazInternalStore.getState();
@@ -130,6 +183,14 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     const connectedChains = chainIds.map((x) => chains!.find((y) => y.chainId === x)!);
     const _resAcc = useGrazSessionStore.getState().accounts;
 
+    if (wasConnected) {
+      emitConnectedSessionChanges({
+        previousAccounts,
+        previousActiveChainIds,
+        walletType: currentWalletType,
+      });
+    }
+
     logger.info(LogCategory.WALLET, "Connection successful", {
       function: LOG_FUNCTIONS.CONNECT,
       walletType: currentWalletType,
@@ -167,9 +228,17 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
   }
 };
 
-export const disconnect = (args?: { chainId?: ActionChainId }) => {
+const disconnectSession = (
+  args: { chainId?: ActionChainId } | undefined,
+  reason: DisconnectReason,
+  disableWallet: boolean,
+) => {
   const logger = getLogger();
   const chainId = typeof args?.chainId === "string" ? [args.chainId] : args?.chainId;
+  const previousSession = useGrazSessionStore.getState();
+  const previousActiveChainIds = [...(previousSession.activeChainIds || [])];
+  const previousAccounts = previousSession.accounts ? { ...previousSession.accounts } : null;
+  const walletType = useGrazInternalStore.getState().walletType;
 
   logger.info(LogCategory.WALLET, "Disconnecting", {
     function: LOG_FUNCTIONS.DISCONNECT,
@@ -179,6 +248,7 @@ export const disconnect = (args?: { chainId?: ActionChainId }) => {
   typeof window !== "undefined" && window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
 
   const disable = () => {
+    if (!disableWallet) return;
     if (isWalletConnect(useGrazInternalStore.getState().walletType)) {
       const walletConnectInstance = getWallet(WalletType.WALLETCONNECT);
       const { disable: walletConnectDisable } = walletConnectInstance;
@@ -198,7 +268,7 @@ export const disconnect = (args?: { chainId?: ActionChainId }) => {
     }
   };
   if (chainId) {
-    const _accounts = useGrazSessionStore.getState().accounts;
+    const _accounts = previousAccounts ? { ...previousAccounts } : null;
     chainId.forEach((x) => {
       delete _accounts?.[x];
     });
@@ -233,12 +303,46 @@ export const disconnect = (args?: { chainId?: ActionChainId }) => {
     logger.debug(LogCategory.STORE, "Session cleared - disconnected from all chains", { function: LOG_FUNCTIONS.DISCONNECT });
   }
 
+  const activeChainIds = [...(useGrazSessionStore.getState().activeChainIds || [])];
+  if (previousActiveChainIds.length > 0) {
+    if (activeChainIds.length === 0) {
+      emitWalletEvent({
+        payload: {
+          chainIds: previousActiveChainIds,
+          reason,
+          walletType,
+        },
+        type: "disconnect",
+      });
+    } else if (!haveSameChainIds(previousActiveChainIds, activeChainIds)) {
+      emitWalletEvent({
+        payload: {
+          activeChainIds,
+          previousActiveChainIds,
+          walletType,
+        },
+        type: "activeChainsChange",
+      });
+    }
+  }
+
   logger.info(LogCategory.WALLET, "Disconnected successfully", {
     function: LOG_FUNCTIONS.DISCONNECT,
     chainId: chainId || "all chains",
   });
 
   return Promise.resolve();
+};
+
+export const disconnect = (args?: { chainId?: ActionChainId }) => {
+  return disconnectSession(args, "user", true);
+};
+
+export const disconnectWithReason = (
+  reason: Exclude<DisconnectReason, "user">,
+  options: { disableWallet?: boolean } = {},
+) => {
+  return disconnectSession(undefined, reason, options.disableWallet ?? false);
 };
 
 export type ReconnectArgs = Maybe<{ onError?: (error: unknown) => void }>;
@@ -257,7 +361,28 @@ export const reconnect = async (args?: ReconnectArgs) => {
     const isWalletReady = checkWallet(_reconnectConnector || undefined);
     if (recentChains && isWalletReady && _reconnectConnector) {
       const isWC = isWalletConnect(_reconnectConnector);
-      if (isWC) return;
+      if (isWC) {
+        const previousSession = useGrazSessionStore.getState();
+        const previousAccounts = previousSession.accounts ? { ...previousSession.accounts } : null;
+        const previousActiveChainIds = [...(previousSession.activeChainIds || [])];
+        const wallet = getWallet(_reconnectConnector);
+        await wallet.enable(recentChains);
+        useGrazSessionStore.setState({ status: "connected" });
+        emitConnectedSessionChanges({
+          previousAccounts,
+          previousActiveChainIds,
+          walletType: _reconnectConnector,
+        });
+        const { accounts } = useGrazSessionStore.getState();
+        const { chains } = useGrazInternalStore.getState();
+        const connectedChains =
+          chains?.filter((chain) => recentChains.includes(chain.chainId)) || [];
+        return {
+          accounts: accounts || {},
+          chains: connectedChains,
+          walletType: _reconnectConnector,
+        };
+      }
       const key = await connect({
         chainId: recentChains,
         walletType: _reconnectConnector,
@@ -279,7 +404,7 @@ export const reconnect = async (args?: ReconnectArgs) => {
       error: error instanceof Error ? error.message : String(error),
     });
     args?.onError?.(error);
-    void disconnect();
+    void disconnectSession(undefined, "reconnect-failed", true);
   }
 };
 
