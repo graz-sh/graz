@@ -1,11 +1,8 @@
-import { isInIframe } from "@dao-dao/cosmiframe";
-
 import { RECONNECT_SESSION_KEY } from "../../constant";
 import { grazSessionDefaultValues, useGrazInternalStore, useGrazSessionStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
 import { WALLET_TYPES, WalletType } from "../../types/wallet";
 import { LogCategory } from "../../types/logger";
-import { isMobile } from "../../utils/os";
 import { getLogger } from "../../utils/logger";
 import { getCactusCosmos } from "./cactus";
 import { getCompass } from "./compass";
@@ -24,41 +21,6 @@ import { getWCCosmostation } from "./wallet-connect/cosmostation";
 import { getWCKeplr } from "./wallet-connect/keplr";
 import { getXDefi } from "./xdefi";
 
-const walletPresence: Record<WalletType, () => boolean> = {
-  [WalletType.KEPLR]: () => typeof window.keplr !== "undefined",
-  [WalletType.COSMOSTATION]: () => typeof window.cosmostation?.providers.keplr !== "undefined",
-  [WalletType.VECTIS]: () => typeof window.vectis !== "undefined",
-  [WalletType.WALLETCONNECT]: () =>
-    Boolean(useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()),
-  [WalletType.WC_KEPLR_MOBILE]: () => {
-    const pid = useGrazInternalStore.getState().walletConnect?.options?.projectId;
-    return isMobile() && Boolean(pid?.trim());
-  },
-  [WalletType.WC_COSMOSTATION_MOBILE]: () => {
-    const pid = useGrazInternalStore.getState().walletConnect?.options?.projectId;
-    return isMobile() && Boolean(pid?.trim());
-  },
-  [WalletType.WC_CLOT_MOBILE]: () => {
-    const pid = useGrazInternalStore.getState().walletConnect?.options?.projectId;
-    return isMobile() && Boolean(pid?.trim());
-  },
-  [WalletType.METAMASK_SNAP_COSMOS]: () =>
-    typeof window !== "undefined" && Boolean((window.ethereum as { isMetaMask?: boolean } | undefined)?.isMetaMask),
-  [WalletType.STATION]: () => typeof window.station?.keplr !== "undefined",
-  [WalletType.XDEFI]: () => typeof window.xfi?.keplr !== "undefined",
-  [WalletType.COSMIFRAME]: () => {
-    const state = useGrazInternalStore.getState();
-    return Boolean(
-      state.iframeOptions && isInIframe() && state.iframeOptions.allowedIframeParentOrigins.length > 0,
-    );
-  },
-  [WalletType.COMPASS]: () => typeof window.compass !== "undefined",
-  [WalletType.INITIA]: () => typeof window.initia !== "undefined",
-  [WalletType.OKX]: () => typeof window.okxwallet?.keplr !== "undefined",
-  [WalletType.PARA]: () => Boolean(useGrazInternalStore.getState().paraConfig?.paraWeb),
-  [WalletType.CACTUSCOSMOS]: () => typeof window.cactuslink_cosmos !== "undefined",
-};
-
 /**
  * Function to check whether given {@link WalletType} or default configured wallet exists.
  *
@@ -69,7 +31,12 @@ const walletPresence: Record<WalletType, () => boolean> = {
  * ```
  */
 export const checkWallet = (type: WalletType = useGrazInternalStore.getState().walletType): boolean => {
-  return walletPresence[type]?.() ?? false;
+  try {
+    getWallet(type);
+    return true;
+  } catch (error) {
+    return false;
+  }
 };
 
 export const clearSession = () => {
