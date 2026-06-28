@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 import { subscribeWalletEvents } from "../actions/events";
 import type { WalletEventHandlers } from "../types/events";
+
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /**
  * Subscribe to committed wallet state changes for the lifetime of a React
@@ -10,7 +12,7 @@ import type { WalletEventHandlers } from "../types/events";
 export const useWalletEvents = (handlers: WalletEventHandlers = {}): void => {
   const handlersRef = useRef(handlers);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     handlersRef.current = handlers;
   }, [handlers]);
 

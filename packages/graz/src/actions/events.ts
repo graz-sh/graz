@@ -8,6 +8,30 @@ interface WalletEventSubscription {
 
 const subscribers = new Set<WalletEventSubscription>();
 
+const reportSubscriberFailure = (error: unknown, eventType: WalletEvent["type"]): void => {
+  getLogger().error(LogCategory.EVENT, "Wallet event subscriber failed", {
+    error: error instanceof Error ? error.message : String(error),
+    eventType,
+    function: "emitWalletEvent",
+  });
+};
+
+const invokeHandler = <T>(
+  handler: ((payload: T) => void | Promise<void>) | undefined,
+  payload: T,
+  eventType: WalletEvent["type"],
+): void => {
+  if (!handler) return;
+
+  try {
+    void Promise.resolve(handler(payload)).catch((error: unknown) => {
+      reportSubscriberFailure(error, eventType);
+    });
+  } catch (error) {
+    reportSubscriberFailure(error, eventType);
+  }
+};
+
 /**
  * Subscribe to committed wallet state changes outside React.
  *
@@ -28,20 +52,12 @@ export const subscribeWalletEvents = (handlers: WalletEventHandlers): (() => voi
 /** @internal */
 export const emitWalletEvent = (event: WalletEvent): void => {
   for (const { handlers } of [...subscribers]) {
-    try {
-      if (event.type === "accountChange") {
-        handlers.onAccountChange?.(event.payload);
-      } else if (event.type === "activeChainsChange") {
-        handlers.onActiveChainsChange?.(event.payload);
-      } else {
-        handlers.onDisconnect?.(event.payload);
-      }
-    } catch (error) {
-      getLogger().error(LogCategory.EVENT, "Wallet event subscriber failed", {
-        error: error instanceof Error ? error.message : String(error),
-        eventType: event.type,
-        function: "emitWalletEvent",
-      });
+    if (event.type === "accountChange") {
+      invokeHandler(handlers.onAccountChange, event.payload, event.type);
+    } else if (event.type === "activeChainsChange") {
+      invokeHandler(handlers.onActiveChainsChange, event.payload, event.type);
+    } else {
+      invokeHandler(handlers.onDisconnect, event.payload, event.type);
     }
   }
 };

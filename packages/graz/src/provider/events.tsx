@@ -124,18 +124,47 @@ export const useGrazEvents = () => {
       const signClient = wcSignClients.get(_reconnectConnector);
       if (!signClient) return;
 
+      const isActiveSessionTopic = (topic: string): boolean => {
+        const { activeChainIds } = useGrazSessionStore.getState();
+        const { recentChainIds } = useGrazInternalStore.getState();
+        const connectedChainIds = activeChainIds || recentChainIds || [];
+        const sessions = signClient.session.getAll();
+        const activeSession =
+          connectedChainIds.length > 0
+            ? [...sessions].reverse().find((session) => {
+                const namespace = session.namespaces?.cosmos;
+                const sessionChainIds = [
+                  ...(session.requiredNamespaces.cosmos?.chains || []),
+                  ...(namespace?.chains || []),
+                  ...(namespace?.accounts || []).map((account) =>
+                    account.split(":").slice(0, 2).join(":"),
+                  ),
+                ].map((chainId) => chainId.split(":")[1]);
+
+                return connectedChainIds.some((chainId) => sessionChainIds.includes(chainId));
+              })
+            : sessions.at(-1);
+
+        return activeSession?.topic === topic;
+      };
       const handleSessionEvent = (args: SignClientTypes.EventArguments["session_event"]) => {
+        if (!isActiveSessionTopic(args.topic)) return;
         if (args.params.event.name !== "accountsChanged") return;
         void reconnect({ onError: _onReconnectFailed });
       };
-      const handleDisconnect = (reason: "wallet" | "session-expired") => {
+      const handleDisconnect = (topic: string, reason: "wallet" | "session-expired") => {
+        if (!isActiveSessionTopic(topic)) return;
         const clients = new Map(useGrazSessionStore.getState().wcSignClients);
         clients.delete(_reconnectConnector);
         useGrazSessionStore.setState({ wcSignClients: clients });
         void disconnectWithReason(reason);
       };
-      const handleSessionDelete = () => handleDisconnect("wallet");
-      const handleSessionExpire = () => handleDisconnect("session-expired");
+      const handleSessionDelete = (args: SignClientTypes.EventArguments["session_delete"]) => {
+        handleDisconnect(args.topic, "wallet");
+      };
+      const handleSessionExpire = (args: SignClientTypes.EventArguments["session_expire"]) => {
+        handleDisconnect(args.topic, "session-expired");
+      };
 
       signClient.events.on("session_delete", handleSessionDelete);
       signClient.events.on("session_expire", handleSessionExpire);

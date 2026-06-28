@@ -29,9 +29,9 @@ export interface DisconnectEvent extends WalletEventContext {
 
 /** Callbacks accepted by wallet event subscriptions. */
 export interface WalletEventHandlers {
-  onAccountChange?: (event: AccountChangeEvent) => void;
-  onActiveChainsChange?: (event: ActiveChainsChangeEvent) => void;
-  onDisconnect?: (event: DisconnectEvent) => void;
+  onAccountChange?: (event: AccountChangeEvent) => void | Promise<void>;
+  onActiveChainsChange?: (event: ActiveChainsChangeEvent) => void | Promise<void>;
+  onDisconnect?: (event: DisconnectEvent) => void | Promise<void>;
 }
 
 /** @internal Semantic event used to dispatch committed wallet state changes. */

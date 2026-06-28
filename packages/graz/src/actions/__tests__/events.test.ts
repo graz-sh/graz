@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { WalletEventHandlers } from "../../types/events";
 import type { Key } from "../../types/wallet";
 import { WalletType } from "../../types/wallet";
+import { getLogger } from "../../utils/logger";
 import { emitWalletEvent, subscribeWalletEvents } from "../events";
 
 const makeKey = (chainId: string): Key => ({
@@ -115,5 +116,36 @@ describe("wallet event subscriptions", () => {
     }).not.toThrow();
     expect(failing).toHaveBeenCalledTimes(1);
     expect(succeeding).toHaveBeenCalledTimes(1);
+  });
+
+  it("logs rejected async subscriber callbacks without blocking other subscribers", async () => {
+    const error = vi.spyOn(getLogger(), "error");
+    const failing = vi.fn(async () => {
+      throw new Error("async consumer failed");
+    });
+    const succeeding = vi.fn();
+    subscribe({ onDisconnect: failing });
+    subscribe({ onDisconnect: succeeding });
+
+    emitWalletEvent({
+      payload: {
+        chainIds: ["cosmoshub-4"],
+        reason: "wallet",
+        walletType: WalletType.KEPLR,
+      },
+      type: "disconnect",
+    });
+
+    expect(succeeding).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => {
+      expect(error).toHaveBeenCalledWith(
+        expect.anything(),
+        "Wallet event subscriber failed",
+        expect.objectContaining({
+          error: "async consumer failed",
+          eventType: "disconnect",
+        }),
+      );
+    });
   });
 });

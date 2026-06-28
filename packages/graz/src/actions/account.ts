@@ -366,8 +366,18 @@ export const reconnect = async (args?: ReconnectArgs) => {
         const previousAccounts = previousSession.accounts ? { ...previousSession.accounts } : null;
         const previousActiveChainIds = [...(previousSession.activeChainIds || [])];
         const wallet = getWallet(_reconnectConnector);
+        await wallet.init?.();
         await wallet.enable(recentChains);
-        useGrazSessionStore.setState({ status: "connected" });
+        useGrazInternalStore.setState({
+          _reconnect,
+          _reconnectConnector,
+          walletType: _reconnectConnector,
+        });
+        useGrazSessionStore.setState({
+          activeChainIds: [...recentChains],
+          status: "connected",
+        });
+        typeof window !== "undefined" && window.sessionStorage.setItem(RECONNECT_SESSION_KEY, "Active");
         emitConnectedSessionChanges({
           previousAccounts,
           previousActiveChainIds,

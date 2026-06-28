@@ -307,6 +307,15 @@ describe("provider components and events", () => {
             expiry: Math.floor(Date.now() / 1000) + 60,
             requiredNamespaces: {
               cosmos: {
+                chains: ["cosmos:osmosis-1"],
+              },
+            },
+            topic: "unrelated-topic",
+          },
+          {
+            expiry: Math.floor(Date.now() / 1000) + 60,
+            requiredNamespaces: {
+              cosmos: {
                 chains: [`cosmos:${chain.chainId}`],
               },
             },
@@ -341,7 +350,7 @@ describe("provider components and events", () => {
           projectId: "project-id",
         },
       },
-      walletType: WalletType.WALLETCONNECT,
+      walletType: WalletType.KEPLR,
     });
     useGrazSessionStore.setState({
       accounts: { [chain.chainId]: previousAccount },
@@ -356,6 +365,7 @@ describe("provider components and events", () => {
 
     await act(async () => {
       signClient.events.emit("session_event", {
+        id: 1,
         params: {
           chainId: `cosmos:${chain.chainId}`,
           event: {
@@ -363,10 +373,26 @@ describe("provider components and events", () => {
             name: "accountsChanged",
           },
         },
+        topic: "unrelated-topic",
       });
       await Promise.resolve();
     });
+    expect(onAccountChange).not.toHaveBeenCalled();
 
+    await act(async () => {
+      signClient.events.emit("session_event", {
+        id: 2,
+        params: {
+          chainId: `cosmos:${chain.chainId}`,
+          event: {
+            data: [bech32Address],
+            name: "accountsChanged",
+          },
+        },
+        topic: "topic-1",
+      });
+      await Promise.resolve();
+    });
     await vi.waitFor(() => {
       expect(onAccountChange).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -375,10 +401,13 @@ describe("provider components and events", () => {
       );
     });
     expect(onDisconnect).not.toHaveBeenCalled();
+    expect(useGrazInternalStore.getState().walletType).toBe(WalletType.WALLETCONNECT);
+    expect(window.sessionStorage.getItem(RECONNECT_SESSION_KEY)).toBe("Active");
 
     bech32Address = `${chain.chainId}1ignored`;
     await act(async () => {
       signClient.events.emit("session_event", {
+        id: 3,
         params: {
           chainId: `cosmos:${chain.chainId}`,
           event: {
@@ -386,16 +415,30 @@ describe("provider components and events", () => {
             name: "chainChanged",
           },
         },
+        topic: "topic-1",
       });
       await Promise.resolve();
     });
     expect(onAccountChange).toHaveBeenCalledTimes(1);
 
     await act(async () => {
-      signClient.events.emit(sessionEvent);
+      signClient.events.emit(
+        sessionEvent,
+        sessionEvent === "session_delete"
+          ? { id: 4, topic: "unrelated-topic" }
+          : { topic: "unrelated-topic" },
+      );
       await Promise.resolve();
     });
+    expect(onDisconnect).not.toHaveBeenCalled();
 
+    await act(async () => {
+      signClient.events.emit(
+        sessionEvent,
+        sessionEvent === "session_delete" ? { id: 5, topic: "topic-1" } : { topic: "topic-1" },
+      );
+      await Promise.resolve();
+    });
     expect(onDisconnect).toHaveBeenCalledWith({
       chainIds: [chain.chainId],
       reason: disconnectReason,
