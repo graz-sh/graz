@@ -1,32 +1,17 @@
-import { useGrazInternalStore } from "../../../store";
 import type { Wallet } from "../../../types/wallet";
 import { WalletType } from "../../../types/wallet";
-import { isMobile } from "../../../utils/os";
-import { getWalletConnect } from ".";
-import type { GetWalletConnectParams } from "./types";
+import { createMobileWCWallet } from "./mobile-factory";
 
-export const getWCCosmostation = (): Wallet => {
-  if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
-    throw new Error("walletConnect.options.projectId is not defined");
-  }
-
-  if (!isMobile()) throw new Error("WalletConnect Cosmostation mobile is only supported in mobile");
-
-  const params: GetWalletConnectParams = {
-    encoding: "hex",
-    appUrl: {
-      mobile: {
-        ios: "cosmostation://",
-        android: "cosmostation://",
+export const getWCCosmostation = (): Wallet =>
+  createMobileWCWallet(
+    WalletType.WC_COSMOSTATION_MOBILE,
+    {
+      encoding: "hex",
+      appUrl: { mobile: { ios: "cosmostation://", android: "cosmostation://" } },
+      formatNativeUrl: (appUrl, wcUri) => {
+        const plainAppUrl = appUrl.replace(/\//g, "").replace(/:/g, "");
+        return wcUri ? `${plainAppUrl}://wc?${wcUri}` : `${plainAppUrl}://wc`;
       },
     },
-    walletType: WalletType.WC_COSMOSTATION_MOBILE,
-    formatNativeUrl: (appUrl, wcUri, _os) => {
-      const plainAppUrl = appUrl.replace(/\//g, "").replace(/:/g, "");
-      if (!wcUri) return `${plainAppUrl}://wc`;
-      return `${plainAppUrl}://wc?${wcUri}`;
-    },
-  };
-
-  return getWalletConnect(params);
-};
+    "Cosmostation",
+  );

@@ -316,7 +316,7 @@ export type UseConnectChainArgs = MutationEventArgs<ConnectArgs, ConnectResult>;
  */
 export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArgs = {}) => {
   const logger = getLogger();
-  const mutationKey = ["USE_CONNECT", onError, onLoading, onSuccess];
+  const mutationKey = ["USE_CONNECT"];
   const mutation = useMutation({
     mutationKey,
     mutationFn: connect,
@@ -325,7 +325,7 @@ export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArg
         error: err instanceof Error ? err.message : String(err),
         chainId: args?.chainId,
       });
-      onError?.(err, args);
+      return onError?.(err, args);
     },
     onMutate: onLoading,
     onSuccess: (connectResult) => {
@@ -334,7 +334,7 @@ export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArg
         walletType: connectResult.walletType,
         chainCount: connectResult.chains.length,
       });
-      return Promise.resolve(onSuccess?.(connectResult));
+      return onSuccess?.(connectResult);
     },
   });
   const { data: isSupported } = useCheckWallet();
@@ -375,7 +375,7 @@ export const useConnect = ({ onError, onLoading, onSuccess }: UseConnectChainArg
  */
 export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventArgs = {}) => {
   const logger = getLogger();
-  const mutationKey = ["USE_DISCONNECT", onError, onLoading, onSuccess];
+  const mutationKey = ["USE_DISCONNECT"];
   const mutation = useMutation({
     mutationKey,
     mutationFn: disconnect,
@@ -384,12 +384,12 @@ export const useDisconnect = ({ onError, onLoading, onSuccess }: MutationEventAr
         hook: "useDisconnect",
         error: err instanceof Error ? err.message : String(err),
       });
-      return Promise.resolve(onError?.(err, undefined));
+      return onError?.(err, undefined);
     },
     onMutate: onLoading,
     onSuccess: () => {
       logger.info(LogCategory.WALLET, "useDisconnect mutation successful", { hook: "useDisconnect" });
-      return Promise.resolve(onSuccess?.(undefined));
+      return onSuccess?.(undefined);
     },
   });
 

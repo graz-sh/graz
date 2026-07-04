@@ -21,8 +21,6 @@ export const LOG_CATEGORIES = {
   PERFORMANCE: "performance",
 } as const;
 
-export type LogCategory = (typeof LOG_CATEGORIES)[keyof typeof LOG_CATEGORIES];
-
 /**
  * Logger Function Names
  * Action/method function names used in logging context
@@ -66,8 +64,6 @@ export const LOG_FUNCTIONS = {
   SUBSCRIPTION: "subscription",
 } as const;
 
-export type LogFunction = (typeof LOG_FUNCTIONS)[keyof typeof LOG_FUNCTIONS];
-
 /**
  * Logger Hook Names
  * React hook names used in logging context
@@ -99,5 +95,3 @@ export const LOG_HOOKS = {
   USE_INSTANTIATE_CONTRACT: "useInstantiateContract",
   USE_EXECUTE_CONTRACT: "useExecuteContract",
 } as const;
-
-export type LogHook = (typeof LOG_HOOKS)[keyof typeof LOG_HOOKS];

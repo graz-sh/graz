@@ -1,23 +1,36 @@
 import { ChainInfo } from "@keplr-wallet/types";
-import pMap from "p-map";
 
 import { useGrazInternalStore } from "../store";
 import { LogCategory } from "../types/logger";
 import { getLogger } from "./logger";
+
+const pMap = async <T, R>(
+  items: T[],
+  fn: (item: T) => Promise<R>,
+  { concurrency = Infinity }: { concurrency?: number } = {},
+): Promise<R[]> => {
+  if (items.length === 0) return [];
+  const limit = concurrency === Infinity ? items.length : concurrency;
+  if (!Number.isInteger(limit) || limit < 1) {
+    throw new RangeError("pMap concurrency must be a positive integer");
+  }
+  const results: R[] = new Array(items.length);
+  let i = 0;
+  const runNext = async (): Promise<void> => {
+    if (i >= items.length) return;
+    const idx = i++;
+    results[idx] = await fn(items[idx]!);
+    await runNext();
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, runNext));
+  return results;
+};
 
 /**
  * ChainId is now always an array of chain IDs.
  * This ensures consistent multi-chain behavior across all hooks.
  */
 export type ChainId = string[];
-
-/**
- * Base interface for hooks that support multi-chain operations.
- * The `multiChain` parameter has been removed - all hooks now return Record<chainId, T>.
- */
-export interface MultiChainHookArgs {
-  chainId?: ChainId;
-}
 
 /**
  * Hook to get chain info objects from chainId argument.

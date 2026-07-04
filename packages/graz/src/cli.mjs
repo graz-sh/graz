@@ -5,12 +5,40 @@ import * as path from "node:path";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { Bech32Address } from "@keplr-wallet/cosmos";
 import arg from "arg";
 import { createClient, createTestnetClient } from "cosmos-directory-client";
-import pmap from "p-map";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+/** @param {string} prefix */
+const defaultBech32Config = (prefix) => ({
+  bech32PrefixAccAddr: prefix,
+  bech32PrefixAccPub: `${prefix}pub`,
+  bech32PrefixValAddr: `${prefix}valoper`,
+  bech32PrefixValPub: `${prefix}valoperpub`,
+  bech32PrefixConsAddr: `${prefix}valcons`,
+  bech32PrefixConsPub: `${prefix}valconspub`,
+});
+
+/**
+ * @template T, R
+ * @param {T[]} items
+ * @param {(item: T) => Promise<R>} fn
+ * @param {{ concurrency?: number }} [opts]
+ * @returns {Promise<R[]>}
+ */
+const pMap = async (items, fn, { concurrency = Infinity } = {}) => {
+  const results = new Array(items.length);
+  let i = 0;
+  const runNext = async () => {
+    if (i >= items.length) return;
+    const idx = i++;
+    results[idx] = await fn(items[idx]);
+    await runNext();
+  };
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, runNext));
+  return results;
+};
 
 const isNumber = (char) => /^\d+$/.test(char);
 
@@ -208,7 +236,7 @@ const makeRecord = async (client, { filter = "" } = {}) => {
     }
   }
 
-  const chains = await pmap(
+  const chains = await pMap(
     paths,
     async (c) => {
       try {
@@ -294,7 +322,7 @@ const makeRecord = async (client, { filter = "" } = {}) => {
         })),
         rest: apis.rest[0].address || "",
         rpc: apis.rpc[0].address || "",
-        bech32Config: Bech32Address.defaultBech32Config(chain.bech32_prefix),
+        bech32Config: defaultBech32Config(chain.bech32_prefix),
         chainName: chain.chain_name,
         feeCurrencies,
         stakeCurrency: nativeCurrency,

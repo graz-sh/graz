@@ -1,7 +1,5 @@
-import type { KeplrIntereactionOptions } from "@keplr-wallet/types";
-
-import { useGrazInternalStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
+import { createKeplrLikeWallet, throwWalletNotFound } from "./keplr-like";
 
 /**
  * Function to return {@link Wallet} object and throws and error if it does not exist on `window`.
@@ -18,26 +16,7 @@ import type { Wallet } from "../../types/wallet";
  * @see https://docs.keplr.app
  */
 export const getKeplr = (): Wallet => {
-  if (typeof window.keplr !== "undefined") {
-    const keplr = window.keplr;
-    const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      const listener = () => reconnect();
-      window.addEventListener("keplr_keystorechange", listener);
-      return () => {
-        window.removeEventListener("keplr_keystorechange", listener);
-      };
-    };
-    const setDefaultOptions = (options: KeplrIntereactionOptions) => {
-      keplr.defaultOptions = options;
-    };
-
-    const res = Object.assign(keplr, {
-      subscription,
-      setDefaultOptions,
-    });
-    return res as unknown as Wallet;
-  }
-
-  useGrazInternalStore.getState()._notFoundFn();
-  throw new Error("window.keplr is not defined");
+  if (typeof window !== "undefined" && typeof window.keplr !== "undefined")
+    return createKeplrLikeWallet(window.keplr, "keplr_keystorechange");
+  return throwWalletNotFound("window.keplr is not defined");
 };

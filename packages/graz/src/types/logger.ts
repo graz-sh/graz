@@ -25,7 +25,7 @@ export enum LogCategory {
  * (e.g., Sentry, custom error tracking)
  */
 export interface ErrorReporter {
-  captureException: (error: Error, context?: { category?: string; context?: Record<string, unknown> }) => void;
+  captureException: (error: Error, context?: { category?: string; message?: string; context?: Record<string, unknown> }) => void;
 }
 
 /**

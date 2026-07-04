@@ -1,5 +1,3 @@
-import type Station from "@terra-money/station-connector";
-
 import type { InitiaWallet } from "../src/actions/wallet/initia";
 
 type KeplrWindow = import("@keplr-wallet/types").Window;

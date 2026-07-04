@@ -253,7 +253,7 @@ export type UseAddChainArgs = MutationEventArgs<ChainInfo>;
  */
 export const useAddChain = ({ onError, onLoading, onSuccess }: UseAddChainArgs = {}) => {
   const logger = getLogger();
-  const mutationKey = ["USE_ADD_CHAIN", onError, onLoading, onSuccess];
+  const mutationKey = ["USE_ADD_CHAIN"];
   const mutation = useMutation({
     mutationKey,
     mutationFn: addChain,
@@ -263,7 +263,7 @@ export const useAddChain = ({ onError, onLoading, onSuccess }: UseAddChainArgs =
         error: err instanceof Error ? err.message : String(err),
         chainId: args.chainInfo.chainId,
       });
-      return Promise.resolve(onError?.(err, args.chainInfo));
+      return onError?.(err, args.chainInfo);
     },
     onMutate: (data) => onLoading?.(data.chainInfo),
     onSuccess: (chainInfo) => {
@@ -272,7 +272,7 @@ export const useAddChain = ({ onError, onLoading, onSuccess }: UseAddChainArgs =
         chainId: chainInfo.chainId,
         chainName: chainInfo.chainName,
       });
-      return Promise.resolve(onSuccess?.(chainInfo));
+      return onSuccess?.(chainInfo);
     },
   });
 
@@ -306,7 +306,7 @@ export type UseSuggestChainArgs = MutationEventArgs<ChainInfo>;
  */
 export const useSuggestChain = ({ onError, onLoading, onSuccess }: UseSuggestChainArgs = {}) => {
   const logger = getLogger();
-  const mutationKey = ["USE_SUGGEST_CHAIN", onError, onLoading, onSuccess];
+  const mutationKey = ["USE_SUGGEST_CHAIN"];
   const mutation = useMutation({
     mutationKey,
     mutationFn: suggestChain,
@@ -317,7 +317,7 @@ export const useSuggestChain = ({ onError, onLoading, onSuccess }: UseSuggestCha
         chainId: args.chainInfo.chainId,
         walletType: args.walletType,
       });
-      return Promise.resolve(onError?.(err, args.chainInfo));
+      return onError?.(err, args.chainInfo);
     },
     onMutate: (data) => onLoading?.(data.chainInfo),
     onSuccess: (chainInfo) => {
@@ -326,7 +326,7 @@ export const useSuggestChain = ({ onError, onLoading, onSuccess }: UseSuggestCha
         chainId: chainInfo.chainId,
         chainName: chainInfo.chainName,
       });
-      return Promise.resolve(onSuccess?.(chainInfo));
+      return onSuccess?.(chainInfo);
     },
   });
 
@@ -374,7 +374,7 @@ export type UseSuggestChainAndConnectArgs = MutationEventArgs<SuggestChainAndCon
  */
 export const useSuggestChainAndConnect = ({ onError, onLoading, onSuccess }: UseSuggestChainAndConnectArgs = {}) => {
   const logger = getLogger();
-  const mutationKey = ["USE_SUGGEST_CHAIN_AND_CONNECT", onError, onLoading, onSuccess];
+  const mutationKey = ["USE_SUGGEST_CHAIN_AND_CONNECT"];
   const mutation = useMutation({
     mutationKey,
     mutationFn: suggestChainAndConnect,
@@ -383,7 +383,7 @@ export const useSuggestChainAndConnect = ({ onError, onLoading, onSuccess }: Use
         error: err instanceof Error ? err.message : String(err),
         chainId: args.chainInfo.chainId,
       });
-      return Promise.resolve(onError?.(err, args));
+      return onError?.(err, args);
     },
     onMutate: (args) => onLoading?.(args),
     onSuccess: (res) => {
@@ -392,7 +392,7 @@ export const useSuggestChainAndConnect = ({ onError, onLoading, onSuccess }: Use
         walletType: res.walletType,
         chainCount: res.chains.length,
       });
-      return Promise.resolve(onSuccess?.(res));
+      return onSuccess?.(res);
     },
   });
   const { data: isSupported } = useCheckWallet();
