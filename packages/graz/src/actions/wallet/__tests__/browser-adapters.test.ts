@@ -171,6 +171,7 @@ describe("browser wallet adapters", () => {
     window.dispatchEvent(new Event("keplr_keystorechange"));
 
     expect(xdefiWallet).toBe(xdefi);
+    expect(xdefiWallet.setDefaultOptions).toBeUndefined();
     expect(xdefiReconnect).toHaveBeenCalledTimes(1);
     expect(useGrazSessionStore.getState().accounts).not.toBeNull();
     xdefiCleanup?.();

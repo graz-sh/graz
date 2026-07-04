@@ -22,7 +22,7 @@ export const createKeplrLikeWallet = (
     return () => window.removeEventListener(eventName, listener);
   };
 
-  const extensions: Record<string, unknown> = { subscription };
+  const extensions: Pick<Wallet, "subscription" | "setDefaultOptions"> = { subscription };
   if (config?.setDefaultOptions !== false) {
     extensions.setDefaultOptions = (options: KeplrIntereactionOptions) => {
       wallet.defaultOptions = options;
