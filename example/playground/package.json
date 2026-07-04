@@ -1,6 +1,6 @@
 {
   "name": "@project/example-playground",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "scripts": {
     "postinstall": "pnpm exec setup-para",
     "build": "node scripts/sync-para-styles.mjs && next build --webpack",
