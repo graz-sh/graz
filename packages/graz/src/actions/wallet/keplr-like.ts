@@ -2,7 +2,6 @@ import type { KeplrIntereactionOptions } from "@keplr-wallet/types";
 
 import { useGrazInternalStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
-import { clearSession } from ".";
 
 export const createKeplrLikeWallet = (
   wallet: NonNullable<Window["keplr"]>,
@@ -14,10 +13,7 @@ export const createKeplrLikeWallet = (
   },
 ): Wallet => {
   const subscription = (reconnect: () => void) => {
-    const listener = () => {
-      clearSession();
-      reconnect();
-    };
+    const listener = () => reconnect();
     if (config?.on && config?.off) {
       config.on(eventName, listener);
       return () => config.off!(eventName, listener);
