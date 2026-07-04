@@ -6,7 +6,6 @@ import Long from "long";
 
 import { useGrazInternalStore } from "../../store";
 import type { Key, SignAminoParams, SignDirectParams, Wallet } from "../../types/wallet";
-import { clearSession } from ".";
 
 /**
  * Function to return {@link Wallet} object and throws and error if it does not exist on `window`.
@@ -26,10 +25,7 @@ export const getVectis = (): Wallet => {
   if (typeof window.vectis !== "undefined") {
     const vectis = window.vectis.cosmos;
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      const listener = () => {
-        clearSession();
-        reconnect();
-      };
+      const listener = () => reconnect();
       window.addEventListener("vectis_accountChanged", listener);
       return () => {
         window.removeEventListener("vectis_accountChanged", listener);

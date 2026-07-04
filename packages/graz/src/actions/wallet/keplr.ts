@@ -2,7 +2,6 @@ import type { KeplrIntereactionOptions } from "@keplr-wallet/types";
 
 import { useGrazInternalStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
-import { clearSession } from ".";
 
 /**
  * Function to return {@link Wallet} object and throws and error if it does not exist on `window`.
@@ -22,10 +21,7 @@ export const getKeplr = (): Wallet => {
   if (typeof window.keplr !== "undefined") {
     const keplr = window.keplr;
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      const listener = () => {
-        clearSession();
-        reconnect();
-      };
+      const listener = () => reconnect();
       window.addEventListener("keplr_keystorechange", listener);
       return () => {
         window.removeEventListener("keplr_keystorechange", listener);

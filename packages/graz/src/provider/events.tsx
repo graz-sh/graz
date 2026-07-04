@@ -1,20 +1,12 @@
 import { Cosmiframe } from "@dao-dao/cosmiframe";
+import type { SignClientTypes } from "@walletconnect/types";
 import type { FC } from "react";
 import { useEffect } from "react";
 
-import { connect, reconnect } from "../actions/account";
-import { checkWallet, getWallet } from "../actions/wallet";
+import { connect, disconnectWithReason, reconnect } from "../actions/account";
+import { checkWallet, getWallet, isWalletConnect } from "../actions/wallet";
 import { LogCategory } from "../types/logger";
 import { getLogger } from "../utils/logger";
-import { getCompass } from "../actions/wallet/compass";
-import { getCosmiframe } from "../actions/wallet/cosmiframe";
-import { getCosmostation } from "../actions/wallet/cosmostation";
-import { getKeplr } from "../actions/wallet/keplr";
-import { getOkx } from "../actions/wallet/okx";
-import { getStation } from "../actions/wallet/station";
-import { getVectis } from "../actions/wallet/vectis";
-import { getWalletConnect } from "../actions/wallet/wallet-connect";
-import { getXDefi } from "../actions/wallet/xdefi";
 import { RECONNECT_SESSION_KEY } from "../constant";
 import { useGrazInternalStore, useGrazSessionStore } from "../store";
 import { WalletType } from "../types/wallet";
@@ -68,7 +60,16 @@ export const useGrazEvents = () => {
     return () => {
       window.removeEventListener("focus", handleFocus);
     };
-  }, [isSessionActive, isReconnectConnectorReady, _reconnectConnector, chains, activeChains, pingInterval]);
+  }, [
+    _onReconnectFailed,
+    activeChains,
+    chains,
+    isReconnectConnectorReady,
+    isSessionActive,
+    logger,
+    pingInterval,
+    _reconnectConnector,
+  ]);
 
   // Auto connect to iframe if possible.
   useEffect(() => {
@@ -117,63 +118,75 @@ export const useGrazEvents = () => {
   }, [isReconnectConnectorReady]);
 
   useEffect(() => {
-    if (_reconnectConnector) {
-      if (!isReconnectConnectorReady) return;
-      if (_reconnectConnector === WalletType.COSMOSTATION) {
-        getCosmostation().subscription?.(() => {
-          logger.debug(LogCategory.EVENT, "Account changed", { function: "subscription", walletType: WalletType.COSMOSTATION });
-          void reconnect({
-            onError: _onReconnectFailed,
-          });
-        });
-      }
-      if (_reconnectConnector === WalletType.KEPLR) {
-        getKeplr().subscription?.(() => {
-          logger.debug(LogCategory.EVENT, "Account changed", { function: "subscription", walletType: WalletType.KEPLR });
-          void reconnect({ onError: _onReconnectFailed });
-        });
-      }
-      if (_reconnectConnector === WalletType.COMPASS) {
-        getCompass().subscription?.(() => {
-          void reconnect({ onError: _onReconnectFailed });
-        });
-      }
-      if (_reconnectConnector === WalletType.VECTIS) {
-        getVectis().subscription?.(() => {
-          void reconnect({ onError: _onReconnectFailed });
-        });
-      }
-      if (_reconnectConnector === WalletType.WALLETCONNECT) {
-        if (wcSignClients.has(WalletType.WALLETCONNECT)) {
-          getWalletConnect().subscription?.(() => {
-            void reconnect({ onError: _onReconnectFailed });
-          });
-        }
-      }
-      if (_reconnectConnector === WalletType.STATION) {
-        getStation().subscription?.(() => {
-          void reconnect({ onError: _onReconnectFailed });
-        });
-      }
-      if (_reconnectConnector === WalletType.XDEFI) {
-        getXDefi().subscription?.(() => {
-          void reconnect({ onError: _onReconnectFailed });
-        });
-      }
-      if (_reconnectConnector === WalletType.COSMIFRAME) {
-        getCosmiframe().subscription?.(() => {
-          void reconnect({ onError: _onReconnectFailed });
-        });
-      }
-      if (_reconnectConnector === WalletType.OKX) {
-        getOkx().subscription?.(() => {
-          void reconnect({ onError: _onReconnectFailed });
-        });
-      }
+    if (!_reconnectConnector || !isReconnectConnectorReady) return;
+
+    if (isWalletConnect(_reconnectConnector)) {
+      const signClient = wcSignClients.get(_reconnectConnector);
+      if (!signClient) return;
+
+      const isActiveSessionTopic = (topic: string): boolean => {
+        const { activeChainIds } = useGrazSessionStore.getState();
+        const { recentChainIds } = useGrazInternalStore.getState();
+        const connectedChainIds = activeChainIds || recentChainIds || [];
+        const sessions = signClient.session.getAll();
+        const activeSession =
+          connectedChainIds.length > 0
+            ? [...sessions].reverse().find((session) => {
+                const namespace = session.namespaces?.cosmos;
+                const sessionChainIds = [
+                  ...(session.requiredNamespaces.cosmos?.chains || []),
+                  ...(namespace?.chains || []),
+                  ...(namespace?.accounts || []).map((account) =>
+                    account.split(":").slice(0, 2).join(":"),
+                  ),
+                ].map((chainId) => chainId.split(":")[1]);
+
+                return connectedChainIds.some((chainId) => sessionChainIds.includes(chainId));
+              })
+            : sessions.at(-1);
+
+        return activeSession?.topic === topic;
+      };
+      const handleSessionEvent = (args: SignClientTypes.EventArguments["session_event"]) => {
+        if (!isActiveSessionTopic(args.topic)) return;
+        if (args.params.event.name !== "accountsChanged") return;
+        void reconnect({ onError: _onReconnectFailed });
+      };
+      const handleDisconnect = (topic: string, reason: "wallet" | "session-expired") => {
+        if (!isActiveSessionTopic(topic)) return;
+        const clients = new Map(useGrazSessionStore.getState().wcSignClients);
+        clients.delete(_reconnectConnector);
+        useGrazSessionStore.setState({ wcSignClients: clients });
+        void disconnectWithReason(reason);
+      };
+      const handleSessionDelete = (args: SignClientTypes.EventArguments["session_delete"]) => {
+        handleDisconnect(args.topic, "wallet");
+      };
+      const handleSessionExpire = (args: SignClientTypes.EventArguments["session_expire"]) => {
+        handleDisconnect(args.topic, "session-expired");
+      };
+
+      signClient.events.on("session_delete", handleSessionDelete);
+      signClient.events.on("session_expire", handleSessionExpire);
+      signClient.events.on("session_event", handleSessionEvent);
+
+      return () => {
+        signClient.events.off("session_delete", handleSessionDelete);
+        signClient.events.off("session_expire", handleSessionExpire);
+        signClient.events.off("session_event", handleSessionEvent);
+      };
     }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [_reconnectConnector, wcSignClients, isReconnectConnectorReady]);
+    const wallet = getWallet(_reconnectConnector);
+    return wallet.subscription?.(() => {
+      logger.debug(LogCategory.EVENT, "Account changed", {
+        function: "subscription",
+        walletType: _reconnectConnector,
+      });
+      void reconnect({ onError: _onReconnectFailed });
+    });
+
+  }, [_onReconnectFailed, _reconnectConnector, isReconnectConnectorReady, logger, wcSignClients]);
 
   return null;
 };

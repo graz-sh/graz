@@ -2,7 +2,6 @@ import type { KeplrIntereactionOptions } from "@keplr-wallet/types";
 
 import { useGrazInternalStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
-import { clearSession } from ".";
 /**
  * Function to return okxwallet object (which is {@link Wallet}) and throws and error if it does not exist on `window`.
  *
@@ -21,10 +20,7 @@ export const getOkx = (): Wallet => {
   if (typeof window.okxwallet?.keplr !== "undefined") {
     const okxWallet = window.okxwallet.keplr;
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      const listener = () => {
-        clearSession();
-        reconnect();
-      };
+      const listener = () => reconnect();
       window.okxwallet?.on("accountsChanged", listener);
       return () => {
         window.okxwallet?.removeListener("accountsChanged", listener);

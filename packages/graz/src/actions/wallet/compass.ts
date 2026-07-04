@@ -2,7 +2,6 @@ import type { KeplrIntereactionOptions } from "@keplr-wallet/types";
 
 import { useGrazInternalStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
-import { clearSession } from ".";
 
 /**
  * Function to return Compass object (which is {@link Wallet}) and throws and error if it does not exist on `window`.
@@ -20,10 +19,7 @@ export const getCompass = (): Wallet => {
   if (typeof window.compass !== "undefined") {
     const compass = window.compass;
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      const listener = () => {
-        clearSession();
-        reconnect();
-      };
+      const listener = () => reconnect();
       window.addEventListener("leap_keystorechange", listener);
       return () => {
         window.removeEventListener("leap_keystorechange", listener);

@@ -6,6 +6,7 @@ import { useGrazInternalStore, useGrazSessionStore } from "../../store";
 import type { Key } from "../../types/wallet";
 import { WalletType } from "../../types/wallet";
 import { connect, disconnect, getOfflineSigners, reconnect } from "../account";
+import { subscribeWalletEvents } from "../events";
 
 const makeKey = (chainId: string): Key => ({
   address: new Uint8Array([1, 2, 3]),
@@ -45,6 +46,8 @@ const setWindowValue = (key: string, value: unknown) => {
 };
 
 describe("account actions", () => {
+  const eventCleanups: Array<() => void> = [];
+
   beforeEach(() => {
     for (const key of ["keplr", "cosmostation"]) {
       Reflect.deleteProperty(window, key);
@@ -52,8 +55,15 @@ describe("account actions", () => {
   });
 
   afterEach(() => {
+    eventCleanups.splice(0).forEach((cleanup) => cleanup());
     vi.restoreAllMocks();
   });
+
+  const subscribe = (handlers: Parameters<typeof subscribeWalletEvents>[0]) => {
+    const cleanup = subscribeWalletEvents(handlers);
+    eventCleanups.push(cleanup);
+    return cleanup;
+  };
 
   it("connects a wallet, stores account state, and enables reconnect", async () => {
     const chain = makeChainInfo();
@@ -112,6 +122,67 @@ describe("account actions", () => {
     expect(useGrazSessionStore.getState().activeChainIds).toEqual([cosmoshub.chainId, osmosis.chainId]);
   });
 
+  it("emits committed active-chain and account changes for established sessions", async () => {
+    const cosmoshub = makeChainInfo();
+    const osmosis = makeChainInfo("osmosis-1");
+    const accounts = {
+      [cosmoshub.chainId]: makeKey(cosmoshub.chainId),
+      [osmosis.chainId]: makeKey(osmosis.chainId),
+    };
+    const wallet = makeWallet(accounts);
+    const onAccountChange = vi.fn();
+    const onActiveChainsChange = vi.fn();
+    setWindowValue("keplr", wallet);
+    useGrazInternalStore.setState({ chains: [cosmoshub, osmosis] });
+    subscribe({ onAccountChange, onActiveChainsChange });
+
+    await connect({
+      chainId: cosmoshub.chainId,
+      walletType: WalletType.KEPLR,
+    });
+
+    expect(onAccountChange).not.toHaveBeenCalled();
+    expect(onActiveChainsChange).not.toHaveBeenCalled();
+
+    await connect({
+      chainId: osmosis.chainId,
+      walletType: WalletType.KEPLR,
+    });
+
+    expect(onActiveChainsChange).toHaveBeenCalledWith({
+      activeChainIds: [cosmoshub.chainId, osmosis.chainId],
+      previousActiveChainIds: [cosmoshub.chainId],
+      walletType: WalletType.KEPLR,
+    });
+    expect(onAccountChange).not.toHaveBeenCalled();
+    expect(useGrazSessionStore.getState().activeChainIds).toEqual([cosmoshub.chainId, osmosis.chainId]);
+
+    const previousAccount = accounts[cosmoshub.chainId];
+    if (!previousAccount) throw new Error("Missing Cosmos Hub account fixture");
+    accounts[cosmoshub.chainId] = {
+      ...previousAccount,
+      bech32Address: `${cosmoshub.chainId}1changed`,
+    };
+
+    await reconnect();
+
+    expect(onAccountChange).toHaveBeenCalledWith({
+      accounts: expect.objectContaining({
+        [cosmoshub.chainId]: expect.objectContaining({
+          bech32Address: `${cosmoshub.chainId}1changed`,
+        }),
+      }),
+      changedChainIds: [cosmoshub.chainId],
+      previousAccounts: expect.objectContaining({
+        [cosmoshub.chainId]: previousAccount,
+      }),
+      walletType: WalletType.KEPLR,
+    });
+    expect(useGrazSessionStore.getState().accounts?.[cosmoshub.chainId]?.bech32Address).toBe(
+      `${cosmoshub.chainId}1changed`,
+    );
+  });
+
   it("rejects unavailable wallets and chains outside the provider config", async () => {
     const chain = makeChainInfo();
     useGrazInternalStore.setState({ chains: [chain] });
@@ -149,6 +220,9 @@ describe("account actions", () => {
       activeChainIds: [cosmoshub.chainId, osmosis.chainId],
       status: "connected",
     });
+    const onActiveChainsChange = vi.fn();
+    const onDisconnect = vi.fn();
+    subscribe({ onActiveChainsChange, onDisconnect });
 
     await disconnect({ chainId: osmosis.chainId });
 
@@ -159,6 +233,12 @@ describe("account actions", () => {
       status: "connected",
     });
     expect(useGrazInternalStore.getState().recentChainIds).toEqual([cosmoshub.chainId]);
+    expect(onActiveChainsChange).toHaveBeenCalledWith({
+      activeChainIds: [cosmoshub.chainId],
+      previousActiveChainIds: [cosmoshub.chainId, osmosis.chainId],
+      walletType: WalletType.KEPLR,
+    });
+    expect(onDisconnect).not.toHaveBeenCalled();
 
     await disconnect();
 
@@ -172,6 +252,21 @@ describe("account actions", () => {
       _reconnectConnector: null,
       recentChainIds: null,
     });
+    expect(onDisconnect).toHaveBeenCalledWith({
+      chainIds: [cosmoshub.chainId],
+      reason: "user",
+      walletType: WalletType.KEPLR,
+    });
+    expect(onActiveChainsChange).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not emit disconnect when the session is already disconnected", async () => {
+    const onDisconnect = vi.fn();
+    subscribe({ onDisconnect });
+
+    await disconnect();
+
+    expect(onDisconnect).not.toHaveBeenCalled();
   });
 
   it("reconnects from stored state and reports reconnect failures", async () => {
@@ -197,11 +292,18 @@ describe("account actions", () => {
       recentChainIds: [chain.chainId],
     });
     const onError = vi.fn();
+    const onDisconnect = vi.fn();
+    subscribe({ onDisconnect });
 
     await reconnect({ onError });
 
     expect(onError).toHaveBeenCalledTimes(1);
     expect(useGrazSessionStore.getState().status).toBe("disconnected");
+    expect(onDisconnect).toHaveBeenCalledWith({
+      chainIds: [chain.chainId],
+      reason: "reconnect-failed",
+      walletType: WalletType.KEPLR,
+    });
   });
 
   it("returns offline signers from the selected wallet", async () => {

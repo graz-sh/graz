@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useGrazInternalStore, useGrazSessionStore } from "../../../store";
 import { WalletType } from "../../../types/wallet";
-import { checkWallet, getAvailableWallets, getWallet } from "../index";
+import { checkWallet, getAvailableWallets, getWallet, isWalletConnect } from "../index";
 import { getCactusCosmos } from "../cactus";
 import { getCompass } from "../compass";
 import { getCosmostation } from "../cosmostation";
@@ -71,6 +71,14 @@ describe("browser wallet adapters", () => {
       [WalletType.KEPLR]: true,
       [WalletType.COSMOSTATION]: false,
     });
+  });
+
+  it("recognizes every WalletConnect connector", () => {
+    expect(isWalletConnect(WalletType.WALLETCONNECT)).toBe(true);
+    expect(isWalletConnect(WalletType.WC_KEPLR_MOBILE)).toBe(true);
+    expect(isWalletConnect(WalletType.WC_COSMOSTATION_MOBILE)).toBe(true);
+    expect(isWalletConnect(WalletType.WC_CLOT_MOBILE)).toBe(true);
+    expect(isWalletConnect(WalletType.KEPLR)).toBe(false);
   });
 
   it("calls the configured not-found callback before throwing", () => {
@@ -164,7 +172,7 @@ describe("browser wallet adapters", () => {
 
     expect(xdefiWallet).toBe(xdefi);
     expect(xdefiReconnect).toHaveBeenCalledTimes(1);
-    expect(useGrazSessionStore.getState().accounts).toBeNull();
+    expect(useGrazSessionStore.getState().accounts).not.toBeNull();
     xdefiCleanup?.();
 
     const cactusSigner = {};

@@ -2,7 +2,6 @@ import type { KeplrIntereactionOptions } from "@keplr-wallet/types";
 
 import { useGrazInternalStore } from "../../store";
 import type { Wallet } from "../../types/wallet";
-import { clearSession } from ".";
 
 /**
  * Function to return cosmostation object (which is {@link Wallet}) and throws and error if it does not exist on `window`.
@@ -22,10 +21,7 @@ export const getCosmostation = (): Wallet => {
   if (typeof window.cosmostation?.providers.keplr !== "undefined") {
     const cosmostation = window.cosmostation.providers.keplr;
     const subscription: (reconnect: () => void) => () => void = (reconnect) => {
-      const listener = () => {
-        clearSession();
-        reconnect();
-      };
+      const listener = () => reconnect();
       window.addEventListener("cosmostation_keystorechange", listener);
       return () => {
         window.removeEventListener("cosmostation_keystorechange", listener);
