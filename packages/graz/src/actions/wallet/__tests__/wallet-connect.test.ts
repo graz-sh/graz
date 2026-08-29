@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { makeChainInfo } from "../../../__tests__/fixtures";
 import { useGrazInternalStore, useGrazSessionStore } from "../../../store";
 import { WalletType, type Key } from "../../../types/wallet";
 import { getWalletConnect } from "../wallet-connect";
@@ -28,6 +29,13 @@ const makeSignClient = (
   const listeners = new Map<string, Set<(args?: unknown) => void>>();
   const session = {
     expiry: Math.floor(Date.now() / 1000) + 60,
+    namespaces: {
+      cosmos: {
+        accounts: [`cosmos:${chainId}:${chainId}1address`],
+        events: ["chainChanged", "accountsChanged"],
+        methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
+      },
+    },
     requiredNamespaces: {
       cosmos: {
         chains: [`cosmos:${chainId}`],
@@ -105,6 +113,7 @@ const makeSignClient = (
     test: {
       deletePairing,
       listeners,
+      session,
     },
   };
 };
@@ -140,6 +149,7 @@ describe("WalletConnect adapter", () => {
     const wcSignClients = new Map();
     wcSignClients.set(WalletType.WALLETCONNECT, signClient);
     useGrazInternalStore.setState({
+      chains: [makeChainInfo(chainId)],
       walletConnect: {
         options: {
           projectId: "project-id",
@@ -302,5 +312,29 @@ describe("WalletConnect adapter", () => {
       },
       topic: "topic-1",
     });
+  });
+
+  it("disconnects a multi-chain session only once", async () => {
+    const chainId = "cosmoshub-4";
+    const additionalChainId = "neutron-1";
+    const signClient = makeSignClient(chainId);
+    signClient.test.session.namespaces.cosmos.accounts.push(
+      `cosmos:${additionalChainId}:${additionalChainId}1address`,
+    );
+    useGrazInternalStore.setState({
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    useGrazSessionStore.setState({
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    const disable = getWalletConnect().disable as unknown as (chainIds: string[]) => Promise<void>;
+    await expect(disable([chainId, additionalChainId])).resolves.toBeUndefined();
+    expect(signClient.disconnect).toHaveBeenCalledTimes(1);
+    expect(signClient.disconnect).toHaveBeenCalledWith(expect.objectContaining({ topic: "topic-1" }));
   });
 });

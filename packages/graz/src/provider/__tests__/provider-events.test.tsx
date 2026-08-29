@@ -305,6 +305,13 @@ describe("provider components and events", () => {
         getAll: vi.fn(() => [
           {
             expiry: Math.floor(Date.now() / 1000) + 60,
+            namespaces: {
+              cosmos: {
+                accounts: ["cosmos:osmosis-1:osmo1unrelated"],
+                events: ["chainChanged", "accountsChanged"],
+                methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
+              },
+            },
             requiredNamespaces: {
               cosmos: {
                 chains: ["cosmos:osmosis-1"],
@@ -314,6 +321,13 @@ describe("provider components and events", () => {
           },
           {
             expiry: Math.floor(Date.now() / 1000) + 60,
+            namespaces: {
+              cosmos: {
+                accounts: [`cosmos:${chain.chainId}:${bech32Address}`],
+                events: ["chainChanged", "accountsChanged"],
+                methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
+              },
+            },
             requiredNamespaces: {
               cosmos: {
                 chains: [`cosmos:${chain.chainId}`],
