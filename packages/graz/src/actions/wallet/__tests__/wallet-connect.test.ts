@@ -314,6 +314,35 @@ describe("WalletConnect adapter", () => {
     });
   });
 
+  it("keeps a reused session and previous accounts when approved key materialization fails", async () => {
+    const chainId = "cosmoshub-4";
+    const additionalChainId = "neutron-1";
+    const previousChainId = "osmosis-1";
+    const signClient = makeSignClient(chainId);
+    signClient.test.session.namespaces.cosmos.accounts.push(
+      `cosmos:${additionalChainId}:${additionalChainId}1address`,
+    );
+    useGrazInternalStore.setState({
+      chains: [makeChainInfo(chainId), makeChainInfo(additionalChainId)],
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    const previousAccount = makeWalletConnectKey(previousChainId) as unknown as Key;
+    useGrazSessionStore.setState({
+      accounts: { [previousChainId]: previousAccount },
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    await expect(getWalletConnect().enable([chainId])).rejects.toThrow(
+      `Expected cosmos_getAccounts for cosmos:${chainId}, received cosmos:${additionalChainId}`,
+    );
+    expect(signClient.disconnect).not.toHaveBeenCalled();
+    expect(useGrazSessionStore.getState().accounts).toEqual({ [previousChainId]: previousAccount });
+  });
+
   it("disconnects a multi-chain session only once", async () => {
     const chainId = "cosmoshub-4";
     const additionalChainId = "neutron-1";
