@@ -1,7 +1,7 @@
 import type { SessionTypes } from "@walletconnect/types";
 import { describe, expect, it } from "vitest";
 
-import { resolveSession } from "../wallet-connect/approved-session";
+import { resolveApprovedChainIds, resolveSession } from "../wallet-connect/approved-session";
 
 const now = 1_700_000_000_000;
 
@@ -11,6 +11,27 @@ const makeSession = (namespaces: SessionTypes.Namespaces, expiry = Math.floor(no
     namespaces,
     topic: "topic-1",
   }) as SessionTypes.Struct;
+
+describe("resolveApprovedChainIds", () => {
+  const scope = {
+    accounts: [],
+    chainIds: ["cosmoshub-4", "osmosis-1", "neutron-1", "unconfigured-1"],
+  };
+
+  it("places requested approved chains first and configured extras after them", () => {
+    expect(
+      resolveApprovedChainIds(
+        scope,
+        ["osmosis-1", "rejected-1", "cosmoshub-4"],
+        ["neutron-1", "cosmoshub-4", "osmosis-1"],
+      ),
+    ).toEqual(["osmosis-1", "cosmoshub-4", "neutron-1"]);
+  });
+
+  it("returns an empty list without an approved configured chain", () => {
+    expect(resolveApprovedChainIds(scope, ["rejected-1"], ["rejected-1"])).toEqual([]);
+  });
+});
 
 describe("resolveSession", () => {
   it("resolves approved accounts from base and chain-scoped Cosmos namespaces", () => {

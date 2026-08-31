@@ -11,7 +11,7 @@ import type { Key } from "../../../types/wallet";
 import { type SignAminoParams, type SignDirectParams, type Wallet, WalletType } from "../../../types/wallet";
 import { isAndroid, isIos, isMobile } from "../../../utils/os";
 import { promiseWithTimeout } from "../../../utils/timeout";
-import { type ResolvedSession, resolveSession } from "./approved-session";
+import { type ResolvedSession, resolveApprovedChainIds, resolveSession } from "./approved-session";
 import type { GetWalletConnectParams, WalletConnectSignDirectResponse } from "./types";
 
 type WalletConnectStoredKey = Omit<Key, "pubKey"> & { chainId?: string; pubKey: Key["pubKey"] | string };
@@ -198,24 +198,13 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     return keys;
   };
 
-  const getApprovedConfiguredChainIds = (resolvedSession: ResolvedSession, requestedChainIds: string[]) => {
-    const configuredChainIds = useGrazInternalStore.getState().chains?.map((chain) => chain.chainId) ?? requestedChainIds;
-    const approvedChainIds = new Set(resolvedSession.scope.chainIds);
-    const requested = requestedChainIds.filter(
-      (chainId) => approvedChainIds.has(chainId) && configuredChainIds.includes(chainId),
-    );
-    const additional = configuredChainIds.filter(
-      (chainId) => approvedChainIds.has(chainId) && !requested.includes(chainId),
-    );
-    return [...requested, ...additional];
-  };
-
   const materializeAccounts = async (
     signClient: ISignClient,
     resolvedSession: ResolvedSession,
     requestedChainIds: string[],
   ) => {
-    const chainIds = getApprovedConfiguredChainIds(resolvedSession, requestedChainIds);
+    const configuredChainIds = useGrazInternalStore.getState().chains?.map((chain) => chain.chainId) ?? requestedChainIds;
+    const chainIds = resolveApprovedChainIds(resolvedSession.scope, requestedChainIds, configuredChainIds);
     if (chainIds.length === 0) throw new Error("No approved WalletConnect accounts for configured chains");
 
     const keys = await getSessionKeys(signClient, resolvedSession, chainIds);

@@ -16,6 +16,22 @@ export type ResolvedSession = {
   scope: SessionScope;
 };
 
+export const resolveApprovedChainIds = (
+  scope: SessionScope,
+  requestedChainIds: readonly string[],
+  configuredChainIds: readonly string[],
+): string[] => {
+  const approved = new Set(scope.chainIds);
+  const requested = requestedChainIds.filter(
+    (chainId) => approved.has(chainId) && configuredChainIds.includes(chainId),
+  );
+  const additional = configuredChainIds.filter(
+    (chainId) => approved.has(chainId) && !requested.includes(chainId),
+  );
+
+  return [...requested, ...additional];
+};
+
 export const resolveSession = (
   session: SessionTypes.Struct | undefined,
   options: { chainIds?: readonly string[]; now?: number } = {},

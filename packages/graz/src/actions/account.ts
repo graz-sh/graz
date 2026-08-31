@@ -11,7 +11,7 @@ import { WalletType } from "../types/wallet";
 import { LogCategory } from "../types/logger";
 import { getLogger } from "../utils/logger";
 import { checkWallet, getWallet, isPara, isWalletConnect } from "./wallet";
-import { resolveSession } from "./wallet/wallet-connect/approved-session";
+import { resolveApprovedChainIds, resolveSession } from "./wallet/wallet-connect/approved-session";
 import { emitWalletEvent } from "./events";
 
 /**
@@ -47,15 +47,11 @@ const getWalletConnectResolvedChainIds = (
   const resolved = resolveSession(signClient.session.getAll().at(-1));
   if (!resolved) throw new Error("No approved WalletConnect accounts");
 
-  const configuredChainIds = chains.map((chain) => chain.chainId);
-  const approvedChainIds = new Set(resolved.scope.chainIds);
-  const requested = requestedChainIds.filter(
-    (chainId) => approvedChainIds.has(chainId) && configuredChainIds.includes(chainId),
+  const resolvedChainIds = resolveApprovedChainIds(
+    resolved.scope,
+    requestedChainIds,
+    chains.map((chain) => chain.chainId),
   );
-  const additional = configuredChainIds.filter(
-    (chainId) => approvedChainIds.has(chainId) && !requested.includes(chainId),
-  );
-  const resolvedChainIds = [...requested, ...additional];
   if (resolvedChainIds.length === 0) throw new Error("No approved WalletConnect accounts for configured chains");
 
   return resolvedChainIds;
