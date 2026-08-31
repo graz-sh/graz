@@ -22,8 +22,7 @@ export const resolveSession = (
 ): ResolvedSession | undefined => {
   if (!session || session.expiry * 1000 <= (options.now ?? Date.now()) + 1000) return;
 
-  const accounts: ApprovedAccount[] = [];
-  const seenAccounts = new Set<string>();
+  const accounts = new Map<string, ApprovedAccount>();
 
   for (const [namespaceKey, namespace] of Object.entries(session.namespaces ?? {})) {
     if (parseNamespaceKey(namespaceKey) !== "cosmos" || !Array.isArray(namespace.accounts)) continue;
@@ -38,21 +37,20 @@ export const resolveSession = (
       if (scopedChainId && scopedChainId !== chainId) continue;
 
       const accountKey = `${chainId}:${address}`;
-      if (seenAccounts.has(accountKey)) continue;
-      seenAccounts.add(accountKey);
-      accounts.push({ address, chainId });
+      accounts.set(accountKey, { address, chainId });
     }
   }
 
-  if (accounts.length === 0) return;
+  const approvedAccounts = [...accounts.values()];
+  if (approvedAccounts.length === 0) return;
 
-  const chainIds = [...new Set(accounts.map((account) => account.chainId))];
+  const chainIds = [...new Set(approvedAccounts.map((account) => account.chainId))];
   if (options.chainIds?.length && !options.chainIds.some((chainId) => chainIds.includes(chainId))) return;
 
   return {
     session,
     scope: {
-      accounts,
+      accounts: approvedAccounts,
       chainIds,
     },
   };
