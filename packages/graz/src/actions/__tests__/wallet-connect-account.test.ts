@@ -120,6 +120,69 @@ describe("WalletConnect account action", () => {
     ]);
   });
 
+  it("reconciles existing chains with the approved session scope", async () => {
+    const chainA = makeChainInfo("cosmoshub-4");
+    const chainB = makeChainInfo("osmosis-1");
+    const chainC = makeChainInfo("juno-1");
+    const chainD = makeChainInfo("neutron-1");
+    const accountA = makeKey(chainA.chainId);
+    const accountB = makeKey(chainB.chainId);
+    const accountC = makeKey(chainC.chainId);
+    const accountD = makeKey(chainD.chainId);
+    const session = {
+      expiry: Math.floor(Date.now() / 1000) + 60,
+      namespaces: {
+        cosmos: {
+          accounts: [
+            `cosmos:${chainA.chainId}:${accountA.bech32Address}`,
+            `cosmos:${chainD.chainId}:${accountD.bech32Address}`,
+          ],
+          events: [],
+          methods: [],
+        },
+      },
+      topic: "topic-1",
+    };
+    const signClient = {
+      session: {
+        getAll: vi.fn(() => [session]),
+      },
+    };
+
+    walletMock.enable.mockImplementation(async () => {
+      useGrazSessionStore.setState({
+        accounts: {
+          [chainC.chainId]: accountC,
+          [chainA.chainId]: accountA,
+          [chainD.chainId]: accountD,
+        },
+        wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+      });
+    });
+    useGrazInternalStore.setState({
+      chains: [chainA, chainB, chainC, chainD],
+      recentChainIds: [chainB.chainId, chainC.chainId],
+      walletType: WalletType.WALLETCONNECT,
+    });
+    useGrazSessionStore.setState({
+      accounts: {
+        [chainB.chainId]: accountB,
+        [chainC.chainId]: accountC,
+      },
+      activeChainIds: [chainB.chainId, chainC.chainId],
+      status: "connected",
+    });
+
+    const result = await connect({
+      chainId: [chainB.chainId, chainA.chainId],
+      walletType: WalletType.WALLETCONNECT,
+    });
+
+    expect(result.chains).toEqual([chainA, chainD]);
+    expect(useGrazSessionStore.getState().activeChainIds).toEqual([chainC.chainId, chainA.chainId, chainD.chainId]);
+    expect(useGrazInternalStore.getState().recentChainIds).toEqual([chainC.chainId, chainA.chainId, chainD.chainId]);
+  });
+
   it("reconnects with the latest approved configured scope", async () => {
     const chainA = makeChainInfo("cosmoshub-4");
     const omitted = makeChainInfo("osmosis-1");
