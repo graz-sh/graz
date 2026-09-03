@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { toBase64 } from "@cosmjs/encoding";
 
 const walletConnectModalMock = vi.hoisted(() => {
   const instances: Array<{
@@ -228,6 +229,109 @@ describe("WalletConnect first-session flow", () => {
         bech32Address: `${chainId}1address`,
       },
     });
+  });
+
+  it("normalizes standard Cosmos RPC accounts without session properties", async () => {
+    const chainId = "dimension_37-1";
+    const address = Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+    const bech32Address = "xpla1qypqxpq9qcrsszg2pvxq6rs0zqg3yyc5p95zd0";
+    const pubKey = Uint8Array.from([4, 5, 6]);
+    const encodedPubKey = toBase64(pubKey);
+    const approved = {
+      ...makeWalletConnectKey(chainId),
+      address: [...address],
+      bech32Address,
+      pubKey: encodedPubKey,
+    };
+    const approval = vi.fn().mockResolvedValue(makeApprovedSession([approved], false));
+    const signClient = {
+      connect: vi.fn().mockResolvedValue({ approval, uri: "wc:topic" }),
+      request: vi.fn().mockResolvedValue([
+        {
+          address: bech32Address,
+          algo: "secp256k1",
+          pubkey: encodedPubKey,
+        },
+      ]),
+      session: { getAll: vi.fn(() => []) },
+    };
+    useGrazInternalStore.setState({ chains: [makeChainInfo(chainId)] });
+    useGrazSessionStore.setState({
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    await expect(getWalletConnect().enable([chainId])).resolves.toBeUndefined();
+
+    expect(Object.keys(useGrazSessionStore.getState().accounts ?? {})).toEqual([chainId]);
+    expect(useGrazSessionStore.getState().accounts?.[chainId]).toMatchObject({
+      address,
+      bech32Address,
+      pubKey,
+    });
+  });
+
+  it.each(["dimension_37-1", "cosmos:dimension_37-1"])(
+    "normalizes standard Cosmos RPC account chain ID %s",
+    async (responseChainId) => {
+      const chainId = "dimension_37-1";
+      const bech32Address = "xpla1qypqxpq9qcrsszg2pvxq6rs0zqg3yyc5p95zd0";
+      const encodedPubKey = toBase64(new Uint8Array([4, 5, 6]));
+      const approved = {
+        ...makeWalletConnectKey(chainId),
+        bech32Address,
+      };
+      const session = makeApprovedSession([approved], false);
+      const signClient = {
+        request: vi.fn().mockResolvedValue([
+          {
+            address: bech32Address,
+            algo: "secp256k1",
+            chainId: responseChainId,
+            pubkey: encodedPubKey,
+          },
+        ]),
+        session: { getAll: vi.fn(() => [session]) },
+      };
+      useGrazInternalStore.setState({ chains: [makeChainInfo(chainId)] });
+      useGrazSessionStore.setState({
+        accounts: null,
+        wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+      });
+
+      await expect(getWalletConnect().enable([chainId])).resolves.toBeUndefined();
+      expect(useGrazSessionStore.getState().accounts?.[chainId]?.bech32Address).toBe(bech32Address);
+    },
+  );
+
+  it("rejects a standard Cosmos RPC account outside the approved namespace", async () => {
+    const chainId = "dimension_37-1";
+    const approvedAddress = "xpla1qypqxpq9qcrsszg2pvxq6rs0zqg3yyc5p95zd0";
+    const responseAddress = "xpla1zsf3yygspu8q6rqtpgysspcxq5zqxqspn7xtws";
+    const approved = {
+      ...makeWalletConnectKey(chainId),
+      bech32Address: approvedAddress,
+    };
+    const session = makeApprovedSession([approved], false);
+    const signClient = {
+      request: vi.fn().mockResolvedValue([
+        {
+          address: responseAddress,
+          algo: "secp256k1",
+          pubkey: toBase64(new Uint8Array([4, 5, 6])),
+        },
+      ]),
+      session: { getAll: vi.fn(() => [session]) },
+    };
+    useGrazInternalStore.setState({ chains: [makeChainInfo(chainId)] });
+    useGrazSessionStore.setState({
+      accounts: null,
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    await expect(getWalletConnect().enable([chainId])).rejects.toThrow(
+      `No WalletConnect accounts for approved chains: ${chainId}`,
+    );
+    expect(useGrazSessionStore.getState().accounts).toBeNull();
   });
 
   it("materializes the approved configured subset, including configured chains outside the request", async () => {

@@ -1,4 +1,5 @@
 import type { AminoSignResponse } from "@cosmjs/amino";
+import { fromBase64, fromBech32 } from "@cosmjs/encoding";
 import type { AccountData, Algo, DirectSignResponse } from "@cosmjs/proto-signing";
 import type { Keplr } from "@keplr-wallet/types";
 import { WalletConnectModal } from "@walletconnect/modal";
@@ -14,7 +15,19 @@ import { promiseWithTimeout } from "../../../utils/timeout";
 import { type ResolvedSession, resolveApprovedChainIds, resolveSession } from "./approved-session";
 import type { GetWalletConnectParams, WalletConnectSignDirectResponse } from "./types";
 
-type WalletConnectStoredKey = Omit<Key, "pubKey"> & { chainId?: string; pubKey: Key["pubKey"] | string };
+type WalletConnectAccount = {
+  address?: Key["address"] | number[] | string;
+  algo?: string;
+  bech32Address?: string;
+  chainId?: string;
+  isKeystone?: boolean;
+  isNanoLedger?: boolean;
+  name?: string;
+  pubKey?: Key["pubKey"] | string;
+  pubkey?: string;
+};
+
+type WalletConnectStoredKey = Key & { chainId?: string };
 
 export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
@@ -106,11 +119,11 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     }
   };
 
-  const parseSessionKeys = (sessionProperties?: Record<string, string>): WalletConnectStoredKey[] | undefined => {
+  const parseSessionKeys = (sessionProperties?: Record<string, string>): WalletConnectAccount[] | undefined => {
     const rawKeys = sessionProperties?.keys;
     if (!rawKeys) return;
 
-    const keys = JSON.parse(String(rawKeys)) as WalletConnectStoredKey[];
+    const keys = JSON.parse(String(rawKeys)) as WalletConnectAccount[];
     if (!Array.isArray(keys) || keys.length === 0) throw new Error("No accounts");
 
     return keys;
@@ -118,6 +131,53 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
   const getWalletConnectChainId = (chainId?: string) =>
     chainId?.includes(":") ? parseChainId(chainId).reference : chainId;
+
+  const normalizeWalletConnectAccount = (
+    account: WalletConnectAccount,
+    fallbackChainId?: string,
+  ): WalletConnectStoredKey | undefined => {
+    const bech32Address = account.bech32Address ?? (typeof account.address === "string" ? account.address : undefined);
+    if (!account.algo || !bech32Address || (!account.pubKey && !account.pubkey)) return;
+
+    let address: Uint8Array | undefined;
+    let pubKey: Uint8Array;
+    if (account.address instanceof Uint8Array) {
+      address = account.address;
+    } else if (Array.isArray(account.address)) {
+      address = Uint8Array.from(account.address);
+    } else {
+      try {
+        address = fromBech32(bech32Address).data;
+      } catch {
+        return;
+      }
+    }
+
+    try {
+      if (account.pubkey) {
+        pubKey = fromBase64(account.pubkey);
+      } else if (typeof account.pubKey === "string") {
+        pubKey = Buffer.from(account.pubKey, encoding);
+      } else if (account.pubKey instanceof Uint8Array) {
+        pubKey = account.pubKey;
+      } else {
+        return;
+      }
+    } catch {
+      return;
+    }
+
+    return {
+      address,
+      algo: account.algo,
+      bech32Address,
+      chainId: getWalletConnectChainId(account.chainId) ?? fallbackChainId,
+      isKeystone: account.isKeystone ?? false,
+      isNanoLedger: account.isNanoLedger ?? false,
+      name: account.name ?? "WalletConnect",
+      pubKey,
+    };
+  };
 
   const filterApprovedKeys = (
     resolvedSession: ResolvedSession,
@@ -155,14 +215,14 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
           },
         });
         const accounts = Array.isArray(response)
-          ? response
-          : (response as { accounts?: WalletConnectStoredKey[] }).accounts;
+          ? (response as WalletConnectAccount[])
+          : (response as { accounts?: WalletConnectAccount[] }).accounts;
         if (!Array.isArray(accounts) || accounts.length === 0) throw new Error("No accounts");
 
-        return accounts.map((account) => ({
-          ...account,
-          chainId: getWalletConnectChainId(account.chainId) || chainId,
-        })) as WalletConnectStoredKey[];
+        return accounts.flatMap((account) => {
+          const key = normalizeWalletConnectAccount(account, chainId);
+          return key ? [key] : [];
+        });
       }),
     );
 
@@ -177,7 +237,10 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     const storedKeys = filterApprovedKeys(
       resolvedSession,
       chainIds,
-      parseSessionKeys(resolvedSession.session.sessionProperties) ?? [],
+      (parseSessionKeys(resolvedSession.session.sessionProperties) ?? []).flatMap((account) => {
+        const key = normalizeWalletConnectAccount(account);
+        return key ? [key] : [];
+      }),
     );
     const missingChainIds = chainIds.filter((chainId) => !storedKeys.some((key) => key.chainId === chainId));
     if (missingChainIds.length === 0) return storedKeys;
@@ -203,7 +266,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     resolvedSession: ResolvedSession,
     requestedChainIds: string[],
   ) => {
-    const configuredChainIds = useGrazInternalStore.getState().chains?.map((chain) => chain.chainId) ?? requestedChainIds;
+    const configuredChainIds =
+      useGrazInternalStore.getState().chains?.map((chain) => chain.chainId) ?? requestedChainIds;
     const chainIds = resolveApprovedChainIds(resolvedSession.scope, requestedChainIds, configuredChainIds);
     if (chainIds.length === 0) throw new Error("No approved WalletConnect accounts for configured chains");
 
@@ -218,7 +282,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
         isNanoLedger: key.isNanoLedger,
         isKeystone: key.isKeystone,
         name: key.name,
-        pubKey: Buffer.from(String(key.pubKey), encoding),
+        pubKey: key.pubKey,
       };
     });
 
@@ -315,9 +379,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       const approving = async (signal: AbortSignal): Promise<SessionTypes.Struct> => {
         if (signal.aborted) return Promise.reject(new Error("User closed wallet connect"));
         return new Promise<SessionTypes.Struct>((resolve, reject) => {
-          approval()
-            .then(resolve)
-            .catch(reject);
+          approval().then(resolve).catch(reject);
           signal.addEventListener(
             "abort",
             () => {
@@ -383,7 +445,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
     return {
       ...key,
-      pubKey: Buffer.from(String(key.pubKey), encoding) as unknown as Uint8Array,
+      pubKey: key.pubKey,
     };
   };
 
