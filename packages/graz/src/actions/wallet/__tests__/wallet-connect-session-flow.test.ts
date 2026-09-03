@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { toBase64 } from "@cosmjs/encoding";
+import { fromBech32, toBase64, toBech32 } from "@cosmjs/encoding";
 
 const walletConnectModalMock = vi.hoisted(() => {
   const instances: Array<{
@@ -43,10 +43,15 @@ type WalletConnectStoredKey = {
   pubKey: string;
 };
 
+const getWalletConnectAddressBytes = (chainId: string) =>
+  Uint8Array.from({ length: 20 }, (_, index) => chainId.charCodeAt(index % chainId.length));
+
+const getWalletConnectAddress = (chainId: string) => toBech32("cosmos", getWalletConnectAddressBytes(chainId));
+
 const makeWalletConnectKey = (chainId: string): WalletConnectStoredKey => ({
-  address: [1, 2, 3],
+  address: Array.from(getWalletConnectAddressBytes(chainId)),
   algo: "secp256k1",
-  bech32Address: `${chainId}1address`,
+  bech32Address: getWalletConnectAddress(chainId),
   chainId,
   isKeystone: false,
   isNanoLedger: false,
@@ -226,7 +231,7 @@ describe("WalletConnect first-session flow", () => {
     });
     expect(useGrazSessionStore.getState().accounts).toMatchObject({
       [chainId]: {
-        bech32Address: `${chainId}1address`,
+        bech32Address: getWalletConnectAddress(chainId),
       },
     });
   });
@@ -302,6 +307,62 @@ describe("WalletConnect first-session flow", () => {
       expect(useGrazSessionStore.getState().accounts?.[chainId]?.bech32Address).toBe(bech32Address);
     },
   );
+
+  it("rejects a standard Cosmos RPC account with a non-Cosmos CAIP-2 chain ID", async () => {
+    const chainId = "dimension_37-1";
+    const bech32Address = "xpla1qypqxpq9qcrsszg2pvxq6rs0zqg3yyc5p95zd0";
+    const approved = {
+      ...makeWalletConnectKey(chainId),
+      bech32Address,
+    };
+    const session = makeApprovedSession([approved], false);
+    const signClient = {
+      request: vi.fn().mockResolvedValue([
+        {
+          address: bech32Address,
+          algo: "secp256k1",
+          chainId: `eip155:${chainId}`,
+          pubkey: toBase64(new Uint8Array([4, 5, 6])),
+        },
+      ]),
+      session: { getAll: vi.fn(() => [session]) },
+    };
+    useGrazInternalStore.setState({ chains: [makeChainInfo(chainId)] });
+    useGrazSessionStore.setState({
+      accounts: null,
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    await expect(getWalletConnect().enable([chainId])).rejects.toThrow(
+      `No WalletConnect accounts for approved chains: ${chainId}`,
+    );
+    expect(useGrazSessionStore.getState().accounts).toBeNull();
+  });
+
+  it("derives a legacy account byte address from its approved bech32 address", async () => {
+    const chainId = "dimension_37-1";
+    const bech32Address = "xpla1qypqxpq9qcrsszg2pvxq6rs0zqg3yyc5p95zd0";
+    const approved = {
+      ...makeWalletConnectKey(chainId),
+      address: [99, 98, 97],
+      bech32Address,
+    };
+    const session = makeApprovedSession([approved]);
+    const signClient = {
+      request: vi.fn(),
+      session: { getAll: vi.fn(() => [session]) },
+    };
+    useGrazInternalStore.setState({ chains: [makeChainInfo(chainId)] });
+    useGrazSessionStore.setState({
+      accounts: null,
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    await expect(getWalletConnect().enable([chainId])).resolves.toBeUndefined();
+
+    expect(useGrazSessionStore.getState().accounts?.[chainId]?.address).toEqual(fromBech32(bech32Address).data);
+    expect(signClient.request).not.toHaveBeenCalled();
+  });
 
   it("rejects a standard Cosmos RPC account outside the approved namespace", async () => {
     const chainId = "dimension_37-1";

@@ -129,8 +129,11 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     return keys;
   };
 
-  const getWalletConnectChainId = (chainId?: string) =>
-    chainId?.includes(":") ? parseChainId(chainId).reference : chainId;
+  const getWalletConnectChainId = (chainId?: string) => {
+    if (!chainId?.includes(":")) return chainId;
+    const parsed = parseChainId(chainId);
+    return parsed.namespace === "cosmos" ? parsed.reference : undefined;
+  };
 
   const normalizeWalletConnectAccount = (
     account: WalletConnectAccount,
@@ -139,18 +142,15 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     const bech32Address = account.bech32Address ?? (typeof account.address === "string" ? account.address : undefined);
     if (!account.algo || !bech32Address || (!account.pubKey && !account.pubkey)) return;
 
-    let address: Uint8Array | undefined;
+    const chainId = account.chainId === undefined ? fallbackChainId : getWalletConnectChainId(account.chainId);
+    if (account.chainId !== undefined && !chainId) return;
+
+    let address: Uint8Array;
     let pubKey: Uint8Array;
-    if (account.address instanceof Uint8Array) {
-      address = account.address;
-    } else if (Array.isArray(account.address)) {
-      address = Uint8Array.from(account.address);
-    } else {
-      try {
-        address = fromBech32(bech32Address).data;
-      } catch {
-        return;
-      }
+    try {
+      address = fromBech32(bech32Address).data;
+    } catch {
+      return;
     }
 
     try {
@@ -171,7 +171,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       address,
       algo: account.algo,
       bech32Address,
-      chainId: getWalletConnectChainId(account.chainId) ?? fallbackChainId,
+      chainId,
       isKeystone: account.isKeystone ?? false,
       isNanoLedger: account.isNanoLedger ?? false,
       name: account.name ?? "WalletConnect",
@@ -188,6 +188,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
     return keys.flatMap((key) => {
       const keyChainId = getWalletConnectChainId(key.chainId);
+      if (key.chainId !== undefined && !keyChainId) return [];
       const matches = approvedAccounts.filter(
         (account) => (!keyChainId || account.chainId === keyChainId) && account.address === key.bech32Address,
       );

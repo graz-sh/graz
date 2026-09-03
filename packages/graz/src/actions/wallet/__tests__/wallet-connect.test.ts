@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { toBech32 } from "@cosmjs/encoding";
 
 import { makeChainInfo } from "../../../__tests__/fixtures";
 import { useGrazInternalStore, useGrazSessionStore } from "../../../store";
@@ -8,10 +9,15 @@ import { getWCClot } from "../wallet-connect/clot";
 import { getWCCosmostation } from "../wallet-connect/cosmostation";
 import { getWCKeplr } from "../wallet-connect/keplr";
 
+const getWalletConnectAddressBytes = (chainId: string) =>
+  Uint8Array.from({ length: 20 }, (_, index) => chainId.charCodeAt(index % chainId.length));
+
+const getWalletConnectAddress = (chainId: string) => toBech32("cosmos", getWalletConnectAddressBytes(chainId));
+
 const makeWalletConnectKey = (chainId: string, overrides: Partial<Key> = {}) => ({
-  address: [1, 2, 3],
+  address: Array.from(getWalletConnectAddressBytes(chainId)),
   algo: "secp256k1",
-  bech32Address: `${chainId}1address`,
+  bech32Address: getWalletConnectAddress(chainId),
   chainId,
   isKeystone: false,
   isNanoLedger: false,
@@ -31,7 +37,7 @@ const makeSignClient = (
     expiry: Math.floor(Date.now() / 1000) + 60,
     namespaces: {
       cosmos: {
-        accounts: [`cosmos:${chainId}:${chainId}1address`],
+        accounts: [`cosmos:${chainId}:${getWalletConnectAddress(chainId)}`],
         events: ["chainChanged", "accountsChanged"],
         methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
       },
@@ -168,13 +174,13 @@ describe("WalletConnect adapter", () => {
 
     await expect(wallet.enable([chainId])).resolves.toBeUndefined();
     expect(useGrazSessionStore.getState().accounts?.[chainId]).toMatchObject({
-      bech32Address: `${chainId}1address`,
+      bech32Address: getWalletConnectAddress(chainId),
       name: "WalletConnect",
     });
 
     const key = await wallet.getKey(chainId);
     expect(key).toMatchObject({
-      bech32Address: `${chainId}1address`,
+      bech32Address: getWalletConnectAddress(chainId),
       isNanoLedger: false,
     });
     expect(Array.from(key.pubKey)).toEqual([4, 5, 6]);
@@ -185,13 +191,13 @@ describe("WalletConnect adapter", () => {
       wallet.getOfflineSigner(chainId).getAccounts(),
     ).resolves.toEqual([
       {
-        address: `${chainId}1address`,
+        address: getWalletConnectAddress(chainId),
         algo: "secp256k1",
         pubkey: Buffer.from(new Uint8Array([4, 5, 6])),
       },
     ]);
     await expect(
-      wallet.signDirect(chainId, `${chainId}1address`, {
+      wallet.signDirect(chainId, getWalletConnectAddress(chainId), {
         accountNumber: 7n,
         authInfoBytes: new Uint8Array([1]),
         bodyBytes: new Uint8Array([2]),
@@ -221,7 +227,7 @@ describe("WalletConnect adapter", () => {
       params: {
         chainId: `cosmos:${chainId}`,
         event: {
-          data: [`${chainId}1address`],
+          data: [getWalletConnectAddress(chainId)],
           name: "accountsChanged",
         },
       },
@@ -271,7 +277,7 @@ describe("WalletConnect adapter", () => {
     const wallet = getWalletConnect();
 
     await expect(wallet.getKey(chainId)).resolves.toMatchObject({
-      bech32Address: `${chainId}1address`,
+      bech32Address: getWalletConnectAddress(chainId),
     });
     expect(signClient.request).toHaveBeenCalledWith({
       chainId: `cosmos:${chainId}`,
@@ -302,7 +308,7 @@ describe("WalletConnect adapter", () => {
     const wallet = getWalletConnect();
 
     await expect(wallet.getKey(chainId)).resolves.toMatchObject({
-      bech32Address: `${chainId}1address`,
+      bech32Address: getWalletConnectAddress(chainId),
     });
     expect(signClient.request).toHaveBeenCalledWith({
       chainId: `cosmos:${chainId}`,
@@ -320,7 +326,7 @@ describe("WalletConnect adapter", () => {
     const previousChainId = "osmosis-1";
     const signClient = makeSignClient(chainId);
     signClient.test.session.namespaces.cosmos.accounts.push(
-      `cosmos:${additionalChainId}:${additionalChainId}1address`,
+      `cosmos:${additionalChainId}:${getWalletConnectAddress(additionalChainId)}`,
     );
     useGrazInternalStore.setState({
       chains: [makeChainInfo(chainId), makeChainInfo(additionalChainId)],
@@ -348,7 +354,7 @@ describe("WalletConnect adapter", () => {
     const additionalChainId = "neutron-1";
     const signClient = makeSignClient(chainId);
     signClient.test.session.namespaces.cosmos.accounts.push(
-      `cosmos:${additionalChainId}:${additionalChainId}1address`,
+      `cosmos:${additionalChainId}:${getWalletConnectAddress(additionalChainId)}`,
     );
     useGrazInternalStore.setState({
       walletConnect: {

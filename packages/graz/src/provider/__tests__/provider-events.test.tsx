@@ -1,4 +1,5 @@
 import { act } from "react";
+import { toBech32 } from "@cosmjs/encoding";
 import type { ISignClient } from "@walletconnect/types";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -12,6 +13,9 @@ import { WalletType } from "../../types/wallet";
 import { ClientOnly } from "../client-only";
 import { GrazEvents } from "../events";
 import { GrazProvider } from "../index";
+
+const makeAddress = (value: number) => new Uint8Array(20).fill(value);
+const makeBech32Address = (value: number) => toBech32("cosmos", makeAddress(value));
 
 const makeKey = (chainId: string): Key => ({
   address: new Uint8Array([1, 2, 3]),
@@ -284,9 +288,13 @@ describe("provider components and events", () => {
     ["session_expire", "session-expired"],
   ] as const)("normalizes WalletConnect account and %s events", async (sessionEvent, disconnectReason) => {
     const chain = makeChainInfo();
-    const previousAccount = makeKey(chain.chainId);
+    const previousAccount = {
+      ...makeKey(chain.chainId),
+      address: makeAddress(1),
+      bech32Address: makeBech32Address(1),
+    };
     const listeners = new Map<string, Set<(args?: unknown) => void>>();
-    let bech32Address = `${chain.chainId}1changed`;
+    let bech32Address = makeBech32Address(2);
     const signClient = {
       events: {
         emit: (event: string, args?: unknown) => {
@@ -307,7 +315,7 @@ describe("provider components and events", () => {
             expiry: Math.floor(Date.now() / 1000) + 60,
             namespaces: {
               cosmos: {
-                accounts: ["cosmos:osmosis-1:osmo1unrelated"],
+                accounts: [`cosmos:osmosis-1:${makeBech32Address(4)}`],
                 events: ["chainChanged", "accountsChanged"],
                 methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
               },
@@ -418,7 +426,7 @@ describe("provider components and events", () => {
     expect(useGrazInternalStore.getState().walletType).toBe(WalletType.WALLETCONNECT);
     expect(window.sessionStorage.getItem(RECONNECT_SESSION_KEY)).toBe("Active");
 
-    bech32Address = `${chain.chainId}1ignored`;
+    bech32Address = makeBech32Address(3);
     await act(async () => {
       signClient.events.emit("session_event", {
         id: 3,
