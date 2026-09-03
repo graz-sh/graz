@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { toBech32 } from "@cosmjs/encoding";
+import { SignClient } from "@walletconnect/sign-client";
 
 import { makeChainInfo } from "../../../__tests__/fixtures";
 import { useGrazInternalStore, useGrazSessionStore } from "../../../store";
@@ -250,7 +251,10 @@ describe("WalletConnect adapter", () => {
         code: 7001,
       }),
     );
-    expect(useGrazSessionStore.getState().wcSignClients.has(WalletType.WALLETCONNECT)).toBe(false);
+    expect(useGrazSessionStore.getState().wcSignClients.get(WalletType.WALLETCONNECT)).toBe(signClient);
+    const initialize = vi.spyOn(SignClient, "init").mockRejectedValue(new Error("Unexpected SignClient re-init"));
+    await expect(wallet.init!()).resolves.toBe(signClient);
+    expect(initialize).not.toHaveBeenCalled();
     expect(useGrazInternalStore.getState()).toMatchObject({
       _reconnect: false,
       _reconnectConnector: null,
@@ -258,6 +262,30 @@ describe("WalletConnect adapter", () => {
     });
   });
 
+  it("coalesces concurrent SignClient initialization", async () => {
+    const chainId = "cosmoshub-4";
+    const signClient = makeSignClient(chainId);
+    let resolveInitialization!: (client: typeof signClient) => void;
+    const initialization = new Promise<typeof signClient>((resolve) => {
+      resolveInitialization = resolve;
+    });
+    const initialize = vi.spyOn(SignClient, "init").mockReturnValue(initialization as never);
+    useGrazInternalStore.setState({
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+
+    const first = getWalletConnect().init!();
+    const second = getWalletConnect().init!();
+
+    expect(initialize).toHaveBeenCalledTimes(1);
+    resolveInitialization(signClient);
+    await expect(Promise.all([first, second])).resolves.toEqual([signClient, signClient]);
+    expect(useGrazSessionStore.getState().wcSignClients.get(WalletType.WALLETCONNECT)).toBe(signClient);
+  });
   it("requests accounts for existing sessions without session properties", async () => {
     const chainId = "cosmoshub-4";
     const signClient = makeSignClient(chainId, { includeSessionProperties: false });

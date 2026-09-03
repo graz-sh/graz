@@ -30,6 +30,7 @@ type WalletConnectAccount = {
 type WalletConnectStoredKey = Key & { chainId?: string };
 
 const disconnectingSessions = new WeakMap<ISignClient, Map<string, Promise<void>>>();
+const initializingSignClients = new Map<WalletType, Promise<ISignClient>>();
 
 export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
@@ -54,15 +55,6 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   };
 
   const _disconnect = () => {
-    const { wcSignClients } = useGrazSessionStore.getState();
-    const wcSignClient = wcSignClients.get(walletType);
-    if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
-
-    wcSignClients.delete(walletType);
-    useGrazSessionStore.setState({
-      wcSignClients,
-    });
-
     useGrazInternalStore.setState({
       _reconnect: false,
       _reconnectConnector: null,
@@ -313,15 +305,33 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   const init = async () => {
     const { walletConnect } = useGrazInternalStore.getState();
     if (!walletConnect?.options) throw new Error("walletConnect.options is not defined");
+    const options = walletConnect.options;
     const { wcSignClients } = useGrazSessionStore.getState();
     const wcSignClient = wcSignClients.get(walletType);
     if (wcSignClient) {
       return wcSignClient;
     }
-    const signClient = await SignClient.init(walletConnect.options);
-    wcSignClients.set(walletType, signClient);
-    useGrazSessionStore.setState({ wcSignClients });
-    return signClient;
+
+    const pendingInitialization = initializingSignClients.get(walletType);
+    if (pendingInitialization) return pendingInitialization;
+
+    const initialization = (async () => {
+      const signClient = await SignClient.init(options);
+      const currentClients = new Map(useGrazSessionStore.getState().wcSignClients);
+      const currentClient = currentClients.get(walletType);
+      if (currentClient) return currentClient;
+
+      currentClients.set(walletType, signClient);
+      useGrazSessionStore.setState({ wcSignClients: currentClients });
+      return signClient;
+    })();
+    initializingSignClients.set(walletType, initialization);
+
+    try {
+      return await initialization;
+    } finally {
+      if (initializingSignClients.get(walletType) === initialization) initializingSignClients.delete(walletType);
+    }
   };
 
   const subscription: (reconnect: () => void) => () => void = (reconnect) => {
@@ -599,7 +609,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
         await Promise.all([...topics].map(wcDisconnect));
       }
 
-      // if no more sessions, remove signClient
+      // Keep the SignClient alive after its last session so reconnects do not
+      // create another Engine over the same WalletConnect Core namespace.
       if (
         signClient?.session.getAll().length === 0 &&
         useGrazSessionStore.getState().wcSignClients.get(walletType) === signClient

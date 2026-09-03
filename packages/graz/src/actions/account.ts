@@ -138,7 +138,7 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
       const { disable: walletConnectDisable } = walletConnectInstance;
 
       if (walletConnectDisable) {
-        void walletConnectDisable();
+        await walletConnectDisable();
       }
     }
 
@@ -280,6 +280,10 @@ const disconnectSession = (
   const previousActiveChainIds = [...(previousSession.activeChainIds || [])];
   const previousAccounts = previousSession.accounts ? { ...previousSession.accounts } : null;
   const walletType = useGrazInternalStore.getState().walletType;
+  const clearSessionState = () => {
+    const { wcSignClients } = useGrazSessionStore.getState();
+    useGrazSessionStore.setState({ ...grazSessionDefaultValues, wcSignClients });
+  };
 
   logger.info(LogCategory.WALLET, "Disconnecting", {
     function: LOG_FUNCTIONS.DISCONNECT,
@@ -316,7 +320,7 @@ const disconnectSession = (
     const isEmpty = Object.values(_accounts ? _accounts : {}).length === 0;
     if (isEmpty) {
       disable();
-      useGrazSessionStore.setState(grazSessionDefaultValues);
+      clearSessionState();
       useGrazInternalStore.setState({
         _reconnect: false,
         _reconnectConnector: null,
@@ -335,7 +339,7 @@ const disconnectSession = (
     }
   } else {
     disable();
-    useGrazSessionStore.setState(grazSessionDefaultValues);
+    clearSessionState();
     useGrazInternalStore.setState({
       _reconnect: false,
       _reconnectConnector: null,

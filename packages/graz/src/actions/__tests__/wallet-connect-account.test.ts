@@ -239,4 +239,64 @@ describe("WalletConnect account action", () => {
     expect(useGrazSessionStore.getState().activeChainIds).toEqual([chainA.chainId, additional.chainId]);
     expect(useGrazInternalStore.getState().recentChainIds).toEqual([chainA.chainId, additional.chainId]);
   });
+
+  it("finishes the previous disconnect before enabling a new session", async () => {
+    const chain = makeChainInfo("cosmoshub-4");
+    const account = makeKey(chain.chainId);
+    const calls: string[] = [];
+    let resolveDisconnect!: () => void;
+    const disconnecting = new Promise<void>((resolve) => {
+      resolveDisconnect = resolve;
+    });
+    const session = {
+      expiry: Math.floor(Date.now() / 1000) + 60,
+      namespaces: {
+        cosmos: {
+          accounts: [`cosmos:${chain.chainId}:${account.bech32Address}`],
+          events: [],
+          methods: [],
+        },
+      },
+      topic: "new-topic",
+    };
+    const signClient = {
+      session: {
+        getAll: vi.fn(() => [session]),
+      },
+    };
+    walletMock.disable.mockImplementation(async () => {
+      calls.push("disable:start");
+      await disconnecting;
+      calls.push("disable:end");
+      useGrazSessionStore.setState({ wcSignClients: new Map() });
+    });
+    walletMock.enable.mockImplementation(async () => {
+      calls.push("enable");
+      useGrazSessionStore.setState({
+        accounts: { [chain.chainId]: account },
+        wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+      });
+    });
+    useGrazInternalStore.setState({
+      chains: [chain],
+      recentChainIds: [chain.chainId],
+      walletType: WalletType.WALLETCONNECT,
+    });
+    useGrazSessionStore.setState({
+      accounts: { [chain.chainId]: account },
+      activeChainIds: [chain.chainId],
+      status: "connected",
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    const connection = connect({ chainId: chain.chainId, walletType: WalletType.WALLETCONNECT });
+    await vi.waitFor(() => expect(walletMock.disable).toHaveBeenCalledTimes(1));
+    expect(walletMock.enable).not.toHaveBeenCalled();
+
+    resolveDisconnect();
+    await expect(connection).resolves.toMatchObject({ walletType: WalletType.WALLETCONNECT });
+
+    expect(calls).toEqual(["disable:start", "disable:end", "enable"]);
+    expect(useGrazSessionStore.getState().wcSignClients.get(WalletType.WALLETCONNECT)).toBe(signClient);
+  });
 });

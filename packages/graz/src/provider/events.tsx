@@ -154,9 +154,6 @@ export const useGrazEvents = () => {
       };
       const handleDisconnect = (topic: string, reason: "wallet" | "session-expired") => {
         if (!isActiveSessionTopic(topic)) return;
-        const clients = new Map(useGrazSessionStore.getState().wcSignClients);
-        clients.delete(_reconnectConnector);
-        useGrazSessionStore.setState({ wcSignClients: clients });
         void disconnectWithReason(reason);
       };
       const handleSessionDelete = (args: SignClientTypes.EventArguments["session_delete"]) => {
