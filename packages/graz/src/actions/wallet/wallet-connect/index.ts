@@ -29,6 +29,8 @@ type WalletConnectAccount = {
 
 type WalletConnectStoredKey = Key & { chainId?: string };
 
+const disconnectingSessions = new WeakMap<ISignClient, Map<string, Promise<void>>>();
+
 export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
     throw new Error("walletConnect.options.projectId is not defined");
@@ -68,17 +70,31 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     });
   };
 
-  const wcDisconnect = async (topic?: string) => {
+  const wcDisconnect = (topic?: string): Promise<void> => {
     const { wcSignClients } = useGrazSessionStore.getState();
     const wcSignClient = wcSignClients.get(walletType);
     if (!wcSignClient) throw new Error("walletConnect.signClient is not defined");
     if (!topic) throw new Error("No wallet connect session");
 
-    await wcSignClient.disconnect({
-      topic,
-      reason: getSdkError("USER_DISCONNECTED"),
+    const clientDisconnects = disconnectingSessions.get(wcSignClient) ?? new Map<string, Promise<void>>();
+    disconnectingSessions.set(wcSignClient, clientDisconnects);
+    const pendingDisconnect = clientDisconnects.get(topic);
+    if (pendingDisconnect) return pendingDisconnect;
+
+    const disconnect = (async () => {
+      await wcSignClient.disconnect({
+        topic,
+        reason: getSdkError("USER_DISCONNECTED"),
+      });
+      await deleteInactivePairings(wcSignClient);
+    })();
+    const trackedDisconnect = disconnect.finally(() => {
+      if (clientDisconnects.get(topic) !== trackedDisconnect) return;
+      clientDisconnects.delete(topic);
+      if (clientDisconnects.size === 0) disconnectingSessions.delete(wcSignClient);
     });
-    await deleteInactivePairings(wcSignClient);
+    clientDisconnects.set(topic, trackedDisconnect);
+    return trackedDisconnect;
   };
 
   const getSession = (chainIds: string[]) => {
@@ -584,7 +600,10 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       }
 
       // if no more sessions, remove signClient
-      if (signClient?.session.getAll().length === 0) {
+      if (
+        signClient?.session.getAll().length === 0 &&
+        useGrazSessionStore.getState().wcSignClients.get(walletType) === signClient
+      ) {
         _disconnect();
       }
     },

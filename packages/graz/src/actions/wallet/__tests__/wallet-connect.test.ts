@@ -372,4 +372,41 @@ describe("WalletConnect adapter", () => {
     expect(signClient.disconnect).toHaveBeenCalledTimes(1);
     expect(signClient.disconnect).toHaveBeenCalledWith(expect.objectContaining({ topic: "topic-1" }));
   });
+
+  it("coalesces concurrent disconnects for the same session topic", async () => {
+    const chainId = "cosmoshub-4";
+    const signClient = makeSignClient(chainId);
+    let resolveDisconnect!: () => void;
+    const disconnecting = new Promise<void>((resolve) => {
+      resolveDisconnect = resolve;
+    });
+    const disconnect = signClient.disconnect.getMockImplementation();
+    let disconnected = false;
+    signClient.disconnect.mockImplementation(async (params) => {
+      await disconnecting;
+      if (disconnected) {
+        throw new Error("Missing or invalid. Record was recently deleted - session: topic-1");
+      }
+      disconnected = true;
+      await disconnect?.(params);
+    });
+    useGrazInternalStore.setState({
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    useGrazSessionStore.setState({
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    const firstDisable = getWalletConnect().disable as () => Promise<void>;
+    const secondDisable = getWalletConnect().disable as () => Promise<void>;
+    const disconnects = Promise.all([firstDisable(), secondDisable()]);
+    resolveDisconnect();
+
+    await expect(disconnects).resolves.toEqual([undefined, undefined]);
+    expect(signClient.disconnect).toHaveBeenCalledTimes(1);
+  });
 });
