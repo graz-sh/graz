@@ -287,6 +287,79 @@ describe("WalletConnect adapter", () => {
     await expect(Promise.all([first, second])).resolves.toEqual([signClient, signClient]);
     expect(useGrazSessionStore.getState().wcSignClients.get(WalletType.WALLETCONNECT)).toBe(signClient);
   });
+  it("uses the latest approved optional-only session for signing", async () => {
+    const chainId = "cosmoshub-4";
+    const previousAddressBytes = Uint8Array.from({ length: 20 }, () => 1);
+    const previousAddress = toBech32("cosmos", previousAddressBytes);
+    const previousKey = makeWalletConnectKey(chainId, {
+      address: previousAddressBytes,
+      bech32Address: previousAddress,
+    });
+    const latestKey = makeWalletConnectKey(chainId);
+    const signClient = makeSignClient(chainId);
+    const previousSession = {
+      ...signClient.test.session,
+      namespaces: {
+        cosmos: {
+          ...signClient.test.session.namespaces.cosmos,
+          accounts: [`cosmos:${chainId}:${previousAddress}`],
+        },
+      },
+      sessionProperties: { keys: JSON.stringify([previousKey]) },
+      topic: "previous-topic",
+    };
+    const latestSession = {
+      ...signClient.test.session,
+      namespaces: {
+        cosmos: {
+          ...signClient.test.session.namespaces.cosmos,
+          accounts: [`cosmos:${chainId}:${latestKey.bech32Address}`],
+        },
+      },
+      requiredNamespaces: {},
+      sessionProperties: { keys: JSON.stringify([latestKey]) },
+      topic: "latest-topic",
+    };
+    signClient.session.getAll.mockReturnValue([previousSession, latestSession] as never);
+    useGrazInternalStore.setState({
+      chains: [makeChainInfo(chainId)],
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    useGrazSessionStore.setState({
+      accounts: { [chainId]: latestKey as unknown as Key },
+      activeChainIds: [chainId],
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    const signer = await getWalletConnect().getOfflineSignerAuto(chainId);
+    await expect(signer.getAccounts()).resolves.toMatchObject([
+      {
+        address: latestKey.bech32Address,
+      },
+    ]);
+
+    await expect(
+      "signDirect" in signer
+        ? signer.signDirect(latestKey.bech32Address, {
+            accountNumber: 7n,
+            authInfoBytes: new Uint8Array([1]),
+            bodyBytes: new Uint8Array([2]),
+            chainId,
+          })
+        : Promise.reject(new Error("Expected direct signer")),
+    ).resolves.toBeDefined();
+    expect(signClient.request).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        request: expect.objectContaining({ method: "cosmos_signDirect" }),
+        topic: "latest-topic",
+      }),
+    );
+  });
+
   it("requests accounts for existing sessions without session properties", async () => {
     const chainId = "cosmoshub-4";
     const signClient = makeSignClient(chainId, { includeSessionProperties: false });
@@ -308,6 +381,70 @@ describe("WalletConnect adapter", () => {
     await expect(wallet.getKey(chainId)).resolves.toMatchObject({
       bech32Address: getWalletConnectAddress(chainId),
     });
+    expect(signClient.request).toHaveBeenCalledWith({
+      chainId: `cosmos:${chainId}`,
+      request: {
+        method: "cosmos_getAccounts",
+        params: {},
+      },
+      topic: "topic-1",
+    });
+  });
+
+  it("does not reuse a stored account outside the latest approved identity", async () => {
+    const chainId = "cosmoshub-4";
+    const signClient = makeSignClient(chainId, { includeSessionProperties: false });
+    const staleChainId = "osmosis-1";
+    useGrazInternalStore.setState({
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    useGrazSessionStore.setState({
+      accounts: {
+        [chainId]: makeWalletConnectKey(chainId, {
+          address: getWalletConnectAddressBytes(staleChainId),
+          bech32Address: getWalletConnectAddress(staleChainId),
+        }) as unknown as Key,
+      },
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    const signer = await getWalletConnect().getOfflineSignerAuto(chainId);
+
+    expect("signDirect" in signer).toBe(true);
+    expect(signClient.request).toHaveBeenCalledTimes(1);
+    expect(signClient.request).toHaveBeenCalledWith({
+      chainId: `cosmos:${chainId}`,
+      request: {
+        method: "cosmos_getAccounts",
+        params: {},
+      },
+      topic: "topic-1",
+    });
+  });
+
+  it("requests accounts for an offline signer when no stored account exists", async () => {
+    const chainId = "cosmoshub-4";
+    const signClient = makeSignClient(chainId, { includeSessionProperties: false });
+    useGrazInternalStore.setState({
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    useGrazSessionStore.setState({
+      accounts: null,
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    const signer = await getWalletConnect().getOfflineSignerAuto(chainId);
+
+    expect("signDirect" in signer).toBe(true);
+    expect(signClient.request).toHaveBeenCalledTimes(1);
     expect(signClient.request).toHaveBeenCalledWith({
       chainId: `cosmos:${chainId}`,
       request: {

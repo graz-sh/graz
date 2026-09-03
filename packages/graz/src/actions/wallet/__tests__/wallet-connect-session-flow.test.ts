@@ -275,6 +275,76 @@ describe("WalletConnect first-session flow", () => {
     });
   });
 
+  it("reuses a materialized approved account for offline signing", async () => {
+    const chainId = "dimension_37-1";
+    const bech32Address = "xpla1qypqxpq9qcrsszg2pvxq6rs0zqg3yyc5p95zd0";
+    const encodedPubKey = toBase64(new Uint8Array([4, 5, 6]));
+    const approved = {
+      ...makeWalletConnectKey(chainId),
+      bech32Address,
+      pubKey: encodedPubKey,
+    };
+    const session = makeApprovedSession([approved], false);
+    let sessions: ReturnType<typeof makeApprovedSession>[] = [];
+    const approval = vi.fn(async () => {
+      sessions = [session];
+      return session;
+    });
+    const request = vi.fn(async ({ request }: { chainId: string; request: { method: string } }) => {
+      if (request.method === "cosmos_getAccounts") {
+        return [{ address: bech32Address, algo: "secp256k1", pubkey: encodedPubKey }];
+      }
+      if (request.method === "cosmos_signDirect") {
+        return {
+          signature: {
+            pub_key: { type: "tendermint/PubKeySecp256k1", value: encodedPubKey },
+            signature: "signature",
+          },
+          signed: {
+            accountNumber: "7",
+            authInfoBytes: toBase64(new Uint8Array([1])),
+            bodyBytes: toBase64(new Uint8Array([2])),
+            chainId,
+          },
+        };
+      }
+      throw new Error(`Unexpected WalletConnect method: ${request.method}`);
+    });
+    const signClient = {
+      connect: vi.fn().mockResolvedValue({ approval, uri: "wc:topic" }),
+      request,
+      session: { getAll: vi.fn(() => sessions) },
+    };
+    useGrazInternalStore.setState({ chains: [makeChainInfo(chainId)] });
+    useGrazSessionStore.setState({
+      accounts: null,
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    const wallet = getWalletConnect();
+    await expect(wallet.enable([chainId])).resolves.toBeUndefined();
+    expect(request).toHaveBeenCalledTimes(1);
+
+    const signer = await wallet.getOfflineSignerAuto(chainId);
+    await expect(signer.getAccounts()).resolves.toMatchObject([{ address: bech32Address }]);
+    expect(request).toHaveBeenCalledTimes(1);
+
+    await expect(
+      "signDirect" in signer
+        ? signer.signDirect(bech32Address, {
+            accountNumber: 7n,
+            authInfoBytes: new Uint8Array([1]),
+            bodyBytes: new Uint8Array([2]),
+            chainId,
+          })
+        : Promise.reject(new Error("Expected direct signer")),
+    ).resolves.toBeDefined();
+    expect(request.mock.calls.map(([call]) => call.request.method)).toEqual([
+      "cosmos_getAccounts",
+      "cosmos_signDirect",
+    ]);
+  });
+
   it.each(["dimension_37-1", "cosmos:dimension_37-1"])(
     "normalizes standard Cosmos RPC account chain ID %s",
     async (responseChainId) => {

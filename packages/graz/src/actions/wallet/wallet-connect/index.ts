@@ -467,8 +467,26 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     commitAccounts(accounts, chainId);
   };
 
+  const resolveStoredApprovedKey = (chainId: string): Key | undefined => {
+    const { accounts, wcSignClients } = useGrazSessionStore.getState();
+    const storedKey = accounts?.[chainId];
+    const wcSignClient = wcSignClients.get(walletType);
+    if (!storedKey || !wcSignClient) return;
+
+    try {
+      const allSession = wcSignClient.session.getAll();
+      const resolvedSession = resolveSession(allSession[allSession.length - 1], { chainIds: [chainId] });
+      const isApproved = resolvedSession?.scope.accounts.some(
+        (account) => account.chainId === chainId && account.address === storedKey.bech32Address,
+      );
+      return isApproved ? storedKey : undefined;
+    } catch (error) {
+      if (!isMissingWalletConnectRecordError(error)) throw error;
+    }
+  };
+
   const getAccount = async (chainId: string): Promise<AccountData> => {
-    const key = await getKey(chainId);
+    const key = resolveStoredApprovedKey(chainId) ?? (await getKey(chainId));
 
     return {
       address: key.bech32Address,
@@ -600,7 +618,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   };
 
   const getOfflineSignerAuto = async (chainId: string) => {
-    const key = await getKey(chainId);
+    const key = resolveStoredApprovedKey(chainId) ?? (await getKey(chainId));
     if (key.isNanoLedger) return getOfflineSignerOnlyAmino(chainId);
     return getOfflineSignerDirect(chainId);
   };
