@@ -127,6 +127,7 @@ const makeSignClient = (
 
 describe("WalletConnect adapter", () => {
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -377,6 +378,43 @@ describe("WalletConnect adapter", () => {
     expect(useGrazSessionStore.getState().accounts).toEqual({ [previousChainId]: previousAccount });
   });
 
+  it("does not update accounts when reused-session materialization resolves after timeout", async () => {
+    vi.useFakeTimers();
+    const chainId = "cosmoshub-4";
+    const previousChainId = "osmosis-1";
+    const signClient = makeSignClient(chainId, { includeSessionProperties: false });
+    let resolveAccounts!: (accounts: ReturnType<typeof makeWalletConnectKey>[]) => void;
+    const accounts = new Promise<ReturnType<typeof makeWalletConnectKey>[]>((resolve) => {
+      resolveAccounts = resolve;
+    });
+    signClient.request.mockImplementationOnce(() => accounts);
+    useGrazInternalStore.setState({
+      chains: [makeChainInfo(chainId)],
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    const previousAccount = makeWalletConnectKey(previousChainId) as unknown as Key;
+    useGrazSessionStore.setState({
+      accounts: { [previousChainId]: previousAccount },
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    const enable = getWalletConnect().enable([chainId]);
+    const timeout = expect(enable).rejects.toThrow("Connection timeout");
+    await vi.advanceTimersByTimeAsync(15_000);
+
+    await timeout;
+    expect(useGrazSessionStore.getState().accounts).toEqual({ [previousChainId]: previousAccount });
+
+    resolveAccounts([makeWalletConnectKey(chainId)]);
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(useGrazSessionStore.getState().accounts).toEqual({ [previousChainId]: previousAccount });
+  });
+
   it("disconnects a multi-chain session only once", async () => {
     const chainId = "cosmoshub-4";
     const additionalChainId = "neutron-1";
@@ -436,5 +474,48 @@ describe("WalletConnect adapter", () => {
 
     await expect(disconnects).resolves.toEqual([undefined, undefined]);
     expect(signClient.disconnect).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    "Missing or invalid. Record was recently deleted - session: topic-1",
+    "Missing or invalid. session topic does not exist in keychain: topic-1",
+  ])("treats an already invalid WalletConnect session as disconnected: %s", async (message) => {
+    const chainId = "cosmoshub-4";
+    const signClient = makeSignClient(chainId);
+    signClient.disconnect.mockImplementationOnce(async () => {
+      signClient.session.getAll.mockReturnValue([]);
+      throw new Error(message);
+    });
+    useGrazInternalStore.setState({
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    useGrazSessionStore.setState({
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    await expect(getWalletConnect().disable?.()).resolves.toBeUndefined();
+    expect(useGrazSessionStore.getState().wcSignClients.get(WalletType.WALLETCONNECT)).toBe(signClient);
+  });
+
+  it("does not hide other WalletConnect disconnect failures", async () => {
+    const chainId = "cosmoshub-4";
+    const signClient = makeSignClient(chainId);
+    signClient.disconnect.mockRejectedValueOnce(new Error("Relay unavailable"));
+    useGrazInternalStore.setState({
+      walletConnect: {
+        options: {
+          projectId: "project-id",
+        },
+      },
+    });
+    useGrazSessionStore.setState({
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    await expect(getWalletConnect().disable?.()).rejects.toThrow("Relay unavailable");
   });
 });

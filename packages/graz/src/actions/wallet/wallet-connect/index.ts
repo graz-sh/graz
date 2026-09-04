@@ -32,6 +32,15 @@ type WalletConnectStoredKey = Key & { chainId?: string };
 const disconnectingSessions = new WeakMap<ISignClient, Map<string, Promise<void>>>();
 const initializingSignClients = new Map<WalletType, Promise<ISignClient>>();
 
+const isMissingWalletConnectRecordError = (error: unknown) => {
+  const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+  return (
+    message.includes("no matching key") ||
+    message.includes("record was recently deleted") ||
+    message.includes("session topic does not exist in keychain")
+  );
+};
+
 export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
   if (!useGrazInternalStore.getState().walletConnect?.options?.projectId?.trim()) {
     throw new Error("walletConnect.options.projectId is not defined");
@@ -74,10 +83,14 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     if (pendingDisconnect) return pendingDisconnect;
 
     const disconnect = (async () => {
-      await wcSignClient.disconnect({
-        topic,
-        reason: getSdkError("USER_DISCONNECTED"),
-      });
+      try {
+        await wcSignClient.disconnect({
+          topic,
+          reason: getSdkError("USER_DISCONNECTED"),
+        });
+      } catch (error) {
+        if (!isMissingWalletConnectRecordError(error)) throw error;
+      }
       await deleteInactivePairings(wcSignClient);
     })();
     const trackedDisconnect = disconnect.finally(() => {
@@ -106,7 +119,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
       return resolveSession(lastSession, { chainIds });
     } catch (error) {
-      if (!(error as Error).message.toLowerCase().includes("no matching key")) throw error;
+      if (!isMissingWalletConnectRecordError(error)) throw error;
     }
   };
 
@@ -123,7 +136,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
         }),
       );
     } catch (error) {
-      if (!(error as Error).message.toLowerCase().includes("no matching key")) throw error;
+      if (!isMissingWalletConnectRecordError(error)) throw error;
     }
   };
 
@@ -274,7 +287,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     signClient: ISignClient,
     resolvedSession: ResolvedSession,
     requestedChainIds: string[],
-  ) => {
+  ): Promise<Record<string, Key>> => {
     const configuredChainIds =
       useGrazInternalStore.getState().chains?.map((chain) => chain.chainId) ?? requestedChainIds;
     const chainIds = resolveApprovedChainIds(resolvedSession.scope, requestedChainIds, configuredChainIds);
@@ -295,6 +308,10 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       };
     });
 
+    return accounts;
+  };
+
+  const commitAccounts = (accounts: Record<string, Key>, requestedChainIds: string[]) => {
     useGrazSessionStore.setState((previous) => {
       const nextAccounts = { ...(previous.accounts ?? {}) };
       requestedChainIds.forEach((chainId) => delete nextAccounts[chainId]);
@@ -429,7 +446,8 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
         approvedSession = await approving(signal);
         const approved = resolveSession(approvedSession);
         if (!approved) throw new Error("No approved WalletConnect accounts");
-        await materializeAccounts(signClient, approved, chainId);
+        const accounts = await materializeAccounts(signClient, approved, chainId);
+        commitAccounts(accounts, chainId);
       } catch (error) {
         walletConnectModal.closeModal();
         if (approvedSession?.topic) await wcDisconnect(approvedSession.topic).catch(() => undefined);
@@ -441,11 +459,12 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       return;
     }
 
-    await promiseWithTimeout(
+    const accounts = await promiseWithTimeout(
       materializeAccounts(signClient, resolvedSession, chainId),
       15000,
       new Error("Connection timeout"),
     );
+    commitAccounts(accounts, chainId);
   };
 
   const getAccount = async (chainId: string): Promise<AccountData> => {
