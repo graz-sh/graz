@@ -32,15 +32,10 @@ export const resolveApprovedChainIds = (
   return [...requested, ...additional];
 };
 
-export const resolveSession = (
-  session: SessionTypes.Struct | undefined,
-  options: { chainIds?: readonly string[]; now?: number } = {},
-): ResolvedSession | undefined => {
-  if (!session || session.expiry * 1000 <= (options.now ?? Date.now()) + 1000) return;
-
+export const resolveSessionScope = (namespaces: SessionTypes.Namespaces | undefined): SessionScope | undefined => {
   const accounts = new Map<string, ApprovedAccount>();
 
-  for (const [namespaceKey, namespace] of Object.entries(session.namespaces ?? {})) {
+  for (const [namespaceKey, namespace] of Object.entries(namespaces ?? {})) {
     if (parseNamespaceKey(namespaceKey) !== "cosmos" || !Array.isArray(namespace.accounts)) continue;
 
     const scopedChainId = namespaceKey.includes(":") ? parseChainId(namespaceKey).reference : undefined;
@@ -60,14 +55,24 @@ export const resolveSession = (
   const approvedAccounts = [...accounts.values()];
   if (approvedAccounts.length === 0) return;
 
-  const chainIds = [...new Set(approvedAccounts.map((account) => account.chainId))];
-  if (options.chainIds?.length && !options.chainIds.some((chainId) => chainIds.includes(chainId))) return;
+  return {
+    accounts: approvedAccounts,
+    chainIds: [...new Set(approvedAccounts.map((account) => account.chainId))],
+  };
+};
+
+export const resolveSession = (
+  session: SessionTypes.Struct | undefined,
+  options: { chainIds?: readonly string[]; now?: number } = {},
+): ResolvedSession | undefined => {
+  if (!session || session.expiry * 1000 <= (options.now ?? Date.now()) + 1000) return;
+
+  const scope = resolveSessionScope(session.namespaces);
+  if (!scope) return;
+  if (options.chainIds?.length && !options.chainIds.some((chainId) => scope.chainIds.includes(chainId))) return;
 
   return {
     session,
-    scope: {
-      accounts: approvedAccounts,
-      chainIds,
-    },
+    scope,
   };
 };

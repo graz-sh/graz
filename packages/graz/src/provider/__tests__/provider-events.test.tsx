@@ -286,7 +286,7 @@ describe("provider components and events", () => {
   it.each([
     ["session_delete", "wallet"],
     ["session_expire", "session-expired"],
-  ] as const)("normalizes WalletConnect account and %s events", async (sessionEvent, disconnectReason) => {
+  ] as const)("handles WalletConnect %s events for a chain-scoped optional session", async (sessionEvent, disconnectReason) => {
     const chain = makeChainInfo();
     const previousAccount = {
       ...makeKey(chain.chainId),
@@ -295,6 +295,8 @@ describe("provider components and events", () => {
     };
     const listeners = new Map<string, Set<(args?: unknown) => void>>();
     let bech32Address = makeBech32Address(2);
+    let activeSessionExpiry = Math.floor(Date.now() / 1000) + 60;
+    let includeActiveSession = true;
     const signClient = {
       events: {
         emit: (event: string, args?: unknown) => {
@@ -328,19 +330,15 @@ describe("provider components and events", () => {
             topic: "unrelated-topic",
           },
           {
-            expiry: Math.floor(Date.now() / 1000) + 60,
+            expiry: activeSessionExpiry,
             namespaces: {
-              cosmos: {
+              [`cosmos:${chain.chainId}`]: {
                 accounts: [`cosmos:${chain.chainId}:${bech32Address}`],
                 events: ["chainChanged", "accountsChanged"],
                 methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
               },
             },
-            requiredNamespaces: {
-              cosmos: {
-                chains: [`cosmos:${chain.chainId}`],
-              },
-            },
+            requiredNamespaces: {},
             sessionProperties: {
               keys: JSON.stringify([
                 {
@@ -354,7 +352,7 @@ describe("provider components and events", () => {
             },
             topic: "topic-1",
           },
-        ]),
+        ].filter((session) => includeActiveSession || session.topic !== "topic-1")),
       },
     };
     const wcSignClients = new Map<WalletType, ISignClient>([
@@ -454,6 +452,8 @@ describe("provider components and events", () => {
     });
     expect(onDisconnect).not.toHaveBeenCalled();
 
+    if (sessionEvent === "session_expire") activeSessionExpiry = Math.floor(Date.now() / 1000) - 1;
+    includeActiveSession = false;
     await act(async () => {
       signClient.events.emit(
         sessionEvent,
@@ -471,6 +471,7 @@ describe("provider components and events", () => {
       activeChainIds: null,
       status: "disconnected",
     });
+    expect(useGrazSessionStore.getState().wcSignClients.get(WalletType.WALLETCONNECT)).toBe(signClient);
     rendered.unmount();
     expect(signClient.events.off).toHaveBeenCalledWith("session_event", expect.any(Function));
   });
