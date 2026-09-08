@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { encodeSecp256k1Pubkey } from "@cosmjs/amino";
 import { fromBech32, toBase64, toBech32 } from "@cosmjs/encoding";
 
 const walletConnectModalMock = vi.hoisted(() => {
@@ -343,6 +344,49 @@ describe("WalletConnect first-session flow", () => {
       "cosmos_getAccounts",
       "cosmos_signDirect",
     ]);
+  });
+
+  it("restores a persisted approved public key before offline signing", async () => {
+    const chainId = "dimension_37-1";
+    const bech32Address = "xpla1lg22287cj523vgdah8z4287nuzct43tmdtj69w";
+    const encodedPubKey = "A3m6JXpt05gNs8LQJhrNd+8vSzBstrWRGfsRdzmrjPVi";
+    const approved = {
+      ...makeWalletConnectKey(chainId),
+      bech32Address,
+      pubKey: encodedPubKey,
+    };
+    const session = makeApprovedSession([approved], false);
+    const request = vi.fn().mockResolvedValue([
+      {
+        address: bech32Address,
+        algo: "secp256k1",
+        pubkey: encodedPubKey,
+      },
+    ]);
+    const signClient = {
+      connect: vi.fn().mockResolvedValue({ approval: vi.fn().mockResolvedValue(session), uri: "wc:topic" }),
+      request,
+      session: { getAll: vi.fn(() => [session]) },
+    };
+    useGrazInternalStore.setState({ chains: [makeChainInfo(chainId)] });
+    useGrazSessionStore.setState({
+      accounts: null,
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    const wallet = getWalletConnect();
+    await wallet.enable([chainId]);
+    const persistedAccounts = JSON.parse(
+      JSON.stringify(useGrazSessionStore.getState().accounts),
+    ) as NonNullable<ReturnType<typeof useGrazSessionStore.getState>["accounts"]>;
+    useGrazSessionStore.setState({ accounts: persistedAccounts });
+
+    const signer = await wallet.getOfflineSignerAuto(chainId);
+    const [account] = await signer.getAccounts();
+    if (!account) throw new Error("Expected an offline signer account");
+
+    expect(() => encodeSecp256k1Pubkey(account.pubkey)).not.toThrow();
+    expect(request).toHaveBeenCalledTimes(1);
   });
 
   it.each(["dimension_37-1", "cosmos:dimension_37-1"])(

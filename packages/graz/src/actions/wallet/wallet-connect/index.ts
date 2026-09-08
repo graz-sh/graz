@@ -479,7 +479,31 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       const isApproved = resolvedSession?.scope.accounts.some(
         (account) => account.chainId === chainId && account.address === storedKey.bech32Address,
       );
-      return isApproved ? storedKey : undefined;
+      if (!isApproved) return;
+      if (ArrayBuffer.isView(storedKey.address) && ArrayBuffer.isView(storedKey.pubKey)) return storedKey;
+
+      const restoreBytes = (value: Uint8Array): Uint8Array | undefined => {
+        if (value instanceof Uint8Array) return value;
+        if (!value || typeof value !== "object") return;
+
+        const entries = Object.entries(value);
+        const bytes = new Uint8Array(entries.length);
+        for (let index = 0; index < entries.length; index += 1) {
+          const byte = (value as unknown as Record<string, unknown>)[String(index)];
+          if (!Number.isInteger(byte) || Number(byte) < 0 || Number(byte) > 255) return;
+          bytes[index] = Number(byte);
+        }
+        return bytes;
+      };
+
+      const pubKey = restoreBytes(storedKey.pubKey);
+      if (!pubKey) return;
+
+      return {
+        ...storedKey,
+        address: fromBech32(storedKey.bech32Address).data,
+        pubKey,
+      };
     } catch (error) {
       if (!isMissingWalletConnectRecordError(error)) throw error;
     }
