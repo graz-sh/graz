@@ -3,6 +3,7 @@ import { toBech32 } from "@cosmjs/encoding";
 import type { ISignClient } from "@walletconnect/types";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { reconnect } from "../../actions/account";
 import { subscribeWalletEvents } from "../../actions/events";
 import { makeChainInfo } from "../../__tests__/fixtures";
 import { flushReact, renderComponent } from "../../__tests__/react";
@@ -284,9 +285,11 @@ describe("provider components and events", () => {
   });
 
   it.each([
-    ["session_delete", "wallet"],
-    ["session_expire", "session-expired"],
-  ] as const)("handles WalletConnect %s events for a chain-scoped optional session", async (sessionEvent, disconnectReason) => {
+    ["session_delete", "wallet", false],
+    ["session_expire", "session-expired", false],
+    ["session_delete", "wallet", true],
+    ["session_expire", "session-expired", true],
+  ] as const)("handles WalletConnect %s (%s) for a chain-scoped optional session (replaced: %s)", async (sessionEvent, disconnectReason, replaceSession) => {
     const chain = makeChainInfo();
     const previousAccount = {
       ...makeKey(chain.chainId),
@@ -297,6 +300,7 @@ describe("provider components and events", () => {
     let bech32Address = makeBech32Address(2);
     let activeSessionExpiry = Math.floor(Date.now() / 1000) + 60;
     let includeActiveSession = true;
+    let activeSessionTopic = "topic-1";
     const signClient = {
       events: {
         emit: (event: string, args?: unknown) => {
@@ -350,9 +354,9 @@ describe("provider components and events", () => {
                 },
               ]),
             },
-            topic: "topic-1",
+            topic: activeSessionTopic,
           },
-        ].filter((session) => includeActiveSession || session.topic !== "topic-1")),
+        ].filter((session) => includeActiveSession || session.topic !== activeSessionTopic)),
       },
     };
     const wcSignClients = new Map<WalletType, ISignClient>([
@@ -383,6 +387,35 @@ describe("provider components and events", () => {
     const rendered = renderComponent(<GrazEvents />);
     await flushReact();
 
+    if (replaceSession) {
+      await act(async () => {
+        // The SDK replaces the session while Graz retains the client and connector.
+        activeSessionTopic = "topic-2";
+        bech32Address = previousAccount.bech32Address;
+        await reconnect();
+      });
+      expect(useGrazSessionStore.getState().wcSignClients).toBe(wcSignClients);
+      expect(useGrazInternalStore.getState()._reconnectConnector).toBe(WalletType.WALLETCONNECT);
+      expect(onAccountChange).not.toHaveBeenCalled();
+      bech32Address = makeBech32Address(2);
+
+      await act(async () => {
+        signClient.events.emit("session_event", {
+          id: 0,
+          params: {
+            chainId: `cosmos:${chain.chainId}`,
+            event: { data: [bech32Address], name: "accountsChanged" },
+          },
+          topic: "topic-1",
+        });
+        signClient.events.emit(sessionEvent, { id: 0, topic: "topic-1" });
+        await Promise.resolve();
+      });
+      expect(onAccountChange).not.toHaveBeenCalled();
+      expect(onDisconnect).not.toHaveBeenCalled();
+      expect(useGrazSessionStore.getState().status).toBe("connected");
+    }
+
     await act(async () => {
       signClient.events.emit("session_event", {
         id: 1,
@@ -409,7 +442,7 @@ describe("provider components and events", () => {
             name: "accountsChanged",
           },
         },
-        topic: "topic-1",
+        topic: activeSessionTopic,
       });
       await Promise.resolve();
     });
@@ -435,7 +468,7 @@ describe("provider components and events", () => {
             name: "chainChanged",
           },
         },
-        topic: "topic-1",
+        topic: activeSessionTopic,
       });
       await Promise.resolve();
     });
@@ -457,7 +490,7 @@ describe("provider components and events", () => {
     await act(async () => {
       signClient.events.emit(
         sessionEvent,
-        sessionEvent === "session_delete" ? { id: 5, topic: "topic-1" } : { topic: "topic-1" },
+        sessionEvent === "session_delete" ? { id: 5, topic: activeSessionTopic } : { topic: activeSessionTopic },
       );
       await Promise.resolve();
     });

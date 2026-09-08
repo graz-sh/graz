@@ -174,7 +174,7 @@ export const useGrazEvents = () => {
       void reconnect({ onError: _onReconnectFailed });
     });
 
-  }, [_onReconnectFailed, _reconnectConnector, isReconnectConnectorReady, logger, wcSignClients]);
+  }, [_onReconnectFailed, _reconnectConnector, activeChains, isReconnectConnectorReady, logger, wcSignClients]);
 
   return null;
 };
