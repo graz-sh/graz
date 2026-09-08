@@ -311,14 +311,6 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     return accounts;
   };
 
-  const commitAccounts = (accounts: Record<string, Key>, requestedChainIds: string[]) => {
-    useGrazSessionStore.setState((previous) => {
-      const nextAccounts = { ...(previous.accounts ?? {}) };
-      requestedChainIds.forEach((chainId) => delete nextAccounts[chainId]);
-      return { accounts: { ...nextAccounts, ...accounts } };
-    });
-  };
-
   const init = async () => {
     const { walletConnect } = useGrazInternalStore.getState();
     if (!walletConnect?.options) throw new Error("walletConnect.options is not defined");
@@ -447,7 +439,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
         const approved = resolveSession(approvedSession);
         if (!approved) throw new Error("No approved WalletConnect accounts");
         const accounts = await materializeAccounts(signClient, approved, chainId);
-        commitAccounts(accounts, chainId);
+        useGrazSessionStore.setState({ accounts });
       } catch (error) {
         walletConnectModal.closeModal();
         if (approvedSession?.topic) await wcDisconnect(approvedSession.topic).catch(() => undefined);
@@ -464,7 +456,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
       15000,
       new Error("Connection timeout"),
     );
-    commitAccounts(accounts, chainId);
+    useGrazSessionStore.setState({ accounts });
   };
 
   const resolveStoredApprovedKey = (chainId: string): Key | undefined => {

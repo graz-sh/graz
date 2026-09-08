@@ -40,7 +40,7 @@ describe("WalletConnect account action", () => {
     walletMock.init.mockReset().mockResolvedValue(undefined);
   });
 
-  it("stores all active approved chains while returning the current resolved scope", async () => {
+  it("replaces active chains with the approved scope in requested and configured order", async () => {
     const chainA = makeChainInfo("cosmoshub-4");
     const chainB = makeChainInfo("osmosis-1");
     const chainC = makeChainInfo("juno-1");
@@ -73,7 +73,6 @@ describe("WalletConnect account action", () => {
     walletMock.enable.mockImplementation(async () => {
       useGrazSessionStore.setState({
         accounts: {
-          [chainC.chainId]: accountC,
           [chainA.chainId]: accountA,
           [chainB.chainId]: accountB,
           [chainD.chainId]: accountD,
@@ -98,7 +97,6 @@ describe("WalletConnect account action", () => {
 
     expect(result).toEqual({
       accounts: {
-        [chainC.chainId]: accountC,
         [chainA.chainId]: accountA,
         [chainB.chainId]: accountB,
         [chainD.chainId]: accountD,
@@ -107,20 +105,18 @@ describe("WalletConnect account action", () => {
       walletType: WalletType.WALLETCONNECT,
     });
     expect(useGrazSessionStore.getState().activeChainIds).toEqual([
-      chainC.chainId,
       chainB.chainId,
       chainA.chainId,
       chainD.chainId,
     ]);
     expect(useGrazInternalStore.getState().recentChainIds).toEqual([
-      chainC.chainId,
       chainB.chainId,
       chainA.chainId,
       chainD.chainId,
     ]);
   });
 
-  it("reconciles existing chains with the approved session scope", async () => {
+  it("drops previous chains absent from the approved session even when not requested", async () => {
     const chainA = makeChainInfo("cosmoshub-4");
     const chainB = makeChainInfo("osmosis-1");
     const chainC = makeChainInfo("juno-1");
@@ -152,7 +148,6 @@ describe("WalletConnect account action", () => {
     walletMock.enable.mockImplementation(async () => {
       useGrazSessionStore.setState({
         accounts: {
-          [chainC.chainId]: accountC,
           [chainA.chainId]: accountA,
           [chainD.chainId]: accountD,
         },
@@ -179,8 +174,9 @@ describe("WalletConnect account action", () => {
     });
 
     expect(result.chains).toEqual([chainA, chainD]);
-    expect(useGrazSessionStore.getState().activeChainIds).toEqual([chainC.chainId, chainA.chainId, chainD.chainId]);
-    expect(useGrazInternalStore.getState().recentChainIds).toEqual([chainC.chainId, chainA.chainId, chainD.chainId]);
+    expect(result.accounts).toEqual({ [chainA.chainId]: accountA, [chainD.chainId]: accountD });
+    expect(useGrazSessionStore.getState().activeChainIds).toEqual([chainA.chainId, chainD.chainId]);
+    expect(useGrazInternalStore.getState().recentChainIds).toEqual([chainA.chainId, chainD.chainId]);
   });
 
   it("reconnects with the latest approved configured scope", async () => {

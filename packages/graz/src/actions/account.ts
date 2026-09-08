@@ -57,11 +57,6 @@ const getWalletConnectResolvedChainIds = (
   return resolvedChainIds;
 };
 
-const reconcileChainIds = (current: string[] | null, requested: string[], resolved: string[]) =>
-  [...(current || []).filter((chainId) => !requested.includes(chainId)), ...resolved].filter(
-    (chainId, index, chainIds) => chainIds.indexOf(chainId) === index,
-  );
-
 const getConnectedChains = (chainIds: string[], chains: ChainInfo[]) =>
   chainIds.map((chainId) => {
     const chain = chains.find((candidate) => candidate.chainId === chainId);
@@ -198,12 +193,12 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
 
     useGrazInternalStore.setState((prev) => ({
       recentChainIds: isWalletConnect(currentWalletType)
-        ? reconcileChainIds(prev.recentChainIds, chainIds, resolvedChainIds)
+        ? resolvedChainIds
         : [...(prev.recentChainIds || []), ...chainIds].filter((thing, i, arr) => arr.indexOf(thing) === i),
     }));
     useGrazSessionStore.setState((prev) => ({
       activeChainIds: isWalletConnect(currentWalletType)
-        ? reconcileChainIds(prev.activeChainIds, chainIds, resolvedChainIds)
+        ? resolvedChainIds
         : [...(prev.activeChainIds || []), ...chainIds].filter((thing, i, arr) => arr.indexOf(thing) === i),
     }));
 

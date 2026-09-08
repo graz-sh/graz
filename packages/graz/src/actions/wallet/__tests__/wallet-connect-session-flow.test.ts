@@ -32,6 +32,7 @@ import { useGrazInternalStore, useGrazSessionStore } from "../../../store";
 import { WalletType } from "../../../types/wallet";
 import { makeChainInfo } from "../../../__tests__/fixtures";
 import { getWalletConnect } from "../wallet-connect";
+import { connect } from "../../account";
 
 type WalletConnectStoredKey = {
   address: number[];
@@ -137,6 +138,60 @@ describe("WalletConnect first-session flow", () => {
         bech32Address: osmosis.bech32Address,
       },
     });
+  });
+
+  it("replaces disconnected chains with the newly approved scope on connect", async () => {
+    const chainA = makeWalletConnectKey("cosmoshub-4");
+    const chainB = makeWalletConnectKey("osmosis-1");
+    const chainC = makeWalletConnectKey("juno-1");
+    const chainD = makeWalletConnectKey("neutron-1");
+    const approved = { ...makeApprovedSession([chainA, chainD]), topic: "new-topic" };
+    let sessions = [makeApprovedSession([chainB, chainC])];
+    const signClient = {
+      core: { pairing: { pairings: { getAll: vi.fn(() => []) } } },
+      disconnect: vi.fn(async ({ topic }: { topic: string }) => {
+        sessions = sessions.filter((session) => session.topic !== topic);
+      }),
+      connect: vi.fn(async () => {
+        expect(sessions).toEqual([]);
+        return {
+          uri: "wc:new-topic",
+          approval: async () => {
+            sessions = [approved];
+            return approved;
+          },
+        };
+      }),
+      session: { getAll: vi.fn(() => sessions) },
+    };
+    useGrazInternalStore.setState({
+      chains: [chainA, chainB, chainC, chainD].map((key) => makeChainInfo(key.chainId)),
+      recentChainIds: [chainB.chainId, chainC.chainId],
+      walletType: WalletType.WALLETCONNECT,
+    });
+    useGrazSessionStore.setState({
+      activeChainIds: [chainB.chainId, chainC.chainId],
+      status: "connected",
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+    const wallet = getWalletConnect();
+    await wallet.enable([chainB.chainId, chainC.chainId]);
+    expect(Object.keys(useGrazSessionStore.getState().accounts!)).toEqual([chainB.chainId, chainC.chainId]);
+
+    const result = await connect({
+      chainId: [chainB.chainId, chainA.chainId],
+      walletType: WalletType.WALLETCONNECT,
+    });
+
+    expect(signClient.disconnect).toHaveBeenCalledWith(expect.objectContaining({ topic: "topic-1" }));
+    expect(signClient.connect).toHaveBeenCalledTimes(1);
+    expect(sessions).toEqual([approved]);
+    expect(Object.keys(result.accounts)).toEqual([chainA.chainId, chainD.chainId]);
+    expect(result.chains.map((chain) => chain.chainId)).toEqual([chainA.chainId, chainD.chainId]);
+    expect(useGrazSessionStore.getState().accounts).toEqual(result.accounts);
+    expect(useGrazSessionStore.getState().activeChainIds).toEqual([chainA.chainId, chainD.chainId]);
+    expect(useGrazInternalStore.getState().recentChainIds).toEqual([chainA.chainId, chainD.chainId]);
+    await expect(wallet.getKey(chainC.chainId)).rejects.toThrow("No wallet connect session");
   });
 
   it("passes custom mobile and desktop wallet lists to the WalletConnect modal", async () => {
