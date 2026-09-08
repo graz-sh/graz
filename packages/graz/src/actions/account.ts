@@ -10,7 +10,7 @@ import type { Key } from "../types/wallet";
 import { WalletType } from "../types/wallet";
 import { LogCategory } from "../types/logger";
 import { getLogger } from "../utils/logger";
-import { checkWallet, getWallet, isPara, isWalletConnect } from "./wallet";
+import { checkWallet, clearSession, getWallet, isPara, isWalletConnect } from "./wallet";
 import { resolveApprovedChainIds, resolveSession } from "./wallet/wallet-connect/approved-session";
 import { emitWalletEvent } from "./events";
 
@@ -128,15 +128,6 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
       timestamp: Date.now(),
     });
 
-    if (isWalletConnect(currentWalletType)) {
-      const walletConnectInstance = getWallet(WalletType.WALLETCONNECT);
-      const { disable: walletConnectDisable } = walletConnectInstance;
-
-      if (walletConnectDisable) {
-        await walletConnectDisable();
-      }
-    }
-
     const isWalletAvailable = checkWallet(currentWalletType);
     if (!isWalletAvailable) {
       logger.warn(LogCategory.WALLET, "Wallet not available", { function: LOG_FUNCTIONS.CONNECT, walletType: currentWalletType });
@@ -156,6 +147,16 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
         throw new Error(`Chain ${chainId} is not provided in GrazProvider`);
       }
     });
+
+    if (isWalletConnect(currentWalletType)) {
+      const walletConnectInstance = getWallet(WalletType.WALLETCONNECT);
+      const { disable: walletConnectDisable } = walletConnectInstance;
+
+      if (walletConnectDisable) {
+        await walletConnectDisable();
+        clearSession();
+      }
+    }
 
     useGrazSessionStore.setState((x) => {
       const isReconnecting =

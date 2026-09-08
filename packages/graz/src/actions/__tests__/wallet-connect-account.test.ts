@@ -295,4 +295,60 @@ describe("WalletConnect account action", () => {
     expect(calls).toEqual(["disable:start", "disable:end", "enable"]);
     expect(useGrazSessionStore.getState().wcSignClients.get(WalletType.WALLETCONNECT)).toBe(signClient);
   });
+
+  it("does not retain connected state when a replacement session fails", async () => {
+    const chain = makeChainInfo("cosmoshub-4");
+    const account = makeKey(chain.chainId);
+    const signClient = { session: { getAll: vi.fn(() => []) } };
+    walletMock.enable.mockRejectedValue(new Error("User closed wallet connect"));
+    useGrazInternalStore.setState({
+      chains: [chain],
+      recentChainIds: [chain.chainId],
+      walletType: WalletType.WALLETCONNECT,
+    });
+    useGrazSessionStore.setState({
+      accounts: { [chain.chainId]: account },
+      activeChainIds: [chain.chainId],
+      status: "connected",
+      wcSignClients: new Map([[WalletType.WALLETCONNECT, signClient as never]]),
+    });
+
+    await expect(connect({ chainId: chain.chainId, walletType: WalletType.WALLETCONNECT })).rejects.toThrow(
+      "User closed wallet connect",
+    );
+
+    expect(walletMock.disable).toHaveBeenCalledTimes(1);
+    expect(useGrazSessionStore.getState()).toMatchObject({
+      accounts: null,
+      activeChainIds: null,
+      status: "disconnected",
+    });
+    expect(useGrazSessionStore.getState().wcSignClients.get(WalletType.WALLETCONNECT)).toBe(signClient);
+  });
+
+  it("validates requested chains before disconnecting the current session", async () => {
+    const chain = makeChainInfo("cosmoshub-4");
+    const account = makeKey(chain.chainId);
+    useGrazInternalStore.setState({
+      chains: [chain],
+      recentChainIds: [chain.chainId],
+      walletType: WalletType.WALLETCONNECT,
+    });
+    useGrazSessionStore.setState({
+      accounts: { [chain.chainId]: account },
+      activeChainIds: [chain.chainId],
+      status: "connected",
+    });
+
+    await expect(connect({ chainId: "unknown-chain", walletType: WalletType.WALLETCONNECT })).rejects.toThrow(
+      "Chain unknown-chain is not provided in GrazProvider",
+    );
+
+    expect(walletMock.disable).not.toHaveBeenCalled();
+    expect(useGrazSessionStore.getState()).toMatchObject({
+      accounts: { [chain.chainId]: account },
+      activeChainIds: [chain.chainId],
+      status: "connected",
+    });
+  });
 });
