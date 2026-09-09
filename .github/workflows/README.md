@@ -36,7 +36,7 @@ Optional environment secret:
 
 - `GRAZ_E2E_RPC_HEADERS_JSON`: JSON object with RPC headers for private/authenticated endpoints.
 
-Environment variables:
+Optional chain configuration overrides:
 
 - `GRAZ_E2E_CHAIN_ID`
 - `GRAZ_E2E_CHAIN_NAME`
@@ -48,6 +48,8 @@ Environment variables:
 - `GRAZ_E2E_GAS_PRICE`
 - `GRAZ_E2E_ENABLE_TX` (optional, defaults to disabled)
 - `GRAZ_E2E_RECIPIENT_ADDRESS` (optional, required only when tx tests are enabled)
+
+When these overrides are unavailable, including on pull requests from forks, the workflow uses the public Cosmos Hub defaults shown in the setup example below.
 
 Setup pattern:
 

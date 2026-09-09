@@ -48,16 +48,16 @@ jobs:
       CI: true
       GRAZ_E2E_WALLET_MNEMONIC: ${{ secrets.GRAZ_E2E_WALLET_MNEMONIC || 'test test test test test test test test test test test junk' }}
       GRAZ_E2E_RPC_HEADERS_JSON: ${{ secrets.GRAZ_E2E_RPC_HEADERS_JSON }}
-      GRAZ_E2E_CHAIN_ID: ${{ vars.GRAZ_E2E_CHAIN_ID }}
-      GRAZ_E2E_CHAIN_NAME: ${{ vars.GRAZ_E2E_CHAIN_NAME }}
-      GRAZ_E2E_RPC_URL: ${{ vars.GRAZ_E2E_RPC_URL }}
-      GRAZ_E2E_REST_URL: ${{ vars.GRAZ_E2E_REST_URL }}
-      GRAZ_E2E_BECH32_PREFIX: ${{ vars.GRAZ_E2E_BECH32_PREFIX }}
-      GRAZ_E2E_DENOM: ${{ vars.GRAZ_E2E_DENOM }}
-      GRAZ_E2E_DISPLAY_DENOM: ${{ vars.GRAZ_E2E_DISPLAY_DENOM }}
-      GRAZ_E2E_GAS_PRICE: ${{ vars.GRAZ_E2E_GAS_PRICE }}
+      GRAZ_E2E_CHAIN_ID: ${{ vars.GRAZ_E2E_CHAIN_ID || 'cosmoshub-4' }}
+      GRAZ_E2E_CHAIN_NAME: ${{ vars.GRAZ_E2E_CHAIN_NAME || 'Cosmos Hub' }}
+      GRAZ_E2E_RPC_URL: ${{ vars.GRAZ_E2E_RPC_URL || 'https://cosmos-rpc.publicnode.com' }}
+      GRAZ_E2E_REST_URL: ${{ vars.GRAZ_E2E_REST_URL || 'https://rest.cosmos.directory/cosmoshub' }}
+      GRAZ_E2E_BECH32_PREFIX: ${{ vars.GRAZ_E2E_BECH32_PREFIX || 'cosmos' }}
+      GRAZ_E2E_DENOM: ${{ vars.GRAZ_E2E_DENOM || 'uatom' }}
+      GRAZ_E2E_DISPLAY_DENOM: ${{ vars.GRAZ_E2E_DISPLAY_DENOM || 'ATOM' }}
+      GRAZ_E2E_GAS_PRICE: ${{ vars.GRAZ_E2E_GAS_PRICE || '0.025' }}
       GRAZ_E2E_EXPECTED_ADDRESS: ${{ secrets.GRAZ_E2E_WALLET_MNEMONIC && vars.GRAZ_E2E_EXPECTED_ADDRESS || 'cosmos15yk64u7zc9g9k2yr2wmzeva5qgwxps6yxj00e7' }}
-      GRAZ_E2E_ENABLE_TX: ${{ vars.GRAZ_E2E_ENABLE_TX }}
+      GRAZ_E2E_ENABLE_TX: ${{ vars.GRAZ_E2E_ENABLE_TX || '0' }}
       GRAZ_E2E_RECIPIENT_ADDRESS: ${{ vars.GRAZ_E2E_RECIPIENT_ADDRESS }}
 
     steps:
