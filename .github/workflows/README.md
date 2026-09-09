@@ -25,9 +25,12 @@ Deploys the Docusaurus site from `dev` or manual dispatch using GitHub Pages act
 
 Runs a purpose-built browser integration harness for `graz` on `dev` pushes, PRs targeting `dev`, nightly schedule, or manual dispatch. It uses the protected `graz-integration` environment and a Keplr-compatible test wallet injected by Playwright.
 
-Required environment secret:
+Optional wallet override for trusted runs:
 
 - `GRAZ_E2E_WALLET_MNEMONIC`: burner testnet wallet mnemonic.
+- `GRAZ_E2E_EXPECTED_ADDRESS`: address derived from the burner mnemonic.
+
+When the secret is unavailable, including on pull requests from forks, the workflow falls back to a public, unfunded disposable mnemonic and its matching address.
 
 Optional environment secret:
 
@@ -43,7 +46,6 @@ Environment variables:
 - `GRAZ_E2E_DENOM`
 - `GRAZ_E2E_DISPLAY_DENOM`
 - `GRAZ_E2E_GAS_PRICE`
-- `GRAZ_E2E_EXPECTED_ADDRESS` (optional)
 - `GRAZ_E2E_ENABLE_TX` (optional, defaults to disabled)
 - `GRAZ_E2E_RECIPIENT_ADDRESS` (optional, required only when tx tests are enabled)
 
@@ -55,10 +57,12 @@ ENV=graz-integration
 
 gh api --method PUT "repos/$REPO/environments/$ENV"
 
+# Optional trusted-run wallet override. Set its matching expected address as a pair.
 read -rsp "Testnet mnemonic: " GRAZ_E2E_WALLET_MNEMONIC; echo
 printf '%s' "$GRAZ_E2E_WALLET_MNEMONIC" \
   | gh secret set GRAZ_E2E_WALLET_MNEMONIC --repo "$REPO" --env "$ENV"
 unset GRAZ_E2E_WALLET_MNEMONIC
+gh variable set GRAZ_E2E_EXPECTED_ADDRESS --repo "$REPO" --env "$ENV" --body "<matching-address>"
 
 gh variable set GRAZ_E2E_CHAIN_ID --repo "$REPO" --env "$ENV" --body "cosmoshub-4"
 gh variable set GRAZ_E2E_CHAIN_NAME --repo "$REPO" --env "$ENV" --body "Cosmos Hub"
@@ -69,7 +73,7 @@ gh variable set GRAZ_E2E_DENOM --repo "$REPO" --env "$ENV" --body "uatom"
 gh variable set GRAZ_E2E_DISPLAY_DENOM --repo "$REPO" --env "$ENV" --body "ATOM"
 gh variable set GRAZ_E2E_GAS_PRICE --repo "$REPO" --env "$ENV" --body "0.025"
 gh variable set GRAZ_E2E_ENABLE_TX --repo "$REPO" --env "$ENV" --body "0"
-# Optional: set GRAZ_E2E_EXPECTED_ADDRESS and GRAZ_E2E_RECIPIENT_ADDRESS when needed.
+# Optional: set GRAZ_E2E_RECIPIENT_ADDRESS when transaction tests are enabled.
 ```
 
 ### Publish (`publish.yml`)

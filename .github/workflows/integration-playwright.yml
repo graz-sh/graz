@@ -46,7 +46,7 @@ jobs:
     environment: graz-integration
     env:
       CI: true
-      GRAZ_E2E_WALLET_MNEMONIC: ${{ secrets.GRAZ_E2E_WALLET_MNEMONIC }}
+      GRAZ_E2E_WALLET_MNEMONIC: ${{ secrets.GRAZ_E2E_WALLET_MNEMONIC || 'test test test test test test test test test test test junk' }}
       GRAZ_E2E_RPC_HEADERS_JSON: ${{ secrets.GRAZ_E2E_RPC_HEADERS_JSON }}
       GRAZ_E2E_CHAIN_ID: ${{ vars.GRAZ_E2E_CHAIN_ID }}
       GRAZ_E2E_CHAIN_NAME: ${{ vars.GRAZ_E2E_CHAIN_NAME }}
@@ -56,7 +56,7 @@ jobs:
       GRAZ_E2E_DENOM: ${{ vars.GRAZ_E2E_DENOM }}
       GRAZ_E2E_DISPLAY_DENOM: ${{ vars.GRAZ_E2E_DISPLAY_DENOM }}
       GRAZ_E2E_GAS_PRICE: ${{ vars.GRAZ_E2E_GAS_PRICE }}
-      GRAZ_E2E_EXPECTED_ADDRESS: ${{ vars.GRAZ_E2E_EXPECTED_ADDRESS }}
+      GRAZ_E2E_EXPECTED_ADDRESS: ${{ secrets.GRAZ_E2E_WALLET_MNEMONIC && vars.GRAZ_E2E_EXPECTED_ADDRESS || 'cosmos15yk64u7zc9g9k2yr2wmzeva5qgwxps6yxj00e7' }}
       GRAZ_E2E_ENABLE_TX: ${{ vars.GRAZ_E2E_ENABLE_TX }}
       GRAZ_E2E_RECIPIENT_ADDRESS: ${{ vars.GRAZ_E2E_RECIPIENT_ADDRESS }}
 
