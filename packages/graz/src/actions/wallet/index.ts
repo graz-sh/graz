@@ -41,7 +41,8 @@ export const checkWallet = (type: WalletType = useGrazInternalStore.getState().w
 
 export const clearSession = () => {
   window.sessionStorage.removeItem(RECONNECT_SESSION_KEY);
-  useGrazSessionStore.setState(grazSessionDefaultValues);
+  const { wcSignClients } = useGrazSessionStore.getState();
+  useGrazSessionStore.setState({ ...grazSessionDefaultValues, wcSignClients });
 };
 
 /**

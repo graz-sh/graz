@@ -1,7 +1,9 @@
 import { act } from "react";
+import { toBech32 } from "@cosmjs/encoding";
 import type { ISignClient } from "@walletconnect/types";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { reconnect } from "../../actions/account";
 import { subscribeWalletEvents } from "../../actions/events";
 import { makeChainInfo } from "../../__tests__/fixtures";
 import { flushReact, renderComponent } from "../../__tests__/react";
@@ -12,6 +14,9 @@ import { WalletType } from "../../types/wallet";
 import { ClientOnly } from "../client-only";
 import { GrazEvents } from "../events";
 import { GrazProvider } from "../index";
+
+const makeAddress = (value: number) => new Uint8Array(20).fill(value);
+const makeBech32Address = (value: number) => toBech32("cosmos", makeAddress(value));
 
 const makeKey = (chainId: string): Key => ({
   address: new Uint8Array([1, 2, 3]),
@@ -280,13 +285,22 @@ describe("provider components and events", () => {
   });
 
   it.each([
-    ["session_delete", "wallet"],
-    ["session_expire", "session-expired"],
-  ] as const)("normalizes WalletConnect account and %s events", async (sessionEvent, disconnectReason) => {
+    ["session_delete", "wallet", false],
+    ["session_expire", "session-expired", false],
+    ["session_delete", "wallet", true],
+    ["session_expire", "session-expired", true],
+  ] as const)("handles WalletConnect %s (%s) for a chain-scoped optional session (replaced: %s)", async (sessionEvent, disconnectReason, replaceSession) => {
     const chain = makeChainInfo();
-    const previousAccount = makeKey(chain.chainId);
+    const previousAccount = {
+      ...makeKey(chain.chainId),
+      address: makeAddress(1),
+      bech32Address: makeBech32Address(1),
+    };
     const listeners = new Map<string, Set<(args?: unknown) => void>>();
-    let bech32Address = `${chain.chainId}1changed`;
+    let bech32Address = makeBech32Address(2);
+    let activeSessionExpiry = Math.floor(Date.now() / 1000) + 60;
+    let includeActiveSession = true;
+    let activeSessionTopic = "topic-1";
     const signClient = {
       events: {
         emit: (event: string, args?: unknown) => {
@@ -305,6 +319,13 @@ describe("provider components and events", () => {
         getAll: vi.fn(() => [
           {
             expiry: Math.floor(Date.now() / 1000) + 60,
+            namespaces: {
+              cosmos: {
+                accounts: [`cosmos:osmosis-1:${makeBech32Address(4)}`],
+                events: ["chainChanged", "accountsChanged"],
+                methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
+              },
+            },
             requiredNamespaces: {
               cosmos: {
                 chains: ["cosmos:osmosis-1"],
@@ -313,12 +334,15 @@ describe("provider components and events", () => {
             topic: "unrelated-topic",
           },
           {
-            expiry: Math.floor(Date.now() / 1000) + 60,
-            requiredNamespaces: {
-              cosmos: {
-                chains: [`cosmos:${chain.chainId}`],
+            expiry: activeSessionExpiry,
+            namespaces: {
+              [`cosmos:${chain.chainId}`]: {
+                accounts: [`cosmos:${chain.chainId}:${bech32Address}`],
+                events: ["chainChanged", "accountsChanged"],
+                methods: ["cosmos_getAccounts", "cosmos_signAmino", "cosmos_signDirect"],
               },
             },
+            requiredNamespaces: {},
             sessionProperties: {
               keys: JSON.stringify([
                 {
@@ -330,9 +354,9 @@ describe("provider components and events", () => {
                 },
               ]),
             },
-            topic: "topic-1",
+            topic: activeSessionTopic,
           },
-        ]),
+        ].filter((session) => includeActiveSession || session.topic !== activeSessionTopic)),
       },
     };
     const wcSignClients = new Map<WalletType, ISignClient>([
@@ -363,6 +387,35 @@ describe("provider components and events", () => {
     const rendered = renderComponent(<GrazEvents />);
     await flushReact();
 
+    if (replaceSession) {
+      await act(async () => {
+        // The SDK replaces the session while Graz retains the client and connector.
+        activeSessionTopic = "topic-2";
+        bech32Address = previousAccount.bech32Address;
+        await reconnect();
+      });
+      expect(useGrazSessionStore.getState().wcSignClients).toBe(wcSignClients);
+      expect(useGrazInternalStore.getState()._reconnectConnector).toBe(WalletType.WALLETCONNECT);
+      expect(onAccountChange).not.toHaveBeenCalled();
+      bech32Address = makeBech32Address(2);
+
+      await act(async () => {
+        signClient.events.emit("session_event", {
+          id: 0,
+          params: {
+            chainId: `cosmos:${chain.chainId}`,
+            event: { data: [bech32Address], name: "accountsChanged" },
+          },
+          topic: "topic-1",
+        });
+        signClient.events.emit(sessionEvent, { id: 0, topic: "topic-1" });
+        await Promise.resolve();
+      });
+      expect(onAccountChange).not.toHaveBeenCalled();
+      expect(onDisconnect).not.toHaveBeenCalled();
+      expect(useGrazSessionStore.getState().status).toBe("connected");
+    }
+
     await act(async () => {
       signClient.events.emit("session_event", {
         id: 1,
@@ -389,7 +442,7 @@ describe("provider components and events", () => {
             name: "accountsChanged",
           },
         },
-        topic: "topic-1",
+        topic: activeSessionTopic,
       });
       await Promise.resolve();
     });
@@ -404,7 +457,7 @@ describe("provider components and events", () => {
     expect(useGrazInternalStore.getState().walletType).toBe(WalletType.WALLETCONNECT);
     expect(window.sessionStorage.getItem(RECONNECT_SESSION_KEY)).toBe("Active");
 
-    bech32Address = `${chain.chainId}1ignored`;
+    bech32Address = makeBech32Address(3);
     await act(async () => {
       signClient.events.emit("session_event", {
         id: 3,
@@ -415,7 +468,7 @@ describe("provider components and events", () => {
             name: "chainChanged",
           },
         },
-        topic: "topic-1",
+        topic: activeSessionTopic,
       });
       await Promise.resolve();
     });
@@ -432,10 +485,12 @@ describe("provider components and events", () => {
     });
     expect(onDisconnect).not.toHaveBeenCalled();
 
+    if (sessionEvent === "session_expire") activeSessionExpiry = Math.floor(Date.now() / 1000) - 1;
+    includeActiveSession = false;
     await act(async () => {
       signClient.events.emit(
         sessionEvent,
-        sessionEvent === "session_delete" ? { id: 5, topic: "topic-1" } : { topic: "topic-1" },
+        sessionEvent === "session_delete" ? { id: 5, topic: activeSessionTopic } : { topic: activeSessionTopic },
       );
       await Promise.resolve();
     });
@@ -449,6 +504,7 @@ describe("provider components and events", () => {
       activeChainIds: null,
       status: "disconnected",
     });
+    expect(useGrazSessionStore.getState().wcSignClients.get(WalletType.WALLETCONNECT)).toBe(signClient);
     rendered.unmount();
     expect(signClient.events.off).toHaveBeenCalledWith("session_event", expect.any(Function));
   });

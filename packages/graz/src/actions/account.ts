@@ -10,7 +10,8 @@ import type { Key } from "../types/wallet";
 import { WalletType } from "../types/wallet";
 import { LogCategory } from "../types/logger";
 import { getLogger } from "../utils/logger";
-import { checkWallet, getWallet, isPara, isWalletConnect } from "./wallet";
+import { checkWallet, clearSession, getWallet, isPara, isWalletConnect } from "./wallet";
+import { resolveApprovedChainIds, resolveSession } from "./wallet/wallet-connect/approved-session";
 import { emitWalletEvent } from "./events";
 
 /**
@@ -34,6 +35,34 @@ export interface ConnectResult {
 const haveSameChainIds = (first: readonly string[], second: readonly string[]) => {
   return first.length === second.length && first.every((chainId) => second.includes(chainId));
 };
+
+const getWalletConnectResolvedChainIds = (
+  walletType: WalletType,
+  requestedChainIds: string[],
+  chains: ChainInfo[],
+) => {
+  const signClient = useGrazSessionStore.getState().wcSignClients.get(walletType);
+  if (!signClient) throw new Error("walletConnect.signClient is not defined");
+
+  const resolved = resolveSession(signClient.session.getAll().at(-1));
+  if (!resolved) throw new Error("No approved WalletConnect accounts");
+
+  const resolvedChainIds = resolveApprovedChainIds(
+    resolved.scope,
+    requestedChainIds,
+    chains.map((chain) => chain.chainId),
+  );
+  if (resolvedChainIds.length === 0) throw new Error("No approved WalletConnect accounts for configured chains");
+
+  return resolvedChainIds;
+};
+
+const getConnectedChains = (chainIds: string[], chains: ChainInfo[]) =>
+  chainIds.map((chainId) => {
+    const chain = chains.find((candidate) => candidate.chainId === chainId);
+    if (!chain) throw new Error(`Chain ${chainId} is not provided in GrazProvider`);
+    return chain;
+  });
 
 const emitConnectedSessionChanges = ({
   previousAccounts,
@@ -99,15 +128,6 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
       timestamp: Date.now(),
     });
 
-    if (isWalletConnect(currentWalletType)) {
-      const walletConnectInstance = getWallet(WalletType.WALLETCONNECT);
-      const { disable: walletConnectDisable } = walletConnectInstance;
-
-      if (walletConnectDisable) {
-        void walletConnectDisable();
-      }
-    }
-
     const isWalletAvailable = checkWallet(currentWalletType);
     if (!isWalletAvailable) {
       logger.warn(LogCategory.WALLET, "Wallet not available", { function: LOG_FUNCTIONS.CONNECT, walletType: currentWalletType });
@@ -128,6 +148,16 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
       }
     });
 
+    if (isWalletConnect(currentWalletType)) {
+      const walletConnectInstance = getWallet(WalletType.WALLETCONNECT);
+      const { disable: walletConnectDisable } = walletConnectInstance;
+
+      if (walletConnectDisable) {
+        await walletConnectDisable();
+        clearSession();
+      }
+    }
+
     useGrazSessionStore.setState((x) => {
       const isReconnecting =
         useGrazInternalStore.getState()._reconnect ||
@@ -145,6 +175,9 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
 
     logger.debug(LogCategory.WALLET, "Enabling chains", { function: LOG_FUNCTIONS.CONNECT, chainIds, chainCount: chainIds.length });
     await wallet.enable(chainIds);
+    const resolvedChainIds = isWalletConnect(currentWalletType)
+      ? getWalletConnectResolvedChainIds(currentWalletType, chainIds, chains || [])
+      : chainIds;
 
     logger.debug(LogCategory.WALLET, "Fetching accounts", { function: LOG_FUNCTIONS.CONNECT });
 
@@ -160,14 +193,14 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     }
 
     useGrazInternalStore.setState((prev) => ({
-      recentChainIds: [...(prev.recentChainIds || []), ...chainIds].filter((thing, i, arr) => {
-        return arr.indexOf(thing) === i;
-      }),
+      recentChainIds: isWalletConnect(currentWalletType)
+        ? resolvedChainIds
+        : [...(prev.recentChainIds || []), ...chainIds].filter((thing, i, arr) => arr.indexOf(thing) === i),
     }));
     useGrazSessionStore.setState((prev) => ({
-      activeChainIds: [...(prev.activeChainIds || []), ...chainIds].filter((thing, i, arr) => {
-        return arr.indexOf(thing) === i;
-      }),
+      activeChainIds: isWalletConnect(currentWalletType)
+        ? resolvedChainIds
+        : [...(prev.activeChainIds || []), ...chainIds].filter((thing, i, arr) => arr.indexOf(thing) === i),
     }));
 
     useGrazInternalStore.setState({
@@ -180,8 +213,9 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     });
     typeof window !== "undefined" && window.sessionStorage.setItem(RECONNECT_SESSION_KEY, "Active");
 
-    const connectedChains = chainIds.map((x) => chains!.find((y) => y.chainId === x)!);
-    const _resAcc = useGrazSessionStore.getState().accounts;
+    const connectedChains = getConnectedChains(resolvedChainIds, chains || []);
+    const resultAccounts = useGrazSessionStore.getState().accounts;
+    if (!resultAccounts) throw new Error("No accounts");
 
     if (wasConnected) {
       emitConnectedSessionChanges({
@@ -194,17 +228,20 @@ export const connect = async (args?: ConnectArgs): Promise<ConnectResult> => {
     logger.info(LogCategory.WALLET, "Connection successful", {
       function: LOG_FUNCTIONS.CONNECT,
       walletType: currentWalletType,
-      chainCount: chainIds.length,
-      chainIds,
-      addresses: _resAcc ? Object.values(_resAcc).map((a) => a.bech32Address) : [],
+      chainCount: resolvedChainIds.length,
+      chainIds: resolvedChainIds,
+      addresses: Object.values(resultAccounts).map((account) => account.bech32Address),
     });
 
-    logger.debug(LogCategory.STORE, "Session store updated", { function: LOG_FUNCTIONS.CONNECT, accountCount: Object.keys(_resAcc || {}).length });
+    logger.debug(LogCategory.STORE, "Session store updated", {
+      function: LOG_FUNCTIONS.CONNECT,
+      accountCount: Object.keys(resultAccounts).length,
+    });
 
     logger.timeEnd("connect");
     logger.groupEnd();
 
-    return { accounts: _resAcc!, walletType: currentWalletType, chains: connectedChains };
+    return { accounts: resultAccounts, walletType: currentWalletType, chains: connectedChains };
   } catch (error) {
     logger.error(LogCategory.WALLET, "Connection failed", {
       function: LOG_FUNCTIONS.CONNECT,
@@ -239,6 +276,10 @@ const disconnectSession = (
   const previousActiveChainIds = [...(previousSession.activeChainIds || [])];
   const previousAccounts = previousSession.accounts ? { ...previousSession.accounts } : null;
   const walletType = useGrazInternalStore.getState().walletType;
+  const clearSessionState = () => {
+    const { wcSignClients } = useGrazSessionStore.getState();
+    useGrazSessionStore.setState({ ...grazSessionDefaultValues, wcSignClients });
+  };
 
   logger.info(LogCategory.WALLET, "Disconnecting", {
     function: LOG_FUNCTIONS.DISCONNECT,
@@ -275,7 +316,7 @@ const disconnectSession = (
     const isEmpty = Object.values(_accounts ? _accounts : {}).length === 0;
     if (isEmpty) {
       disable();
-      useGrazSessionStore.setState(grazSessionDefaultValues);
+      clearSessionState();
       useGrazInternalStore.setState({
         _reconnect: false,
         _reconnectConnector: null,
@@ -294,7 +335,7 @@ const disconnectSession = (
     }
   } else {
     disable();
-    useGrazSessionStore.setState(grazSessionDefaultValues);
+    clearSessionState();
     useGrazInternalStore.setState({
       _reconnect: false,
       _reconnectConnector: null,
@@ -368,13 +409,16 @@ export const reconnect = async (args?: ReconnectArgs) => {
         const wallet = getWallet(_reconnectConnector);
         await wallet.init?.();
         await wallet.enable(recentChains);
+        const { chains } = useGrazInternalStore.getState();
+        const resolvedChainIds = getWalletConnectResolvedChainIds(_reconnectConnector, recentChains, chains || []);
         useGrazInternalStore.setState({
           _reconnect,
           _reconnectConnector,
+          recentChainIds: resolvedChainIds,
           walletType: _reconnectConnector,
         });
         useGrazSessionStore.setState({
-          activeChainIds: [...recentChains],
+          activeChainIds: resolvedChainIds,
           status: "connected",
         });
         typeof window !== "undefined" && window.sessionStorage.setItem(RECONNECT_SESSION_KEY, "Active");
@@ -384,9 +428,7 @@ export const reconnect = async (args?: ReconnectArgs) => {
           walletType: _reconnectConnector,
         });
         const { accounts } = useGrazSessionStore.getState();
-        const { chains } = useGrazInternalStore.getState();
-        const connectedChains =
-          chains?.filter((chain) => recentChains.includes(chain.chainId)) || [];
+        const connectedChains = getConnectedChains(resolvedChainIds, chains || []);
         return {
           accounts: accounts || {},
           chains: connectedChains,
