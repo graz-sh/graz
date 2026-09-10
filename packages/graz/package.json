@@ -80,17 +80,17 @@
     "@cosmjs/encoding": "0.39.0",
     "@cosmjs/proto-signing": "0.39.0",
     "@cosmjs/stargate": "0.39.0",
-    "@getpara/web-sdk": "3.3.0",
+    "@getpara/web-sdk": "3.18.0",
     "@metamask/providers": "16.1.0",
     "@types/node": "26.0.0",
     "@types/react": "19.2.17",
-    "@vitest/ui": "4.1.9",
+    "@vitest/ui": "4.1.11",
     "arg": "5.0.2",
     "jsdom": "29.1.1",
     "react": "19.2.7",
     "typescript": "6.0.3",
-    "vite": "7.3.5",
-    "vitest": "4.1.9"
+    "vite": "7.3.6",
+    "vitest": "4.1.11"
   },
   "keywords": [
     "graz",

@@ -169,7 +169,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
     let address: Uint8Array;
     let pubKey: Uint8Array;
     try {
-      address = fromBech32(bech32Address).data;
+      address = fromBech32(bech32Address, bech32Address.length).data;
     } catch {
       return;
     }
@@ -493,7 +493,7 @@ export const getWalletConnect = (params?: GetWalletConnectParams): Wallet => {
 
       return {
         ...storedKey,
-        address: fromBech32(storedKey.bech32Address).data,
+        address: fromBech32(storedKey.bech32Address, storedKey.bech32Address.length).data,
         pubKey,
       };
     } catch (error) {
