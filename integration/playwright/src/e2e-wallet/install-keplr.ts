@@ -78,7 +78,7 @@ export const installTestKeplrWallet = (config: GrazE2EConfig): void => {
       name: "Graz E2E Wallet",
       algo: account.algo,
       pubKey: account.pubkey,
-      address: fromBech32(account.address).data,
+      address: fromBech32(account.address, account.address.length).data,
       bech32Address: account.address,
       ethereumHexAddress: "",
       isNanoLedger: false,

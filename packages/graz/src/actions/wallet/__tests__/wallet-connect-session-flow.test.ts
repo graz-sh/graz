@@ -529,7 +529,9 @@ describe("WalletConnect first-session flow", () => {
 
     await expect(getWalletConnect().enable([chainId])).resolves.toBeUndefined();
 
-    expect(useGrazSessionStore.getState().accounts?.[chainId]?.address).toEqual(fromBech32(bech32Address).data);
+    expect(useGrazSessionStore.getState().accounts?.[chainId]?.address).toEqual(
+      fromBech32(bech32Address, bech32Address.length).data,
+    );
     expect(signClient.request).not.toHaveBeenCalled();
   });
 

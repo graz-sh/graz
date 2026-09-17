@@ -4,6 +4,7 @@ import type { GrazE2EConfig } from "../../src/e2e-wallet/types";
 
 const localMnemonic =
   "test test test test test test test test test test test junk";
+const localMnemonicAddress = "cosmos15yk64u7zc9g9k2yr2wmzeva5qgwxps6yxj00e7";
 
 const readConfig = (): GrazE2EConfig => {
   const mnemonic = process.env.GRAZ_E2E_WALLET_MNEMONIC || (!process.env.CI ? localMnemonic : "");
@@ -33,7 +34,9 @@ const readConfig = (): GrazE2EConfig => {
       displayDenom: process.env.GRAZ_E2E_DISPLAY_DENOM ?? "ATOM",
       gasPrice: process.env.GRAZ_E2E_GAS_PRICE ?? "0.025",
       rpcHeaders,
-      expectedAddress: process.env.GRAZ_E2E_EXPECTED_ADDRESS || undefined,
+      expectedAddress:
+        process.env.GRAZ_E2E_EXPECTED_ADDRESS ||
+        (mnemonic === localMnemonic ? localMnemonicAddress : undefined),
       enableTx: process.env.GRAZ_E2E_ENABLE_TX === "1",
       recipientAddress: process.env.GRAZ_E2E_RECIPIENT_ADDRESS || undefined,
     },
