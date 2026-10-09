@@ -1,4 +1,5 @@
 import { ChainInfo } from "@keplr-wallet/types";
+import { useMemo } from "react";
 
 import { useGrazInternalStore } from "../store";
 import { LogCategory } from "../types/logger";
@@ -39,15 +40,17 @@ export type ChainId = string[];
  */
 export const useChainsFromArgs = ({ chainId }: { chainId?: ChainId }) => {
   const chains = useGrazInternalStore((x) => x.chains);
-  if (!chains) throw new Error("No chains found in GrazProvider");
+  return useMemo(() => {
+    if (!chains) throw new Error("No chains found in GrazProvider");
 
-  // If chainId provided, return those specific chains
-  if (chainId && chainId.length > 0) {
-    return chainId.map((id) => chains.find((c) => c.chainId === id)!).filter(Boolean);
-  }
+    // If chainId provided, return those specific chains
+    if (chainId && chainId.length > 0) {
+      return chainId.map((id) => chains.find((c) => c.chainId === id)!).filter(Boolean);
+    }
 
-  // Otherwise return all configured chains
-  return chains;
+    // Otherwise return all configured chains
+    return chains;
+  }, [chainId, chains]);
 };
 
 /**
