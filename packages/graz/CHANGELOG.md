@@ -1,5 +1,11 @@
 # graz
 
+## 0.7.1
+
+### Patch Changes
+
+- 255f680: Fixed `useAccount().data` reference stability across rerenders and status-only changes when account state, chain IDs, and configured chains retain their references.
+
 ## 0.7.0
 
 ### Minor Changes

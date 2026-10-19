@@ -1,5 +1,12 @@
 # @project/example-playground
 
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [255f680]
+  - graz@0.7.1
+
 ## 0.1.6
 
 ### Patch Changes
