@@ -133,6 +133,33 @@ describe("account and wallet hooks", () => {
     rendered.unmount();
   });
 
+  it("preserves account data across rerenders and status changes, and updates it when inputs change", () => {
+    const chain = makeChainInfo();
+    const otherChain = makeChainInfo("osmosis-1");
+    const accounts = {
+      [chain.chainId]: makeKey(chain.chainId),
+      [otherChain.chainId]: makeKey(otherChain.chainId),
+    };
+    useGrazInternalStore.setState({ chains: [chain, otherChain] });
+    useGrazSessionStore.setState({ accounts, activeChainIds: [chain.chainId], status: "connected" });
+    const rendered = renderHook(() => useAccount());
+    const data = rendered.result.data;
+    expect(data).toEqual({ [chain.chainId]: accounts[chain.chainId] });
+
+    rendered.rerender();
+    expect(rendered.result.data).toBe(data);
+    act(() => useGrazSessionStore.setState({ status: "reconnecting" }));
+    expect(rendered.result.data).toBe(data);
+
+    const updatedAccount = makeKey("changed");
+    act(() => useGrazSessionStore.setState({ accounts: { ...accounts, [chain.chainId]: updatedAccount } }));
+    expect(rendered.result.data).toEqual({ [chain.chainId]: updatedAccount });
+
+    act(() => useGrazSessionStore.setState({ activeChainIds: [otherChain.chainId] }));
+    expect(rendered.result.data).toEqual({ [otherChain.chainId]: accounts[otherChain.chainId] });
+    rendered.unmount();
+  });
+
   it("connects, returns offline signers, and disconnects through hook mutations", async () => {
     const { wrapper } = createQueryWrapper();
     const chain = makeChainInfo();
